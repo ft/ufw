@@ -1,17 +1,31 @@
+TOPDIR = ../..
+UFW_LOCATION = $(TOPDIR)/ufw
+GTEST_LOCATION = $(TOPDIR)/googletest
+GTEST_TAP_LOCATION = $(TOPDIR)/gtest-tap-listener
+LIBTAP_LOCATION = $(TOPDIR)/libtap
+
+-include $(UFW_LOCATION)/config/ufw-common.mk
+
 CC = gcc
 CXX = g++
-MKDEP = mkdep
-MKDIR = mkdir -p
--include $(UFW_LOCATION)/config/ufw-common.mk
-CFLAGS = $(CFLAGS_STRICTNESS) $(CFLAGS_FATAL_WARNINGS)
-CFLAGS += -O0 -g -I. -I.. -Ilibtap -I"$(UFW_LOCATION)"
-CXXFLAGS = $(CFLAGS) -Igoogletest/include -Igtest-tap-listener/src
+
+CFLAGS = $(CFLAGS_STRICTNESS) # $(CFLAGS_FATAL_WARNINGS)
+CFLAGS += -O0 -g -I"$(UFW_LOCATION)"
+
+CXXFLAGS = $(CFLAGS) -isystem "$(GTEST_LOCATION)/googletest/include"
+CXXFLAGS += -I"$(GTEST_TAP_LOCATION)/src"
 CXXFLAGS += -DGTEST_TAP_PRINT_TO_STDOUT
-LDXXFLAGS = -Lgoogletest/googletest -lgtest -lgtest_main -lpthread -lgcov
+
+CFLAGS += -I"$(LIBTAP_LOCATION)"
+
+LDXXFLAGS = -L"$(GTEST_LOCATION)/googletest" -lgtest -lgtest_main -lpthread -lgcov
 
 HARNESS = prove --color --normalize --merge --exec "./run"
 HFLAGS =
 RESULTS = ./results
+
+MKDEP = mkdep
+MKDIR = mkdir -p
 
 TESTS = RangeValidator TrivialValidator
 SOURCES = $(patsubst %,%.cpp,$(TESTS))
@@ -46,11 +60,10 @@ distclean: clean
 	rm -f .depend *~
 
 depend: diagnostics
-	$(MKDEP) $(CFLAGS) $(SOURCES)
+	$(MKDEP) $(CXXFLAGS) $(SOURCES)
 
 diagnostics::
 	@if ! test -f .depend; then printf 'Dependency file missing. You may want to run "make depend".\n'; fi
-	@if ! test -d "$(UFW_LOCATION)"; then printf 'Please define UFW_LOCATION.\n'; exit 1; fi
 
 .suffixes: .c .o
 
