@@ -1,0 +1,623 @@
+#!/usr/bin/perl
+
+# Copyright © 2017 micro framework workers, All rights reserved.
+#
+# Redistribution  and use  in source  and binary  forms, with  or without
+# modification, are permitted provided  that the following conditions are
+# met:
+#
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# 2. Redistributions  in  binary  form  must  reproduce  the  above
+#    copyright notice,  this list  of conditions and  the following
+#    disclaimer  in   the  documentation  and/or   other  materials
+#    provided with the distribution.
+#
+# THIS  SOFTWARE  IS  PROVIDED  "AS   IS"  AND  ANY  EXPRESS  OR  IMPLIED
+# WARRANTIES, INCLUDING,  BUT NOT LIMITED  TO, THE IMPLIED  WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
+# NO EVENT SHALL THE AUTHOR OR  CONTRIBUTORS OF THE PROJECT BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL,  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS  OF USE, DATA, OR PROFITS;  OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED  AND ON  ANY THEORY OF  LIABILITY, WHETHER  IN CONTRACT,
+# STRICT LIABILITY,  OR TORT (INCLUDING NEGLIGENCE  OR OTHERWISE) ARISING
+# IN ANY  WAY OUT OF  THE USE  OF THIS SOFTWARE,  EVEN IF ADVISED  OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+# ## Compiler support tests ##
+#
+# UFW contains  a header  file called  compiler.h that  contains a  number of
+# convenience macros to access compiler specific (read: unportable) features.
+#
+# At the same time,  it is possible to test whether or  not a compiler binary
+# supports a certain set of features to use in a build system.
+#
+# This program performs  these tests and can generate  files containing their
+# results. The  tests commonly revolve  around generating a  test-program and
+# running a  given compiler  with a  certain set of  options against  it. The
+# return value of  such a compiler run is  used as the result of  the test in
+# question.
+#
+# Running the program  with the --help/-h option will provide  a brief intro-
+# duction to the program's general usage.
+
+use strict;
+use warnings;
+use diagnostics;
+
+use Carp qw{ confess cluck };
+use Cwd qw{ getcwd };
+use Data::Dump qw{ dump };
+use English qw{ -no_match_vars };
+use File::Basename qw{ basename };
+use File::Path qw{ make_path remove_tree };
+use Getopt::Long;
+use List::Util qw{ first };
+
+# This module is from CPAN:
+use IPC::Run qw{ run };
+
+sub with_main;
+sub with_more;
+
+
+my @c_code_header = (
+    q{#include <stddef.h>},
+    q{#include <stdlib.h>}
+);
+
+my @c_code_main_header = (
+    q{int},
+    q{main(int argc, char *argv[])},
+    q[{]
+);
+
+my @c_code_main_footer = (
+    q[    return EXIT_SUCCESS;],
+    q[}]
+);
+
+
+# List of in-code compiler implementation features (attributes and builtins):
+
+my @features = (
+
+     # attributes
+
+    { attribute => "cold",
+      code => with_more("__attribute__((cold)) int rare(int);") },
+
+    { attribute => "deprecated",
+      code => with_more("void old(int horrible, char *api)",
+                        "__attribute__((deprecated));") },
+
+    { attribute => "hot",
+      code => with_more("__attribute__((hot)) int often(int);") },
+
+    { attribute => "noreturn",
+      code => with_more("__attribute__((noreturn)) void die(void);") },
+
+    { attribute => "packed",
+      code => with_main("struct s { int a; int b; } __attribute__((packed));") },
+
+    { attribute => "printf_fmt",
+      code => with_more("__attribute__((format(__printf__, 1, 2)))",
+                        "void logger(const char *fmt, ...);") },
+
+    { attribute => "section",
+      code => with_more("__attribute__((section (\".bss\"))) int foo = 0;") },
+
+    { attribute => "unused",
+      code => with_main("int foo __attribute__((unused));") },
+
+    { attribute => "warn_unused_result",
+      code => with_more("struct foo { int a; int b; };",
+                        "__attribute__((warn_unused_result))",
+                        "struct foo *new_foo(const char *bar);") },
+
+     # builtins
+
+    { builtin => "expect",
+      code => with_main("int i; if (__builtin_expect(1,1)) i = 1;") }
+);
+
+
+# List of compiler flags:
+
+my @options = (
+
+    { standard => "c99" },
+    { standard => "c11" },
+    { warning => "all" },
+    { warning => "asm" },
+    { warning => "error" },
+    { warning => "extra" },
+    { warning => "implicit-fallthrough=3" },
+    { warning => "implicit-function-declaration" },
+    { warning => "missing-prototypes" },
+    { warning => "newline-eof" },
+    { warning => "packed" },
+    # Not sure about this one yet.
+    #{ warning => "padded" },
+    { warning => "pedantic" },
+    { warning => "redundant-decls" },
+    { warning => "sequence-point" },
+    { warning => "shadow" },
+    { warning => "shift-sign-overflow" },
+    { warning => "strict-prototypes" },
+    { warning => "undef" },
+    { warning => "used-but-marked-unused" }
+
+);
+
+Getopt::Long::Configure('require_order', 'no_gnu_compat',
+                        'auto_abbrev', 'no_ignore_case',
+                        'bundling');
+
+my ($NAME, $VERSION) = ('compiler-tests', '2017-07-10-1');
+
+my %opts = (
+    compiler => 'cc',
+    debug => 0,
+    dryrun => 0,
+    help => 0,
+    'knowns-all-features' => 0,
+    'knowns-all-options' => 0,
+    'output-makefile' => undef,
+    'output-c-header' => 'config.h',
+    'prefer-standard' => 'c11',
+    quiet => 0,
+    tmpdir => '.',
+    verbose => 0,
+    version => 0
+);
+
+sub __handle_options {
+    my ($opt, $key, $val) = @_;
+    if ($opt eq 'knows-everything') {
+        __handle_options('knows-all-features', 1);
+        __handle_options('knows-all-options', 1);
+        return 0;
+    }
+    if ($opts{debug}) {
+        unless (defined $val) {
+            print("[debug] $opt: \"$key\"\n");
+        } else {
+            print("[debug] $opt: \"$key\" ($val)\n");
+        }
+    }
+
+    $opts{$opt} = $key;
+
+    __handle_options('verbose', 1) if ($opt eq 'debug');
+    return 0;
+}
+
+my ($rc);
+$rc = GetOptions(
+    "compiler|c=s" => \&__handle_options,
+    "debug|D" => \&__handle_options,
+    "dryrun|d" => \&__handle_options,
+    "help|h" => \&__handle_options,
+    "knows-everything|E" => \&__handle_options,
+    "knows-all-features|F" => \&__handle_options,
+    "knows-all-options|O" => \&__handle_options,
+    "output-makefile|M=s" => \&__handle_options,
+    "output-c-header|C=s" => \&__handle_options,
+    "prefer-standard|s=s" => \&__handle_options,
+    "quiet|Q" => \&__handle_options,
+    "tmpdir|t=s" => \&__handle_options,
+    "verbose|v" => \&__handle_options,
+    "version|V" => \&__handle_options,
+);
+
+confess "    Try $NAME -h\n"  unless ($rc);
+
+$opts{tmpdir} =~ s@/*$@@;
+
+if ($opts{help}) {
+    print <<EOF
+usage: $NAME [OPTION(s)]
+
+Recognised options:
+
+    --compiler, -c COMPILER       Specify compiler to test (Default: 'cc').
+    --debug, -D                   Enable debugging output.
+    --dryrun, -d                  Do not actually perform any actions.
+    --help, -h                    Show this help output.
+    --knows-everything, -E        Assume ALL compiler tests succeeded.
+    --knows-all-features, -F      Assume all FEATURE tests succeeded.
+    --knows-all-options, -O       Assume all OPTION tests succeeded.
+    --output-makefile, -M FILE    Specify make(1) file to store compiler
+                                  flag settings in (Default: <unset>).
+    --output-c-header, -C FILE    Specify c language header to store all
+                                  test results in (Default: 'config.h').
+    --prefer-standard, -s STRING  Specify which standard of the c language to
+                                  prefer if more than one such test succeeds.
+    --quiet, -Q                   Be quiet. Only output warnings and fatal
+                                  errors.
+    --tmpdir, -t DIRECTORY        Specify a directory to put temporary
+                                  files into (Default: '.')
+    --verbose, -v                 Make output verbose.
+    --version, -V                 Show program's name and version.
+EOF
+;
+    exit 0;
+}
+
+if ($opts{version}) {
+    print "$NAME version $VERSION\n";
+    exit 0;
+}
+
+sub debug {
+    return 0 unless ($opts{debug});
+    print q{[debug] }, @_;
+    return 1;
+}
+
+sub verbose {
+    return 0 unless ($opts{verbose});
+    print q{[verbose] }, @_;
+    return 1;
+}
+
+sub short_featurestring {
+    my ($f) = @_;
+    my ($key, $value);
+
+    if (defined $f->{attribute}) {
+        $key = q{attribute};
+        $value = $f->{attribute};
+    } elsif (defined $f->{builtin}) {
+        $key = q{builtin};
+        $value = $f->{builtin};
+    } else {
+        confess "Unknown feature:\n", dump($f);
+    }
+    return ($key . q{_} . $value);
+}
+
+sub featurestring {
+    my ($f) = @_;
+    return (q{HAVE_COMPILER_} . uc (short_featurestring($f)));
+}
+
+sub optionstring {
+    my ($o) = @_;
+    if (defined $o->{standard}) {
+        return q{-std=} . $o->{standard};
+    } elsif (defined $o->{warning}) {
+        return q{-W} . $o->{warning};
+    }
+    confess "Unknown option:\n", dump($o);
+}
+
+sub sanitisename {
+    my ($name) = @_;
+    $name =~ s@[^A-Za-z0-9_]+@_@g;
+    $name =~ s@^[_-]+@@;
+    return $name;
+}
+
+sub fileprefix {
+    return ($opts{tmpdir} . q{/} . "out_$NAME" );
+}
+
+sub handle_out {
+    verbose("stdout: ", @_);
+}
+
+sub handle_err {
+    verbose("stderr: ", @_);
+}
+
+sub call_compiler {
+    my ($file, @co) = @_;
+    my $cmd = [ $opts{compiler}, qw{ -c -o test.o}, @co, $file ];
+    debug('Calling compiler: ', dump($cmd), qq{\n});
+    run $cmd, \undef, \&handle_out, \&handle_err;
+    return ($? ? 0 : 1);
+}
+
+my $code_count = 0;
+sub build_code {
+    my ($file, $code) = @_;
+
+    my $num = sprintf q{%04d}, $code_count++;
+    my $prefix = fileprefix() . q{/} . $num;
+    make_path $prefix;
+    debug("build_code(): Prefix: $prefix\n");
+
+    my $fullfile = $prefix . q{/} . $file;
+    debug("build_code(): Full file name: $fullfile\n");
+    open my $fh, q{>}, $fullfile
+        or confess "Could not open $fullfile: $ERRNO\n";
+
+    foreach my $line (@{ $code }) {
+        print {$fh} $line, qq{\n};
+    }
+
+    close $fh;
+    return $prefix;
+}
+
+sub build_option_code {
+    my ($o) = @_;
+    my $filename = sanitisename(optionstring($o)) . q{.c};
+    debug("build_option_code(): File name: $filename\n");
+    my $prefix = build_code($filename, with_trivial());
+    return { directory => $prefix,
+             filename => $filename };
+}
+
+sub build_feature_code {
+    my ($f) = @_;
+    my $filename = short_featurestring($f) . q{.c};
+    debug("build_feature_code(): File name: $filename\n");
+    my $prefix = build_code($filename, $f->{code});
+    return { directory => $prefix,
+             filename => $filename };
+}
+
+sub featuretest {
+    my ($f) = @_;
+
+    my $data = build_feature_code($f);
+    my $feature = short_featurestring($f);
+
+    local $| = 1;
+    print "Testing if compiler understands feature: $feature ...";
+    if ($opts{debug}) {
+        print qq{\n};
+    }
+
+    my $dir = getcwd();
+    debug("Changing into ", $data->{directory}, qq{\n});
+    chdir $data->{directory}
+        or confess("Could not change directory to "
+                   . $data->{directory} . ": $ERRNO\n");
+    my $rc = call_compiler($data->{filename});
+    debug("Changing back to $dir\n");
+    chdir $dir;
+    if ($opts{debug}) {
+        print "Testing if compiler understands feature: $feature ...";
+    }
+    print(($rc ? q{yes} : q{no}), qq{\n});
+    return $rc;
+}
+
+sub optiontest {
+    my ($o) = @_;
+
+    my $data = build_option_code($o);
+    my $option = optionstring($o);
+
+    print "Testing if compiler understands option: $option ...";
+    if ($opts{debug}) {
+        print qq{\n};
+    }
+
+    my $dir = getcwd();
+    chdir $data->{directory}
+        or confess("Could not change directory to "
+                   . $data->{directory} . ": $ERRNO\n");
+    my $rc = call_compiler($data->{filename}, $option);
+    chdir $dir;
+    if ($opts{debug}) {
+        print "Testing if compiler understands option: $option ...";
+    }
+    print(($rc ? q{yes} : q{no}), qq{\n});
+    return $rc;
+}
+
+sub indent {
+    return map { "    $_" } @_;
+}
+
+sub with_more {
+    return [ @c_code_header,
+             @_,
+             @c_code_main_header,
+             @c_code_main_footer ];
+}
+
+sub with_main {
+    return [ @c_code_header,
+             @c_code_main_header,
+             indent(@_),
+             @c_code_main_footer ];
+}
+
+sub with_trivial {
+    return [ @c_code_header,
+             @c_code_main_header,
+             @c_code_main_footer ];
+}
+
+sub generate_c_header {
+    print "Generating C language header: ", $opts{'output-c-header'}, "\n";
+
+    my $guard = sanitisename(uc $opts{'output-c-header'});
+    $guard = q{INC_} . $guard . q{_GENERATED};
+
+    my $file = $opts{'output-c-header'};
+    open my $fh, q{>}, $file or confess "Could not open $file: $ERRNO\n";
+
+    print {$fh} "/**\n";
+    print {$fh} q{ * @file }, basename($opts{'output-c-header'}), qq{\n};
+    print {$fh} q{ * @brief Configuration header generated by }, $NAME, qq{\n};
+    print {$fh} " *\n";
+    print {$fh} q{ * This file was generated by },
+        $NAME, q{ version }, $VERSION, qq{.\n};
+    print {$fh} " * Therefore, please DO NOT edit this file manually!\n";
+    print {$fh} " */\n\n";
+    print {$fh} "#ifndef $guard\n";
+    print {$fh} "#define $guard\n\n";
+
+    foreach my $f (@features) {
+        if ($f->{result} > 0) {
+            print {$fh} "#define ", featurestring($f), qq{\n};
+        } else {
+            print {$fh} "/* Test failed: #define ", featurestring($f), qq{ */\n};
+        }
+    }
+    foreach my $o (@options) {
+        my $string = sanitisename(optionstring($o));
+        $string = q{HAVE_COMPILER_FLAG_} . $string;
+        if ($o->{result} > 0) {
+            print {$fh} "#define $string\n";
+        } else {
+            print {$fh} "/* Test failed: #define $string */\n";
+        }
+    }
+    print {$fh} "\n#endif /* $guard */\n";
+    close $fh;
+}
+
+sub generate_standard {
+    my ($fh) = @_;
+    my $pref = $opts{'prefer-standard'};
+    my @stds;
+
+    OPTION: foreach my $o (@options) {
+        next OPTION unless (defined $o->{standard});
+        next OPTION unless ($o->{result} > 0);
+        push @stds, $o;
+    }
+    print {$fh} "CFLAGS_STANDARD =";
+    if ($#stds < 0) {
+        verbose("Compiler supports no language standard option!\n");
+    } elsif (my $o = first { $_->{standard} eq $pref } @stds) {
+        verbose("Picking standard preference: $pref\n");
+        print {$fh} q{ }, optionstring($o), qq{\n};
+    } else {
+        verbose("Preferred standard not available!\n");
+        verbose("Picking first available option: ",
+                $stds[0]->{standard}, qq{\n});
+        print {$fh} q{ }, optionstring($stds[0]), qq{\n};
+    }
+    return 1;
+}
+
+sub generate_warnings {
+    my ($fh) = @_;
+
+    my $prefix = "CFLAGS_STRICTNESS";
+    my $prelen = length $prefix;
+    my $init = " =";
+    my $initlen = length $init;
+    my $cont = " +=";
+    my $contlen = length $init;
+    my $line = q{};
+    my @lines;
+    my $len = 0;
+    my $first = 1;
+    my $limit = 80;
+
+    OPTION: foreach my $o (@options) {
+        next OPTION unless (defined $o->{warning});
+        next OPTION if ($o->{warning} eq "error");
+        next OPTION unless ($o->{result} > 0);
+
+        my $add = optionstring($o);
+        my $addlen = length $add;
+
+        if (($len + $addlen + 1) >= $limit) {
+            push @lines, $line;
+            $line = q{};
+        }
+        if ($line eq q{}) {
+            $line .= $prefix;
+            $len = $prelen;
+            if ($first) {
+                $line .= $init;
+                $len += $initlen;
+                $first = 0;
+            } else {
+                $line .= $cont;
+                $len += $contlen;
+            }
+        }
+        $line .= qq{ $add};
+        $len += 1 + $addlen;
+    }
+    push @lines, $line unless ($line eq q{});
+    foreach my $l (@lines) {
+        print {$fh} $l, qq{\n};
+    }
+    return 1;
+}
+
+sub generate_error {
+    my ($fh) = @_;
+    print {$fh} "CFLAGS_FATAL_WARNINGS =";
+    my $o = first { defined $_->{warning}
+                        && $_->{warning} eq q{error}
+                    } @options;
+    if ($o->{result} > 0) {
+        print {$fh} q{ }, optionstring($o);
+    }
+    print {$fh} qq{\n};
+    return 1;
+}
+
+sub generate_makefile {
+    print "Generating CFLAGS Makefile: ", $opts{'output-makefile'}, "\n";
+    my $file = $opts{'output-makefile'};
+    open my $fh, q{>}, $file or confess "Could not open $file: $ERRNO\n";
+    print {$fh} q{# Compiler Flags Makefile: }, basename($file), qq{\n};
+    print {$fh} (q{# This file was generated by },
+                 $NAME, q{ version }, $VERSION, qq{.\n});
+    print {$fh} qq{# Therefore, please DO NOT edit this file manually!\n\n};
+    generate_standard($fh);
+    generate_warnings($fh);
+    generate_error($fh);
+    print {$fh} qq{\n};
+
+    foreach my $f (@features) {
+        my $var = featurestring($f);
+        print {$fh} qq{$var = }, (($f->{result} > 0) ? 1 : 0) , qq{\n};
+    }
+    foreach my $o (@options) {
+        my $var = sanitisename(optionstring($o));
+        $var = q{HAVE_COMPILER_FLAG_} . $var;
+        print {$fh} qq{$var = }, (($o->{result} > 0) ? 1 : 0) , qq{\n};
+    }
+
+    close $fh;
+}
+
+if ($opts{'knows-all-options'}) {
+    print "Assuming the compiler knows all options.\n";
+    foreach my $option (@options) {
+        verbose("Enabling ", optionstring($option), qq{\n});
+        $option->{result} = 1;
+    }
+} else {
+    verbose("Running compiler option tests.\n");
+    foreach my $option (@options) {
+        $option->{result} = optiontest($option);
+    }
+}
+
+if ($opts{'knows-all-features'}) {
+    print "Assuming the compiler knows all features.\n";
+    foreach my $feature (@features) {
+        verbose("Enabling ", featurestring($feature), qq{\n});
+        $feature->{result} = 1;
+    }
+} else {
+    verbose("Running compiler feature tests.\n");
+    foreach my $feature (@features) {
+        $feature->{result} = featuretest($feature);
+    }
+}
+
+generate_c_header() if (defined $opts{'output-c-header'});
+generate_makefile() if (defined $opts{'output-makefile'});
+remove_tree fileprefix() unless ($opts{debug});
+
+exit 0;
