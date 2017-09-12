@@ -1,0 +1,11 @@
+.*
+!.gitignore
+*~
+\#*\#
+results/
+googletest/
+gtest-tap-listener/
+libtap/
+tests.txt
+RangeValidator
+TrivialValidator
