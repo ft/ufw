@@ -18,7 +18,7 @@ CXXFLAGS += -DGTEST_TAP_PRINT_TO_STDOUT
 
 CFLAGS += -I"$(LIBTAP_LOCATION)"
 
-LDXXFLAGS = -L"$(GTEST_LOCATION)/googletest" -lgtest -lgtest_main -lpthread -lgcov
+LDXXFLAGS = -L"$(GTEST_LOCATION)/build/googlemock/gtest" -lgtest -lgtest_main -lpthread -lgcov
 
 HARNESS = prove --color --normalize --merge --exec "./run"
 HFLAGS =
