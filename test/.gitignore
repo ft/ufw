@@ -9,3 +9,4 @@ libtap/
 tests.txt
 RangeValidator
 TrivialValidator
+ring-buffer
