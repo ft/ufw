@@ -27,11 +27,14 @@ RESULTS = ./results
 MKDEP = mkdep
 MKDIR = mkdir -p
 
-TESTS = RangeValidator TrivialValidator
-SOURCES = $(patsubst %,%.cpp,$(TESTS))
-OBJECTS = $(patsubst %.cpp,%.o,$(SOURCES))
+TESTS =
+XXTESTS = RangeValidator TrivialValidator
+SOURCES = $(patsubst %,%.c,$(TESTS))
+OBJECTS = $(patsubst %.c,%.o,$(SOURCES))
+XXSOURCES = $(patsubst %,%.cpp,$(XXTESTS))
+XXOBJECTS = $(patsubst %.cpp,%.o,$(XXSOURCES))
 
-run-tests: diagnostics $(OBJECTS) $(TESTS) tests.txt
+run-tests: diagnostics $(OBJECTS) $(XXOBJECTS) $(TESTS) $(XXTESTS) tests.txt
 	$(HARNESS) $(HFLAGS) - < tests.txt
 
 test:
@@ -51,16 +54,18 @@ test-verbose-archive:
 tests.txt: Makefile
 	:> $@
 	for i in $(TESTS); do echo "$$i" >> $@; done
+	for i in $(XXTESTS); do echo "$$i" >> $@; done
 
 clean:
-	rm -f $(OBJECTS) $(TESTS) *.tap tests.txt core
+	rm -f $(OBJECTS) $(XXOBJECTS) $(TESTS) $(XXTESTS) *.tap tests.txt core
 	rm -Rf "$(RESULTS)"
 
 distclean: clean
 	rm -f .depend *~
 
 depend: diagnostics
-	$(MKDEP) $(CXXFLAGS) $(SOURCES)
+	$(MKDEP) $(CXXFLAGS) $(XXSOURCES)
+	$(MKDEP) $(CFLAGS) $(SOURCES)
 
 diagnostics::
 	@if ! test -f .depend; then printf 'Dependency file missing. You may want to run "make depend".\n'; fi
@@ -68,9 +73,12 @@ diagnostics::
 .suffixes: .c .o
 
 .c.o:
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+.cpp.o:
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(TESTS): %: %.o $(OBJECTS)
+$(XXTESTS): %: %.o $(XXOBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $< $(LDXXFLAGS)
 
 -include .depend
