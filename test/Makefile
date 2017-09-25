@@ -11,12 +11,13 @@ CXX = g++
 
 CFLAGS = $(CFLAGS_STRICTNESS) # $(CFLAGS_FATAL_WARNINGS)
 CFLAGS += -O0 -g -I"$(UFW_LOCATION)"
+CFLAGS += -I"$(LIBTAP_LOCATION)"
 
-CXXFLAGS = $(CFLAGS) -isystem "$(GTEST_LOCATION)/googletest/include"
+CXXFLAGS = $(CXXFLAGS_STRICTNESS) # $(CFLAGS_FATAL_WARNINGS)
+CXXFLAGS += -O0 -g -I"$(UFW_LOCATION)"
+CXXFLAGS += -isystem "$(GTEST_LOCATION)/googletest/include"
 CXXFLAGS += -I"$(GTEST_TAP_LOCATION)/src"
 CXXFLAGS += -DGTEST_TAP_PRINT_TO_STDOUT
-
-CFLAGS += -I"$(LIBTAP_LOCATION)"
 
 LDXXFLAGS = -L"$(GTEST_LOCATION)/build/googlemock/gtest" -lgtest -lgtest_main -lpthread -lgcov
 
