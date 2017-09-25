@@ -19,4 +19,7 @@ all:
 config:
 	$(PERL) $(COMPILER_TEST) $(CTFLAGS)
 
-.PHONY: all config
+clean:
+	rm config/ufw-*.*
+
+.PHONY: all clean config
