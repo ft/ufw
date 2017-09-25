@@ -19,6 +19,7 @@ CXXFLAGS += -isystem "$(GTEST_LOCATION)/googletest/include"
 CXXFLAGS += -I"$(GTEST_TAP_LOCATION)/src"
 CXXFLAGS += -DGTEST_TAP_PRINT_TO_STDOUT
 
+LDFLAGS = -L"$(LIBTAP_LOCATION)" -ltap
 LDXXFLAGS = -L"$(GTEST_LOCATION)/build/googlemock/gtest" -lgtest -lgtest_main -lpthread -lgcov
 
 HARNESS = prove --color --normalize --merge --exec "./run"
@@ -28,7 +29,7 @@ RESULTS = ./results
 MKDEP = mkdep
 MKDIR = mkdir -p
 
-TESTS =
+TESTS = ring-buffer
 XXTESTS = RangeValidator TrivialValidator
 SOURCES = $(patsubst %,%.c,$(TESTS))
 OBJECTS = $(patsubst %.c,%.o,$(SOURCES))
@@ -78,6 +79,9 @@ diagnostics::
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(TESTS): %: %.o $(XXOBJECTS)
+	$(CC) $(CFLAGS) -static -o $@ $< $(LDFLAGS)
 
 $(XXTESTS): %: %.o $(XXOBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $< $(LDXXFLAGS)
