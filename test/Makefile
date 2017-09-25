@@ -59,7 +59,7 @@ tests.txt: Makefile
 	for i in $(XXTESTS); do echo "$$i" >> $@; done
 
 clean:
-	rm -f $(OBJECTS) $(XXOBJECTS) $(TESTS) $(XXTESTS) *.tap tests.txt core
+	rm -f $(OBJECTS) $(XXOBJECTS) $(TESTS) $(XXTESTS) *.tap tests.txt core *~
 	rm -Rf "$(RESULTS)"
 
 distclean: clean
