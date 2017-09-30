@@ -28,6 +28,8 @@ config:
 	fi
 
 clean:
-	rm config/ufw-*.*
+	$(MAKE) -C test clean
+	rm -f config/ufw-*.*
+	rm -f *~ "#"*"#"
 
 .PHONY: all clean config
