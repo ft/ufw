@@ -10,14 +10,22 @@ CSTD = c99
 
 PERL = perl
 COMPILER_TEST = ./config/compiler-test
+CT_HEADER = ./config/ufw-config.h
+CT_MAKE = ./config/ufw-common.mk
 CTFLAGS = --compiler $(CC) --prefer-standard $(CSTD)
-CTFLAGS += --output-c-header ./config/ufw-config.h
-CTFLAGS += --output-makefile ./config/ufw-common.mk
+CTFLAGS += --output-c-header "$(CT_HEADER)"
+CTFLAGS += --output-makefile "$(CT_MAKE)"
 
 all:
 
 config:
-	$(PERL) $(COMPILER_TEST) $(CTFLAGS)
+	@if ! test -e "$(CT_HEADER)" || \
+	    ! test -e "$(CT_MAKE)"; then \
+	    printf 'Running compiler tests...\n'; \
+	    $(PERL) $(COMPILER_TEST) $(CTFLAGS); \
+	else \
+	    true; \
+	fi
 
 clean:
 	rm config/ufw-*.*
