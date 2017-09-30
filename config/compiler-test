@@ -165,7 +165,8 @@ Getopt::Long::Configure('require_order', 'no_gnu_compat',
 my ($NAME, $VERSION) = ('compiler-tests', '2017-07-10-1');
 
 my %opts = (
-    compiler => 'cc',
+    'c-compiler' => 'cc',
+    'cxx-compiler' => 'c++',
     debug => 0,
     dryrun => 0,
     help => 0,
@@ -173,7 +174,8 @@ my %opts = (
     'knowns-all-options' => 0,
     'output-makefile' => undef,
     'output-c-header' => 'config.h',
-    'prefer-standard' => 'c11',
+    'prefer-c-standard' => 'c11',
+    'prefer-cxx-standard' => 'c++11',
     quiet => 0,
     tmpdir => '.',
     verbose => 0,
@@ -203,7 +205,8 @@ sub __handle_options {
 
 my ($rc);
 $rc = GetOptions(
-    "compiler|c=s" => \&__handle_options,
+    "c-compiler|c=s" => \&__handle_options,
+    "cxx-compiler|C=s" => \&__handle_options,
     "debug|D" => \&__handle_options,
     "dryrun|d" => \&__handle_options,
     "help|h" => \&__handle_options,
@@ -211,8 +214,10 @@ $rc = GetOptions(
     "knows-all-features|F" => \&__handle_options,
     "knows-all-options|O" => \&__handle_options,
     "output-makefile|M=s" => \&__handle_options,
-    "output-c-header|C=s" => \&__handle_options,
-    "prefer-standard|s=s" => \&__handle_options,
+    "output-c-header|a=s" => \&__handle_options,
+    "output-cxx-header|A=s" => \&__handle_options,
+    "prefer-c-standard|s=s" => \&__handle_options,
+    "prefer-cxx-standard|S=s" => \&__handle_options,
     "quiet|Q" => \&__handle_options,
     "tmpdir|t=s" => \&__handle_options,
     "verbose|v" => \&__handle_options,
@@ -229,25 +234,43 @@ usage: $NAME [OPTION(s)]
 
 Recognised options:
 
-    --compiler, -c COMPILER       Specify compiler to test (Default: 'cc').
-    --debug, -D                   Enable debugging output.
-    --dryrun, -d                  Do not actually perform any actions.
-    --help, -h                    Show this help output.
-    --knows-everything, -E        Assume ALL compiler tests succeeded.
-    --knows-all-features, -F      Assume all FEATURE tests succeeded.
-    --knows-all-options, -O       Assume all OPTION tests succeeded.
-    --output-makefile, -M FILE    Specify make(1) file to store compiler
-                                  flag settings in (Default: <unset>).
-    --output-c-header, -C FILE    Specify c language header to store all
-                                  test results in (Default: 'config.h').
-    --prefer-standard, -s STRING  Specify which standard of the c language to
-                                  prefer if more than one such test succeeds.
-    --quiet, -Q                   Be quiet. Only output warnings and fatal
-                                  errors.
-    --tmpdir, -t DIRECTORY        Specify a directory to put temporary
-                                  files into (Default: '.')
-    --verbose, -v                 Make output verbose.
-    --version, -V                 Show program's name and version.
+    --c-compiler, -c COMPILER 
+            Specify C compiler to test (Default: 'cc').
+    --cxx-compiler, -C COMPILER 
+            Specify C++ compiler to test (Default: 'c++').
+    --debug, -D
+            Enable debugging output.
+    --dryrun, -d
+            Do not actually perform any actions.
+    --help, -h
+            Show this help output.
+    --knows-everything, -E
+            Assume ALL compiler tests succeeded.
+    --knows-all-features, -F 
+            Assume all FEATURE tests succeeded.
+    --knows-all-options, -O
+            Assume all OPTION tests succeeded.
+    --output-makefile, -M FILE
+            Specify make(1) file to store compiler flag settings in (Default:
+            <unset>).
+    --output-c-header, -a FILE
+            Specify c language header to store all test results in (Default:
+            'config.h').
+    --output-cxx-header, -A FILE
+            Like -a but for the C++ header (Default: 'config-pp.h)
+    --prefer-c-standard, -s STRING
+            Specify which standard of the c language to prefer if more than
+            one such test succeeds (Default: 'c11')
+    --prefer-cxx-standard, -s STRING
+            Like -s, but for the preferred C++ standard (Default: 'c11')
+    --quiet, -Q
+            Be quiet. Only output warnings and fatal errors.
+    --tmpdir, -t DIRECTORY
+            Specify a directory to put temporary files into (Default: '.')
+    --verbose, -v
+            Make output verbose.
+    --version, -V
+            Show program's name and version.
 EOF
 ;
     exit 0;
@@ -320,10 +343,18 @@ sub handle_err {
     verbose("stderr: ", @_);
 }
 
-sub call_compiler {
+sub call_c_compiler {
     my ($file, @co) = @_;
-    my $cmd = [ $opts{compiler}, qw{ -c -o test.o}, @co, $file ];
-    debug('Calling compiler: ', dump($cmd), qq{\n});
+    my $cmd = [ $opts{'c-compiler'}, qw{ -c -o test.o}, @co, $file ];
+    debug('Calling C compiler: ', dump($cmd), qq{\n});
+    run $cmd, \undef, \&handle_out, \&handle_err;
+    return ($? ? 0 : 1);
+}
+
+sub call_cxx_compiler {
+    my ($file, @co) = @_;
+    my $cmd = [ $opts{'cxx-compiler'}, qw{ -c -o test.o}, @co, $file ];
+    debug('Calling C++ compiler: ', dump($cmd), qq{\n});
     run $cmd, \undef, \&handle_out, \&handle_err;
     return ($? ? 0 : 1);
 }
@@ -385,7 +416,7 @@ sub featuretest {
     chdir $data->{directory}
         or confess("Could not change directory to "
                    . $data->{directory} . ": $ERRNO\n");
-    my $rc = call_compiler($data->{filename});
+    my $rc = call_c_compiler($data->{filename});
     debug("Changing back to $dir\n");
     chdir $dir;
     if ($opts{debug}) {
@@ -410,7 +441,7 @@ sub optiontest {
     chdir $data->{directory}
         or confess("Could not change directory to "
                    . $data->{directory} . ": $ERRNO\n");
-    my $rc = call_compiler($data->{filename}, $option);
+    my $rc = call_c_compiler($data->{filename}, $option);
     chdir $dir;
     if ($opts{debug}) {
         print "Testing if compiler understands option: $option ...";
@@ -485,24 +516,24 @@ sub generate_c_header {
 
 sub generate_standard {
     my ($fh) = @_;
-    my $pref = $opts{'prefer-standard'};
+    my $pref = $opts{'prefer-c-standard'};
     my @stds;
 
     OPTION: foreach my $o (@options) {
-        next OPTION unless (defined $o->{standard});
+        next OPTION unless (defined $o->{'c-standard'});
         next OPTION unless ($o->{result} > 0);
         push @stds, $o;
     }
     print {$fh} "CFLAGS_STANDARD =";
     if ($#stds < 0) {
         verbose("Compiler supports no language standard option!\n");
-    } elsif (my $o = first { $_->{standard} eq $pref } @stds) {
-        verbose("Picking standard preference: $pref\n");
+    } elsif (my $o = first { $_->{'c-standard'} eq $pref } @stds) {
+        verbose("Picking C standard preference: $pref\n");
         print {$fh} q{ }, optionstring($o), qq{\n};
     } else {
-        verbose("Preferred standard not available!\n");
+        verbose("Preferred C standard not available!\n");
         verbose("Picking first available option: ",
-                $stds[0]->{standard}, qq{\n});
+                $stds[0]->{'c-standard'}, qq{\n});
         print {$fh} q{ }, optionstring($stds[0]), qq{\n};
     }
     return 1;
