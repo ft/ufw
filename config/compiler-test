@@ -52,6 +52,7 @@ use Cwd qw{ getcwd };
 use Data::Dump qw{ dump };
 use English qw{ -no_match_vars };
 use File::Basename qw{ basename };
+use File::Copy;
 use File::Path qw{ make_path remove_tree };
 use Getopt::Long;
 use List::Util qw{ first none };
@@ -311,8 +312,13 @@ sub short_featurestring {
 }
 
 sub featurestring {
-    my ($f) = @_;
-    return (q{HAVE_COMPILER_} . uc (short_featurestring($f)));
+    my ($f, $lang) = @_;
+    if (defined $lang) {
+        $lang = q{_} . ($lang eq q{C} ? q{C} : q{CXX}) . q{_};
+    } else {
+        $lang = q{_};
+    }
+    return (q{HAVE} . $lang . q{COMPILER_} . uc (short_featurestring($f)));
 }
 
 sub optionstring {
@@ -385,20 +391,32 @@ sub build_code {
 
 sub build_option_code {
     my ($o) = @_;
-    my $filename = sanitisename(optionstring($o)) . q{.c};
-    debug("build_option_code(): File name: $filename\n");
-    my $prefix = build_code($filename, with_trivial());
+    my $filename_c = sanitisename(optionstring($o)) . q{.c};
+    debug("build_option_code(): File name: $filename_c\n");
+    my $prefix = build_code($filename_c, with_trivial());
+
+    my $filename_cxx = sanitisename(optionstring($o)) . q{.cpp};
+    debug("build_option_code(): File name: $filename_cxx\n");
+    copy("$prefix/$filename_c", "$prefix/$filename_cxx") or die "$ERRNO";
+
     return { directory => $prefix,
-             filename => $filename };
+             'filename-c' => $filename_c,
+             'filename-cxx' => $filename_cxx };
 }
 
 sub build_feature_code {
     my ($f) = @_;
-    my $filename = short_featurestring($f) . q{.c};
-    debug("build_feature_code(): File name: $filename\n");
-    my $prefix = build_code($filename, $f->{code});
+    my $filename_c = short_featurestring($f) . q{.c};
+    debug("build_feature_code(): File name: $filename_c\n");
+    my $prefix = build_code($filename_c, $f->{code});
+
+    my $filename_cxx = short_featurestring($f) . q{.cpp};
+    debug("build_feature_code(): File name: $filename_cxx\n");
+    copy("$prefix/$filename_c", "$prefix/$filename_cxx") or die "$ERRNO";
+
     return { directory => $prefix,
-             filename => $filename };
+             'filename-c' => $filename_c,
+             'filename-cxx' => $filename_cxx };
 }
 
 sub featuretest {
@@ -415,7 +433,9 @@ sub featuretest {
     chdir $data->{directory}
         or confess("Could not change directory to "
                    . $data->{directory} . ": $ERRNO\n");
-    my $rc = $cb->($data->{filename});
+    my $rc = $cb->($lang eq q{C}
+                       ? $data->{'filename-c'}
+                       : $data->{'filename-cxx'});
     debug("Changing back to $dir\n");
     chdir $dir;
     if ($opts{debug}) {
@@ -458,7 +478,10 @@ sub optiontest {
     chdir $data->{directory}
         or confess("Could not change directory to "
                    . $data->{directory} . ": $ERRNO\n");
-    my $rc = $cb->($data->{filename}, $option);
+    my $rc = $cb->(($lang eq q{C}
+                        ? $data->{'filename-c'}
+                        : $data->{'filename-cxx'}),
+                   $option);
     chdir $dir;
     if ($opts{debug}) {
         print "Testing if $lang compiler understands option: $option ...";
@@ -570,16 +593,21 @@ sub generate_header {
 }
 
 sub generate_standard {
-    my ($fh) = @_;
-    my $pref = $opts{'prefer-c-standard'};
+    my (%api) = @_;
+
+    my $fh = $api{fh};
+    my $lang = $api{lang};
+    my $var = $api{var};
+    my $tag = ($lang eq q{C} ? q{c} : q{cxx});
+    my $pref = $opts{"prefer-$tag-standard"};
     my @stds;
 
     OPTION: foreach my $o (@options) {
         next OPTION unless (defined $o->{'standard'});
-        next OPTION unless ($o->{result} > 0);
+        next OPTION if (none { $_ eq $lang } @{ $o->{result} });
         push @stds, $o;
     }
-    print {$fh} "CFLAGS_STANDARD =";
+    print {$fh} qq{$var =};
     if ($#stds < 0) {
         verbose("Compiler supports no language standard option!\n");
     } elsif (my $o = first { $_->{'standard'} eq $pref } @stds) {
@@ -598,7 +626,7 @@ sub generate_warnings {
     my (%api) = @_;
 
     my $fh = $api{fh};
-    my $cb = $api{skip};
+    my $lang = $api{lang};
 
     my $prefix = $api{var};
     my $prelen = length $prefix;
@@ -618,8 +646,7 @@ sub generate_warnings {
     OPTION: foreach my $o (@options) {
         next OPTION unless (defined $o->{warning});
         next OPTION if ($o->{warning} eq "error");
-        next OPTION unless ($o->{result} > 0);
-        next OPTION if ($cb->($o));
+        next OPTION if (none { $_ eq $lang } @{ $o->{result} });
 
         my $add = optionstring($o);
         my $addlen = length $add;
@@ -651,12 +678,17 @@ sub generate_warnings {
 }
 
 sub generate_error {
-    my ($fh) = @_;
-    print {$fh} "CFLAGS_FATAL_WARNINGS =";
+    my (%api) = @_;
+
+    my $fh = $api{fh};
+    my $lang = $api{lang};
+    my $var = $api{var};
+
+    print {$fh} qq{$var =};
     my $o = first { defined $_->{warning}
                         && $_->{warning} eq q{error}
                     } @options;
-    if ($o->{result} > 0) {
+    unless (none { $_ eq $lang } @{ $o->{result} }) {
         print {$fh} q{ }, optionstring($o);
     }
     print {$fh} qq{\n};
@@ -664,33 +696,51 @@ sub generate_error {
 }
 
 sub generate_makefile {
-    print "Generating CFLAGS Makefile: ", $opts{'output-makefile'}, "\n";
+    print "Generating Common Makefile: ", $opts{'output-makefile'}, "\n";
     my $file = $opts{'output-makefile'};
     open my $fh, q{>}, $file or confess "Could not open $file: $ERRNO\n";
     print {$fh} q{# Compiler Flags Makefile: }, basename($file), qq{\n};
     print {$fh} (q{# This file was generated by },
                  $NAME, q{ version }, $VERSION, qq{.\n});
     print {$fh} qq{# Therefore, please DO NOT edit this file manually!\n\n};
-    generate_standard($fh);
+    generate_standard(fh => $fh,
+                      lang => q{C},
+                      var => q{C_LANGUAGE_STANDARD});
+    generate_standard(fh => $fh,
+                      lang => q{C++},
+                      var => q{CXX_LANGUAGE_STANDARD});
+    print {$fh} qq{\n};
     generate_warnings(fh => $fh,
-                      var => q{COMPILER_FLAGS_STRICTNESS},
-                      skip => sub { return (defined $_[0]->{lang}) });
+                      lang => q{C},
+                      var => q{C_COMPILER_FLAGS_STRICTNESS});
+    print {$fh} qq{\n};
     generate_warnings(fh => $fh,
-                      var => q{CFLAGS_STRICTNESS},
-                      init => q{$(COMPILER_FLAGS_STRICTNESS)},
-                      skip => sub { return !(defined $_[0]->{lang}) });
-    print {$fh} q{CXXFLAGS_STRICTNESS = $(COMPILER_FLAGS_STRICTNESS)}, qq{\n};
-    generate_error($fh);
+                      lang => q{C++},
+                      var => q{CXX_COMPILER_FLAGS_STRICTNESS});
+    print {$fh} qq{\n};
+    generate_error(fh => $fh,
+                   lang => q{C},
+                   var => q{C_COMPILER_FLAG_FATAL_ERRORS});
+    generate_error(fh => $fh,
+                   lang => q{C++},
+                   var => q{CXX_COMPILER_FLAG_FATAL_ERRORS});
     print {$fh} qq{\n};
 
-    foreach my $f (@features) {
-        my $var = featurestring($f);
-        print {$fh} qq{$var = }, (($f->{result} > 0) ? 1 : 0) , qq{\n};
-    }
-    foreach my $o (@options) {
-        my $var = sanitisename(optionstring($o));
-        $var = q{HAVE_COMPILER_FLAG_} . $var;
-        print {$fh} qq{$var = }, (($o->{result} > 0) ? 1 : 0) , qq{\n};
+    foreach my $lang (qw{ C C++ }) {
+        foreach my $f (@features) {
+            my $var = featurestring($f, $lang);
+            print {$fh} qq{$var = }, (($f->{result} > 0) ? 1 : 0) , qq{\n};
+        }
+        foreach my $o (@options) {
+            my $var = sanitisename(optionstring($o));
+            $var =
+                q{HAVE_} . ($lang eq q{C} ? q{C} : q{CXX})
+                . q{_COMPILER_FLAG_} . $var;
+            print {$fh}
+                qq{$var = },
+                ((none { $_ eq $lang } @{ $o->{result} }) ? 0 : 1),
+                qq{\n};
+        }
     }
 
     close $fh;
