@@ -554,7 +554,13 @@ sub generate_header {
         my $string = sanitisename(optionstring($o));
         $string = q{HAVE_COMPILER_FLAG_} . $string;
         if (none { $_ eq $lang } @{ $o->{result} }) {
-            print {$fh} "/* Test failed/skipped: #define $string */\n";
+            my $reason;
+            if (defined $o->{lang} && $lang ne $o->{lang}) {
+                $reason = q{skipped};
+            } else {
+                $reason = q{failed};
+            }
+            print {$fh} "/* Test $reason #define $string */\n";
         } else {
             print {$fh} "#define $string\n";
         }
