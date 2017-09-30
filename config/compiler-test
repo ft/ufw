@@ -54,7 +54,7 @@ use English qw{ -no_match_vars };
 use File::Basename qw{ basename };
 use File::Path qw{ make_path remove_tree };
 use Getopt::Long;
-use List::Util qw{ first };
+use List::Util qw{ first none };
 
 # This module is from CPAN:
 use IPC::Run qw{ run };
@@ -128,10 +128,10 @@ my @features = (
 
 my @options = (
 
-    { standard => "c99" },
-    { standard => "gnu99" },
-    { standard => "c11" },
-    { standard => "gnu11" },
+    { standard => "c99", lang => "C" },
+    { standard => "gnu99", lang => "C" },
+    { standard => "c11", lang => "C" },
+    { standard => "gnu11", lang => "C" },
     { standard => "c++11", lang => "C++" },
     { standard => "gnu++11", lang => "C++" },
     { standard => "c++14", lang => "C++" },
@@ -174,6 +174,7 @@ my %opts = (
     'knowns-all-options' => 0,
     'output-makefile' => undef,
     'output-c-header' => 'config.h',
+    'output-cxx-header' => 'config-pp.h',
     'prefer-c-standard' => 'c11',
     'prefer-cxx-standard' => 'c++11',
     quiet => 0,
@@ -326,6 +327,7 @@ sub optionstring {
 
 sub sanitisename {
     my ($name) = @_;
+    $name =~ s@\+\+@xx@g;
     $name =~ s@[^A-Za-z0-9_]+@_@g;
     $name =~ s@^[_-]+@@;
     return $name;
@@ -400,13 +402,10 @@ sub build_feature_code {
 }
 
 sub featuretest {
-    my ($f) = @_;
-
-    my $data = build_feature_code($f);
-    my $feature = short_featurestring($f);
+    my ($lang, $cb, $data, $feature) = @_;
 
     local $| = 1;
-    print "Testing if compiler understands feature: $feature ...";
+    print "Testing if $lang compiler understands feature: $feature ...";
     if ($opts{debug}) {
         print qq{\n};
     }
@@ -416,23 +415,41 @@ sub featuretest {
     chdir $data->{directory}
         or confess("Could not change directory to "
                    . $data->{directory} . ": $ERRNO\n");
-    my $rc = call_c_compiler($data->{filename});
+    my $rc = $cb->($data->{filename});
     debug("Changing back to $dir\n");
     chdir $dir;
     if ($opts{debug}) {
-        print "Testing if compiler understands feature: $feature ...";
+        print "Testing if $lang compiler understands feature: $feature ...";
     }
     print(($rc ? q{yes} : q{no}), qq{\n});
     return $rc;
 }
 
+sub featuretest_fe {
+    my ($f) = @_;
+
+    my $data = build_feature_code($f);
+    my $feature = short_featurestring($f);
+
+    my $config = {
+        'C' => { compile => \&call_c_compiler },
+        'C++' => { compile => \&call_cxx_compiler }
+    };
+
+    my $rc = [];
+
+    foreach my $lang (qw{ C C++ }) {
+        if (featuretest($lang, $config->{$lang}->{compile}, $data, $feature)) {
+            push @{ $rc }, $lang;
+        }
+    }
+    return $rc;
+}
+
 sub optiontest {
-    my ($o) = @_;
+    my ($lang, $cb, $data, $option) = @_;
 
-    my $data = build_option_code($o);
-    my $option = optionstring($o);
-
-    print "Testing if compiler understands option: $option ...";
+    print "Testing if $lang compiler understands option: $option ...";
     if ($opts{debug}) {
         print qq{\n};
     }
@@ -441,12 +458,43 @@ sub optiontest {
     chdir $data->{directory}
         or confess("Could not change directory to "
                    . $data->{directory} . ": $ERRNO\n");
-    my $rc = call_c_compiler($data->{filename}, $option);
+    my $rc = $cb->($data->{filename}, $option);
     chdir $dir;
     if ($opts{debug}) {
-        print "Testing if compiler understands option: $option ...";
+        print "Testing if $lang compiler understands option: $option ...";
     }
     print(($rc ? q{yes} : q{no}), qq{\n});
+    return $rc;
+}
+
+sub optiontest_fe {
+    my ($o) = @_;
+
+    my $config = {
+        'C' => { compile => \&call_c_compiler },
+        'C++' => { compile => \&call_cxx_compiler }
+    };
+
+    my $data = build_option_code($o);
+    my $option = optionstring($o);
+
+    my $langs;
+
+    # If an option has a language defined, just use that. Otherwise use both
+    # supported languages.
+    if (defined $o->{lang}) {
+        $langs = [ $o->{lang} ];
+    } else {
+        $langs = [ qw{ C C++ } ];
+    }
+
+    my $rc = [];
+
+    foreach my $lang (@{ $langs }) {
+        if (optiontest($lang, $config->{$lang}->{compile}, $data, $option)) {
+            push @{ $rc }, $lang;
+        }
+    }
     return $rc;
 }
 
@@ -474,17 +522,18 @@ sub with_trivial {
              @c_code_main_footer ];
 }
 
-sub generate_c_header {
-    print "Generating C language header: ", $opts{'output-c-header'}, "\n";
+sub generate_header {
+    my ($lang, $h) = @_;
+    print "Generating $lang language header: $h\n";
 
-    my $guard = sanitisename(uc $opts{'output-c-header'});
+    my $guard = sanitisename(uc $h);
     $guard = q{INC_} . $guard . q{_GENERATED};
 
-    my $file = $opts{'output-c-header'};
+    my $file = $h;
     open my $fh, q{>}, $file or confess "Could not open $file: $ERRNO\n";
 
     print {$fh} "/**\n";
-    print {$fh} q{ * @file }, basename($opts{'output-c-header'}), qq{\n};
+    print {$fh} q{ * @file }, basename($h), qq{\n};
     print {$fh} q{ * @brief Configuration header generated by }, $NAME, qq{\n};
     print {$fh} " *\n";
     print {$fh} q{ * This file was generated by },
@@ -504,10 +553,10 @@ sub generate_c_header {
     foreach my $o (@options) {
         my $string = sanitisename(optionstring($o));
         $string = q{HAVE_COMPILER_FLAG_} . $string;
-        if ($o->{result} > 0) {
-            print {$fh} "#define $string\n";
+        if (none { $_ eq $lang } @{ $o->{result} }) {
+            print {$fh} "/* Test failed/skipped: #define $string */\n";
         } else {
-            print {$fh} "/* Test failed: #define $string */\n";
+            print {$fh} "#define $string\n";
         }
     }
     print {$fh} "\n#endif /* $guard */\n";
@@ -520,20 +569,20 @@ sub generate_standard {
     my @stds;
 
     OPTION: foreach my $o (@options) {
-        next OPTION unless (defined $o->{'c-standard'});
+        next OPTION unless (defined $o->{'standard'});
         next OPTION unless ($o->{result} > 0);
         push @stds, $o;
     }
     print {$fh} "CFLAGS_STANDARD =";
     if ($#stds < 0) {
         verbose("Compiler supports no language standard option!\n");
-    } elsif (my $o = first { $_->{'c-standard'} eq $pref } @stds) {
+    } elsif (my $o = first { $_->{'standard'} eq $pref } @stds) {
         verbose("Picking C standard preference: $pref\n");
         print {$fh} q{ }, optionstring($o), qq{\n};
     } else {
         verbose("Preferred C standard not available!\n");
         verbose("Picking first available option: ",
-                $stds[0]->{'c-standard'}, qq{\n});
+                $stds[0]->{'standard'}, qq{\n});
         print {$fh} q{ }, optionstring($stds[0]), qq{\n};
     }
     return 1;
@@ -650,7 +699,7 @@ if ($opts{'knows-all-options'}) {
 } else {
     verbose("Running compiler option tests.\n");
     foreach my $option (@options) {
-        $option->{result} = optiontest($option);
+        $option->{result} = optiontest_fe($option);
     }
 }
 
@@ -663,11 +712,16 @@ if ($opts{'knows-all-features'}) {
 } else {
     verbose("Running compiler feature tests.\n");
     foreach my $feature (@features) {
-        $feature->{result} = featuretest($feature);
+        $feature->{result} = featuretest_fe($feature);
     }
 }
 
-generate_c_header() if (defined $opts{'output-c-header'});
+if (defined $opts{'output-c-header'}) {
+    generate_header(q{C}, $opts{'output-c-header'})
+}
+if (defined $opts{'output-cxx-header'}) {
+    generate_header(q{C++}, $opts{'output-cxx-header'})
+}
 generate_makefile() if (defined $opts{'output-makefile'});
 remove_tree fileprefix() unless ($opts{debug});
 
