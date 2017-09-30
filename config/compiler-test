@@ -129,7 +129,13 @@ my @features = (
 my @options = (
 
     { standard => "c99" },
+    { standard => "gnu99" },
     { standard => "c11" },
+    { standard => "gnu11" },
+    { standard => "c++11", lang => "C++" },
+    { standard => "gnu++11", lang => "C++" },
+    { standard => "c++14", lang => "C++" },
+    { standard => "gnu++14", lang => "C++" },
     { warning => "all" },
     { warning => "asm" },
     { warning => "error" },
