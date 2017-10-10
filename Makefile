@@ -34,9 +34,13 @@ config:
 	    true; \
 	fi
 
-clean:
-	$(MAKE) -C test clean
+clean-config:
 	rm -f config/ufw-*.*
+	rm -f config/*~
+	rm -f config/"#"*"#"
+
+clean: clean-config
+	$(MAKE) -C test clean
 	rm -f *~ "#"*"#"
 
-.PHONY: all clean config
+.PHONY: all clean clean-config config
