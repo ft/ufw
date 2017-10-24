@@ -145,8 +145,8 @@ my @options = (
     { warning => "implicit-function-declaration", lang => "C" },
     { warning => "missing-prototypes", lang => "C" },
     { warning => "newline-eof" },
-    { warning => "packed" },
-    # Not sure about this one yet.
+    # Not sure about these yet.
+    #{ warning => "packed" },
     #{ warning => "padded" },
     { warning => "pedantic" },
     { warning => "redundant-decls" },
