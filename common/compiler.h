@@ -12,7 +12,7 @@
 #ifndef INC_COMPILER_H
 #define INC_COMPILER_H
 
-#include <config/ufw-config.h>
+#include <common/ufw-config.h>
 
 /*
  * Annotation macros
