@@ -1,0 +1,61 @@
+#ifndef INC_UFW_CONFIG_H
+#define INC_UFW_CONFIG_H
+
+#cmakedefine UFW_CC_HAS_Wall @UFW_CC_HAS_Wall@
+
+#cmakedefine UFW_CC_HAS_Wall @UFW_CC_HAS_Wall@
+#cmakedefine UFW_CC_HAS_Wextra @UFW_CC_HAS_Wextra@
+#cmakedefine UFW_CC_HAS_Werror @UFW_CC_HAS_Werror@
+#cmakedefine UFW_CC_HAS_Wasm @UFW_CC_HAS_Wasm@
+#cmakedefine UFW_CC_HAS_Wimplicit_fallthrough @UFW_CC_HAS_Wimplicit_fallthrough@
+#cmakedefine UFW_CC_HAS_Wimplicit_function_declaration @UFW_CC_HAS_Wimplicit_function_declaration@
+#cmakedefine UFW_CC_HAS_Wmissing_prototypes @UFW_CC_HAS_Wmissing_prototypes@
+#cmakedefine UFW_CC_HAS_Wnewline_eof @UFW_CC_HAS_Wnewline_eof@
+#cmakedefine UFW_CC_HAS_Wpacked @UFW_CC_HAS_Wpacked@
+#cmakedefine UFW_CC_HAS_Wpadded @UFW_CC_HAS_Wpadded@
+#cmakedefine UFW_CC_HAS_Wpedantic @UFW_CC_HAS_Wpedantic@
+#cmakedefine UFW_CC_HAS_Wredundant_decls @UFW_CC_HAS_Wredundant_decls@
+#cmakedefine UFW_CC_HAS_Wsequence_point @UFW_CC_HAS_Wsequence_point@
+#cmakedefine UFW_CC_HAS_Wshadow @UFW_CC_HAS_Wshadow@
+#cmakedefine UFW_CC_HAS_Wshift_sign_overflow @UFW_CC_HAS_Wshift_sign_overflow@
+#cmakedefine UFW_CC_HAS_Wstrict_prototypes @UFW_CC_HAS_Wstrict_prototypes@
+#cmakedefine UFW_CC_HAS_Wundef @UFW_CC_HAS_Wundef@
+#cmakedefine UFW_CC_HAS_Wused_but_marked_unused @UFW_CC_HAS_Wused_but_marked_unused@
+
+#cmakedefine UFW_CC_HAS_ATTRIBUTE_COLD @UFW_CC_HAS_ATTRIBUTE_COLD@
+#cmakedefine UFW_CC_HAS_ATTRIBUTE_DEPRECATED @UFW_CC_HAS_ATTRIBUTE_DEPRECATED@
+#cmakedefine UFW_CC_HAS_ATTRIBUTE_HOT @UFW_CC_HAS_ATTRIBUTE_HOT@
+#cmakedefine UFW_CC_HAS_ATTRIBUTE_NORETURN @UFW_CC_HAS_ATTRIBUTE_NORETURN@
+#cmakedefine UFW_CC_HAS_ATTRIBUTE_PACKED @UFW_CC_HAS_ATTRIBUTE_PACKED@
+#cmakedefine UFW_CC_HAS_ATTRIBUTE_SECTION @UFW_CC_HAS_ATTRIBUTE_SECTION@
+#cmakedefine UFW_CC_HAS_ATTRIBUTE_UNUSED @UFW_CC_HAS_ATTRIBUTE_UNUSED@
+#cmakedefine UFW_CC_HAS_ATTRIBUTE_WARN_UNUSED_RESULT @UFW_CC_HAS_ATTRIBUTE_WARN_UNUSED_RESULT@
+#cmakedefine UFW_CC_HAS_BUILTIN_EXPECT @UFW_CC_HAS_BUILTIN_EXPECT@
+
+#cmakedefine UFW_CXX_HAS_Wall @UFW_CXX_HAS_Wall@
+#cmakedefine UFW_CXX_HAS_Wextra @UFW_CXX_HAS_Wextra@
+#cmakedefine UFW_CXX_HAS_Werror @UFW_CXX_HAS_Werror@
+#cmakedefine UFW_CXX_HAS_Wasm @UFW_CXX_HAS_Wasm@
+#cmakedefine UFW_CXX_HAS_Wimplicit_fallthrough @UFW_CXX_HAS_Wimplicit_fallthrough@
+#cmakedefine UFW_CXX_HAS_Wnewline_eof @UFW_CXX_HAS_Wnewline_eof@
+#cmakedefine UFW_CXX_HAS_Wpacked @UFW_CXX_HAS_Wpacked@
+#cmakedefine UFW_CXX_HAS_Wpadded @UFW_CXX_HAS_Wpadded@
+#cmakedefine UFW_CXX_HAS_Wpedantic @UFW_CXX_HAS_Wpedantic@
+#cmakedefine UFW_CXX_HAS_Wredundant_decls @UFW_CXX_HAS_Wredundant_decls@
+#cmakedefine UFW_CXX_HAS_Wsequence_point @UFW_CXX_HAS_Wsequence_point@
+#cmakedefine UFW_CXX_HAS_Wshadow @UFW_CXX_HAS_Wshadow@
+#cmakedefine UFW_CXX_HAS_Wshift_sign_overflow @UFW_CXX_HAS_Wshift_sign_overflow@
+#cmakedefine UFW_CXX_HAS_Wundef @UFW_CXX_HAS_Wundef@
+#cmakedefine UFW_CXX_HAS_Wused_but_marked_unused @UFW_CXX_HAS_Wused_but_marked_unused@
+
+#cmakedefine UFW_CXX_HAS_ATTRIBUTE_COLD @UFW_CXX_HAS_ATTRIBUTE_COLD@
+#cmakedefine UFW_CXX_HAS_ATTRIBUTE_DEPRECATED @UFW_CXX_HAS_ATTRIBUTE_DEPRECATED@
+#cmakedefine UFW_CXX_HAS_ATTRIBUTE_HOT @UFW_CXX_HAS_ATTRIBUTE_HOT@
+#cmakedefine UFW_CXX_HAS_ATTRIBUTE_NORETURN @UFW_CXX_HAS_ATTRIBUTE_NORETURN@
+#cmakedefine UFW_CXX_HAS_ATTRIBUTE_PACKED @UFW_CXX_HAS_ATTRIBUTE_PACKED@
+#cmakedefine UFW_CXX_HAS_ATTRIBUTE_SECTION @UFW_CXX_HAS_ATTRIBUTE_SECTION@
+#cmakedefine UFW_CXX_HAS_ATTRIBUTE_UNUSED @UFW_CXX_HAS_ATTRIBUTE_UNUSED@
+#cmakedefine UFW_CXX_HAS_ATTRIBUTE_WARN_UNUSED_RESULT @UFW_CXX_HAS_ATTRIBUTE_WARN_UNUSED_RESULT@
+#cmakedefine UFW_CXX_HAS_BUILTIN_EXPECT @UFW_CXX_HAS_BUILTIN_EXPECT@
+
+#endif /* INC_UFW_CONFIG_H */
