@@ -105,49 +105,49 @@ endmacro()
 
 macro(CheckGNUAttribute_CXX_cold)
   check_cxx_source_compiles("${__UFW_GNUAttribute_cold}"
-    UFW_CC_HAS_ATTRIBUTE_COLD
+    UFW_CXX_HAS_ATTRIBUTE_COLD
     FAIL_REGEX "${__UFW_GNUAttributes_warning_fail}")
 endmacro()
 
 macro(CheckGNUAttribute_CXX_deprecated)
   check_cxx_source_compiles("${__UFW_GNUAttribute_deprecated}"
-    UFW_CC_HAS_ATTRIBUTE_DEPRECATED
+    UFW_CXX_HAS_ATTRIBUTE_DEPRECATED
     FAIL_REGEX "${__UFW_GNUAttributes_warning_fail}")
 endmacro()
 
 macro(CheckGNUAttribute_CXX_hot)
   check_cxx_source_compiles("${__UFW_GNUAttribute_hot}"
-    UFW_CC_HAS_ATTRIBUTE_HOT
+    UFW_CXX_HAS_ATTRIBUTE_HOT
     FAIL_REGEX "${__UFW_GNUAttributes_warning_fail}")
 endmacro()
 
 macro(CheckGNUAttribute_CXX_noreturn)
   check_cxx_source_compiles("${__UFW_GNUAttribute_noreturn}"
-    UFW_CC_HAS_ATTRIBUTE_NORETURN
+    UFW_CXX_HAS_ATTRIBUTE_NORETURN
     FAIL_REGEX "${__UFW_GNUAttributes_warning_fail}")
 endmacro()
 
 macro(CheckGNUAttribute_CXX_packed)
   check_cxx_source_compiles("${__UFW_GNUAttribute_packed}"
-    UFW_CC_HAS_ATTRIBUTE_PACKED
+    UFW_CXX_HAS_ATTRIBUTE_PACKED
     FAIL_REGEX "${__UFW_GNUAttributes_warning_fail}")
 endmacro()
 
 macro(CheckGNUAttribute_CXX_section)
   check_cxx_source_compiles("${__UFW_GNUAttribute_section}"
-    UFW_CC_HAS_ATTRIBUTE_SECTION
+    UFW_CXX_HAS_ATTRIBUTE_SECTION
     FAIL_REGEX "${__UFW_GNUAttributes_warning_fail}")
 endmacro()
 
 macro(CheckGNUAttribute_CXX_unused)
   check_cxx_source_compiles("${__UFW_GNUAttribute_unused}"
-    UFW_CC_HAS_ATTRIBUTE_UNUSED
+    UFW_CXX_HAS_ATTRIBUTE_UNUSED
     FAIL_REGEX "${__UFW_GNUAttributes_warning_fail}")
 endmacro()
 
 macro(CheckGNUAttribute_CXX_warn_unused_result)
   check_cxx_source_compiles("${__UFW_GNUAttribute_warn_unused_result}"
-    UFW_CC_HAS_ATTRIBUTE_WARN_UNUSED_RESULT
+    UFW_CXX_HAS_ATTRIBUTE_WARN_UNUSED_RESULT
     FAIL_REGEX "${__UFW_GNUAttributes_warning_fail}")
 endmacro()
 
