@@ -6,7 +6,7 @@
 #include <c/ring-buffer.h>
 #include <c/ring-buffer-iter.h>
 #include <c/ring-buffer-iter.c>
-#include <compiler.h>
+#include <common/compiler.h>
 
 #include <tap.h>
 

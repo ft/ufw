@@ -5,7 +5,7 @@
 #include <tap.h>
 #pragma GCC diagnostic pop
 
-#include "compiler.h"
+#include "common/compiler.h"
 #include "c++/Validator.h"
 
 TEST(TrivialValidator, AlwaysReturnsTrue0) {
