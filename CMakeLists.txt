@@ -10,10 +10,12 @@ include(GNUBuiltins)
 GNUCCompilerWarnings()
 CheckAllGNUAttributes_C()
 CheckAllGNUBuiltins_C()
+MakeStrictCCompiler()
 
 GNUCXXCompilerWarnings()
 CheckAllGNUAttributes_CXX()
 CheckAllGNUBuiltins_CXX()
+MakeStrictCXXCompiler()
 
 configure_file("${PROJECT_SOURCE_DIR}/common/config.h.in"
                "${PROJECT_BINARY_DIR}/common/config.h" )
