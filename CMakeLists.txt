@@ -17,8 +17,8 @@ CheckAllGNUAttributes_CXX()
 CheckAllGNUBuiltins_CXX()
 MakeStrictCXXCompiler()
 
-configure_file("${PROJECT_SOURCE_DIR}/common/config.h.in"
-               "${PROJECT_BINARY_DIR}/common/config.h" )
+configure_file("${PROJECT_SOURCE_DIR}/common/ufw-config.h.in"
+               "${PROJECT_BINARY_DIR}/common/ufw-config.h" )
 
 add_subdirectory(c)
 add_subdirectory(c++)
