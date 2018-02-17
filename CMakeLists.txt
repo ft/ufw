@@ -144,8 +144,8 @@ check_cxx_source_compiles("int main(void) {
                            }"
   UFW_CXX_HAS_BUILTIN_EXPECT)
 
-configure_file("${PROJECT_SOURCE_DIR}/config.h.in"
-               "${PROJECT_BINARY_DIR}/config.h" )
+configure_file("${PROJECT_SOURCE_DIR}/common/config.h.in"
+               "${PROJECT_BINARY_DIR}/common/config.h" )
 
 add_subdirectory(c)
 add_subdirectory(c++)
