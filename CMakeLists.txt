@@ -25,3 +25,4 @@ configure_file("${PROJECT_SOURCE_DIR}/common/ufw-config.h.in"
 
 add_subdirectory(c)
 add_subdirectory(c++)
+add_subdirectory(test)
