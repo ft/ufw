@@ -1,3 +1,7 @@
+if (${CMAKE_CROSSCOMPILING})
+  return()
+endif()
+
 MaybeSetupGoogleTest()
 find_package(GTest REQUIRED)
 
