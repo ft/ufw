@@ -10,15 +10,23 @@ include(GNUBuiltins)
 
 DetectMonolith()
 
-GNUCCompilerWarnings()
+if ((${CMAKE_C_COMPILER_ID} MATCHES "GNU") OR
+    (${CMAKE_C_COMPILER_ID} MATCHES "Clang"))
+  GNUCCompilerWarnings()
+  MakeStrictCCompiler()
+endif()
+
 CheckAllGNUAttributes_C()
 CheckAllGNUBuiltins_C()
-MakeStrictCCompiler()
 
-GNUCXXCompilerWarnings()
+if ((${CMAKE_C_COMPILER_ID} MATCHES "GNU") OR
+    (${CMAKE_C_COMPILER_ID} MATCHES "Clang"))
+  GNUCXXCompilerWarnings()
+  MakeStrictCXXCompiler()
+endif()
+
 CheckAllGNUAttributes_CXX()
 CheckAllGNUBuiltins_CXX()
-MakeStrictCXXCompiler()
 
 configure_file("${PROJECT_SOURCE_DIR}/common/ufw-config.h.in"
                "${PROJECT_BINARY_DIR}/common/ufw-config.h" )
