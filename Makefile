@@ -26,7 +26,10 @@ build-clang-arm-none-eabi:
 
 build-ti-c2000-c28x:
 	mkdir -p $@
-	cd $@ && cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchains/ti-c2000.cmake -DCMAKE_CXX_COMPILER_ID=TI ..
+	cd $@ && cmake -DCMAKE_TI_TARGET=c28x \
+                       -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchains/ti-c2000.cmake \
+                       -DCMAKE_CXX_COMPILER_ID=TI \
+                       ..
 	cd $@ && cmake --build .
 
 .PHONY: $(EVERYTHING)
