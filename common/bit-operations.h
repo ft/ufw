@@ -237,7 +237,7 @@
  * @return True if all bits from mask are set in container; false otherwise.
  * @sideeffects None
  */
-#define BIT_ISSET(container, mask) ((container) & (mask) == (mask))
+#define BIT_ISSET(container, mask) (((container) & (mask)) == (mask))
 
 /**
  * Return true if a any bit from a set of bits is set in a given container
