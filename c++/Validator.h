@@ -11,7 +11,6 @@
  * These validators take an arbitrary piece of data and return a boolean value.
  */
 
-
 #ifndef INC_VALIDATOR_H
 #define INC_VALIDATOR_H
 
@@ -19,19 +18,27 @@
 
 namespace MicroFrameWork {
 
+template <typename I, typename T>
+class Validator {
+public:
+    Validator() {};
+    inline bool operator()(T v) {
+        impl().operator()(v);
+    }
+private:
+    I &impl() { return * static_cast<I*>(this); }
+};
+
+
 /**
  * Trivial validator, that always returns true.
  *
  * This is the default validator used by the Setting class.
  */
 template <typename T>
-class TrivialValidator {
+class TrivialValidator : public Validator<TrivialValidator<T>, T> {
 public:
-    TrivialValidator(){};
-    bool
-    operator()(UNUSED T v) const {
-        return true;
-    };
+    bool operator()(UNUSED T v) { return true; }
 };
 
 /**
@@ -44,19 +51,16 @@ public:
  * The data type used with this validator has to have the <= and >= operators
  * defined for it.
  */
-template <typename T>
-class RangeValidator {
+template <typename T, T min, T max>
+class RangeValidator : public Validator<RangeValidator<T, min, max>, T> {
 public:
-    RangeValidator(T min_, T max_) : min(min_), max(max_){};
+    RangeValidator() {};
     bool
-    operator()(const T v) const {
+    operator()(T v) const {
         return v >= min && v <= max;
     };
-
-private:
-    const T min;
-    const T max;
 };
+
 }
 
 #endif /* INC_VALIDATOR_H */
