@@ -26,3 +26,4 @@ GTAGS
 config/*.mk
 config/*.h
 build-*/
+build/
