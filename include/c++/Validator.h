@@ -26,7 +26,7 @@ namespace MicroFrameWork {
 template <typename T>
 class TrivialValidator {
 public:
-    inline bool operator()(UNUSED T v) const { return true; }
+    inline bool operator()(UNUSED const T v) const { return true; }
 };
 
 /**
@@ -45,7 +45,7 @@ public:
     RangeValidator(T max_) : min(0), max(max_) {};
     RangeValidator(T min_, T max_) : min(min_), max(max_) {};
     inline bool
-    operator()(T v) const {
+    operator()(const T v) const {
         return v >= min && v <= max;
     };
 private:
