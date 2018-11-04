@@ -2,10 +2,9 @@ if (${CMAKE_CROSSCOMPILING})
   return()
 endif()
 
-MaybeSetupGoogleTest()
-find_package(GTest REQUIRED)
+find_package(GTest)
 
-# TODO: Need detection for gtest-tap and libtap, before I can switch this one over.
-
-#add_executable(TrivialValidator TrivialValidator.cpp)
-#target_link_libraries(TrivialValidator GTest::GTest GTest::Main)
+if (GTest_FOUND)
+  add_executable(TrivialValidator TrivialValidator.cpp)
+  target_link_libraries(TrivialValidator GTest::GTest GTest::Main)
+endif()
