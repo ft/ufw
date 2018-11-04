@@ -19,37 +19,37 @@
  * returns the value returned by said operator.
  */
 
-
-#include <functional>
 #include "c++/Validator.h"
 
 namespace MicroFrameWork {
 
-template <typename T>
+template <typename T, typename V=TrivialValidator<T> >
 class Setting {
 public:
-    Setting() : validate(TrivialValidator<T>()){};
-    Setting(T v) : validate(TrivialValidator<T>()), value(v){};
-    Setting(T v, std::function<bool(T)> vd) : validate(vd), value(v){};
+    Setting() : validate((TrivialValidator<T>())) { }
+    Setting(T v) : validate((TrivialValidator<T>())),
+                   value(v) { }
+    Setting(V f, T v) : validate(f), value(v) { }
+
+    T get(void) const { return value; }
+
     bool
     set(T v) {
         if (!validate(v))
             return false;
         value = v;
         return true;
-    };
-    T
-    get(void) const {
-        return value;
-    };
-    Setting<T> &
+    }
+
+    Setting<T, V> &
     operator=(T v) {
         value = v;
         return *this;
     }
 
 private:
-    std::function<bool(T)> validate;
+    V validate;
     T value;
 };
+
 };
