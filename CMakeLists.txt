@@ -3,12 +3,9 @@ project(ufw)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 
-include(DetectMonolith)
 include(GNUCompilerWarnings)
 include(GNUAttributes)
 include(GNUBuiltins)
-
-DetectMonolith()
 
 if ((${CMAKE_C_COMPILER_ID} MATCHES "GNU") OR
     (${CMAKE_C_COMPILER_ID} MATCHES "Clang"))
