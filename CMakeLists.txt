@@ -28,9 +28,18 @@ endif()
 CheckAllGNUAttributes_CXX()
 CheckAllGNUBuiltins_CXX()
 
-configure_file("${PROJECT_SOURCE_DIR}/common/toolchain.h.in"
-               "${PROJECT_BINARY_DIR}/common/toolchain.h" )
+configure_file("${PROJECT_SOURCE_DIR}/include/common/toolchain.h.in"
+               "${PROJECT_BINARY_DIR}/include/common/toolchain.h" )
 
-add_subdirectory(c)
-add_subdirectory(c++)
+add_library(ufw STATIC src/c/ring-buffer-iter.c)
+target_include_directories(ufw PUBLIC ${CMAKE_SOURCE_DIR}/include)
+
+add_library(ufw++ INTERFACE)
+target_include_directories(ufw++ INTERFACE ${CMAKE_SOURCE_DIR}/include)
+
+add_library(ufw-common INTERFACE)
+target_include_directories(ufw-common
+  INTERFACE ${CMAKE_SOURCE_DIR}/include
+            ${CMAKE_BINARY_DIR}/include)
+
 add_subdirectory(test)

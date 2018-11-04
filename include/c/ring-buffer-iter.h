@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "ring-buffer.h"
+#include "c/ring-buffer.h"
 
 typedef enum {
     RING_BUFFER_ITER_OLD_TO_NEW,

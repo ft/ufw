@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "ring-buffer-iter.h"
+#include "c/ring-buffer-iter.h"
 
 bool
 rb_iter_done(rb_iter *iter)
