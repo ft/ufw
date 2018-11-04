@@ -31,7 +31,7 @@ public:
                    value(v) { }
     Setting(V f, T v) : validate(f), value(v) { }
 
-    T get(void) const { return value; }
+    inline T get(void) const { return value; }
 
     bool
     set(T v) {
