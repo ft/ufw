@@ -28,8 +28,8 @@ endif()
 CheckAllGNUAttributes_CXX()
 CheckAllGNUBuiltins_CXX()
 
-configure_file("${PROJECT_SOURCE_DIR}/common/ufw-config.h.in"
-               "${PROJECT_BINARY_DIR}/common/ufw-config.h" )
+configure_file("${PROJECT_SOURCE_DIR}/common/toolchain.h.in"
+               "${PROJECT_BINARY_DIR}/common/toolchain.h" )
 
 add_subdirectory(c)
 add_subdirectory(c++)
