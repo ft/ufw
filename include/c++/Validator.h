@@ -48,12 +48,12 @@ public:
     operator()(const T v) const {
         return v >= min && v <= max;
     };
-private:
 
+private:
     const T min;
     const T max;
 };
 
-}
+} /* namespace MicroFrameWork */
 
 #endif /* INC_VALIDATOR_H */
