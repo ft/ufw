@@ -18,25 +18,13 @@
 
 namespace MicroFrameWork {
 
-template <typename I, typename T>
-class Validator {
-public:
-    Validator() {};
-    inline bool operator()(T v) {
-        impl().operator()(v);
-    }
-private:
-    I &impl() { return * static_cast<I*>(this); }
-};
-
-
 /**
  * Trivial validator, that always returns true.
  *
  * This is the default validator used by the Setting class.
  */
 template <typename T>
-class TrivialValidator : public Validator<TrivialValidator<T>, T> {
+class TrivialValidator {
 public:
     bool operator()(UNUSED T v) { return true; }
 };
@@ -51,14 +39,19 @@ public:
  * The data type used with this validator has to have the <= and >= operators
  * defined for it.
  */
-template <typename T, T min, T max>
-class RangeValidator : public Validator<RangeValidator<T, min, max>, T> {
+template <typename T>
+class RangeValidator {
 public:
-    RangeValidator() {};
+    RangeValidator(T max_) : min(0), max(max_) {};
+    RangeValidator(T min_, T max_) : min(min_), max(max_) {};
     bool
     operator()(T v) const {
         return v >= min && v <= max;
     };
+private:
+
+    const T min;
+    const T max;
 };
 
 }
