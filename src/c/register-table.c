@@ -70,12 +70,36 @@ rds_u32_des(const RegisterAtom *r, RegisterValue *v)
     return true;
 }
 
+static bool
+rds_u64_ser(const RegisterValue *v, RegisterAtom *r)
+{
+    assert(v->type == REG_TYPE_UINT64);
+    *(r+0) = (v->value.u64 >>  0u) & 0xfffful;
+    *(r+1) = (v->value.u64 >> 16u) & 0xfffful;
+    *(r+2) = (v->value.u64 >> 32u) & 0xfffful;
+    *(r+3) = (v->value.u64 >> 48u) & 0xfffful;
+    return true;
+}
+
+static bool
+rds_u64_des(const RegisterAtom *r, RegisterValue *v)
+{
+    uint64_t n = *r;
+    n |= ((uint64_t)*(r+1)) << 16u;
+    n |= ((uint64_t)*(r+2)) << 32u;
+    n |= ((uint64_t)*(r+3)) << 48u;
+    v->value.u64 = n;
+    v->type = REG_TYPE_UINT64;
+    return true;
+}
+
 #define rs(t) (sizeof(t) / sizeof(RegisterAtom))
 
 const RegisterSerDes rds_serdes[] = {
     [REG_TYPE_INVALID] = { rds_invalid_ser, rds_invalid_des, 0 },
     [REG_TYPE_UINT16] = { rds_u16_ser, rds_u16_des, rs(uint16_t) },
-    [REG_TYPE_UINT32] = { rds_u32_ser, rds_u32_des, rs(uint32_t) }
+    [REG_TYPE_UINT32] = { rds_u32_ser, rds_u32_des, rs(uint32_t) },
+    [REG_TYPE_UINT64] = { rds_u64_ser, rds_u64_des, rs(uint64_t) }
 };
 
 static inline bool
