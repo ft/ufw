@@ -230,6 +230,25 @@ register_get(RegisterTable *t, size_t idx, RegisterValue *v)
 }
 
 RegisterAccessResult
+register_default(RegisterTable *t, size_t idx, RegisterValue *v)
+{
+    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+    RegisterEntry *e;
+
+    if (idx > t->entries) {
+        rv.code = REG_ACCESS_NOENTRY;
+        rv.address = idx;
+        return rv;
+    }
+
+    e = &t->entry[idx];
+    v->type = e->type;
+    v->value = e->default_value;
+
+    return rv;
+}
+
+RegisterAccessResult
 reg_mem_read(const RegisterArea *a, RegisterAtom *dest,
              RegisterOffset offset, size_t n)
 {

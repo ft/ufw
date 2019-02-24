@@ -120,5 +120,6 @@ reg_mem_write(RegisterArea*, const RegisterAtom*, RegisterOffset, size_t);
 
 RegisterAccessResult register_set(RegisterTable*, size_t, RegisterValue*);
 RegisterAccessResult register_get(RegisterTable*, size_t, RegisterValue*);
+RegisterAccessResult register_default(RegisterTable*, size_t, RegisterValue*);
 
 #endif /* INC_REGISTER_TABLE_H */
