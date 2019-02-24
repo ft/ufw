@@ -28,7 +28,8 @@ CheckAllGNUBuiltins_CXX()
 configure_file("${PROJECT_SOURCE_DIR}/include/common/toolchain.h.in"
                "${PROJECT_BINARY_DIR}/include/common/toolchain.h" )
 
-add_library(ufw STATIC src/c/ring-buffer-iter.c)
+add_library(ufw STATIC src/c/ring-buffer-iter.c
+                       src/c/register-table.c)
 target_include_directories(ufw PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 add_library(ufw++ INTERFACE)
