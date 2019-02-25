@@ -360,7 +360,7 @@ ra_find_area_by_addr(RegisterTable *t, RegisterAddress addr)
 }
 
 static bool
-ra_find_memory(RegisterTable *t, RegisterEntry *e)
+ra_entry_is_in_memory(RegisterTable *t, RegisterEntry *e)
 {
     for (size_t an = 0ull; an < t->areas; ++an) {
         RegisterArea *area = &t->area[an];
@@ -392,7 +392,7 @@ registers_init(RegisterTable *t)
         RegisterValue def;
         RegisterEntry *e = &t->entry[i];
         /* Link into register table memory */
-        bool success = ra_find_memory(t, e);
+        bool success = ra_entry_is_in_memory(t, e);
         if (success == false) {
             rv.code = REG_ACCESS_NOENTRY;
             rv.address = e->address;
