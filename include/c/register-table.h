@@ -11,6 +11,7 @@ typedef uint16_t RegisterAtom;
 typedef size_t RegisterAddress;
 typedef size_t RegisterOffset;
 typedef struct RegisterArea RegisterArea;
+typedef struct RegisterEntry RegisterEntry;
 typedef struct RegisterValue RegisterValue;
 
 typedef enum RegisterAccessBits {
@@ -34,6 +35,7 @@ typedef struct RegisterAccessResult {
 
 typedef bool(*registerSer)(const RegisterValue*, RegisterAtom*);
 typedef bool(*registerDes)(const RegisterAtom*, RegisterValue*);
+typedef bool(*validatorFunction)(const RegisterEntry*, RegisterValue);
 
 typedef RegisterAccessResult(*registerRead)(
     const RegisterArea*, RegisterAtom*, RegisterOffset, size_t);
@@ -81,17 +83,42 @@ typedef struct RegisterSerDes {
     size_t size;
 } RegisterSerDes;
 
-typedef struct RegisterEntry {
+typedef enum RegisterValidatorType {
+    REGV_TYPE_TRIVIAL = 0,
+    REGV_TYPE_MIN,
+    REGV_TYPE_MAX,
+    REGV_TYPE_RANGE,
+    REGV_TYPE_CALLBACK
+} RegisterValidatorType;
+
+typedef struct RegisterValidator {
+    RegisterValidatorType type;
+    union {
+        RegisterValueU min;
+        RegisterValueU max;
+        struct {
+            RegisterValueU min;
+            RegisterValueU max;
+        } range;
+        validatorFunction cb;
+    } arg;
+} RegisterValidator;
+
+#define REGV_INIT { .type = REGV_TYPE_TRIVIAL }
+
+struct RegisterEntry {
     RegisterType type;
     RegisterValueU default_value;
     RegisterAddress address;
     RegisterArea *area;
     RegisterOffset offset;
-} RegisterEntry;
+    RegisterValidator check;
+};
 
 #define REG_ENTRY_END                                   \
     { .type = REG_TYPE_INVALID, .default_value.u16 = 0, \
-      .address = 0, .area = NULL, .offset = 0 }
+      .address = 0, .area = NULL, .offset = 0,          \
+      .check.type = REGV_TYPE_TRIVIAL }
 
 struct RegisterArea {
     registerRead read;
