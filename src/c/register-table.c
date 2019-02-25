@@ -157,6 +157,28 @@ rds_s64_des(const RegisterAtom *r, RegisterValue *v)
     return true;
 }
 
+static bool
+rds_f32_ser(const RegisterValue *v, RegisterAtom *r)
+{
+    assert(v->type == REG_TYPE_FLOAT32);
+    /* Here is another assumption: The register table is supposed to represent
+     * 32 bit floating point numbers in IEEE754 format. And this assumes that
+     * the target architecture uses that one as well. */
+    *r = v->value.u32 & 0xfffful;
+    *(r+1) = (v->value.u32 >> 16u) & 0xfffful;
+    return true;
+}
+
+static bool
+rds_f32_des(const RegisterAtom *r, RegisterValue *v)
+{
+    uint32_t n = *r;
+    n |= ((uint32_t)*(r+1)) << 16u;
+    v->value.u32 = n;
+    v->type = REG_TYPE_FLOAT32;
+    return true;
+}
+
 #define rs(t) (sizeof(t) / sizeof(RegisterAtom))
 
 const RegisterSerDes rds_serdes[] = {
@@ -166,7 +188,8 @@ const RegisterSerDes rds_serdes[] = {
     [REG_TYPE_UINT64] = { rds_u64_ser, rds_u64_des, rs(uint64_t) },
     [REG_TYPE_SINT16] = { rds_s16_ser, rds_s16_des, rs(int16_t) },
     [REG_TYPE_SINT32] = { rds_s32_ser, rds_s32_des, rs(int32_t) },
-    [REG_TYPE_SINT64] = { rds_s64_ser, rds_s64_des, rs(int64_t) }
+    [REG_TYPE_SINT64] = { rds_s64_ser, rds_s64_des, rs(int64_t) },
+    [REG_TYPE_FLOAT32] = { rds_f32_ser, rds_f32_des, rs(float) }
 };
 
 static inline bool
