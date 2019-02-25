@@ -13,8 +13,11 @@
 
 /* Internal API */
 
-#define regmem_read(rm, dst, o, n) ((rm).read(&(rm), (dst), (o), (n)))
-#define regmem_write(rm, src, o, n) ((rm).write(&(rm), (src), (o), (n)))
+static inline size_t
+reg_min(size_t a, size_t b)
+{
+    return (a > b) ? b : a;
+}
 
 static bool
 rds_invalid_ser(const RegisterValue *v, RegisterAtom *r)
@@ -318,15 +321,21 @@ reg_count_entries(RegisterEntry *e)
 }
 
 static bool
-ra_reg_is_part_of(RegisterArea *a, RegisterEntry *e)
+ra_addr_is_part_of(RegisterArea *a, RegisterAddress addr)
 {
-    if (a->base > e->address)
+    if (a->base > addr)
         return false;
 
-    if ((a->base + a->size) <= e->address)
+    if ((a->base + a->size) <= addr)
         return false;
 
     return true;
+}
+
+static inline bool
+ra_reg_is_part_of(RegisterArea *a, RegisterEntry *e)
+{
+    return ra_addr_is_part_of(a, e->address);
 }
 
 static bool
@@ -335,6 +344,19 @@ ra_reg_fits_into(RegisterArea *a, RegisterEntry *e)
     const size_t area_end = a->base + a->size;
     const size_t entry_end = e->address + rds_serdes[e->type].size;
     return (area_end <= entry_end);
+}
+
+static size_t
+ra_find_area_by_addr(RegisterTable *t, RegisterAddress addr)
+{
+    size_t n;
+    for (n = 0ull; n < t->areas; ++n) {
+        if (ra_addr_is_part_of(&t->area[n], addr)) {
+            break;
+        }
+    }
+
+    return n;
 }
 
 static bool
@@ -489,5 +511,35 @@ reg_mem_write(RegisterArea *a, const RegisterAtom *src,
 {
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
     memcpy(a->mem + offset, src, n * sizeof(RegisterAtom));
+    return rv;
+}
+
+RegisterAccessResult
+register_block_read(RegisterTable *t, RegisterAddress addr, size_t n,
+                    RegisterAtom *buf)
+{
+    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+    size_t rest = n;
+
+    while (rest > 0ull) {
+        RegisterArea *a;
+        size_t an, offset, readn;
+
+        an = ra_find_area_by_addr(t, addr);
+        if (an == t->areas) {
+            rv.code = REG_ACCESS_NOENTRY;
+            rv.address = addr;
+            return rv;
+        }
+
+        a = &t->area[an];
+        offset = addr - a->base;
+        readn = reg_min(a->base + a->size - addr, rest);
+        a->read(a, buf, offset, readn);
+        buf += readn;
+        addr += readn;
+        rest -= readn;
+    }
+
     return rv;
 }
