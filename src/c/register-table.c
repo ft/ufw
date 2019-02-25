@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2019 ufw workers, All rights reserved.
+ *
+ * Terms for redistribution and use can be found in LICENCE.
+ */
+
 #ifndef DEBUG
 #define NDEBUG
 #endif /* DEBUG */

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2019 ufw workers, All rights reserved.
+ *
+ * Terms for redistribution and use can be found in LICENCE.
+ */
+
 #ifndef INC_REGISTER_TABLE_H
 #define INC_REGISTER_TABLE_H
 
