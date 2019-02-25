@@ -194,6 +194,90 @@ const RegisterSerDes rds_serdes[] = {
 };
 
 static inline bool
+rv_check_min(RegisterEntry *e, RegisterValue v)
+{
+    switch (v.type) {
+    case REG_TYPE_INVALID:
+        return false;
+    case REG_TYPE_UINT16:
+        return (v.value.u16 >= e->check.arg.min.u16);
+    case REG_TYPE_UINT32:
+        return (v.value.u32 >= e->check.arg.min.u32);
+    case REG_TYPE_UINT64:
+        return (v.value.u64 >= e->check.arg.min.u64);
+    case REG_TYPE_SINT16:
+        return (v.value.s16 >= e->check.arg.min.s16);
+    case REG_TYPE_SINT32:
+        return (v.value.s32 >= e->check.arg.min.s32);
+    case REG_TYPE_SINT64:
+        return (v.value.s64 >= e->check.arg.min.s64);
+    case REG_TYPE_FLOAT32:
+        return (v.value.f32 >= e->check.arg.min.f32);
+    case REG_TYPE_STRING:
+        return true;
+    }
+}
+
+static inline bool
+rv_check_max(RegisterEntry *e, RegisterValue v)
+{
+    switch (v.type) {
+    case REG_TYPE_INVALID:
+        return false;
+    case REG_TYPE_UINT16:
+        return (v.value.u16 <= e->check.arg.max.u16);
+    case REG_TYPE_UINT32:
+        return (v.value.u32 <= e->check.arg.max.u32);
+    case REG_TYPE_UINT64:
+        return (v.value.u64 <= e->check.arg.max.u64);
+    case REG_TYPE_SINT16:
+        return (v.value.s16 <= e->check.arg.max.s16);
+    case REG_TYPE_SINT32:
+        return (v.value.s32 <= e->check.arg.max.s32);
+    case REG_TYPE_SINT64:
+        return (v.value.s64 <= e->check.arg.max.s64);
+    case REG_TYPE_FLOAT32:
+        return (v.value.f32 <= e->check.arg.max.f32);
+    case REG_TYPE_STRING:
+        return true;
+    }
+}
+
+static inline bool
+rv_check_range(RegisterEntry *e, RegisterValue v)
+{
+    return (rv_check_min(e, v) && rv_check_max(e, v));
+}
+
+static inline bool
+rv_check_cb(RegisterEntry *e, RegisterValue v)
+{
+    return e->check.arg.cb(e, v);
+}
+
+static bool
+rv_validate(RegisterEntry *e, RegisterValue v)
+{
+    if (e->type != v.type)
+        return false;
+
+    switch (e->check.type) {
+    case REGV_TYPE_TRIVIAL:
+        return true;
+    case REGV_TYPE_MIN:
+        return rv_check_min(e, v);
+    case REGV_TYPE_MAX:
+        return rv_check_max(e, v);
+    case REGV_TYPE_RANGE:
+        return rv_check_range(e, v);
+    case REGV_TYPE_CALLBACK:
+        return rv_check_cb(e, v);
+    default:
+        return false;
+    }
+}
+
+static inline bool
 is_end_of_areas(RegisterArea *a)
 {
     if (a->read != NULL || a->write != NULL)
@@ -324,6 +408,13 @@ register_set(RegisterTable *t, size_t idx, RegisterValue *v)
     }
 
     e = &t->entry[idx];
+    success = rv_validate(e, *v);
+    if (success == false) {
+        rv.code = REG_ACCESS_INVALID;
+        rv.address = e->address;
+        return rv;
+    }
+
     a = e->area;
     success = rds_serdes[e->type].ser(v, raw);
 
