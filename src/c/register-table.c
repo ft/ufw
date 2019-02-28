@@ -382,6 +382,107 @@ ra_entry_is_in_memory(RegisterTable *t, RegisterEntry *e)
     return false;
 }
 
+static inline void
+ra_read_entry(RegisterEntry *e, RegisterAtom *buf)
+{
+    (void)e->area->read(e->area, buf, e->offset, rds_serdes[e->type].size);
+}
+
+bool
+ra_malformed_write(RegisterTable *t, RegisterAddress addr, size_t n,
+                   RegisterAtom *buf, RegisterAccessResult *rv)
+{
+    RegisterAddress last = addr + n - 1;
+
+    for (size_t i = 0ull; i < t->entries; ++i) {
+        RegisterEntry *e = &t->entry[i];
+        RegisterValue datum;
+        RegisterAtom raw[REG_ATOM_BIGGEST_DATUM];
+        const size_t size = rds_serdes[e->type].size;
+        const RegisterAddress end = e->address + size - 1;
+        size_t bs, rs, rlen;
+
+        /* Skip entries before block start */
+        if (addr > end)
+            continue;
+
+        /* Terminate for entries after last */
+        if (e->address > last)
+            break;
+
+        /*
+         * What we now need to do is this: Which parts of the entry does the
+         * block touch. There are four cases:
+         *
+         * 1. The block touches the entire entry.
+         * 2. The block only touches end of the entry.
+         * 3. The block only touches the beginning of the entry.
+         * 4. The block only touches an embedded part of the entry (2+3).
+         *
+         * Case 2 can only happen with the first entry that is processed. And
+         * indeed, the first atom of the block has to be used. Conversely, case
+         * 3 can only happen with the last entry being processed. And indeed,
+         * that last atom of the block has to be involved.
+         *
+         * Case 4 is a combination of 2 and three. Thus the entry being proces-
+         * sed has to be first as well as the last and therefore the only entry
+         * that's touched.
+         *
+         * Case 1 covers all the other cases, where all the atoms of an entry
+         * have to be touched while processing.
+         *
+         * Now we need to figure out which atoms of the block map to the entry
+         * we're working on: This is simple though because the new block has a
+         * starting address and a length and every entry knows to which address
+         * in the register-table's address space it is mapped to.
+         *
+         * That means we can just substract the block start address from the
+         * entry's address and have the offset from the block start to find the
+         * atoms that should go into the newly formed binary form of the
+         * register table entry.
+         *
+         * That with the information about which parts are touched tells us
+         * precisely which atoms from the new block should go into the entry's
+         * memory. Perform that in temporary memory.
+         */
+
+        rlen = size;
+        if (addr > e->address) {
+            /* This can only happen with the first entry the block touches. */
+            bs = 0ull;
+            rs = addr - e->address;
+            rlen -= rs - 1;
+        } else {
+            bs = e->address - addr;
+            rs = 0ull;
+        }
+
+        if (end > last) {
+            /* This can only happen with the last entry the block touches. */
+            rlen -= bs + size - n;
+        }
+
+        /* Fetch the entire memory of where the old entry is stored */
+        ra_read_entry(e, raw);
+        memcpy(raw + rs, buf + bs, rlen * sizeof(RegisterAtom));
+
+        /* Try the deserialiser, fail if it fails */
+        if (rds_serdes[e->type].des(raw, &datum) == false) {
+            rv->code = REG_ACCESS_INVALID;
+            rv->address = addr + bs;
+            return true;
+        }
+
+        /* Try the validator, fail if it fails */
+        if (rv_validate(e, datum) == false) {
+            rv->code = REG_ACCESS_INVALID;
+            rv->address = addr + bs;
+            return true;
+        }
+    }
+    return false;
+}
+
 /* Public API */
 
 RegisterAccessResult
@@ -502,6 +603,98 @@ register_default(RegisterTable *t, size_t idx, RegisterValue *v)
     return rv;
 }
 
+/* These _unsafe() functions are marked unsafe for a reason. You should make
+ * sure before using it, that the block access they are asked to do is NOT
+ * going to try to touch any memory holes! */
+void
+register_block_read_unsafe(RegisterTable *t, RegisterAddress addr, size_t n,
+                           RegisterAtom *buf)
+{
+    size_t rest = n;
+    while (rest > 0ull) {
+        size_t an = ra_find_area_by_addr(t, addr);
+        size_t offset, readn;
+        RegisterArea *a;
+
+        assert(an < t->areas);
+        a = &t->area[an];
+        offset = addr - a->base;
+        readn = reg_min(a->base + a->size - addr, rest);
+        a->read(a, buf, offset, readn);
+        buf += readn;
+        addr += readn;
+        rest -= readn;
+    }
+}
+
+void
+register_block_write_unsafe(RegisterTable *t, RegisterAddress addr, size_t n,
+                            RegisterAtom *buf)
+{
+    size_t rest = n;
+    while (rest > 0ull) {
+        size_t an = ra_find_area_by_addr(t, addr);
+        size_t offset, writen;
+        RegisterArea *a;
+
+        assert(an < t->areas);
+        a = &t->area[an];
+        offset = addr - a->base;
+        writen = reg_min(a->base + a->size - addr, rest);
+        a->write(a, buf, offset, writen);
+        buf += writen;
+        addr += writen;
+        rest -= writen;
+    }
+}
+
+RegisterAccessResult
+register_block_read(RegisterTable *t, RegisterAddress addr, size_t n,
+                    RegisterAtom *buf)
+{
+    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+
+    if (register_block_touches_hole(t, &addr, n)) {
+        rv.code = REG_ACCESS_NOENTRY;
+        rv.address = addr;
+        return rv;
+    }
+
+    register_block_read_unsafe(t, addr, n, buf);
+    return rv;
+}
+
+RegisterAccessResult
+register_block_write(RegisterTable *t, RegisterAddress addr, size_t n,
+                     RegisterAtom *buf)
+{
+    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+
+    /* Zero-length writes finish trivially. */
+    if (n == 0ull)
+        return rv;
+
+    /* First make sure the block write instruction does not want to write into
+     * an address that does not map to an area in the register table. */
+
+    if (register_block_touches_hole(t, &addr, n)) {
+        rv.code = REG_ACCESS_NOENTRY;
+        rv.address = addr;
+        return rv;
+    }
+
+    if (ra_malformed_write(t, addr, n, buf, &rv)) {
+        return rv;
+    }
+
+    /* If the previous validation steps succeeded, it is safe to push this
+     * chunk of memory into the referenced register table. Since we checked for
+     * all errors before hand, it is safe to use this function. */
+
+    register_block_write_unsafe(t, addr, n, buf);
+    return rv;
+}
+
 RegisterAccessResult
 reg_mem_read(const RegisterArea *a, RegisterAtom *dest,
              RegisterOffset offset, size_t n)
@@ -520,32 +713,24 @@ reg_mem_write(RegisterArea *a, const RegisterAtom *src,
     return rv;
 }
 
-RegisterAccessResult
-register_block_read(RegisterTable *t, RegisterAddress addr, size_t n,
-                    RegisterAtom *buf)
+bool
+register_block_touches_hole(RegisterTable *t, RegisterAddress *addr, size_t n)
 {
-    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+    RegisterAddress old = *addr;
     size_t rest = n;
-
-    while (rest > 0ull) {
+    while (rest > 0) {
         RegisterArea *a;
-        size_t an, offset, readn;
+        size_t used;
+        size_t an = ra_find_area_by_addr(t, *addr);
 
-        an = ra_find_area_by_addr(t, addr);
-        if (an == t->areas) {
-            rv.code = REG_ACCESS_NOENTRY;
-            rv.address = addr;
-            return rv;
-        }
+        if (an == t->areas)
+            return true;
 
         a = &t->area[an];
-        offset = addr - a->base;
-        readn = reg_min(a->base + a->size - addr, rest);
-        a->read(a, buf, offset, readn);
-        buf += readn;
-        addr += readn;
-        rest -= readn;
+        used = reg_min(a->base + a->size - *addr, rest);
+        rest -= used;
+        *addr += used;
     }
-
-    return rv;
+    *addr = old;
+    return false;
 }
