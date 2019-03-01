@@ -127,7 +127,7 @@ struct RegisterEntry {
     RegisterState state;
 };
 
-#define REG_ENTRY_END                                   \
+#define REGISTER_ENTRY_END                              \
     { .type = REG_TYPE_INVALID, .default_value.u16 = 0, \
       .address = 0, .area = NULL, .offset = 0,          \
       .check.type = REGV_TYPE_TRIVIAL }
@@ -140,7 +140,7 @@ struct RegisterArea {
     RegisterAtom *mem;
 };
 
-#define REG_MEMORY_END \
+#define REGISTER_AREA_END \
     { .read = NULL, .write = NULL, .base = 0, .size = 0, .mem = NULL }
 
 typedef struct RegisterTable {
