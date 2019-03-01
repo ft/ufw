@@ -14,6 +14,7 @@
 /* Data types */
 
 typedef uint16_t RegisterAtom;
+typedef uint16_t RegisterState;
 typedef size_t RegisterAddress;
 typedef size_t RegisterOffset;
 typedef struct RegisterArea RegisterArea;
@@ -112,6 +113,10 @@ typedef struct RegisterValidator {
 
 #define REGV_INIT { .type = REGV_TYPE_TRIVIAL }
 
+typedef enum RegisterStateBits {
+    REG_STATE_TOUCHED  = (1u << 0u)
+} RegisterStateBits;
+
 struct RegisterEntry {
     RegisterType type;
     RegisterValueU default_value;
@@ -119,6 +124,7 @@ struct RegisterEntry {
     RegisterArea *area;
     RegisterOffset offset;
     RegisterValidator check;
+    RegisterState state;
 };
 
 #define REG_ENTRY_END                                   \

@@ -298,6 +298,35 @@ is_end_of_areas(RegisterArea *a)
     return true;
 }
 
+static inline int
+reg_range_touches(RegisterEntry *e, RegisterAddress addr, size_t n)
+{
+    /* Return -1 if entry is below range; 0 if it is within the range and 1 if
+     * it is above the range */
+    const size_t size = rds_serdes[e->type].size;
+
+    if ((e->address + size) < addr)
+        return -1;
+
+    if ((addr + n) < e->address)
+        return 1;
+
+    return 0;
+}
+
+static void
+reg_taint_in_range(RegisterTable *t, RegisterAddress addr, size_t n)
+{
+    for (size_t i = 0ull; i < t->entries; ++i) {
+        int touch = reg_range_touches(&t->entry[i], addr, n);
+        if (touch > 0)
+            return;
+        if (touch < 0)
+            continue;
+        t->entry[i].state |= REG_STATE_TOUCHED;
+    }
+}
+
 static size_t
 reg_count_areas(RegisterArea *a)
 {
@@ -692,6 +721,7 @@ register_block_write(RegisterTable *t, RegisterAddress addr, size_t n,
      * all errors before hand, it is safe to use this function. */
 
     register_block_write_unsafe(t, addr, n, buf);
+    reg_taint_in_range(t, addr, n);
     return rv;
 }
 
