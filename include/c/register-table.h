@@ -224,4 +224,12 @@ register_area_is_readable(RegisterArea *a)
     return ((a->read != NULL) && (BIT_ISSET(a->flags, REG_AF_READABLE)));
 }
 
+static inline bool
+register_was_touched(RegisterTable *t, size_t reg)
+{
+    const bool rc = BIT_ISSET(t->entry[reg].flags, REG_EF_TOUCHED);
+    BIT_CLEAR(t->entry[reg].flags, REG_EF_TOUCHED);
+    return rc;
+}
+
 #endif /* INC_REGISTER_TABLE_H */
