@@ -431,9 +431,10 @@ ra_range_touches(RegisterArea *a, RegisterAddress addr, size_t n)
     return 0;
 }
 
-static bool
-ra_writable(RegisterTable *t, RegisterAddress *addr, size_t n)
+static RegisterAccessResult
+ra_writable(RegisterTable *t, RegisterAddress addr, size_t n)
 {
+    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
     /*
      * There are two kinds of "writability":
      *
@@ -446,16 +447,19 @@ ra_writable(RegisterTable *t, RegisterAddress *addr, size_t n)
      *   memory in question.
      */
     for (size_t i = 0ull; i < t->areas; ++i) {
-        int touch = ra_range_touches(&t->area[i], *addr, n);
+        int touch = ra_range_touches(&t->area[i], addr, n);
         if (touch < 0)
             continue;
         if (touch > 0)
             break;
-        if (register_area_is_writable(&t->area[i]) == false)
-            return false;
+        if (register_area_is_writable(&t->area[i]) == false) {
+            rv.code = REG_ACCESS_READONLY;
+            rv.address = addr;
+            return rv;
+        }
     }
 
-    return true;
+    return rv;
 }
 
 bool
@@ -745,11 +749,9 @@ register_block_write(RegisterTable *t, RegisterAddress addr, size_t n,
     if (n == 0ull)
         return rv;
 
-    if (ra_writable(t, &addr, n) == false) {
-        rv.code = REG_ACCESS_READONLY;
-        rv.address = addr;
+    rv = ra_writable(t, addr, n);
+    if (rv.code != REG_ACCESS_SUCCESS)
         return rv;
-    }
 
     /* Make sure the block write instruction does not want to write into
      * an address that does not map to an area in the register table. */
