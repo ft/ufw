@@ -695,7 +695,14 @@ register_block_read_unsafe(RegisterTable *t, RegisterAddress addr, size_t n,
         a = &t->area[an];
         offset = addr - a->base;
         readn = reg_min(a->base + a->size - addr, rest);
-        a->read(a, buf, offset, readn);
+
+        if (register_area_is_readable(a)) {
+            a->read(a, buf, offset, readn);
+        } else {
+            /* Memory that can't be read reads back zeroes */
+            memset(buf + offset, 0, sizeof(RegisterAtom) * readn);
+        }
+
         buf += readn;
         addr += readn;
         rest -= readn;

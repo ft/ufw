@@ -190,4 +190,10 @@ register_area_is_writable(RegisterArea *a)
     return ((a->write != NULL) && (BIT_ISSET(a->flags, REG_AF_WRITEABLE)));
 }
 
+static inline bool
+register_area_is_readable(RegisterArea *a)
+{
+    return ((a->read != NULL) && (BIT_ISSET(a->flags, REG_AF_READABLE)));
+}
+
 #endif /* INC_REGISTER_TABLE_H */
