@@ -724,6 +724,9 @@ register_block_read(RegisterTable *t, RegisterAddress addr, size_t n,
 {
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
 
+    if (n == 0ull)
+        return rv;
+
     if (register_block_touches_hole(t, &addr, n)) {
         rv.code = REG_ACCESS_NOENTRY;
         rv.address = addr;
