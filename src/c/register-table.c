@@ -462,10 +462,11 @@ ra_writable(RegisterTable *t, RegisterAddress addr, size_t n)
     return rv;
 }
 
-bool
+RegisterAccessResult
 ra_malformed_write(RegisterTable *t, RegisterAddress addr, size_t n,
-                   RegisterAtom *buf, RegisterAccessResult *rv)
+                   RegisterAtom *buf)
 {
+    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
     RegisterAddress last = addr + n - 1;
 
     for (size_t i = 0ull; i < t->entries; ++i) {
@@ -542,19 +543,19 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr, size_t n,
 
         /* Try the deserialiser, fail if it fails */
         if (rds_serdes[e->type].des(raw, &datum) == false) {
-            rv->code = REG_ACCESS_INVALID;
-            rv->address = addr + bs;
-            return true;
+            rv.code = REG_ACCESS_INVALID;
+            rv.address = addr + bs;
+            return rv;
         }
 
         /* Try the validator, fail if it fails */
         if (rv_validate(e, datum) == false) {
-            rv->code = REG_ACCESS_INVALID;
-            rv->address = addr + bs;
-            return true;
+            rv.code = REG_ACCESS_INVALID;
+            rv.address = addr + bs;
+            return rv;
         }
     }
-    return false;
+    return rv;
 }
 
 /* Public API */
@@ -760,9 +761,9 @@ register_block_write(RegisterTable *t, RegisterAddress addr, size_t n,
     if (rv.code != REG_ACCESS_SUCCESS)
         return rv;
 
-    if (ra_malformed_write(t, addr, n, buf, &rv)) {
+    rv = ra_malformed_write(t, addr, n, buf);
+    if (rv.code != REG_ACCESS_SUCCESS)
         return rv;
-    }
 
     /* If the previous validation steps succeeded, it is safe to push this
      * chunk of memory into the referenced register table. Since we checked for
