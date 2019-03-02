@@ -16,17 +16,11 @@
 /* Data types */
 
 typedef uint16_t RegisterAtom;
-typedef uint16_t RegisterState;
 typedef size_t RegisterAddress;
 typedef size_t RegisterOffset;
 typedef struct RegisterArea RegisterArea;
 typedef struct RegisterEntry RegisterEntry;
 typedef struct RegisterValue RegisterValue;
-
-typedef enum RegisterAccessBits {
-    REG_ACCESS_BIT_READ  = (1u << 0u),
-    REG_ACCESS_BIT_WRITE = (1u << 1u)
-} RegisterAccessBits;
 
 typedef enum RegisterAccessCode {
     REG_ACCESS_SUCCESS,
@@ -115,9 +109,43 @@ typedef struct RegisterValidator {
 
 #define REGV_INIT { .type = REGV_TYPE_TRIVIAL }
 
-typedef enum RegisterStateBits {
-    REG_STATE_TOUCHED  = (1u << 0u)
-} RegisterStateBits;
+/**
+ * Register Entry flags
+ *
+ * The access bits are able to override the access control of the area the
+ * entry is situated in. If both _ENABLE and _DISABLE are unset, the entry uses
+ * the area's access control.
+ *
+ * Setting both bits is will cause undefined behaviour.
+ *
+ * The _LOCK bits can be used to temporatily allow/disallow a form of access.
+ * If set, the corresponding form of access is disabled. If it is unset, the
+ * normal access control applies.
+ */
+typedef enum RegisterEntryFlags {
+    /** If set, read-access to the corresponding entry is enabled. */
+    REG_EF_READ_ENABLE  = (1u << 0u),
+    /** If set, read-access to the corresponding entry is disabled. */
+    REG_EF_READ_DISABLE  = (1u << 1u),
+    /**
+     * If set, read-access to the corresponding entry is locked, meaning it
+     * will behave as though it cannot be read, regardless of any other access
+     * control.
+     */
+    REG_EF_READ_LOCK  = (1u << 2u),
+    /** If set, write-access to the corresponding entry is enabled. */
+    REG_EF_WRITE_ENABLE = (1u << 3u),
+    /** If set, write-access to the corresponding entry is disabled. */
+    REG_EF_WRITE_DISABLE = (1u << 4u),
+    /**
+     * If set, write-access to the corresponding entry is locked, meaning it
+     * will behave as though it cannot be written to, regardless of any other
+     * access control.
+     */
+    REG_EF_WRITE_LOCK = (1u << 5u),
+    /** If set, a block access has changed this entry. */
+    REG_EF_TOUCHED = (1u << 6u)
+} RegisterEntryFlags;
 
 struct RegisterEntry {
     RegisterType type;
@@ -126,7 +154,7 @@ struct RegisterEntry {
     RegisterArea *area;
     RegisterOffset offset;
     RegisterValidator check;
-    RegisterState state;
+    uint16_t flags;
 };
 
 #define REGISTER_ENTRY_END                              \
