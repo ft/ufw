@@ -180,7 +180,9 @@ void register_block_read_unsafe(RegisterTable*, RegisterAddress, size_t,
 void register_block_write_unsafe(RegisterTable*, RegisterAddress, size_t,
                                  RegisterAtom*);
 
-bool register_block_touches_hole(RegisterTable*, RegisterAddress*, size_t);
+RegisterAccessResult register_block_touches_hole(RegisterTable*,
+                                                 RegisterAddress,
+                                                 size_t);
 
 static inline bool
 register_area_is_writable(RegisterArea *a)

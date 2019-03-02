@@ -727,11 +727,9 @@ register_block_read(RegisterTable *t, RegisterAddress addr, size_t n,
     if (n == 0ull)
         return rv;
 
-    if (register_block_touches_hole(t, &addr, n)) {
-        rv.code = REG_ACCESS_NOENTRY;
-        rv.address = addr;
+    rv = register_block_touches_hole(t, addr, n);
+    if (rv.code != REG_ACCESS_SUCCESS)
         return rv;
-    }
 
     register_block_read_unsafe(t, addr, n, buf);
     return rv;
@@ -756,11 +754,9 @@ register_block_write(RegisterTable *t, RegisterAddress addr, size_t n,
     /* Make sure the block write instruction does not want to write into
      * an address that does not map to an area in the register table. */
 
-    if (register_block_touches_hole(t, &addr, n)) {
-        rv.code = REG_ACCESS_NOENTRY;
-        rv.address = addr;
+    rv = register_block_touches_hole(t, addr, n);
+    if (rv.code != REG_ACCESS_SUCCESS)
         return rv;
-    }
 
     if (ra_malformed_write(t, addr, n, buf, &rv)) {
         return rv;
@@ -793,24 +789,26 @@ reg_mem_write(RegisterArea *a, const RegisterAtom *src,
     return rv;
 }
 
-bool
-register_block_touches_hole(RegisterTable *t, RegisterAddress *addr, size_t n)
+RegisterAccessResult
+register_block_touches_hole(RegisterTable *t, RegisterAddress addr, size_t n)
 {
-    RegisterAddress old = *addr;
+    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
     size_t rest = n;
     while (rest > 0) {
         RegisterArea *a;
         size_t used;
-        size_t an = ra_find_area_by_addr(t, *addr);
+        size_t an = ra_find_area_by_addr(t, addr);
 
-        if (an == t->areas)
-            return true;
+        if (an == t->areas) {
+            rv.code = REG_ACCESS_NOENTRY;
+            rv.address = addr;
+            return rv;
+        }
 
         a = &t->area[an];
-        used = reg_min(a->base + a->size - *addr, rest);
+        used = reg_min(a->base + a->size - addr, rest);
         rest -= used;
-        *addr += used;
+        addr += used;
     }
-    *addr = old;
-    return false;
+    return rv;
 }
