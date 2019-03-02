@@ -432,11 +432,11 @@ ra_range_touches(RegisterArea *a, RegisterAddress addr, size_t n)
 }
 
 static RegisterAccessResult
-ra_writable(RegisterTable *t, RegisterAddress addr, size_t n)
+ra_writeable(RegisterTable *t, RegisterAddress addr, size_t n)
 {
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
     /*
-     * There are two kinds of "writability":
+     * There are two kinds of "writeability":
      *
      * - An area does not have the REG_AF_WRITEABLE bit set in its flags field.
      *   This means that the outside may not write into the memory range that
@@ -452,7 +452,7 @@ ra_writable(RegisterTable *t, RegisterAddress addr, size_t n)
             continue;
         if (touch > 0)
             break;
-        if (register_area_is_writable(&t->area[i]) == false) {
+        if (register_area_is_writeable(&t->area[i]) == false) {
             rv.code = REG_ACCESS_READONLY;
             rv.address = addr;
             return rv;
@@ -757,7 +757,7 @@ register_block_write(RegisterTable *t, RegisterAddress addr, size_t n,
     if (n == 0ull)
         return rv;
 
-    rv = ra_writable(t, addr, n);
+    rv = ra_writeable(t, addr, n);
     if (rv.code != REG_ACCESS_SUCCESS)
         return rv;
 

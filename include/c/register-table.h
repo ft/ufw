@@ -185,7 +185,7 @@ RegisterAccessResult register_block_touches_hole(RegisterTable*,
                                                  size_t);
 
 static inline bool
-register_area_is_writable(RegisterArea *a)
+register_area_is_writeable(RegisterArea *a)
 {
     return ((a->write != NULL) && (BIT_ISSET(a->flags, REG_AF_WRITEABLE)));
 }
