@@ -11,6 +11,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include <common/bit-operations.h>
+
 /* Data types */
 
 typedef uint16_t RegisterAtom;
