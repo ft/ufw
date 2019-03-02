@@ -417,6 +417,47 @@ ra_read_entry(RegisterEntry *e, RegisterAtom *buf)
     (void)e->area->read(e->area, buf, e->offset, rds_serdes[e->type].size);
 }
 
+static inline int
+ra_range_touches(RegisterArea *a, RegisterAddress addr, size_t n)
+{
+    /* Return -1 if area is below range; 0 if it is within the range and 1 if
+     * it is above the range */
+    if ((a->base + a->size) < addr)
+        return -1;
+
+    if ((addr + n) < a->base)
+        return 1;
+
+    return 0;
+}
+
+static bool
+ra_writable(RegisterTable *t, RegisterAddress *addr, size_t n)
+{
+    /*
+     * There are two kinds of "writability":
+     *
+     * - An area does not have the REG_AF_WRITEABLE bit set in its flags field.
+     *   This means that the outside may not write into the memory range that
+     *   the area controls.
+     *
+     * - The area does not define a write() callback. This means that it's not
+     *   at all possible for the register abstraction to modify the range of
+     *   memory in question.
+     */
+    for (size_t i = 0ull; i < t->areas; ++i) {
+        int touch = ra_range_touches(&t->area[i], *addr, n);
+        if (touch < 0)
+            continue;
+        if (touch > 0)
+            break;
+        if (register_area_is_writable(&t->area[i]) == false)
+            return false;
+    }
+
+    return true;
+}
+
 bool
 ra_malformed_write(RegisterTable *t, RegisterAddress addr, size_t n,
                    RegisterAtom *buf, RegisterAccessResult *rv)
@@ -703,7 +744,13 @@ register_block_write(RegisterTable *t, RegisterAddress addr, size_t n,
     if (n == 0ull)
         return rv;
 
-    /* First make sure the block write instruction does not want to write into
+    if (ra_writable(t, &addr, n) == false) {
+        rv.code = REG_ACCESS_READONLY;
+        rv.address = addr;
+        return rv;
+    }
+
+    /* Make sure the block write instruction does not want to write into
      * an address that does not map to an area in the register table. */
 
     if (register_block_touches_hole(t, &addr, n)) {

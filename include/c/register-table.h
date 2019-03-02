@@ -134,9 +134,17 @@ struct RegisterEntry {
       .address = 0, .area = NULL, .offset = 0,          \
       .check.type = REGV_TYPE_TRIVIAL }
 
+typedef enum RegisterAreaFlags {
+    REG_AF_READABLE = (1u << 0u),
+    REG_AF_WRITEABLE = (1u << 1u)
+} RegisterAreaFlags;
+
+#define REG_AF_RW (REG_AF_READABLE | REG_AF_WRITEABLE)
+
 struct RegisterArea {
     registerRead read;
     registerWrite write;
+    uint16_t flags;
     size_t base;
     size_t size;
     RegisterAtom *mem;
@@ -173,5 +181,11 @@ void register_block_write_unsafe(RegisterTable*, RegisterAddress, size_t,
                                  RegisterAtom*);
 
 bool register_block_touches_hole(RegisterTable*, RegisterAddress*, size_t);
+
+static inline bool
+register_area_is_writable(RegisterArea *a)
+{
+    return ((a->write != NULL) && (BIT_ISSET(a->flags, REG_AF_WRITEABLE)));
+}
 
 #endif /* INC_REGISTER_TABLE_H */
