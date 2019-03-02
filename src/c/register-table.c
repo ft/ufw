@@ -355,6 +355,18 @@ reg_count_entries(RegisterEntry *e)
     return n;
 }
 
+static inline bool
+register_area_is_writeable(RegisterArea *a)
+{
+    return ((a->write != NULL) && (BIT_ISSET(a->flags, REG_AF_WRITEABLE)));
+}
+
+static inline bool
+register_area_is_readable(RegisterArea *a)
+{
+    return ((a->read != NULL) && (BIT_ISSET(a->flags, REG_AF_READABLE)));
+}
+
 static bool
 ra_addr_is_part_of(RegisterArea *a, RegisterAddress addr)
 {

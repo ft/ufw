@@ -213,18 +213,6 @@ RegisterAccessResult register_block_touches_hole(RegisterTable*,
                                                  size_t);
 
 static inline bool
-register_area_is_writeable(RegisterArea *a)
-{
-    return ((a->write != NULL) && (BIT_ISSET(a->flags, REG_AF_WRITEABLE)));
-}
-
-static inline bool
-register_area_is_readable(RegisterArea *a)
-{
-    return ((a->read != NULL) && (BIT_ISSET(a->flags, REG_AF_READABLE)));
-}
-
-static inline bool
 register_was_touched(RegisterTable *t, size_t reg)
 {
     const bool rc = BIT_ISSET(t->entry[reg].flags, REG_EF_TOUCHED);
