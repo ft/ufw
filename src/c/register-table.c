@@ -26,7 +26,7 @@ reg_min(size_t a, size_t b)
 }
 
 static bool
-rds_invalid_ser(const RegisterValue *v, RegisterAtom *r)
+rds_invalid_ser(const RegisterValue v, RegisterAtom *r)
 {
     (void)v;
     (void)r;
@@ -44,10 +44,10 @@ rds_invalid_des(const RegisterAtom *r, RegisterValue *v)
 }
 
 static bool
-rds_u16_ser(const RegisterValue *v, RegisterAtom *r)
+rds_u16_ser(const RegisterValue v, RegisterAtom *r)
 {
-    assert(v->type == REG_TYPE_UINT16);
-    *r = v->value.u16;
+    assert(v.type == REG_TYPE_UINT16);
+    *r = v.value.u16;
     return true;
 }
 
@@ -61,11 +61,11 @@ rds_u16_des(const RegisterAtom *r, RegisterValue *v)
 }
 
 static bool
-rds_u32_ser(const RegisterValue *v, RegisterAtom *r)
+rds_u32_ser(const RegisterValue v, RegisterAtom *r)
 {
-    assert(v->type == REG_TYPE_UINT32);
-    *r = v->value.u32 & 0xfffful;
-    *(r+1) = (v->value.u32 >> 16u) & 0xfffful;
+    assert(v.type == REG_TYPE_UINT32);
+    *r = v.value.u32 & 0xfffful;
+    *(r+1) = (v.value.u32 >> 16u) & 0xfffful;
     return true;
 }
 
@@ -80,13 +80,13 @@ rds_u32_des(const RegisterAtom *r, RegisterValue *v)
 }
 
 static bool
-rds_u64_ser(const RegisterValue *v, RegisterAtom *r)
+rds_u64_ser(const RegisterValue v, RegisterAtom *r)
 {
-    assert(v->type == REG_TYPE_UINT64);
-    *(r+0) = (v->value.u64 >>  0u) & 0xfffful;
-    *(r+1) = (v->value.u64 >> 16u) & 0xfffful;
-    *(r+2) = (v->value.u64 >> 32u) & 0xfffful;
-    *(r+3) = (v->value.u64 >> 48u) & 0xfffful;
+    assert(v.type == REG_TYPE_UINT64);
+    *(r+0) = (v.value.u64 >>  0u) & 0xfffful;
+    *(r+1) = (v.value.u64 >> 16u) & 0xfffful;
+    *(r+2) = (v.value.u64 >> 32u) & 0xfffful;
+    *(r+3) = (v.value.u64 >> 48u) & 0xfffful;
     return true;
 }
 
@@ -103,15 +103,15 @@ rds_u64_des(const RegisterAtom *r, RegisterValue *v)
 }
 
 static bool
-rds_s16_ser(const RegisterValue *v, RegisterAtom *r)
+rds_s16_ser(const RegisterValue v, RegisterAtom *r)
 {
-    assert(v->type == REG_TYPE_SINT16);
+    assert(v.type == REG_TYPE_SINT16);
     /*
      * This assumes that the machine that this runs on uses two's complement to
      * encode negative numbers, which is the format this module uses in its re-
      * presentation. This is true for all signed-ser/des functions for now.
      */
-    *r = v->value.u16;
+    *r = v.value.u16;
     return true;
 }
 
@@ -125,11 +125,11 @@ rds_s16_des(const RegisterAtom *r, RegisterValue *v)
 }
 
 static bool
-rds_s32_ser(const RegisterValue *v, RegisterAtom *r)
+rds_s32_ser(const RegisterValue v, RegisterAtom *r)
 {
-    assert(v->type == REG_TYPE_SINT32);
-    *r = v->value.u32 & 0xfffful;
-    *(r+1) = (v->value.u32 >> 16u) & 0xfffful;
+    assert(v.type == REG_TYPE_SINT32);
+    *r = v.value.u32 & 0xfffful;
+    *(r+1) = (v.value.u32 >> 16u) & 0xfffful;
     return true;
 }
 
@@ -144,13 +144,13 @@ rds_s32_des(const RegisterAtom *r, RegisterValue *v)
 }
 
 static bool
-rds_s64_ser(const RegisterValue *v, RegisterAtom *r)
+rds_s64_ser(const RegisterValue v, RegisterAtom *r)
 {
-    assert(v->type == REG_TYPE_SINT64);
-    *(r+0) = (v->value.u64 >>  0u) & 0xfffful;
-    *(r+1) = (v->value.u64 >> 16u) & 0xfffful;
-    *(r+2) = (v->value.u64 >> 32u) & 0xfffful;
-    *(r+3) = (v->value.u64 >> 48u) & 0xfffful;
+    assert(v.type == REG_TYPE_SINT64);
+    *(r+0) = (v.value.u64 >>  0u) & 0xfffful;
+    *(r+1) = (v.value.u64 >> 16u) & 0xfffful;
+    *(r+2) = (v.value.u64 >> 32u) & 0xfffful;
+    *(r+3) = (v.value.u64 >> 48u) & 0xfffful;
     return true;
 }
 
@@ -167,14 +167,14 @@ rds_s64_des(const RegisterAtom *r, RegisterValue *v)
 }
 
 static bool
-rds_f32_ser(const RegisterValue *v, RegisterAtom *r)
+rds_f32_ser(const RegisterValue v, RegisterAtom *r)
 {
-    assert(v->type == REG_TYPE_FLOAT32);
+    assert(v.type == REG_TYPE_FLOAT32);
     /* Here is another assumption: The register table is supposed to represent
      * 32 bit floating point numbers in IEEE754 format. And this assumes that
      * the target architecture uses that one as well. */
-    *r = v->value.u32 & 0xfffful;
-    *(r+1) = (v->value.u32 >> 16u) & 0xfffful;
+    *r = v.value.u32 & 0xfffful;
+    *(r+1) = (v.value.u32 >> 16u) & 0xfffful;
     return true;
 }
 
@@ -203,7 +203,7 @@ const RegisterSerDes rds_serdes[] = {
 };
 
 static inline bool
-rv_check_min(RegisterEntry *e, RegisterValue v)
+rv_check_min(RegisterEntry *e, const RegisterValue v)
 {
     switch (v.type) {
     case REG_TYPE_INVALID:
@@ -228,7 +228,7 @@ rv_check_min(RegisterEntry *e, RegisterValue v)
 }
 
 static inline bool
-rv_check_max(RegisterEntry *e, RegisterValue v)
+rv_check_max(RegisterEntry *e, const RegisterValue v)
 {
     switch (v.type) {
     case REG_TYPE_INVALID:
@@ -253,19 +253,19 @@ rv_check_max(RegisterEntry *e, RegisterValue v)
 }
 
 static inline bool
-rv_check_range(RegisterEntry *e, RegisterValue v)
+rv_check_range(RegisterEntry *e, const RegisterValue v)
 {
     return (rv_check_min(e, v) && rv_check_max(e, v));
 }
 
 static inline bool
-rv_check_cb(RegisterEntry *e, RegisterValue v)
+rv_check_cb(RegisterEntry *e, const RegisterValue v)
 {
     return e->check.arg.cb(e, v);
 }
 
 static bool
-rv_validate(RegisterEntry *e, RegisterValue v)
+rv_validate(RegisterEntry *e, const RegisterValue v)
 {
     if (e->type != v.type)
         return false;
@@ -583,7 +583,7 @@ registers_init(RegisterTable *t)
         /* Load default value into register table */
         def.value = e->default_value;
         def.type = e->type;
-        success = rds_serdes[e->type].ser(&def, raw);
+        success = rds_serdes[e->type].ser(def, raw);
 
         if (success == false) {
             rv.code = REG_ACCESS_INVALID;
@@ -597,7 +597,7 @@ registers_init(RegisterTable *t)
 }
 
 RegisterAccessResult
-register_set(RegisterTable *t, size_t idx, RegisterValue *v)
+register_set(RegisterTable *t, size_t idx, const RegisterValue v)
 {
     RegisterAtom raw[REG_ATOM_BIGGEST_DATUM];
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
@@ -612,7 +612,7 @@ register_set(RegisterTable *t, size_t idx, RegisterValue *v)
     }
 
     e = &t->entry[idx];
-    success = rv_validate(e, *v);
+    success = rv_validate(e, v);
     if (success == false) {
         rv.code = REG_ACCESS_INVALID;
         rv.address = e->address;

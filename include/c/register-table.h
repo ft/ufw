@@ -42,7 +42,7 @@ typedef struct RegisterAccessResult {
 
 #define REG_ACCESS_RESULT_INIT { REG_ACCESS_SUCCESS, 0u }
 
-typedef bool(*registerSer)(const RegisterValue*, RegisterAtom*);
+typedef bool(*registerSer)(const RegisterValue, RegisterAtom*);
 typedef bool(*registerDes)(const RegisterAtom*, RegisterValue*);
 typedef bool(*validatorFunction)(const RegisterEntry*, RegisterValue);
 
@@ -167,7 +167,7 @@ RegisterAccessResult reg_mem_read(const RegisterArea*, RegisterAtom*,
 RegisterAccessResult reg_mem_write(RegisterArea*, const RegisterAtom*,
                                    RegisterOffset, size_t);
 
-RegisterAccessResult register_set(RegisterTable*, size_t, RegisterValue*);
+RegisterAccessResult register_set(RegisterTable*, size_t, const RegisterValue);
 RegisterAccessResult register_get(RegisterTable*, size_t, RegisterValue*);
 RegisterAccessResult register_default(RegisterTable*, size_t, RegisterValue*);
 RegisterAccessResult register_block_read(RegisterTable*, RegisterAddress,
