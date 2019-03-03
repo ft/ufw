@@ -127,13 +127,14 @@ struct RegisterEntry {
     RegisterArea *area;
     RegisterOffset offset;
     RegisterValidator check;
+    char *name;
     uint16_t flags;
 };
 
 #define REGISTER_ENTRY_END                              \
     { .type = REG_TYPE_INVALID, .default_value.u16 = 0, \
       .address = 0, .area = NULL, .offset = 0,          \
-      .check.type = REGV_TYPE_TRIVIAL, .flags = 0 }
+      .check.type = REGV_TYPE_TRIVIAL, .name = NULL, .flags = 0 }
 
 typedef enum RegisterAreaFlags {
     REG_AF_READABLE = (1u << 0u),
