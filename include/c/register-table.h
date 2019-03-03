@@ -182,13 +182,19 @@ struct RegisterArea {
     uint16_t flags;
     RegisterAddress base;
     RegisterOffset size;
+    struct {
+        RegisterHandle first;
+        RegisterHandle last;
+        RegisterOffset count;
+    } entry;
     RegisterAtom *mem;
 };
 
-#define REGISTER_AREA_END \
-    { .read = NULL, .write = NULL,                      \
-      .flags = 0,                                       \
-      .base = 0, .size = 0,                             \
+#define REGISTER_AREA_END                                   \
+    { .read = NULL, .write = NULL,                          \
+      .flags = 0,                                           \
+      .base = 0, .size = 0,                                 \
+      .entry.first = 0, .entry.last = 0, .entry.count = 0,  \
       .mem = NULL }
 
 typedef struct RegisterTable {

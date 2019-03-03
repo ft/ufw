@@ -441,6 +441,15 @@ ra_range_touches(RegisterArea *a, RegisterAddress addr, RegisterOffset n)
 
     return 0;
 }
+static RegisterHandle
+ra_first_entry_of_next(RegisterTable *t, RegisterArea *a, RegisterHandle start)
+{
+    for (RegisterHandle i = start; i < t->entries; ++i) {
+        if (ra_addr_is_part_of(a, t->entry[i].address) == false)
+            return i;
+    }
+    return t->entries;
+}
 
 static RegisterAccessResult
 ra_writeable(RegisterTable *t, RegisterAddress addr, RegisterOffset n)
@@ -603,6 +612,25 @@ registers_init(RegisterTable *t)
             return rv;
         }
         e->area->write(e->area, raw, e->offset, rds_serdes[e->type].size);
+    }
+
+    /* Now link entries back into their area (first and last) */
+    RegisterHandle entry = 0ul;
+    for (AreaHandle i = 0ul; i < t->areas; ++i) {
+        RegisterArea *a = &t->area[i];
+        RegisterEntry *e = &t->entry[entry];
+        /* The area and entry lists of a table are sorted by address and all
+         * entries have to map to an area. Therefore, when we're trying to find
+         * the first entry of an area is either the trivial case or the area is
+         * empty and does not contain any entry at all. */
+        if (entry < t->entries && ra_addr_is_part_of(a, e->address)) {
+            a->entry.first = entry;
+            entry = ra_first_entry_of_next(t, a, entry + 1u);
+            a->entry.last = entry - 1;
+            a->entry.count = entry - a->entry.first;
+        } else {
+            a->entry.first = a->entry.last = a->entry.count = 0;
+        }
     }
 
     return rv;
