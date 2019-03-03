@@ -16,6 +16,7 @@
 /* Data types */
 
 typedef uint16_t RegisterAtom;
+typedef uint16_t RegisterHandle;
 typedef size_t RegisterAddress;
 typedef size_t RegisterOffset;
 typedef struct RegisterArea RegisterArea;
@@ -184,7 +185,7 @@ struct RegisterArea {
 typedef struct RegisterTable {
     size_t areas;
     RegisterArea *area;
-    size_t entries;
+    RegisterHandle entries;
     RegisterEntry *entry;
 } RegisterTable;
 
@@ -195,9 +196,12 @@ RegisterAccessResult reg_mem_read(const RegisterArea*, RegisterAtom*,
 RegisterAccessResult reg_mem_write(RegisterArea*, const RegisterAtom*,
                                    RegisterOffset, size_t);
 
-RegisterAccessResult register_set(RegisterTable*, size_t, const RegisterValue);
-RegisterAccessResult register_get(RegisterTable*, size_t, RegisterValue*);
-RegisterAccessResult register_default(RegisterTable*, size_t, RegisterValue*);
+RegisterAccessResult register_set(RegisterTable*, RegisterHandle,
+                                  const RegisterValue);
+RegisterAccessResult register_get(RegisterTable*, RegisterHandle,
+                                  RegisterValue*);
+RegisterAccessResult register_default(RegisterTable*, RegisterHandle,
+                                      RegisterValue*);
 RegisterAccessResult register_block_read(RegisterTable*, RegisterAddress,
                                          size_t, RegisterAtom*);
 RegisterAccessResult register_block_write(RegisterTable*, RegisterAddress,
@@ -213,7 +217,7 @@ RegisterAccessResult register_block_touches_hole(RegisterTable*,
                                                  size_t);
 
 static inline bool
-register_was_touched(RegisterTable *t, size_t reg)
+register_was_touched(RegisterTable *t, RegisterHandle reg)
 {
     const bool rc = BIT_ISSET(t->entry[reg].flags, REG_EF_TOUCHED);
     BIT_CLEAR(t->entry[reg].flags, REG_EF_TOUCHED);
@@ -221,25 +225,25 @@ register_was_touched(RegisterTable *t, size_t reg)
 }
 
 static inline void
-register_read_lock(RegisterTable *t, size_t reg)
+register_read_lock(RegisterTable *t, RegisterHandle reg)
 {
     BIT_SET(t->entry[reg].flags, REG_EF_READ_LOCK);
 }
 
 static inline void
-register_read_unlock(RegisterTable *t, size_t reg)
+register_read_unlock(RegisterTable *t, RegisterHandle reg)
 {
     BIT_CLEAR(t->entry[reg].flags, REG_EF_READ_LOCK);
 }
 
 static inline void
-register_write_lock(RegisterTable *t, size_t reg)
+register_write_lock(RegisterTable *t, RegisterHandle reg)
 {
     BIT_SET(t->entry[reg].flags, REG_EF_WRITE_LOCK);
 }
 
 static inline void
-register_write_unlock(RegisterTable *t, size_t reg)
+register_write_unlock(RegisterTable *t, RegisterHandle reg)
 {
     BIT_CLEAR(t->entry[reg].flags, REG_EF_WRITE_LOCK);
 }

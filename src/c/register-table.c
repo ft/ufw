@@ -481,7 +481,7 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr, size_t n,
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
     RegisterAddress last = addr + n - 1;
 
-    for (size_t i = 0ull; i < t->entries; ++i) {
+    for (RegisterHandle i = 0ul; i < t->entries; ++i) {
         RegisterEntry *e = &t->entry[i];
         RegisterValue datum;
         RegisterAtom raw[REG_ATOM_BIGGEST_DATUM];
@@ -582,7 +582,7 @@ registers_init(RegisterTable *t)
     t->areas = reg_count_areas(t->area);
     t->entries = reg_count_entries(t->entry);
 
-    for (size_t i = 0ull; i < t->entries; ++i) {
+    for (RegisterHandle i = 0ul; i < t->entries; ++i) {
         RegisterValue def;
         RegisterEntry *e = &t->entry[i];
         /* Link into register table memory */
@@ -609,7 +609,7 @@ registers_init(RegisterTable *t)
 }
 
 RegisterAccessResult
-register_set(RegisterTable *t, size_t idx, const RegisterValue v)
+register_set(RegisterTable *t, RegisterHandle idx, const RegisterValue v)
 {
     RegisterAtom raw[REG_ATOM_BIGGEST_DATUM];
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
@@ -645,7 +645,7 @@ register_set(RegisterTable *t, size_t idx, const RegisterValue v)
 }
 
 RegisterAccessResult
-register_get(RegisterTable *t, size_t idx, RegisterValue *v)
+register_get(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
 {
     RegisterAtom raw[REG_ATOM_BIGGEST_DATUM];
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
@@ -672,7 +672,7 @@ register_get(RegisterTable *t, size_t idx, RegisterValue *v)
 }
 
 RegisterAccessResult
-register_default(RegisterTable *t, size_t idx, RegisterValue *v)
+register_default(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
 {
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
     RegisterEntry *e;
