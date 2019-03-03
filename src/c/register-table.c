@@ -483,7 +483,7 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr,
     for (RegisterHandle i = 0ul; i < t->entries; ++i) {
         RegisterEntry *e = &t->entry[i];
         RegisterValue datum;
-        RegisterAtom raw[REG_ATOM_BIGGEST_DATUM];
+        RegisterAtom raw[REG_SIZEOF_LARGEST_DATUM];
         const RegisterOffset size = rds_serdes[e->type].size;
         const RegisterAddress end = e->address + size - 1;
         RegisterAddress bs, rs;
@@ -575,7 +575,7 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr,
 RegisterAccessResult
 registers_init(RegisterTable *t)
 {
-    RegisterAtom raw[REG_ATOM_BIGGEST_DATUM];
+    RegisterAtom raw[REG_SIZEOF_LARGEST_DATUM];
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
 
     /* Determine table sizes first */
@@ -611,7 +611,7 @@ registers_init(RegisterTable *t)
 RegisterAccessResult
 register_set(RegisterTable *t, RegisterHandle idx, const RegisterValue v)
 {
-    RegisterAtom raw[REG_ATOM_BIGGEST_DATUM];
+    RegisterAtom raw[REG_SIZEOF_LARGEST_DATUM];
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
     RegisterEntry *e;
     RegisterArea *a;
@@ -647,7 +647,7 @@ register_set(RegisterTable *t, RegisterHandle idx, const RegisterValue v)
 RegisterAccessResult
 register_get(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
 {
-    RegisterAtom raw[REG_ATOM_BIGGEST_DATUM];
+    RegisterAtom raw[REG_SIZEOF_LARGEST_DATUM];
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
     RegisterEntry *e;
     RegisterArea *a;
