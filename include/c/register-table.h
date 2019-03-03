@@ -51,6 +51,11 @@ typedef struct RegisterAccessResult {
 
 typedef enum RegisterInitCode {
     REG_INIT_SUCCESS,
+    REG_INIT_NO_AREAS,
+    REG_INIT_AREA_INVALID_ORDER,
+    REG_INIT_AREA_ADDRESS_OVERLAP,
+    REG_INIT_ENTRY_INVALID_ORDER,
+    REG_INIT_ENTRY_ADDRESS_OVERLAP,
     REG_INIT_ENTRY_IN_MEMORY_HOLE,
     REG_INIT_ENTRY_INVALID_DEFAULT
 } RegisterInitCode;
@@ -181,7 +186,12 @@ struct RegisterArea {
       .entry.first = 0, .entry.last = 0, .entry.count = 0,  \
       .mem = NULL }
 
+typedef enum RegisterTableFlags {
+    REG_TF_INITIALISED = (1u << 0u)
+} RegisterTableFlags;
+
 typedef struct RegisterTable {
+    uint16_t flags;
     AreaHandle areas;
     RegisterArea *area;
     RegisterHandle entries;

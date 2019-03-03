@@ -654,10 +654,50 @@ register_init(RegisterTable *t)
 {
     RegisterAtom raw[REG_SIZEOF_LARGEST_DATUM];
     RegisterInitResult rv = REG_INIT_RESULT_INIT;
+    RegisterAddress previous;
 
+    BIT_CLEAR(t->flags, REG_TF_INITIALISED);
     /* Determine table sizes first */
     t->areas = reg_count_areas(t->area);
     t->entries = reg_count_entries(t->entry);
+
+    if (t->areas == 0ul) {
+        rv.code = REG_INIT_NO_AREAS;
+        rv.pos.area = 0;
+        return rv;
+    }
+
+    previous = t->area[0].base;
+    for (AreaHandle i = 1ul; i < t->areas; ++i) {
+        const RegisterAddress current = t->area[i].base;
+        if (current < previous) {
+            rv.code = REG_INIT_AREA_INVALID_ORDER;
+            rv.pos.area = i;
+            return rv;
+        }
+        if (current < (previous + t->area[i-1].size)) {
+            rv.code = REG_INIT_AREA_ADDRESS_OVERLAP;
+            rv.pos.area = i;
+            return rv;
+        }
+        previous = current;
+    }
+
+    previous = t->entry[0].address;
+    for (RegisterHandle i = 1ul; i < t->entries; ++i) {
+        const RegisterAddress current = t->entry[i].address;
+        if (t->entry[i].address < previous) {
+            rv.code = REG_INIT_ENTRY_INVALID_ORDER;
+            rv.pos.entry = i;
+            return rv;
+        }
+        if (current < (previous+rds_serdes[t->entry[i-1].type].size)) {
+            rv.code = REG_INIT_ENTRY_ADDRESS_OVERLAP;
+            rv.pos.entry = i;
+            return rv;
+        }
+        previous = current;
+    }
 
     for (RegisterHandle i = 0ul; i < t->entries; ++i) {
         RegisterAccessResult access;
@@ -702,6 +742,7 @@ register_init(RegisterTable *t)
         }
     }
 
+    BIT_SET(t->flags, REG_TF_INITIALISED);
     return rv;
 }
 
