@@ -116,42 +116,8 @@ typedef struct RegisterValidator {
 
 #define REGV_INIT { .type = REGV_TYPE_TRIVIAL }
 
-/**
- * Register Entry flags
- *
- * The access bits are able to override the access control of the area the
- * entry is situated in. If both _ENABLE and _DISABLE are unset, the entry uses
- * the area's access control.
- *
- * Setting both bits is will cause undefined behaviour.
- *
- * The _LOCK bits can be used to temporatily allow/disallow a form of access.
- * If set, the corresponding form of access is disabled. If it is unset, the
- * normal access control applies.
- */
 typedef enum RegisterEntryFlags {
-    /** If set, read-access to the corresponding entry is enabled. */
-    REG_EF_READ_ENABLE  = (1u << 0u),
-    /** If set, read-access to the corresponding entry is disabled. */
-    REG_EF_READ_DISABLE  = (1u << 1u),
-    /**
-     * If set, read-access to the corresponding entry is locked, meaning it
-     * will behave as though it cannot be read, regardless of any other access
-     * control.
-     */
-    REG_EF_READ_LOCK  = (1u << 2u),
-    /** If set, write-access to the corresponding entry is enabled. */
-    REG_EF_WRITE_ENABLE = (1u << 3u),
-    /** If set, write-access to the corresponding entry is disabled. */
-    REG_EF_WRITE_DISABLE = (1u << 4u),
-    /**
-     * If set, write-access to the corresponding entry is locked, meaning it
-     * will behave as though it cannot be written to, regardless of any other
-     * access control.
-     */
-    REG_EF_WRITE_LOCK = (1u << 5u),
-    /** If set, a block access has changed this entry. */
-    REG_EF_TOUCHED = (1u << 6u)
+    REG_EF_TOUCHED = (1u << 0u)
 } RegisterEntryFlags;
 
 struct RegisterEntry {
@@ -237,30 +203,6 @@ register_was_touched(RegisterTable *t, RegisterHandle reg)
     const bool rc = BIT_ISSET(t->entry[reg].flags, REG_EF_TOUCHED);
     BIT_CLEAR(t->entry[reg].flags, REG_EF_TOUCHED);
     return rc;
-}
-
-static inline void
-register_read_lock(RegisterTable *t, RegisterHandle reg)
-{
-    BIT_SET(t->entry[reg].flags, REG_EF_READ_LOCK);
-}
-
-static inline void
-register_read_unlock(RegisterTable *t, RegisterHandle reg)
-{
-    BIT_CLEAR(t->entry[reg].flags, REG_EF_READ_LOCK);
-}
-
-static inline void
-register_write_lock(RegisterTable *t, RegisterHandle reg)
-{
-    BIT_SET(t->entry[reg].flags, REG_EF_WRITE_LOCK);
-}
-
-static inline void
-register_write_unlock(RegisterTable *t, RegisterHandle reg)
-{
-    BIT_CLEAR(t->entry[reg].flags, REG_EF_WRITE_LOCK);
 }
 
 #endif /* INC_REGISTER_TABLE_H */
