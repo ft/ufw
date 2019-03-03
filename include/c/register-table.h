@@ -173,6 +173,31 @@ typedef struct RegisterTable {
 
 /* Public API prototypes */
 
+#define MAKE_MEMORY_AREA(ADDR,SIZE,FLAGS)   \
+    { .read = reg_mem_read,                 \
+      .write = reg_mem_write,               \
+      .flags = FLAGS,                       \
+      .base = ADDR,                         \
+      .size = SIZE,                         \
+      .mem = (RegisterAtom[SIZE]) { 0 } }
+
+#define MEMORY_AREA(A,S) MAKE_MEMORY_AREA(A,S,REG_AF_RW)
+#define MEMORY_AREA_RO(A,S) MAKE_MEMORY_AREA(A,S,REG_AF_READABLE)
+#define MEMORY_AREA_WO(A,S) MAKE_MEMORY_AREA(A,S,REG_AF_WRITEABLE)
+
+#define MAKE_REGISTER(IDX,ADDR,TYPE,MEMBER,DEFAULT)         \
+    [IDX] = { .type = TYPE,                                 \
+              .default_value.MEMBER = DEFAULT,              \
+              .address = ADDR, .name = #IDX }
+
+#define REG_U16(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_UINT16,u16,D)
+#define REG_U32(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_UINT32,u32,D)
+#define REG_U64(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_UINT64,u64,D)
+#define REG_S16(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_SINT16,s16,D)
+#define REG_S32(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_SINT32,s32,D)
+#define REG_S64(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_SINT64,s64,D)
+#define REG_F32(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_FLOAT32,f32,D)
+
 RegisterAccessResult reg_mem_read(const RegisterArea*, RegisterAtom*,
                                   RegisterOffset, RegisterOffset);
 RegisterAccessResult reg_mem_write(RegisterArea*, const RegisterAtom*,
