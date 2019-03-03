@@ -220,4 +220,28 @@ register_was_touched(RegisterTable *t, size_t reg)
     return rc;
 }
 
+static inline void
+register_read_lock(RegisterTable *t, size_t reg)
+{
+    BIT_SET(t->entry[reg].flags, REG_EF_READ_LOCK);
+}
+
+static inline void
+register_read_unlock(RegisterTable *t, size_t reg)
+{
+    BIT_CLEAR(t->entry[reg].flags, REG_EF_READ_LOCK);
+}
+
+static inline void
+register_write_lock(RegisterTable *t, size_t reg)
+{
+    BIT_SET(t->entry[reg].flags, REG_EF_WRITE_LOCK);
+}
+
+static inline void
+register_write_unlock(RegisterTable *t, size_t reg)
+{
+    BIT_CLEAR(t->entry[reg].flags, REG_EF_WRITE_LOCK);
+}
+
 #endif /* INC_REGISTER_TABLE_H */
