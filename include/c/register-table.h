@@ -42,9 +42,9 @@ typedef bool(*registerDes)(const RegisterAtom*, RegisterValue*);
 typedef bool(*validatorFunction)(const RegisterEntry*, RegisterValue);
 
 typedef RegisterAccessResult(*registerRead)(
-    const RegisterArea*, RegisterAtom*, RegisterOffset, size_t);
+    const RegisterArea*, RegisterAtom*, RegisterOffset, RegisterOffset);
 typedef RegisterAccessResult(*registerWrite)(
-    RegisterArea*, const RegisterAtom*, RegisterOffset, size_t);
+    RegisterArea*, const RegisterAtom*, RegisterOffset, RegisterOffset);
 
 typedef struct RegisterString {
     char *data;
@@ -84,7 +84,7 @@ struct RegisterValue {
 typedef struct RegisterSerDes {
     registerSer ser;
     registerDes des;
-    size_t size;
+    RegisterOffset size;
 } RegisterSerDes;
 
 typedef enum RegisterValidatorType {
@@ -174,8 +174,8 @@ struct RegisterArea {
     registerRead read;
     registerWrite write;
     uint16_t flags;
-    size_t base;
-    size_t size;
+    RegisterAddress base;
+    RegisterOffset size;
     RegisterAtom *mem;
 };
 
@@ -192,9 +192,9 @@ typedef struct RegisterTable {
 /* Public API prototypes */
 
 RegisterAccessResult reg_mem_read(const RegisterArea*, RegisterAtom*,
-                                  RegisterOffset, size_t);
+                                  RegisterOffset, RegisterOffset);
 RegisterAccessResult reg_mem_write(RegisterArea*, const RegisterAtom*,
-                                   RegisterOffset, size_t);
+                                   RegisterOffset, RegisterOffset);
 
 RegisterAccessResult register_set(RegisterTable*, RegisterHandle,
                                   const RegisterValue);
@@ -203,18 +203,18 @@ RegisterAccessResult register_get(RegisterTable*, RegisterHandle,
 RegisterAccessResult register_default(RegisterTable*, RegisterHandle,
                                       RegisterValue*);
 RegisterAccessResult register_block_read(RegisterTable*, RegisterAddress,
-                                         size_t, RegisterAtom*);
+                                         RegisterOffset, RegisterAtom*);
 RegisterAccessResult register_block_write(RegisterTable*, RegisterAddress,
-                                          size_t, RegisterAtom*);
+                                          RegisterOffset, RegisterAtom*);
 
-void register_block_read_unsafe(RegisterTable*, RegisterAddress, size_t,
-                                RegisterAtom*);
-void register_block_write_unsafe(RegisterTable*, RegisterAddress, size_t,
-                                 RegisterAtom*);
+void register_block_read_unsafe(RegisterTable*, RegisterAddress,
+                                RegisterOffset, RegisterAtom*);
+void register_block_write_unsafe(RegisterTable*, RegisterAddress,
+                                 RegisterOffset, RegisterAtom*);
 
 RegisterAccessResult register_block_touches_hole(RegisterTable*,
                                                  RegisterAddress,
-                                                 size_t);
+                                                 RegisterOffset);
 
 static inline bool
 register_was_touched(RegisterTable *t, RegisterHandle reg)

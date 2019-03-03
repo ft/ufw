@@ -299,11 +299,11 @@ is_end_of_areas(RegisterArea *a)
 }
 
 static inline int
-reg_range_touches(RegisterEntry *e, RegisterAddress addr, size_t n)
+reg_range_touches(RegisterEntry *e, RegisterAddress addr, RegisterOffset n)
 {
     /* Return -1 if entry is below range; 0 if it is within the range and 1 if
      * it is above the range */
-    const size_t size = rds_serdes[e->type].size;
+    const RegisterOffset size = rds_serdes[e->type].size;
 
     if ((e->address + size) < addr)
         return -1;
@@ -315,9 +315,9 @@ reg_range_touches(RegisterEntry *e, RegisterAddress addr, size_t n)
 }
 
 static void
-reg_taint_in_range(RegisterTable *t, RegisterAddress addr, size_t n)
+reg_taint_in_range(RegisterTable *t, RegisterAddress addr, RegisterOffset n)
 {
-    for (size_t i = 0ull; i < t->entries; ++i) {
+    for (RegisterOffset i = 0ul; i < t->entries; ++i) {
         int touch = reg_range_touches(&t->entry[i], addr, n);
         if (touch > 0)
             return;
@@ -344,10 +344,10 @@ is_end_of_entries(RegisterEntry *e)
     return (e->type == REG_TYPE_INVALID);
 }
 
-static size_t
+static RegisterHandle
 reg_count_entries(RegisterEntry *e)
 {
-    size_t n = 0ull;
+    RegisterHandle n = 0ull;
     while (is_end_of_entries(e) == false) {
         n++;
         e++;
@@ -388,8 +388,8 @@ ra_reg_is_part_of(RegisterArea *a, RegisterEntry *e)
 static bool
 ra_reg_fits_into(RegisterArea *a, RegisterEntry *e)
 {
-    const size_t area_end = a->base + a->size;
-    const size_t entry_end = e->address + rds_serdes[e->type].size;
+    const RegisterAddress area_end = a->base + a->size;
+    const RegisterAddress entry_end = e->address + rds_serdes[e->type].size;
     return (area_end <= entry_end);
 }
 
@@ -430,7 +430,7 @@ ra_read_entry(RegisterEntry *e, RegisterAtom *buf)
 }
 
 static inline int
-ra_range_touches(RegisterArea *a, RegisterAddress addr, size_t n)
+ra_range_touches(RegisterArea *a, RegisterAddress addr, RegisterOffset n)
 {
     /* Return -1 if area is below range; 0 if it is within the range and 1 if
      * it is above the range */
@@ -444,7 +444,7 @@ ra_range_touches(RegisterArea *a, RegisterAddress addr, size_t n)
 }
 
 static RegisterAccessResult
-ra_writeable(RegisterTable *t, RegisterAddress addr, size_t n)
+ra_writeable(RegisterTable *t, RegisterAddress addr, RegisterOffset n)
 {
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
     /*
@@ -475,8 +475,8 @@ ra_writeable(RegisterTable *t, RegisterAddress addr, size_t n)
 }
 
 RegisterAccessResult
-ra_malformed_write(RegisterTable *t, RegisterAddress addr, size_t n,
-                   RegisterAtom *buf)
+ra_malformed_write(RegisterTable *t, RegisterAddress addr,
+                   RegisterOffset n, RegisterAtom *buf)
 {
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
     RegisterAddress last = addr + n - 1;
@@ -485,9 +485,10 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr, size_t n,
         RegisterEntry *e = &t->entry[i];
         RegisterValue datum;
         RegisterAtom raw[REG_ATOM_BIGGEST_DATUM];
-        const size_t size = rds_serdes[e->type].size;
+        const RegisterOffset size = rds_serdes[e->type].size;
         const RegisterAddress end = e->address + size - 1;
-        size_t bs, rs, rlen;
+        RegisterAddress bs, rs;
+        RegisterOffset rlen;
 
         /* Skip entries before block start */
         if (addr > end)
@@ -694,13 +695,13 @@ register_default(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
  * sure before using it, that the block access they are asked to do is NOT
  * going to try to touch any memory holes! */
 void
-register_block_read_unsafe(RegisterTable *t, RegisterAddress addr, size_t n,
-                           RegisterAtom *buf)
+register_block_read_unsafe(RegisterTable *t, RegisterAddress addr,
+                           RegisterOffset n, RegisterAtom *buf)
 {
-    size_t rest = n;
+    RegisterOffset rest = n;
     while (rest > 0ull) {
         size_t an = ra_find_area_by_addr(t, addr);
-        size_t offset, readn;
+        RegisterOffset offset, readn;
         RegisterArea *a;
 
         assert(an < t->areas);
@@ -722,13 +723,13 @@ register_block_read_unsafe(RegisterTable *t, RegisterAddress addr, size_t n,
 }
 
 void
-register_block_write_unsafe(RegisterTable *t, RegisterAddress addr, size_t n,
-                            RegisterAtom *buf)
+register_block_write_unsafe(RegisterTable *t, RegisterAddress addr,
+                            RegisterOffset n, RegisterAtom *buf)
 {
-    size_t rest = n;
+    RegisterOffset rest = n;
     while (rest > 0ull) {
         size_t an = ra_find_area_by_addr(t, addr);
-        size_t offset, writen;
+        RegisterOffset offset, writen;
         RegisterArea *a;
 
         assert(an < t->areas);
@@ -743,8 +744,8 @@ register_block_write_unsafe(RegisterTable *t, RegisterAddress addr, size_t n,
 }
 
 RegisterAccessResult
-register_block_read(RegisterTable *t, RegisterAddress addr, size_t n,
-                    RegisterAtom *buf)
+register_block_read(RegisterTable *t, RegisterAddress addr,
+                    RegisterOffset n, RegisterAtom *buf)
 {
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
 
@@ -760,8 +761,8 @@ register_block_read(RegisterTable *t, RegisterAddress addr, size_t n,
 }
 
 RegisterAccessResult
-register_block_write(RegisterTable *t, RegisterAddress addr, size_t n,
-                     RegisterAtom *buf)
+register_block_write(RegisterTable *t, RegisterAddress addr,
+                     RegisterOffset n, RegisterAtom *buf)
 {
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
 
@@ -795,7 +796,7 @@ register_block_write(RegisterTable *t, RegisterAddress addr, size_t n,
 
 RegisterAccessResult
 reg_mem_read(const RegisterArea *a, RegisterAtom *dest,
-             RegisterOffset offset, size_t n)
+             RegisterOffset offset, RegisterOffset n)
 {
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
     memcpy(dest, a->mem + offset, n * sizeof(RegisterAtom));
@@ -804,7 +805,7 @@ reg_mem_read(const RegisterArea *a, RegisterAtom *dest,
 
 RegisterAccessResult
 reg_mem_write(RegisterArea *a, const RegisterAtom *src,
-              RegisterOffset offset, size_t n)
+              RegisterOffset offset, RegisterOffset n)
 {
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
     memcpy(a->mem + offset, src, n * sizeof(RegisterAtom));
@@ -812,13 +813,14 @@ reg_mem_write(RegisterArea *a, const RegisterAtom *src,
 }
 
 RegisterAccessResult
-register_block_touches_hole(RegisterTable *t, RegisterAddress addr, size_t n)
+register_block_touches_hole(RegisterTable *t, RegisterAddress addr,
+                            RegisterOffset n)
 {
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
-    size_t rest = n;
+    RegisterOffset rest = n;
     while (rest > 0) {
         RegisterArea *a;
-        size_t used;
+        RegisterOffset used;
         size_t an = ra_find_area_by_addr(t, addr);
 
         if (an == t->areas) {
