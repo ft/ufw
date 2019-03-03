@@ -47,11 +47,6 @@ typedef RegisterAccessResult(*registerRead)(
 typedef RegisterAccessResult(*registerWrite)(
     RegisterArea*, const RegisterAtom*, RegisterOffset, RegisterOffset);
 
-typedef struct RegisterString {
-    char *data;
-    size_t size;
-} RegisterString;
-
 typedef enum RegisterType {
     REG_TYPE_INVALID = 0u,
     REG_TYPE_UINT16,
@@ -60,8 +55,7 @@ typedef enum RegisterType {
     REG_TYPE_SINT16,
     REG_TYPE_SINT32,
     REG_TYPE_SINT64,
-    REG_TYPE_FLOAT32,
-    REG_TYPE_STRING
+    REG_TYPE_FLOAT32
 } RegisterType;
 
 #define REG_ATOM_BIGGEST_DATUM (sizeof(uint64_t) / sizeof(RegisterAtom))
@@ -74,7 +68,6 @@ typedef union RegisterValueU {
     int32_t s32;
     int64_t s64;
     float f32;
-    RegisterString string;
 } RegisterValueU;
 
 struct RegisterValue {

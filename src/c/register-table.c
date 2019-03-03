@@ -198,8 +198,7 @@ const RegisterSerDes rds_serdes[] = {
     [REG_TYPE_SINT16] = { rds_s16_ser, rds_s16_des, rs(int16_t) },
     [REG_TYPE_SINT32] = { rds_s32_ser, rds_s32_des, rs(int32_t) },
     [REG_TYPE_SINT64] = { rds_s64_ser, rds_s64_des, rs(int64_t) },
-    [REG_TYPE_FLOAT32] = { rds_f32_ser, rds_f32_des, rs(float) },
-    [REG_TYPE_STRING] = { rds_invalid_ser, rds_invalid_des, 0 }
+    [REG_TYPE_FLOAT32] = { rds_f32_ser, rds_f32_des, rs(float) }
 };
 
 static inline bool
@@ -222,8 +221,8 @@ rv_check_min(RegisterEntry *e, const RegisterValue v)
         return (v.value.s64 >= e->check.arg.min.s64);
     case REG_TYPE_FLOAT32:
         return (v.value.f32 >= e->check.arg.min.f32);
-    case REG_TYPE_STRING:
-        return true;
+    default:
+        return false;
     }
 }
 
@@ -247,8 +246,8 @@ rv_check_max(RegisterEntry *e, const RegisterValue v)
         return (v.value.s64 <= e->check.arg.max.s64);
     case REG_TYPE_FLOAT32:
         return (v.value.f32 <= e->check.arg.max.f32);
-    case REG_TYPE_STRING:
-        return true;
+    default:
+        return false;
     }
 }
 
