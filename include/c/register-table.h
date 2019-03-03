@@ -167,7 +167,7 @@ struct RegisterEntry {
 #define REGISTER_ENTRY_END                              \
     { .type = REG_TYPE_INVALID, .default_value.u16 = 0, \
       .address = 0, .area = NULL, .offset = 0,          \
-      .check.type = REGV_TYPE_TRIVIAL }
+      .check.type = REGV_TYPE_TRIVIAL, flags = 0 }
 
 typedef enum RegisterAreaFlags {
     REG_AF_READABLE = (1u << 0u),
@@ -186,7 +186,10 @@ struct RegisterArea {
 };
 
 #define REGISTER_AREA_END \
-    { .read = NULL, .write = NULL, .base = 0, .size = 0, .mem = NULL }
+    { .read = NULL, .write = NULL,                      \
+      .flags = 0,                                       \
+      .base = 0, .size = 0,                             \
+      .mem = NULL }
 
 typedef struct RegisterTable {
     AreaHandle areas;
