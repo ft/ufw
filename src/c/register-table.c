@@ -649,34 +649,35 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr,
 
 /* Public API */
 
-RegisterAccessResult
-registers_init(RegisterTable *t)
+RegisterInitResult
+register_init(RegisterTable *t)
 {
     RegisterAtom raw[REG_SIZEOF_LARGEST_DATUM];
-    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+    RegisterInitResult rv = REG_INIT_RESULT_INIT;
 
     /* Determine table sizes first */
     t->areas = reg_count_areas(t->area);
     t->entries = reg_count_entries(t->entry);
 
     for (RegisterHandle i = 0ul; i < t->entries; ++i) {
+        RegisterAccessResult access;
         RegisterValue def;
         RegisterEntry *e = &t->entry[i];
         /* Link into register table memory */
         bool success = reg_entry_is_in_memory(t, e);
         if (success == false) {
-            rv.code = REG_ACCESS_NOENTRY;
-            rv.address = e->address;
+            rv.code = REG_INIT_ENTRY_IN_MEMORY_HOLE;
+            rv.pos.entry = i;
             return rv;
         }
         /* Load default value into register table */
         def.value = e->default_value;
         def.type = e->type;
-        success = rds_serdes[e->type].ser(def, raw);
+        access = register_set(t, i, def);
 
-        if (success == false) {
-            rv.code = REG_ACCESS_INVALID;
-            rv.address = e->address;
+        if (access.code != REG_ACCESS_SUCCESS) {
+            rv.code = REG_INIT_ENTRY_INVALID_DEFAULT;
+            rv.pos.entry = i;
             return rv;
         }
         e->area->write(e->area, raw, e->offset, rds_serdes[e->type].size);

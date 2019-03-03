@@ -49,6 +49,23 @@ typedef struct RegisterAccessResult {
 
 #define REG_ACCESS_RESULT_INIT { .code = REG_ACCESS_SUCCESS, .address = 0u }
 
+typedef enum RegisterInitCode {
+    REG_INIT_SUCCESS,
+    REG_INIT_ENTRY_IN_MEMORY_HOLE,
+    REG_INIT_ENTRY_INVALID_DEFAULT
+} RegisterInitCode;
+
+typedef struct RegisterInitResult {
+    RegisterInitCode code;
+    union {
+        AreaHandle area;
+        RegisterHandle entry;
+        RegisterAddress address;
+    } pos;
+} RegisterInitResult;
+
+#define REG_INIT_RESULT_INIT { .code = REG_INIT_SUCCESS, .pos.address = 0u }
+
 typedef bool(*registerSer)(const RegisterValue, RegisterAtom*);
 typedef bool(*registerDes)(const RegisterAtom*, RegisterValue*);
 typedef bool(*validatorFunction)(const RegisterEntry*, RegisterValue);
@@ -197,6 +214,8 @@ typedef struct RegisterTable {
 #define REG_S32(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_SINT32,s32,D)
 #define REG_S64(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_SINT64,s64,D)
 #define REG_F32(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_FLOAT32,f32,D)
+
+RegisterInitResult register_init(RegisterTable*);
 
 RegisterAccessResult reg_mem_read(const RegisterArea*, RegisterAtom*,
                                   RegisterOffset, RegisterOffset);
