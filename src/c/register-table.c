@@ -17,7 +17,75 @@
 #include <c/register-table.h>
 #endif /* INC_REGISTER_TABLE_H */
 
-/* Internal API */
+/*
+ * Internal API prototypes
+ */
+
+/* Ser/Des */
+static bool rds_invalid_ser(const RegisterValue, RegisterAtom*);
+static bool rds_invalid_des(const RegisterAtom*, RegisterValue*);
+static bool rds_u16_ser(const RegisterValue, RegisterAtom*);
+static bool rds_u16_des(const RegisterAtom*, RegisterValue*);
+static bool rds_u32_ser(const RegisterValue, RegisterAtom*);
+static bool rds_u32_des(const RegisterAtom*, RegisterValue*);
+static bool rds_u64_ser(const RegisterValue, RegisterAtom*);
+static bool rds_u64_des(const RegisterAtom*, RegisterValue*);
+static bool rds_s16_ser(const RegisterValue, RegisterAtom*);
+static bool rds_s16_des(const RegisterAtom*, RegisterValue*);
+static bool rds_s32_ser(const RegisterValue, RegisterAtom*);
+static bool rds_s32_des(const RegisterAtom*, RegisterValue*);
+static bool rds_s64_ser(const RegisterValue, RegisterAtom*);
+static bool rds_s64_des(const RegisterAtom*, RegisterValue*);
+static bool rds_f32_ser(const RegisterValue, RegisterAtom*);
+static bool rds_f32_des(const RegisterAtom*, RegisterValue*);
+
+/* Validators */
+static inline bool rv_check_min(RegisterEntry*, const RegisterValue);
+static inline bool rv_check_max(RegisterEntry*, const RegisterValue);
+static inline bool rv_check_range(RegisterEntry*, const RegisterValue);
+static inline bool rv_check_cb(RegisterEntry*, const RegisterValue);
+static bool rv_validate(RegisterEntry*, const RegisterValue);
+
+/* Initialisation utilities */
+static inline bool is_end_of_areas(RegisterArea*);
+static inline bool is_end_of_entries(RegisterEntry*);
+static AreaHandle reg_count_areas(RegisterArea*);
+static RegisterHandle reg_count_entries(RegisterEntry*);
+static RegisterHandle ra_first_entry_of_next(RegisterTable*,
+                                             RegisterArea*,
+                                             RegisterHandle);
+
+/* Area utilities */
+static inline bool register_area_is_writeable(RegisterArea*);
+static inline bool register_area_is_readable(RegisterArea*);
+static bool ra_addr_is_part_of(RegisterArea*, RegisterAddress);
+static inline bool ra_reg_is_part_of(RegisterArea*, RegisterEntry*);
+static bool ra_reg_fits_into(RegisterArea*, RegisterEntry*);
+static AreaHandle ra_find_area_by_addr(RegisterTable*, RegisterAddress);
+static inline int ra_range_touches(RegisterArea*,
+                                   RegisterAddress,
+                                   RegisterOffset);
+
+/* Entry utilities */
+static void reg_taint_in_range(RegisterTable*, RegisterAddress, RegisterOffset);
+static bool reg_entry_is_in_memory(RegisterTable*, RegisterEntry*);
+static inline void reg_read_entry(RegisterEntry*, RegisterAtom*);
+static inline int reg_range_touches(RegisterEntry*,
+                                    RegisterAddress,
+                                    RegisterOffset);
+
+/* Block write utilities */
+static RegisterAccessResult ra_writeable(RegisterTable*,
+                                         RegisterAddress,
+                                         RegisterOffset);
+RegisterAccessResult ra_malformed_write(RegisterTable*,
+                                        RegisterAddress,
+                                        RegisterOffset,
+                                        RegisterAtom*);
+
+/*
+ * Internal API implementation
+ */
 
 static inline size_t
 reg_min(size_t a, size_t b)
@@ -406,7 +474,7 @@ ra_find_area_by_addr(RegisterTable *t, RegisterAddress addr)
 }
 
 static bool
-ra_entry_is_in_memory(RegisterTable *t, RegisterEntry *e)
+reg_entry_is_in_memory(RegisterTable *t, RegisterEntry *e)
 {
     for (AreaHandle an = 0ul; an < t->areas; ++an) {
         RegisterArea *area = &t->area[an];
@@ -423,7 +491,7 @@ ra_entry_is_in_memory(RegisterTable *t, RegisterEntry *e)
 }
 
 static inline void
-ra_read_entry(RegisterEntry *e, RegisterAtom *buf)
+reg_read_entry(RegisterEntry *e, RegisterAtom *buf)
 {
     (void)e->area->read(e->area, buf, e->offset, rds_serdes[e->type].size);
 }
@@ -559,7 +627,7 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr,
         }
 
         /* Fetch the entire memory of where the old entry is stored */
-        ra_read_entry(e, raw);
+        reg_read_entry(e, raw);
         memcpy(raw + rs, buf + bs, rlen * sizeof(RegisterAtom));
 
         /* Try the deserialiser, fail if it fails */
@@ -595,7 +663,7 @@ registers_init(RegisterTable *t)
         RegisterValue def;
         RegisterEntry *e = &t->entry[i];
         /* Link into register table memory */
-        bool success = ra_entry_is_in_memory(t, e);
+        bool success = reg_entry_is_in_memory(t, e);
         if (success == false) {
             rv.code = REG_ACCESS_NOENTRY;
             rv.address = e->address;
