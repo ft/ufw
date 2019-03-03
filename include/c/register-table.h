@@ -47,7 +47,7 @@ typedef struct RegisterAccessResult {
     RegisterAddress address;
 } RegisterAccessResult;
 
-#define REG_ACCESS_RESULT_INIT { REG_ACCESS_SUCCESS, 0u }
+#define REG_ACCESS_RESULT_INIT { .code = REG_ACCESS_SUCCESS, .address = 0u }
 
 typedef bool(*registerSer)(const RegisterValue, RegisterAtom*);
 typedef bool(*registerDes)(const RegisterAtom*, RegisterValue*);
