@@ -17,6 +17,7 @@
 
 typedef uint16_t RegisterAtom;
 typedef uint16_t RegisterHandle;
+typedef uint16_t AreaHandle;
 typedef size_t RegisterAddress;
 typedef size_t RegisterOffset;
 typedef struct RegisterArea RegisterArea;
@@ -183,7 +184,7 @@ struct RegisterArea {
     { .read = NULL, .write = NULL, .base = 0, .size = 0, .mem = NULL }
 
 typedef struct RegisterTable {
-    size_t areas;
+    AreaHandle areas;
     RegisterArea *area;
     RegisterHandle entries;
     RegisterEntry *entry;

@@ -327,10 +327,10 @@ reg_taint_in_range(RegisterTable *t, RegisterAddress addr, RegisterOffset n)
     }
 }
 
-static size_t
+static AreaHandle
 reg_count_areas(RegisterArea *a)
 {
-    size_t n = 0ull;
+    AreaHandle n = 0ull;
     while (is_end_of_areas(a) == false) {
         n++;
         a++;
@@ -393,10 +393,10 @@ ra_reg_fits_into(RegisterArea *a, RegisterEntry *e)
     return (area_end <= entry_end);
 }
 
-static size_t
+static AreaHandle
 ra_find_area_by_addr(RegisterTable *t, RegisterAddress addr)
 {
-    size_t n;
+    AreaHandle n;
     for (n = 0ull; n < t->areas; ++n) {
         if (ra_addr_is_part_of(&t->area[n], addr)) {
             break;
@@ -409,7 +409,7 @@ ra_find_area_by_addr(RegisterTable *t, RegisterAddress addr)
 static bool
 ra_entry_is_in_memory(RegisterTable *t, RegisterEntry *e)
 {
-    for (size_t an = 0ull; an < t->areas; ++an) {
+    for (AreaHandle an = 0ul; an < t->areas; ++an) {
         RegisterArea *area = &t->area[an];
         if (ra_reg_is_part_of(area, e)) {
             if (ra_reg_fits_into(area, e))
@@ -458,7 +458,7 @@ ra_writeable(RegisterTable *t, RegisterAddress addr, RegisterOffset n)
      *   at all possible for the register abstraction to modify the range of
      *   memory in question.
      */
-    for (size_t i = 0ull; i < t->areas; ++i) {
+    for (AreaHandle i = 0ul; i < t->areas; ++i) {
         int touch = ra_range_touches(&t->area[i], addr, n);
         if (touch < 0)
             continue;
@@ -700,7 +700,7 @@ register_block_read_unsafe(RegisterTable *t, RegisterAddress addr,
 {
     RegisterOffset rest = n;
     while (rest > 0ull) {
-        size_t an = ra_find_area_by_addr(t, addr);
+        AreaHandle an = ra_find_area_by_addr(t, addr);
         RegisterOffset offset, readn;
         RegisterArea *a;
 
@@ -728,7 +728,7 @@ register_block_write_unsafe(RegisterTable *t, RegisterAddress addr,
 {
     RegisterOffset rest = n;
     while (rest > 0ull) {
-        size_t an = ra_find_area_by_addr(t, addr);
+        AreaHandle an = ra_find_area_by_addr(t, addr);
         RegisterOffset offset, writen;
         RegisterArea *a;
 
@@ -821,7 +821,7 @@ register_block_touches_hole(RegisterTable *t, RegisterAddress addr,
     while (rest > 0) {
         RegisterArea *a;
         RegisterOffset used;
-        size_t an = ra_find_area_by_addr(t, addr);
+        AreaHandle an = ra_find_area_by_addr(t, addr);
 
         if (an == t->areas) {
             rv.code = REG_ACCESS_NOENTRY;
