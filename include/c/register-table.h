@@ -15,11 +15,22 @@
 
 /* Data types */
 
-typedef uint16_t RegisterAtom;
-typedef uint16_t RegisterHandle;
 typedef uint16_t AreaHandle;
-typedef size_t RegisterAddress;
-typedef size_t RegisterOffset;
+#define AREA_HANDLE_MAX UINT16_MAX
+
+typedef uint32_t RegisterHandle;
+#define REGISTER_HANDLE_MAX UINT32_MAX
+
+typedef uint16_t RegisterAtom;
+#define REGISTER_ATOM_MAX UINT16_MAX
+
+typedef uint32_t RegisterAddress;
+#define REGISTER_ADDRESS_MAX UINT32_MAX
+
+typedef uint32_t RegisterOffset;
+#define REGISTER_OFFSET_MAX UINT32_MAX
+
+/* A couple of forward declarations */
 typedef struct RegisterArea RegisterArea;
 typedef struct RegisterEntry RegisterEntry;
 typedef struct RegisterValue RegisterValue;
