@@ -791,7 +791,7 @@ register_get(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
     RegisterArea *a;
     bool success;
 
-    if (idx > t->entries) {
+    if (idx >= t->entries) {
         rv.code = REG_ACCESS_NOENTRY;
         rv.address = idx;
         return rv;
@@ -815,7 +815,7 @@ register_default(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
     RegisterEntry *e;
 
-    if (idx > t->entries) {
+    if (idx >= t->entries) {
         rv.code = REG_ACCESS_NOENTRY;
         rv.address = idx;
         return rv;
