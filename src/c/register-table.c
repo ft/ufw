@@ -755,6 +755,12 @@ register_set(RegisterTable *t, RegisterHandle idx, const RegisterValue v)
     RegisterArea *a;
     bool success;
 
+    if (BIT_ISSET(t->flags, REG_TF_INITIALISED) == false) {
+        rv.code = REG_ACCESS_UNINITIALISED;
+        rv.address = idx;
+        return rv;
+    }
+
     if (idx > t->entries) {
         rv.code = REG_ACCESS_NOENTRY;
         rv.address = idx;
@@ -791,6 +797,12 @@ register_get(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
     RegisterArea *a;
     bool success;
 
+    if (BIT_ISSET(t->flags, REG_TF_INITIALISED) == false) {
+        rv.code = REG_ACCESS_UNINITIALISED;
+        rv.address = idx;
+        return rv;
+    }
+
     if (idx >= t->entries) {
         rv.code = REG_ACCESS_NOENTRY;
         rv.address = idx;
@@ -814,6 +826,12 @@ register_default(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
 {
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
     RegisterEntry *e;
+
+    if (BIT_ISSET(t->flags, REG_TF_INITIALISED) == false) {
+        rv.code = REG_ACCESS_UNINITIALISED;
+        rv.address = idx;
+        return rv;
+    }
 
     if (idx >= t->entries) {
         rv.code = REG_ACCESS_NOENTRY;
@@ -886,6 +904,12 @@ register_block_read(RegisterTable *t, RegisterAddress addr,
 {
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
 
+    if (BIT_ISSET(t->flags, REG_TF_INITIALISED) == false) {
+        rv.code = REG_ACCESS_UNINITIALISED;
+        rv.address = addr;
+        return rv;
+    }
+
     if (n == 0ull)
         return rv;
 
@@ -902,6 +926,12 @@ register_block_write(RegisterTable *t, RegisterAddress addr,
                      RegisterOffset n, RegisterAtom *buf)
 {
     RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+
+    if (BIT_ISSET(t->flags, REG_TF_INITIALISED) == false) {
+        rv.code = REG_ACCESS_UNINITIALISED;
+        rv.address = addr;
+        return rv;
+    }
 
     /* Zero-length writes finish trivially. */
     if (n == 0ull)
