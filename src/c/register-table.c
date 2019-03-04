@@ -699,6 +699,7 @@ register_init(RegisterTable *t)
         previous = current;
     }
 
+    BIT_SET(t->flags, REG_TF_INITIALISED);
     for (RegisterHandle i = 0ul; i < t->entries; ++i) {
         RegisterAccessResult access;
         RegisterValue def;
@@ -708,6 +709,7 @@ register_init(RegisterTable *t)
         if (success == false) {
             rv.code = REG_INIT_ENTRY_IN_MEMORY_HOLE;
             rv.pos.entry = i;
+            BIT_CLEAR(t->flags, REG_TF_INITIALISED);
             return rv;
         }
         /* Load default value into register table */
@@ -718,6 +720,7 @@ register_init(RegisterTable *t)
         if (access.code != REG_ACCESS_SUCCESS) {
             rv.code = REG_INIT_ENTRY_INVALID_DEFAULT;
             rv.pos.entry = i;
+            BIT_CLEAR(t->flags, REG_TF_INITIALISED);
             return rv;
         }
         e->area->write(e->area, raw, e->offset, rds_serdes[e->type].size);
@@ -742,7 +745,6 @@ register_init(RegisterTable *t)
         }
     }
 
-    BIT_SET(t->flags, REG_TF_INITIALISED);
     return rv;
 }
 
