@@ -43,10 +43,10 @@ typedef enum RegisterAccessCode {
     REG_ACCESS_READONLY
 } RegisterAccessCode;
 
-typedef struct RegisterAccessResult {
+typedef struct RegisterAccess {
     RegisterAccessCode code;
     RegisterAddress address;
-} RegisterAccessResult;
+} RegisterAccess;
 
 #define REG_ACCESS_RESULT_INIT { .code = REG_ACCESS_SUCCESS, .address = 0u }
 
@@ -61,14 +61,14 @@ typedef enum RegisterInitCode {
     REG_INIT_ENTRY_INVALID_DEFAULT
 } RegisterInitCode;
 
-typedef struct RegisterInitResult {
+typedef struct RegisterInit {
     RegisterInitCode code;
     union {
         AreaHandle area;
         RegisterHandle entry;
         RegisterAddress address;
     } pos;
-} RegisterInitResult;
+} RegisterInit;
 
 #define REG_INIT_RESULT_INIT { .code = REG_INIT_SUCCESS, .pos.address = 0u }
 
@@ -76,9 +76,9 @@ typedef bool(*registerSer)(const RegisterValue, RegisterAtom*);
 typedef bool(*registerDes)(const RegisterAtom*, RegisterValue*);
 typedef bool(*validatorFunction)(const RegisterEntry*, RegisterValue);
 
-typedef RegisterAccessResult(*registerRead)(
+typedef RegisterAccess(*registerRead)(
     const RegisterArea*, RegisterAtom*, RegisterOffset, RegisterOffset);
-typedef RegisterAccessResult(*registerWrite)(
+typedef RegisterAccess(*registerWrite)(
     RegisterArea*, const RegisterAtom*, RegisterOffset, RegisterOffset);
 
 typedef enum RegisterType {
@@ -226,32 +226,32 @@ typedef struct RegisterTable {
 #define REG_S64(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_SINT64,s64,D)
 #define REG_F32(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_FLOAT32,f32,D)
 
-RegisterInitResult register_init(RegisterTable*);
+RegisterInit register_init(RegisterTable*);
 
-RegisterAccessResult reg_mem_read(const RegisterArea*, RegisterAtom*,
-                                  RegisterOffset, RegisterOffset);
-RegisterAccessResult reg_mem_write(RegisterArea*, const RegisterAtom*,
-                                   RegisterOffset, RegisterOffset);
+RegisterAccess reg_mem_read(const RegisterArea*, RegisterAtom*,
+                            RegisterOffset, RegisterOffset);
+RegisterAccess reg_mem_write(RegisterArea*, const RegisterAtom*,
+                             RegisterOffset, RegisterOffset);
 
-RegisterAccessResult register_set(RegisterTable*, RegisterHandle,
-                                  const RegisterValue);
-RegisterAccessResult register_get(RegisterTable*, RegisterHandle,
-                                  RegisterValue*);
-RegisterAccessResult register_default(RegisterTable*, RegisterHandle,
-                                      RegisterValue*);
-RegisterAccessResult register_block_read(RegisterTable*, RegisterAddress,
-                                         RegisterOffset, RegisterAtom*);
-RegisterAccessResult register_block_write(RegisterTable*, RegisterAddress,
-                                          RegisterOffset, RegisterAtom*);
+RegisterAccess register_set(RegisterTable*, RegisterHandle,
+                            const RegisterValue);
+RegisterAccess register_get(RegisterTable*, RegisterHandle,
+                            RegisterValue*);
+RegisterAccess register_default(RegisterTable*, RegisterHandle,
+                                RegisterValue*);
+RegisterAccess register_block_read(RegisterTable*, RegisterAddress,
+                                   RegisterOffset, RegisterAtom*);
+RegisterAccess register_block_write(RegisterTable*, RegisterAddress,
+                                    RegisterOffset, RegisterAtom*);
 
 void register_block_read_unsafe(RegisterTable*, RegisterAddress,
                                 RegisterOffset, RegisterAtom*);
 void register_block_write_unsafe(RegisterTable*, RegisterAddress,
                                  RegisterOffset, RegisterAtom*);
 
-RegisterAccessResult register_block_touches_hole(RegisterTable*,
-                                                 RegisterAddress,
-                                                 RegisterOffset);
+RegisterAccess register_block_touches_hole(RegisterTable*,
+                                           RegisterAddress,
+                                           RegisterOffset);
 
 static inline bool
 register_was_touched(RegisterTable *t, RegisterHandle reg)

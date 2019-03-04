@@ -75,13 +75,13 @@ static inline int reg_range_touches(RegisterEntry*,
                                     RegisterOffset);
 
 /* Block write utilities */
-static RegisterAccessResult ra_writeable(RegisterTable*,
-                                         RegisterAddress,
-                                         RegisterOffset);
-RegisterAccessResult ra_malformed_write(RegisterTable*,
-                                        RegisterAddress,
-                                        RegisterOffset,
-                                        RegisterAtom*);
+static RegisterAccess ra_writeable(RegisterTable*,
+                                   RegisterAddress,
+                                   RegisterOffset);
+RegisterAccess ra_malformed_write(RegisterTable*,
+                                  RegisterAddress,
+                                  RegisterOffset,
+                                  RegisterAtom*);
 
 /*
  * Internal API implementation
@@ -519,10 +519,10 @@ ra_first_entry_of_next(RegisterTable *t, RegisterArea *a, RegisterHandle start)
     return t->entries;
 }
 
-static RegisterAccessResult
+static RegisterAccess
 ra_writeable(RegisterTable *t, RegisterAddress addr, RegisterOffset n)
 {
-    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+    RegisterAccess rv = REG_ACCESS_RESULT_INIT;
     /*
      * There are two kinds of "writeability":
      *
@@ -550,11 +550,11 @@ ra_writeable(RegisterTable *t, RegisterAddress addr, RegisterOffset n)
     return rv;
 }
 
-RegisterAccessResult
+RegisterAccess
 ra_malformed_write(RegisterTable *t, RegisterAddress addr,
                    RegisterOffset n, RegisterAtom *buf)
 {
-    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+    RegisterAccess rv = REG_ACCESS_RESULT_INIT;
     RegisterAddress last = addr + n - 1;
 
     for (RegisterHandle i = 0ul; i < t->entries; ++i) {
@@ -649,11 +649,11 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr,
 
 /* Public API */
 
-RegisterInitResult
+RegisterInit
 register_init(RegisterTable *t)
 {
     RegisterAtom raw[REG_SIZEOF_LARGEST_DATUM];
-    RegisterInitResult rv = REG_INIT_RESULT_INIT;
+    RegisterInit rv = REG_INIT_RESULT_INIT;
     RegisterAddress previous;
 
     BIT_CLEAR(t->flags, REG_TF_INITIALISED);
@@ -701,7 +701,7 @@ register_init(RegisterTable *t)
 
     BIT_SET(t->flags, REG_TF_INITIALISED);
     for (RegisterHandle i = 0ul; i < t->entries; ++i) {
-        RegisterAccessResult access;
+        RegisterAccess access;
         RegisterValue def;
         RegisterEntry *e = &t->entry[i];
         /* Link into register table memory */
@@ -748,11 +748,11 @@ register_init(RegisterTable *t)
     return rv;
 }
 
-RegisterAccessResult
+RegisterAccess
 register_set(RegisterTable *t, RegisterHandle idx, const RegisterValue v)
 {
     RegisterAtom raw[REG_SIZEOF_LARGEST_DATUM];
-    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+    RegisterAccess rv = REG_ACCESS_RESULT_INIT;
     RegisterEntry *e;
     RegisterArea *a;
     bool success;
@@ -790,11 +790,11 @@ register_set(RegisterTable *t, RegisterHandle idx, const RegisterValue v)
     return rv;
 }
 
-RegisterAccessResult
+RegisterAccess
 register_get(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
 {
     RegisterAtom raw[REG_SIZEOF_LARGEST_DATUM];
-    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+    RegisterAccess rv = REG_ACCESS_RESULT_INIT;
     RegisterEntry *e;
     RegisterArea *a;
     bool success;
@@ -823,10 +823,10 @@ register_get(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
     return rv;
 }
 
-RegisterAccessResult
+RegisterAccess
 register_default(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
 {
-    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+    RegisterAccess rv = REG_ACCESS_RESULT_INIT;
     RegisterEntry *e;
 
     if (BIT_ISSET(t->flags, REG_TF_INITIALISED) == false) {
@@ -900,11 +900,11 @@ register_block_write_unsafe(RegisterTable *t, RegisterAddress addr,
     }
 }
 
-RegisterAccessResult
+RegisterAccess
 register_block_read(RegisterTable *t, RegisterAddress addr,
                     RegisterOffset n, RegisterAtom *buf)
 {
-    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+    RegisterAccess rv = REG_ACCESS_RESULT_INIT;
 
     if (BIT_ISSET(t->flags, REG_TF_INITIALISED) == false) {
         rv.code = REG_ACCESS_UNINITIALISED;
@@ -923,11 +923,11 @@ register_block_read(RegisterTable *t, RegisterAddress addr,
     return rv;
 }
 
-RegisterAccessResult
+RegisterAccess
 register_block_write(RegisterTable *t, RegisterAddress addr,
                      RegisterOffset n, RegisterAtom *buf)
 {
-    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+    RegisterAccess rv = REG_ACCESS_RESULT_INIT;
 
     if (BIT_ISSET(t->flags, REG_TF_INITIALISED) == false) {
         rv.code = REG_ACCESS_UNINITIALISED;
@@ -963,29 +963,29 @@ register_block_write(RegisterTable *t, RegisterAddress addr,
     return rv;
 }
 
-RegisterAccessResult
+RegisterAccess
 reg_mem_read(const RegisterArea *a, RegisterAtom *dest,
              RegisterOffset offset, RegisterOffset n)
 {
-    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+    RegisterAccess rv = REG_ACCESS_RESULT_INIT;
     memcpy(dest, a->mem + offset, n * sizeof(RegisterAtom));
     return rv;
 }
 
-RegisterAccessResult
+RegisterAccess
 reg_mem_write(RegisterArea *a, const RegisterAtom *src,
               RegisterOffset offset, RegisterOffset n)
 {
-    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+    RegisterAccess rv = REG_ACCESS_RESULT_INIT;
     memcpy(a->mem + offset, src, n * sizeof(RegisterAtom));
     return rv;
 }
 
-RegisterAccessResult
+RegisterAccess
 register_block_touches_hole(RegisterTable *t, RegisterAddress addr,
                             RegisterOffset n)
 {
-    RegisterAccessResult rv = REG_ACCESS_RESULT_INIT;
+    RegisterAccess rv = REG_ACCESS_RESULT_INIT;
     RegisterOffset rest = n;
     while (rest > 0) {
         RegisterArea *a;
