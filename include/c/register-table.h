@@ -13,6 +13,10 @@
 
 #include <common/bit-operations.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /* Data types */
 
 typedef uint16_t AreaHandle;
@@ -260,5 +264,9 @@ register_was_touched(RegisterTable *t, RegisterHandle reg)
     BIT_CLEAR(t->entry[reg].flags, REG_EF_TOUCHED);
     return rc;
 }
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* INC_REGISTER_TABLE_H */
