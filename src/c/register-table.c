@@ -398,7 +398,7 @@ static AreaHandle
 reg_count_areas(RegisterArea *a)
 {
     AreaHandle n = 0ull;
-    while (is_end_of_areas(a) == false) {
+    while ((n < AREA_HANDLE_MAX) && (is_end_of_areas(a) == false)) {
         n++;
         a++;
     }
@@ -415,7 +415,7 @@ static RegisterHandle
 reg_count_entries(RegisterEntry *e)
 {
     RegisterHandle n = 0ull;
-    while (is_end_of_entries(e) == false) {
+    while ((n < REGISTER_HANDLE_MAX) && (is_end_of_entries(e) == false)) {
         n++;
         e++;
     }
@@ -659,7 +659,17 @@ register_init(RegisterTable *t)
     BIT_CLEAR(t->flags, REG_TF_INITIALISED);
     /* Determine table sizes first */
     t->areas = reg_count_areas(t->area);
+    if (t->areas == AREA_HANDLE_MAX) {
+        rv.code = REG_INIT_TOO_MANY_AREAS;
+        rv.pos.area = AREA_HANDLE_MAX;
+        return rv;
+    }
     t->entries = reg_count_entries(t->entry);
+    if (t->entries == REGISTER_HANDLE_MAX) {
+        rv.code = REG_INIT_TOO_MANY_ENTRIES;
+        rv.pos.entry = REGISTER_HANDLE_MAX;
+        return rv;
+    }
 
     if (t->areas == 0ul) {
         rv.code = REG_INIT_NO_AREAS;
