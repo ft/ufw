@@ -372,10 +372,10 @@ reg_range_touches(RegisterEntry *e, RegisterAddress addr, RegisterOffset n)
      * it is above the range */
     const RegisterOffset size = rds_serdes[e->type].size;
 
-    if ((e->address + size) < addr)
+    if ((e->address + size) <= addr)
         return -1;
 
-    if ((addr + n) < e->address)
+    if ((addr + n) <= e->address)
         return 1;
 
     return 0;
@@ -501,10 +501,10 @@ ra_range_touches(RegisterArea *a, RegisterAddress addr, RegisterOffset n)
 {
     /* Return -1 if area is below range; 0 if it is within the range and 1 if
      * it is above the range */
-    if ((a->base + a->size) < addr)
+    if ((a->base + a->size) <= addr)
         return -1;
 
-    if ((addr + n) < a->base)
+    if ((addr + n) <= a->base)
         return 1;
 
     return 0;
