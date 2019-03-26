@@ -9,8 +9,8 @@
  * @brief This files contains datatype definitions and function prototypes.
  */
 
-#ifndef __DEBUG_UART_H
-#define __DEBUG_UART_H
+#ifndef INC_LOGGER_H
+#define INC_LOGGER_H
 
 /**
  * @addtogroup ufw
@@ -76,4 +76,4 @@ void log_printf(LogLevel level, const char *frmt_msg, ...);
  * @}
  */
 
-#endif /* __DEBUG_UART_H */
+#endif /* INC_LOGGER_H */
