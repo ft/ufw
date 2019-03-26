@@ -42,6 +42,17 @@ add_library(ufw STATIC src/c/logger.c
                        src/c/register-table.c)
 
 set_property(TARGET ufw PROPERTY C_STANDARD 99)
+
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "debug" AND "${COMPILER_API}" STREQUAL "gnu")
+  if ("${TOOLCHAIN_ID}" STREQUAL "gcc-native")
+    target_compile_options(ufw PUBLIC
+      -fsanitize=address,undefined -fno-omit-frame-pointer)
+  elseif ("${TOOLCHAIN_ID}" STREQUAL "clang-native")
+    target_compile_options(ufw PUBLIC
+      -fsanitize=address,undefined,integer -fno-omit-frame-pointer)
+  endif()
+endif()
+
 add_library(ufw++ INTERFACE)
 target_include_directories(ufw++
   INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
