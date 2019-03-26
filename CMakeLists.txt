@@ -40,6 +40,8 @@ configure_file("${PROJECT_SOURCE_DIR}/include/common/toolchain.h.in"
 add_library(ufw STATIC src/c/logger.c
                        src/c/ring-buffer-iter.c
                        src/c/register-table.c)
+
+set_property(TARGET ufw PROPERTY C_STANDARD 99)
 add_library(ufw++ INTERFACE)
 target_include_directories(ufw++
   INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
