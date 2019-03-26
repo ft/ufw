@@ -6,6 +6,13 @@
 
 #include "c/ring-buffer.h"
 
+/**
+ * @addtogroup ufw
+ * @{
+ * @addtogroup ringbuffer
+ * @{
+ */
+
 typedef enum {
     RING_BUFFER_ITER_OLD_TO_NEW,
     RING_BUFFER_ITER_NEW_TO_OLD
@@ -63,5 +70,10 @@ size_t rb_iter_advance(rb_iter *);
     {                                                   \
         return c->data[iter->index];                    \
     }
+
+/**
+ * @}
+ * @}
+ */
 
 #endif /* INC_RING_BUFFER_ITER_H */

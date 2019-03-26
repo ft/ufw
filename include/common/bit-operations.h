@@ -14,6 +14,13 @@
 
 #include <limits.h>
 
+/**
+ * @addtogroup ufw
+ * @{
+ * @addtogroup bit-operations
+ * @{
+ */
+
 /*
  * Constants
  */
@@ -289,5 +296,10 @@
  * @sideeffects Modifies container as described.
  */
 #define BIT_TOGGLE(container, mask) ((container) ^= (mask))
+
+/**
+ * @}
+ * @}
+ */
 
 #endif /* INC_BITOPS_H */

@@ -14,6 +14,13 @@
 
 #include <common/toolchain.h>
 
+/**
+ * @addtogroup ufw
+ * @{
+ * @addtogroup compiler
+ * @{
+ */
+
 /*
  * Annotation macros
  */
@@ -201,5 +208,10 @@
 #else
 #define DEPRECATED
 #endif /* HAVE_COMPILER_ATTRIBUTE_DEPRECATED */
+
+/**
+ * @}
+ * @}
+ */
 
 #endif /* INC_COMPILER_H */

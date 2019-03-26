@@ -1,6 +1,13 @@
 #ifndef INC_RING_BUFFER_H
 #define INC_RING_BUFFER_H
 
+/**
+ * @addtogroup ufw
+ * @{
+ * @addtogroup ringbuffer
+ * @{
+ */
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -166,5 +173,10 @@
     {                                           \
         c->override_if_full = state;            \
     }
+
+/**
+ * @}
+ * @}
+ */
 
 #endif /* INC_RING_BUFFER_H */

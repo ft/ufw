@@ -3,6 +3,13 @@
 
 #include "c/ring-buffer-iter.h"
 
+/**
+ * @addtogroup ufw
+ * @{
+ * @addtogroup ringbuffer
+ * @{
+ */
+
 bool
 rb_iter_done(rb_iter *iter)
 {
@@ -24,3 +31,8 @@ rb_iter_advance(rb_iter *iter)
     iter->steps--;
     return iter->index;
 }
+
+/**
+ * @}
+ * @}
+ */
