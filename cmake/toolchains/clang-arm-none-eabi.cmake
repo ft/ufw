@@ -16,3 +16,6 @@ set(CMAKE_CXX_COMPILER_TARGET ${triple})
 set(CMAKE_SYSROOT /usr/lib/arm-none-eabi)
 
 set(CMAKE_EXE_LINKER_FLAGS_INIT "-fuse-ld=bfd -static -nostartfiles -nodefaultlibs -nostdlib")
+
+set(TOOLCHAIN_ID "clang-arm")
+set(COMPILER_API "gnu")
