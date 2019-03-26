@@ -24,6 +24,16 @@ if (NOT PROJECT_TARGET_CPU)
   set(PROJECT_TARGET_CPU native)
 endif()
 
+include(CheckIncludeFile)
+check_include_file("sys/types.h" WITH_SYS_TYPES_H)
+
+include(CheckTypeSize)
+check_type_size("uint8_t" UFW_UINT8_T_SIZE)
+if (UFW_UINT8_T_SIZE)
+    set(UINT8_T_SIZE ${UFW_UINT8_T_SIZE})
+    set(WITH_UINT8_T 1)
+endif()
+
 configure_file("${PROJECT_SOURCE_DIR}/include/common/toolchain.h.in"
                "${PROJECT_BINARY_DIR}/include/common/toolchain.h" )
 

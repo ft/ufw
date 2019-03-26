@@ -138,5 +138,10 @@
 
 #endif /* __cplusplus */
 
+/* Toolchain Compatibility */
+
+#cmakedefine WITH_SYS_TYPES_H
+#cmakedefine UINT8_T_SIZE @UINT8_T_SIZE@
+#cmakedefine WITH_UINT8_T
 
 #endif /* INC_UFW_CONFIG_H */
