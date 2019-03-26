@@ -1,6 +1,8 @@
 #ifndef INC_UFW_CONFIG_H
 #define INC_UFW_CONFIG_H
 
+/* Compiler Command Line API Identification */
+
 #cmakedefine UFW_CC_HAS_Wall @UFW_CC_HAS_Wall@
 
 #cmakedefine UFW_CC_HAS_Wall @UFW_CC_HAS_Wall@
@@ -60,7 +62,11 @@
 #cmakedefine UFW_CXX_HAS_ATTRIBUTE_WARN_UNUSED_RESULT @UFW_CXX_HAS_ATTRIBUTE_WARN_UNUSED_RESULT@
 #cmakedefine UFW_CXX_HAS_BUILTIN_EXPECT @UFW_CXX_HAS_BUILTIN_EXPECT@
 
+/* Language Extension Identification */
+
 #ifdef __cplusplus
+
+/* C++ */
 
 #ifdef UFW_CXX_HAS_ATTRIBUTE_COLD
 #define HAVE_COMPILER_ATTRIBUTE_COLD
@@ -99,6 +105,8 @@
 #endif /* UFW_CXX_HAS_BUILTIN_EXPECT */
 
 #else
+
+/* C */
 
 #ifdef UFW_CC_HAS_ATTRIBUTE_COLD
 #define HAVE_COMPILER_ATTRIBUTE_COLD
