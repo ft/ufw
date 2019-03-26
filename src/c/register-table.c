@@ -708,6 +708,19 @@ register_init(RegisterTable *t)
         previous = current;
     }
 
+    /*
+     * Looks like TI's C99 compiler doesn't initialise arrays that are initia-
+     * lised like this
+     *
+     *   int foo[32] = { 0 };
+     *
+     * correctly. Only initialising the first item of the array. Initialise all
+     * memory to zero upon boot then...
+     */
+    for (AreaHandle i = 0ul; i < t->areas; ++i) {
+        memset(t->area[i].mem, 0, t->area[i].size * sizeof(RegisterAtom));
+    }
+
     BIT_SET(t->flags, REG_TF_INITIALISED);
     for (RegisterHandle i = 0ul; i < t->entries; ++i) {
         RegisterAccess access;
