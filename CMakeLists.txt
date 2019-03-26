@@ -1,29 +1,28 @@
 cmake_minimum_required (VERSION 3.1.0)
-project(ufw)
+project(ufw C CXX)
 
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
-
-include(GNUCompilerWarnings)
-include(GNUAttributes)
-include(GNUBuiltins)
-
-if ((${CMAKE_C_COMPILER_ID} MATCHES "GNU") OR
-    (${CMAKE_C_COMPILER_ID} MATCHES "Clang"))
-  GNUCCompilerWarnings()
-  MakeStrictCCompiler()
+include(InitialiseToolchain OPTIONAL RESULT_VARIABLE WITH_INITIALISE_TOOLCHAIN)
+if (NOT WITH_INITIALISE_TOOLCHAIN)
+  list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
+  message(STATUS "InitialiseToolchain missing; trying local cmake-modules")
+  include(InitialiseToolchain OPTIONAL RESULT_VARIABLE WITH_INITIALISE_TOOLCHAIN)
 endif()
 
-CheckAllGNUAttributes_C()
-CheckAllGNUBuiltins_C()
-
-if ((${CMAKE_C_COMPILER_ID} MATCHES "GNU") OR
-    (${CMAKE_C_COMPILER_ID} MATCHES "Clang"))
-  GNUCXXCompilerWarnings()
-  MakeStrictCXXCompiler()
+if (WITH_INITIALISE_TOOLCHAIN)
+  if (NOT COMPILER_API)
+    message(STATUS "COMPILER_API unset; assuming GNU")
+    set(COMPILER_API gnu)
+  endif()
+  initialise_toolchain()
+else()
+  message(FATAL_ERROR "InitialiseToolchain missing! Giving up!")
 endif()
 
-CheckAllGNUAttributes_CXX()
-CheckAllGNUBuiltins_CXX()
+include(SetupTargetCPU)
+if (NOT PROJECT_TARGET_CPU)
+  message(STATUS "PROJECT_TARGET_APU unset; assuming default")
+  set(PROJECT_TARGET_CPU native)
+endif()
 
 configure_file("${PROJECT_SOURCE_DIR}/include/common/toolchain.h.in"
                "${PROJECT_BINARY_DIR}/include/common/toolchain.h" )
@@ -31,14 +30,17 @@ configure_file("${PROJECT_SOURCE_DIR}/include/common/toolchain.h.in"
 add_library(ufw STATIC src/c/logger.c
                        src/c/ring-buffer-iter.c
                        src/c/register-table.c)
-target_include_directories(ufw PUBLIC ${CMAKE_SOURCE_DIR}/include)
-
 add_library(ufw++ INTERFACE)
-target_include_directories(ufw++ INTERFACE ${CMAKE_SOURCE_DIR}/include)
-
+target_include_directories(ufw++
+  INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
+            ${CMAKE_CURRENT_BINARY_DIR}/include)
 add_library(ufw-common INTERFACE)
 target_include_directories(ufw-common
-  INTERFACE ${CMAKE_SOURCE_DIR}/include
-            ${CMAKE_BINARY_DIR}/include)
+  INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
+            ${CMAKE_CURRENT_BINARY_DIR}/include)
+
+target_link_libraries(ufw PUBLIC ufw-common)
+MakeStrictCompilerC(ufw)
+set_target_cpu(ufw)
 
 add_subdirectory(test)
