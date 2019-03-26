@@ -652,7 +652,6 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr,
 RegisterInit
 register_init(RegisterTable *t)
 {
-    RegisterAtom raw[REG_SIZEOF_LARGEST_DATUM];
     RegisterInit rv = REG_INIT_RESULT_INIT;
     RegisterAddress previous;
 
@@ -722,6 +721,8 @@ register_init(RegisterTable *t)
             BIT_CLEAR(t->flags, REG_TF_INITIALISED);
             return rv;
         }
+        e->area = &t->area[ra_find_area_by_addr(t, e->address)];
+
         /* Load default value into register table */
         def.value = e->default_value;
         def.type = e->type;
@@ -733,7 +734,6 @@ register_init(RegisterTable *t)
             BIT_CLEAR(t->flags, REG_TF_INITIALISED);
             return rv;
         }
-        e->area->write(e->area, raw, e->offset, rds_serdes[e->type].size);
     }
 
     /* Now link entries back into their area (first and last) */
