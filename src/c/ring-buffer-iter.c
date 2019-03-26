@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2017-2019 micro framework workers, All rights reserved.
+ *
+ * Terms for redistribution and use can be found in LICENCE.
+ */
+
 #include <stdbool.h>
 #include <stddef.h>
 

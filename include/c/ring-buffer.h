@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2017-2019 micro framework workers, All rights reserved.
+ *
+ * Terms for redistribution and use can be found in LICENCE.
+ */
+
 #ifndef INC_RING_BUFFER_H
 #define INC_RING_BUFFER_H
 
