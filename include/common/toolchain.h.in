@@ -21,6 +21,7 @@
 #cmakedefine UFW_CC_HAS_Wstrict_prototypes @UFW_CC_HAS_Wstrict_prototypes@
 #cmakedefine UFW_CC_HAS_Wundef @UFW_CC_HAS_Wundef@
 #cmakedefine UFW_CC_HAS_Wused_but_marked_unused @UFW_CC_HAS_Wused_but_marked_unused@
+#cmakedefine UFW_CC_HAS_Wmisleading_indentation @UFW_CC_HAS_Wmisleading_indentation@
 
 #cmakedefine UFW_CC_HAS_ATTRIBUTE_COLD @UFW_CC_HAS_ATTRIBUTE_COLD@
 #cmakedefine UFW_CC_HAS_ATTRIBUTE_DEPRECATED @UFW_CC_HAS_ATTRIBUTE_DEPRECATED@
@@ -47,6 +48,7 @@
 #cmakedefine UFW_CXX_HAS_Wshift_sign_overflow @UFW_CXX_HAS_Wshift_sign_overflow@
 #cmakedefine UFW_CXX_HAS_Wundef @UFW_CXX_HAS_Wundef@
 #cmakedefine UFW_CXX_HAS_Wused_but_marked_unused @UFW_CXX_HAS_Wused_but_marked_unused@
+#cmakedefine UFW_CXX_HAS_Wmisleading_indentation @UFW_CXX_HAS_Wmisleading_indentation@
 
 #cmakedefine UFW_CXX_HAS_ATTRIBUTE_COLD @UFW_CXX_HAS_ATTRIBUTE_COLD@
 #cmakedefine UFW_CXX_HAS_ATTRIBUTE_DEPRECATED @UFW_CXX_HAS_ATTRIBUTE_DEPRECATED@
