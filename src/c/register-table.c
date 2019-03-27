@@ -390,7 +390,7 @@ reg_taint_in_range(RegisterTable *t, RegisterAddress addr, RegisterOffset n)
             return;
         if (touch < 0)
             continue;
-        BIT_SET(t->entry[i].flags, REG_EF_TOUCHED);
+        register_touch(t, REG_EF_TOUCHED);
     }
 }
 

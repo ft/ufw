@@ -259,11 +259,23 @@ RegisterAccess register_block_touches_hole(RegisterTable*,
                                            RegisterAddress,
                                            RegisterOffset);
 
+static inline void
+register_touch(RegisterTable *t, RegisterHandle reg)
+{
+    BIT_SET(t->entry[reg].flags, REG_EF_TOUCHED);
+}
+
+static inline void
+register_untouch(RegisterTable *t, RegisterHandle reg)
+{
+    BIT_CLEAR(t->entry[reg].flags, REG_EF_TOUCHED);
+}
+
 static inline bool
 register_was_touched(RegisterTable *t, RegisterHandle reg)
 {
     const bool rc = BIT_ISSET(t->entry[reg].flags, REG_EF_TOUCHED);
-    BIT_CLEAR(t->entry[reg].flags, REG_EF_TOUCHED);
+    register_untouch(t, reg);
     return rc;
 }
 
