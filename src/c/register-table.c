@@ -639,7 +639,7 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr,
 
         /* Try the validator, fail if it fails */
         if (rv_validate(e, datum) == false) {
-            rv.code = REG_ACCESS_INVALID;
+            rv.code = REG_ACCESS_RANGE;
             rv.address = addr + bs;
             return rv;
         }
@@ -795,7 +795,7 @@ register_set(RegisterTable *t, RegisterHandle idx, const RegisterValue v)
     e = &t->entry[idx];
     success = rv_validate(e, v);
     if (success == false) {
-        rv.code = REG_ACCESS_INVALID;
+        rv.code = REG_ACCESS_RANGE;
         rv.address = e->address;
         return rv;
     }

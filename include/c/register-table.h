@@ -43,6 +43,7 @@ typedef enum RegisterAccessCode {
     REG_ACCESS_SUCCESS,
     REG_ACCESS_UNINITIALISED,
     REG_ACCESS_NOENTRY,
+    REG_ACCESS_RANGE,
     REG_ACCESS_INVALID,
     REG_ACCESS_READONLY
 } RegisterAccessCode;
