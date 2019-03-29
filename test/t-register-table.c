@@ -18,12 +18,30 @@ t_trivial_success(void)
     };
 
     RegisterInit success = register_init(&registers);
-    cmp_ok(success.code, "==", REG_INIT_SUCCESS, "Trivial table succeeds");
+    cmp_ok(success.code, "==", REG_INIT_SUCCESS, "One area table succeeds");
+}
+
+static void
+t_trivial_fail(void)
+{
+    /* A register table needs at least one area. */
+    RegisterTable registers = {
+        .area = (RegisterArea[]) {
+            REGISTER_AREA_END
+        },
+        .entry = (RegisterEntry[]) {
+            REGISTER_ENTRY_END
+        }
+    };
+
+    RegisterInit success = register_init(&registers);
+    cmp_ok(success.code, "==", REG_INIT_NO_AREAS, "Trivial table fails");
 }
 
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(1);
+    plan(2);
     t_trivial_success();
+    t_trivial_fail();
 }
