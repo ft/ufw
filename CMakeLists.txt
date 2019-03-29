@@ -20,7 +20,7 @@ endif()
 
 include(SetupTargetCPU)
 if (NOT PROJECT_TARGET_CPU)
-  message(STATUS "PROJECT_TARGET_APU unset; assuming default")
+  message(STATUS "PROJECT_TARGET_CPU unset; assuming default")
   set(PROJECT_TARGET_CPU native)
 endif()
 
