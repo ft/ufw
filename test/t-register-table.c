@@ -159,6 +159,7 @@ t_entry_init_checks(void)
         },
         .entry = (RegisterEntry[]) {
             REG_U32(0, 0x0100ul, 0x2342u),
+            REG_U32(1, 0x02f0ul, 0x2342u),
             REGISTER_ENTRY_END
         }
     };
@@ -205,15 +206,22 @@ t_entry_init_checks(void)
     success = register_init(&r_with_hole);
     cmp_ok(success.code, "==", REG_INIT_SUCCESS,
            "Entry completely in memory succeeds");
+    r_with_hole.entry[1].check.type = REGV_TYPE_MIN;
+    r_with_hole.entry[1].check.arg.range.min.u32 = 0x3000ul;
+    success = register_init(&r_with_hole);
+    cmp_ok(success.code, "==", REG_INIT_ENTRY_INVALID_DEFAULT,
+           "Entry default value does not pass inspection");
+    cmp_ok(success.pos.entry, "==", 1,
+           "  ...entry at index 1 yielded the error");
 }
 
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(23);
+    plan(25);
     t_invalid_tables();    /*  3 */
     t_trivial_success();   /*  1 */
     t_trivial_fail();      /*  1 */
     t_area_init_checks();  /*  4 */
-    t_entry_init_checks(); /* 14 */
+    t_entry_init_checks(); /* 16 */
 }
