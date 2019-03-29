@@ -8,11 +8,12 @@ endif()
 
 include(CheckIncludeFile)
 
-include(CTest)
 set(test_names)
 
 if (TARGET tap)
-  list(APPEND test_names t-ring-buffer)
+  list(APPEND test_names
+    t-register-table
+    t-ring-buffer)
 endif()
 
 set(test_prgs)
