@@ -57,6 +57,7 @@ typedef struct RegisterAccess {
 
 typedef enum RegisterInitCode {
     REG_INIT_SUCCESS,
+    REG_INIT_TABLE_INVALID,
     REG_INIT_NO_AREAS,
     REG_INIT_TOO_MANY_AREAS,
     REG_INIT_AREA_INVALID_ORDER,

@@ -655,6 +655,21 @@ register_init(RegisterTable *t)
     RegisterInit rv = REG_INIT_RESULT_INIT;
     RegisterAddress previous;
 
+    if (t == NULL) {
+        rv.code = REG_INIT_TABLE_INVALID;
+        return rv;
+    }
+
+    if (t->area == NULL) {
+        rv.code = REG_INIT_TABLE_INVALID;
+        return rv;
+    }
+
+    if (t->entry == NULL) {
+        rv.code = REG_INIT_TABLE_INVALID;
+        return rv;
+    }
+
     BIT_CLEAR(t->flags, REG_TF_INITIALISED);
     /* Determine table sizes first */
     t->areas = reg_count_areas(t->area);
