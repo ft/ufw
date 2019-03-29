@@ -457,7 +457,7 @@ ra_reg_fits_into(RegisterArea *a, RegisterEntry *e)
 {
     const RegisterAddress area_end = a->base + a->size;
     const RegisterAddress entry_end = e->address + rds_serdes[e->type].size;
-    return (area_end <= entry_end);
+    return (entry_end <= area_end);
 }
 
 static AreaHandle
@@ -479,7 +479,7 @@ reg_entry_is_in_memory(RegisterTable *t, RegisterEntry *e)
     for (AreaHandle an = 0ul; an < t->areas; ++an) {
         RegisterArea *area = &t->area[an];
         if (ra_reg_is_part_of(area, e)) {
-            if (ra_reg_fits_into(area, e))
+            if (ra_reg_fits_into(area, e) == false)
                 return false;
 
             e->area = area;
