@@ -113,12 +113,107 @@ t_area_init_checks(void)
            "  ...area at index 1 yielded the error");
 }
 
+static void
+t_entry_init_checks(void)
+{
+    /* A register table needs at least one area. */
+    RegisterTable r_overlap = {
+        .area = (RegisterArea[]) {
+            MEMORY_AREA(0x0000ul, 0x100ul),
+            REGISTER_AREA_END
+        },
+        .entry = (RegisterEntry[]) {
+            REG_U32(0, 0x0000ul, 0x2342u),
+            REG_U32(1, 0x0001ul, 0x2342u),
+            REGISTER_ENTRY_END
+        }
+    };
+    RegisterTable r_just_no_overlap = {
+        .area = (RegisterArea[]) {
+            MEMORY_AREA(0x0000ul, 0x100ul),
+            REGISTER_AREA_END
+        },
+        .entry = (RegisterEntry[]) {
+            REG_U32(0, 0x0000ul, 0x2342u),
+            REG_U32(1, 0x0002ul, 0x2342u),
+            REGISTER_ENTRY_END
+        }
+    };
+    RegisterTable r_entry_order = {
+        .area = (RegisterArea[]) {
+            MEMORY_AREA(0x0000ul, 0x100ul),
+            REGISTER_AREA_END
+        },
+        .entry = (RegisterEntry[]) {
+            REG_U32(0, 0x0002ul, 0x2342u),
+            REG_U32(1, 0x0000ul, 0x2342u),
+            REGISTER_ENTRY_END
+        }
+    };
+    RegisterTable r_with_hole = {
+        .area = (RegisterArea[]) {
+            MEMORY_AREA(0x0000ul, 0x100ul),
+            /* Hole from 0x100 to 0x1ff */
+            MEMORY_AREA(0x0200ul, 0x100ul),
+            REGISTER_AREA_END
+        },
+        .entry = (RegisterEntry[]) {
+            REG_U32(0, 0x0100ul, 0x2342u),
+            REGISTER_ENTRY_END
+        }
+    };
+
+    RegisterInit success = register_init(&r_overlap);
+    cmp_ok(success.code, "==", REG_INIT_ENTRY_ADDRESS_OVERLAP,
+           "Entry overlap detected");
+    success = register_init(&r_just_no_overlap);
+    cmp_ok(success.code, "==", REG_INIT_SUCCESS,
+           "Adjacent entries without gap in between succeeds");
+    success = register_init(&r_entry_order);
+    cmp_ok(success.code, "==", REG_INIT_ENTRY_INVALID_ORDER,
+           "Entry order is not proper");
+    cmp_ok(success.pos.entry, "==", 1,
+           "  ...entry at index 1 yielded the error");
+    success = register_init(&r_with_hole);
+    cmp_ok(success.code, "==", REG_INIT_ENTRY_IN_MEMORY_HOLE,
+           "Entry in memory hole");
+    cmp_ok(success.pos.entry, "==", 0,
+           "  ...entry at index 0 yielded the error");
+    r_with_hole.entry[0].address = 0xfful;
+    success = register_init(&r_with_hole);
+    cmp_ok(success.code, "==", REG_INIT_ENTRY_IN_MEMORY_HOLE,
+           "Entry still in memory hole (part of it)");
+    cmp_ok(success.pos.entry, "==", 0,
+           "  ...entry at index 0 yielded the error");
+    r_with_hole.entry[0].address = 0xfeul;
+    success = register_init(&r_with_hole);
+    cmp_ok(success.code, "==", REG_INIT_SUCCESS,
+           "Entry completely in memory succeeds");
+    r_with_hole.entry[0].address = 0x1feul;
+    success = register_init(&r_with_hole);
+    cmp_ok(success.code, "==", REG_INIT_ENTRY_IN_MEMORY_HOLE,
+           "Entry in memory hole again");
+    cmp_ok(success.pos.entry, "==", 0,
+           "  ...entry at index 0 yielded the error");
+    r_with_hole.entry[0].address = 0x1fful;
+    success = register_init(&r_with_hole);
+    cmp_ok(success.code, "==", REG_INIT_ENTRY_IN_MEMORY_HOLE,
+           "Entry still in memory hole (part of it)");
+    cmp_ok(success.pos.entry, "==", 0,
+           "  ...entry at index 0 yielded the error");
+    r_with_hole.entry[0].address = 0x200ul;
+    success = register_init(&r_with_hole);
+    cmp_ok(success.code, "==", REG_INIT_SUCCESS,
+           "Entry completely in memory succeeds");
+}
+
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(9);
-    t_invalid_tables();    /* 3 */
-    t_trivial_success();   /* 1 */
-    t_trivial_fail();      /* 1 */
-    t_area_init_checks();  /* 4 */
+    plan(23);
+    t_invalid_tables();    /*  3 */
+    t_trivial_success();   /*  1 */
+    t_trivial_fail();      /*  1 */
+    t_area_init_checks();  /*  4 */
+    t_entry_init_checks(); /* 14 */
 }
