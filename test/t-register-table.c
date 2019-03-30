@@ -351,13 +351,13 @@ t_bfg2000(void)
     cmp_ok(bfg2000.area[0].entry.first, "==", 0u,
            "  ...first is 0");
     cmp_ok(bfg2000.area[0].entry.last, "==", 2u,
-           "  ...first is 2");
+           "  ...last is 2");
     cmp_ok(bfg2000.area[1].entry.count, "==", 3u,
            "BFG2000 area[1] has three entries");
     cmp_ok(bfg2000.area[1].entry.first, "==", 3u,
            "  ...first is 3");
     cmp_ok(bfg2000.area[1].entry.last, "==", 5u,
-           "  ...first is 5");
+           "  ...last is 5");
     cmp_ok(bfg2000.area[2].entry.count, "==", 1u,
            "BFG2000 area[2] has one entry");
     cmp_ok(bfg2000.area[2].entry.first, "==", 6u,
