@@ -1,6 +1,10 @@
 cmake_minimum_required (VERSION 3.1.0)
 project(ufw C CXX)
 
+if ((NOT CMAKE_BUILD_TYPE) OR ("${CMAKE_BUILD_TYPE}" STREQUAL ""))
+  set(CMAKE_BUILD_TYPE "debug")
+endif()
+
 include(InitialiseToolchain OPTIONAL RESULT_VARIABLE WITH_INITIALISE_TOOLCHAIN)
 if (NOT WITH_INITIALISE_TOOLCHAIN)
   list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
