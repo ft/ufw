@@ -339,7 +339,7 @@ t_bfg2000(void)
     RegisterInit init_success;
 
     init_success = register_init(&bfg2000);
-    /* Check initialisation results: 3 */
+    /* Check initialisation results: 12 */
     cmp_ok(init_success.code, "==", REG_INIT_SUCCESS,
            "BFG2000 register table initialises");
     cmp_ok(bfg2000.areas, "==", 3u,
