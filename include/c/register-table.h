@@ -261,6 +261,24 @@ RegisterAccess register_block_touches_hole(RegisterTable*,
                                            RegisterAddress,
                                            RegisterOffset);
 
+static inline RegisterArea*
+register_area(RegisterTable *t, RegisterHandle reg)
+{
+    return t->entry[reg].area;
+}
+
+static inline RegisterOffset
+register_offset(RegisterTable *t, RegisterHandle reg)
+{
+    return t->entry[reg].offset;
+}
+
+static inline char*
+register_name(RegisterTable *t, RegisterHandle reg)
+{
+    return t->entry[reg].name;
+}
+
 static inline void
 register_touch(RegisterTable *t, RegisterHandle reg)
 {
