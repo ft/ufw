@@ -40,6 +40,8 @@ static bool rds_f32_ser(const RegisterValue, RegisterAtom*);
 static bool rds_f32_des(const RegisterAtom*, RegisterValue*);
 
 /* Validators */
+static inline bool rv_check_max_value(const RegisterValueU, const RegisterValue);
+static inline bool rv_check_min_value(const RegisterValueU, const RegisterValue);
 static inline bool rv_check_min(RegisterEntry*, const RegisterValue);
 static inline bool rv_check_max(RegisterEntry*, const RegisterValue);
 static inline bool rv_check_range(RegisterEntry*, const RegisterValue);
@@ -270,25 +272,56 @@ const RegisterSerDes rds_serdes[] = {
 };
 
 static inline bool
-rv_check_min(RegisterEntry *e, const RegisterValue v)
+rv_check_min_value(const RegisterValueU limit, const RegisterValue v)
 {
     switch (v.type) {
     case REG_TYPE_INVALID:
         return false;
     case REG_TYPE_UINT16:
-        return (v.value.u16 >= e->check.arg.min.u16);
+        return (v.value.u16 >= limit.u16);
     case REG_TYPE_UINT32:
-        return (v.value.u32 >= e->check.arg.min.u32);
+        return (v.value.u32 >= limit.u32);
     case REG_TYPE_UINT64:
-        return (v.value.u64 >= e->check.arg.min.u64);
+        return (v.value.u64 >= limit.u64);
     case REG_TYPE_SINT16:
-        return (v.value.s16 >= e->check.arg.min.s16);
+        return (v.value.s16 >= limit.s16);
     case REG_TYPE_SINT32:
-        return (v.value.s32 >= e->check.arg.min.s32);
+        return (v.value.s32 >= limit.s32);
     case REG_TYPE_SINT64:
-        return (v.value.s64 >= e->check.arg.min.s64);
+        return (v.value.s64 >= limit.s64);
     case REG_TYPE_FLOAT32:
-        return (v.value.f32 >= e->check.arg.min.f32);
+        return (v.value.f32 >= limit.f32);
+    default:
+        return false;
+    }
+}
+
+static inline bool
+rv_check_min(RegisterEntry *e, const RegisterValue v)
+{
+    return rv_check_min_value(e->check.arg.min, v);
+}
+
+static inline bool
+rv_check_max_value(const RegisterValueU limit, const RegisterValue v)
+{
+    switch (v.type) {
+    case REG_TYPE_INVALID:
+        return false;
+    case REG_TYPE_UINT16:
+        return (v.value.u16 <= limit.u16);
+    case REG_TYPE_UINT32:
+        return (v.value.u32 <= limit.u32);
+    case REG_TYPE_UINT64:
+        return (v.value.u64 <= limit.u64);
+    case REG_TYPE_SINT16:
+        return (v.value.s16 <= limit.s16);
+    case REG_TYPE_SINT32:
+        return (v.value.s32 <= limit.s32);
+    case REG_TYPE_SINT64:
+        return (v.value.s64 <= limit.s64);
+    case REG_TYPE_FLOAT32:
+        return (v.value.f32 <= limit.f32);
     default:
         return false;
     }
@@ -297,32 +330,14 @@ rv_check_min(RegisterEntry *e, const RegisterValue v)
 static inline bool
 rv_check_max(RegisterEntry *e, const RegisterValue v)
 {
-    switch (v.type) {
-    case REG_TYPE_INVALID:
-        return false;
-    case REG_TYPE_UINT16:
-        return (v.value.u16 <= e->check.arg.max.u16);
-    case REG_TYPE_UINT32:
-        return (v.value.u32 <= e->check.arg.max.u32);
-    case REG_TYPE_UINT64:
-        return (v.value.u64 <= e->check.arg.max.u64);
-    case REG_TYPE_SINT16:
-        return (v.value.s16 <= e->check.arg.max.s16);
-    case REG_TYPE_SINT32:
-        return (v.value.s32 <= e->check.arg.max.s32);
-    case REG_TYPE_SINT64:
-        return (v.value.s64 <= e->check.arg.max.s64);
-    case REG_TYPE_FLOAT32:
-        return (v.value.f32 <= e->check.arg.max.f32);
-    default:
-        return false;
-    }
+    return rv_check_max_value(e->check.arg.max, v);
 }
 
 static inline bool
 rv_check_range(RegisterEntry *e, const RegisterValue v)
 {
-    return (rv_check_min(e, v) && rv_check_max(e, v));
+    return (rv_check_min_value(e->check.arg.range.min, v) &&
+            rv_check_max_value(e->check.arg.range.max, v));
 }
 
 static inline bool
