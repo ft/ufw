@@ -224,7 +224,8 @@ typedef struct RegisterTable {
 #define MAKE_REGISTER(IDX,ADDR,TYPE,MEMBER,DEFAULT)         \
     [IDX] = { .type = TYPE,                                 \
               .default_value.MEMBER = DEFAULT,              \
-              .address = ADDR, .name = #IDX }
+              .address = ADDR, .name = #IDX,                \
+              .check.type = REGV_TYPE_TRIVIAL }
 
 #define REG_U16(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_UINT16,u16,D)
 #define REG_U32(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_UINT32,u32,D)
