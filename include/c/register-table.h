@@ -227,13 +227,90 @@ typedef struct RegisterTable {
               .address = ADDR, .name = #IDX,                \
               .check.type = REGV_TYPE_TRIVIAL }
 
+#define MAKE_MIN_REGISTER(IDX,ADDR,TYPE,MEMBER,DEFAULT,MIN) \
+    [IDX] = { .type = TYPE,                                 \
+              .default_value.MEMBER = DEFAULT,              \
+              .address = ADDR, .name = #IDX,                \
+              .check.type = REGV_TYPE_MIN,                  \
+              .check.arg.min.MEMBER = MIN }
+
+#define MAKE_MAX_REGISTER(IDX,ADDR,TYPE,MEMBER,DEFAULT,MAX) \
+    [IDX] = { .type = TYPE,                                 \
+              .default_value.MEMBER = DEFAULT,              \
+              .address = ADDR, .name = #IDX,                \
+              .check.type = REGV_TYPE_MAX,                  \
+              .check.arg.max.MEMBER = MAX }
+
+#define MAKE_RANGE_REGISTER(IDX,ADDR,TYPE,MEMBER,DEFAULT,MIN,MAX)       \
+    [IDX] = { .type = TYPE,                                             \
+              .default_value.MEMBER = DEFAULT,                          \
+              .address = ADDR, .name = #IDX,                            \
+              .check.type = REGV_TYPE_RANGE,                            \
+              .check.arg.range.min.MEMBER = MIN,                        \
+              .check.arg.range.max.MEMBER = MAX }
+
+#define MAKE_VALIDATOR_REGISTER(IDX,ADDR,TYPE,MEMBER,DEFAULT,FNC)       \
+    [IDX] = { .type = TYPE,                                             \
+              .default_value.MEMBER = DEFAULT,                          \
+              .address = ADDR, .name = #IDX,                            \
+              .check.type = REGV_TYPE_CALLBACK,                         \
+              .check.arg.cb = FNC }
+
 #define REG_U16(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_UINT16,u16,D)
+#define REG_U16MIN(I,A,MIN,D) MAKE_MIN_REGISTER(I,A,REG_TYPE_UINT16,u16,D,MIN)
+#define REG_U16MAX(I,A,MAX,D) MAKE_MAX_REGISTER(I,A,REG_TYPE_UINT16,u16,D,MAX)
+#define REG_U16RANGE(I,A,MIN,MAX,D) \
+    MAKE_RANGE_REGISTER(I,A,REG_TYPE_UINT16,u16,D,MIN,MAX)
+#define REG_U16FNC(I,A,FNC,D) \
+    MAKE_VALIDATOR_REGISTER(I,A,REG_TYPE_UINT16,u16,D,FNC)
+
 #define REG_U32(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_UINT32,u32,D)
+#define REG_U32MIN(I,A,MIN,D) MAKE_MIN_REGISTER(I,A,REG_TYPE_UINT32,u32,D,MIN)
+#define REG_U32MAX(I,A,MAX,D) MAKE_MAX_REGISTER(I,A,REG_TYPE_UINT32,u32,D,MAX)
+#define REG_U32RANGE(I,A,MIN,MAX,D) \
+    MAKE_RANGE_REGISTER(I,A,REG_TYPE_UINT32,u32,D,MIN,MAX)
+#define REG_U32FNC(I,A,FNC,D) \
+    MAKE_VALIDATOR_REGISTER(I,A,REG_TYPE_UINT32,u32,D,FNC)
+
 #define REG_U64(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_UINT64,u64,D)
+#define REG_U64MIN(I,A,MIN,D) MAKE_MIN_REGISTER(I,A,REG_TYPE_UINT64,u64,D,MIN)
+#define REG_U64MAX(I,A,MAX,D) MAKE_MAX_REGISTER(I,A,REG_TYPE_UINT64,u64,D,MAX)
+#define REG_U64RANGE(I,A,MIN,MAX,D) \
+    MAKE_RANGE_REGISTER(I,A,REG_TYPE_UINT64,u64,D,MIN,MAX)
+#define REG_U64FNC(I,A,FNC,D) \
+    MAKE_VALIDATOR_REGISTER(I,A,REG_TYPE_UINT64,u64,D,FNC)
+
 #define REG_S16(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_SINT16,s16,D)
+#define REG_S16MIN(I,A,MIN,D) MAKE_MIN_REGISTER(I,A,REG_TYPE_SINT16,s16,D,MIN)
+#define REG_S16MAX(I,A,MAX,D) MAKE_MAX_REGISTER(I,A,REG_TYPE_SINT16,s16,D,MAX)
+#define REG_S16RANGE(I,A,MIN,MAX,D) \
+    MAKE_RANGE_REGISTER(I,A,REG_TYPE_SINT16,s16,D,MIN,MAX)
+#define REG_S16FNC(I,A,FNC,D) \
+    MAKE_VALIDATOR_REGISTER(I,A,REG_TYPE_SINT16,s16,D,FNC)
+
 #define REG_S32(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_SINT32,s32,D)
+#define REG_S32MIN(I,A,MIN,D) MAKE_MIN_REGISTER(I,A,REG_TYPE_SINT32,s32,D,MIN)
+#define REG_S32MAX(I,A,MAX,D) MAKE_MAX_REGISTER(I,A,REG_TYPE_SINT32,s32,D,MAX)
+#define REG_S32RANGE(I,A,MIN,MAX,D) \
+    MAKE_RANGE_REGISTER(I,A,REG_TYPE_SINT32,s32,D,MIN,MAX)
+#define REG_S32FNC(I,A,FNC,D) \
+    MAKE_VALIDATOR_REGISTER(I,A,REG_TYPE_SINT32,s32,D,FNC)
+
 #define REG_S64(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_SINT64,s64,D)
+#define REG_S64MIN(I,A,MIN,D) MAKE_MIN_REGISTER(I,A,REG_TYPE_SINT64,s64,D,MIN)
+#define REG_S64MAX(I,A,MAX,D) MAKE_MAX_REGISTER(I,A,REG_TYPE_SINT64,s64,D,MAX)
+#define REG_S64RANGE(I,A,MIN,MAX,D) \
+    MAKE_RANGE_REGISTER(I,A,REG_TYPE_SINT64,s64,D,MIN,MAX)
+#define REG_S64FNC(I,A,FNC,D) \
+    MAKE_VALIDATOR_REGISTER(I,A,REG_TYPE_SINT64,s64,D,FNC)
+
 #define REG_F32(I,A,D) MAKE_REGISTER(I,A,REG_TYPE_FLOAT32,f32,D)
+#define REG_F32MIN(I,A,MIN,D) MAKE_MIN_REGISTER(I,A,REG_TYPE_FLOAT32,f32,D,MIN)
+#define REG_F32MAX(I,A,MAX,D) MAKE_MAX_REGISTER(I,A,REG_TYPE_FLOAT32,f32,D,MAX)
+#define REG_F32RANGE(I,A,MIN,MAX,D) \
+    MAKE_RANGE_REGISTER(I,A,REG_TYPE_FLOAT32,f32,D,MIN,MAX)
+#define REG_F32FNC(I,A,FNC,D) \
+    MAKE_VALIDATOR_REGISTER(I,A,REG_TYPE_FLOAT32,f32,D,FNC)
 
 RegisterInit register_init(RegisterTable*);
 
