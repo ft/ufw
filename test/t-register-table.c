@@ -382,14 +382,99 @@ t_bfg2000(void)
                   REG_TYPE_FLOAT32, (RegisterValueU){ .f32 = 42e-6 });
 }
 
+static bool
+validate_u16(const RegisterEntry *e, const RegisterValue v)
+{
+    if (e->type != REG_TYPE_UINT16)
+        return false;
+
+    if (v.type != REG_TYPE_UINT16)
+        return false;
+
+    switch (v.value.u16) {
+    case 0x1000:
+        return true;
+    case 0x2000:
+        return true;
+    case 0x3000:
+        return true;
+    case 0x4000:
+        return true;
+    default:
+        return false;
+    }
+}
+
+#define RV(T,M,V) ((RegisterValue){ .type = REG_TYPE_##T, .value.M = V })
+
+static void
+t_u16_regs(void)
+{
+    RegisterTable rok = {
+        .area = (RegisterArea[]) {
+            MEMORY_AREA(0x0000ul, 0x100ul),
+            REGISTER_AREA_END
+        },
+        .entry = (RegisterEntry[]) {
+            REG_U16(     0, 0x0000ul,                 0x1234u),
+            REG_U16MIN(  1, 0x0001ul, 0x1000,         0x1000u),
+            REG_U16MAX(  2, 0x0002ul,         0x3000, 0x3000u),
+            REG_U16RANGE(3, 0x0003ul, 0x3000, 0x4000, 0x3fffu),
+            REG_U16FNC(  4, 0x0004ul, validate_u16,   0x3000u),
+            REGISTER_ENTRY_END
+        }
+    };
+    RegisterInit success = register_init(&rok);
+    cmp_ok(success.code, "==", REG_INIT_SUCCESS, "u16 table initialises");
+    RegisterAccess a = register_set(&rok, 0, RV(UINT16, u16, 0));
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 unconstrained min");
+    a = register_set(&rok, 0,  RV(UINT16, u16, UINT16_MAX));
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 unconstrained max");
+
+    a = register_set(&rok, 1, RV(UINT16, u16, 0x1000u));
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 min-constrained min");
+    a = register_set(&rok, 1, RV(UINT16, u16, 0x0fffu));
+    cmp_ok(a.code, "==", REG_ACCESS_RANGE, "u16 min-constrained min fail");
+    a = register_set(&rok, 1,  RV(UINT16, u16, UINT16_MAX));
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 min-constrained max");
+
+    a = register_set(&rok, 2, RV(UINT16, u16, 0));
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 max-constrained min");
+    a = register_set(&rok, 2, RV(UINT16, u16, 0x3000u));
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 max-constrained max");
+    a = register_set(&rok, 2,  RV(UINT16, u16, 0x3001u));
+    cmp_ok(a.code, "==", REG_ACCESS_RANGE, "u16 max-constrained max fail");
+
+    a = register_set(&rok, 3, RV(UINT16, u16, 0x3000u));
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 range-constrained min");
+    a = register_set(&rok, 3,  RV(UINT16, u16, 0x2fffu));
+    cmp_ok(a.code, "==", REG_ACCESS_RANGE, "u16 range-constrained max fail");
+    a = register_set(&rok, 3, RV(UINT16, u16, 0x4000u));
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 range-constrained max");
+    a = register_set(&rok, 3,  RV(UINT16, u16, 0x4001u));
+    cmp_ok(a.code, "==", REG_ACCESS_RANGE, "u16 range-constrained max fail");
+
+    a = register_set(&rok, 4, RV(UINT16, u16, 0x1000u));
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 fnc-constrained a");
+    a = register_set(&rok, 4, RV(UINT16, u16, 0x2000u));
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 fnc-constrained b");
+    a = register_set(&rok, 4, RV(UINT16, u16, 0x3000u));
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 fnc-constrained c");
+    a = register_set(&rok, 4, RV(UINT16, u16, 0x4000u));
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 fnc-constrained d");
+    a = register_set(&rok, 4, RV(UINT16, u16, 0x5000u));
+    cmp_ok(a.code, "==", REG_ACCESS_RANGE, "u16 fnc-constrained e fail");
+}
+
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(72);
+    plan(3+1+1+4+16+47+18);
     t_invalid_tables();    /*  3 */
     t_trivial_success();   /*  1 */
     t_trivial_fail();      /*  1 */
     t_area_init_checks();  /*  4 */
     t_entry_init_checks(); /* 16 */
     t_bfg2000();           /* 47 */
+    t_u16_regs();          /* 18 */
 }
