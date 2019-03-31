@@ -9,6 +9,7 @@
 #endif /* DEBUG */
 
 #include <assert.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -243,6 +244,8 @@ rds_f32_ser(const RegisterValue v, RegisterAtom *r)
     /* Here is another assumption: The register table is supposed to represent
      * 32 bit floating point numbers in IEEE754 format. And this assumes that
      * the target architecture uses that one as well. */
+    if ((v.value.f32 != 0.) && (isnormal(v.value.f32) == false))
+        return false;
     *r = v.value.u32 & 0xfffful;
     *(r+1) = (v.value.u32 >> 16u) & 0xfffful;
     return true;
@@ -255,7 +258,7 @@ rds_f32_des(const RegisterAtom *r, RegisterValue *v)
     n |= ((uint32_t)*(r+1)) << 16u;
     v->value.u32 = n;
     v->type = REG_TYPE_FLOAT32;
-    return true;
+    return ((v->value.f32 == 0.) || (isnormal(v->value.f32) == false));
 }
 
 #define rs(t) (sizeof(t) / sizeof(RegisterAtom))

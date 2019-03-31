@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include <tap.h>
 #include <common/compiler.h>
 #include <c/register-table.h>
@@ -564,10 +566,59 @@ GENERATE_CONSTRAIN_TESTS(
     /* VT_RAN_VAL, VT_RAN_MIN, VT_RAN_MAX */
     500e3, -1e3, 800e3)
 
+void
+t_f32_abnormal(void)
+{
+    RegisterTable regs = {
+        .area = (RegisterArea[]) {
+            MEMORY_AREA(0x0000ul, 0x40ul),
+            REGISTER_AREA_END
+        },
+        .entry = (RegisterEntry[]) {
+            REG_F32(0, 0x0000ul, NAN),
+            REGISTER_ENTRY_END
+        }
+    };
+
+    RegisterInit success = register_init(&regs);
+    cmp_ok(success.code, "==", REG_INIT_ENTRY_INVALID_DEFAULT,
+           "f32 can't default to NAN");
+    regs.entry[0].default_value.f32 = -NAN;
+    success = register_init(&regs);
+    cmp_ok(success.code, "==", REG_INIT_ENTRY_INVALID_DEFAULT,
+           "f32 can't default to -NAN");
+    regs.entry[0].default_value.f32 = INFINITY;
+    success = register_init(&regs);
+    cmp_ok(success.code, "==", REG_INIT_ENTRY_INVALID_DEFAULT,
+           "f32 can't default to INFINITY");
+    regs.entry[0].default_value.f32 = -INFINITY;
+    success = register_init(&regs);
+    cmp_ok(success.code, "==", REG_INIT_ENTRY_INVALID_DEFAULT,
+           "f32 can't default to -INFINITY");
+    regs.entry[0].default_value.f32 = 0.;
+    success = register_init(&regs);
+    cmp_ok(success.code, "==", REG_INIT_SUCCESS, "f32 with zero works");
+
+    RegisterAccess a = register_set(&regs, 0, RV(FLOAT32, f32, NAN));
+    cmp_ok(a.code, "==", REG_ACCESS_INVALID, "f32 can't set to NAN");
+    a = register_set(&regs, 0, RV(FLOAT32, f32, -NAN));
+    cmp_ok(a.code, "==", REG_ACCESS_INVALID, "f32 can't set to -NAN");
+    a = register_set(&regs, 0, RV(FLOAT32, f32, INFINITY));
+    cmp_ok(a.code, "==", REG_ACCESS_INVALID, "f32 can't set to INFINITY");
+    a = register_set(&regs, 0, RV(FLOAT32, f32, -INFINITY));
+    cmp_ok(a.code, "==", REG_ACCESS_INVALID, "f32 can't set to -INFINITY");
+
+    RegisterValue v;
+    a = register_get(&regs, 0, &v);
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "f32 can get value");
+    cmp_ok(v.type, "==", REG_TYPE_FLOAT32, "Gotten value is type f32");
+    cmp_ok(v.value.f32, "==", 0., "Gotten value is type f32");
+}
+
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(3+1+1+4+16+47+(7*18));
+    plan(3+1+1+4+16+47+(7*18)+12);
     t_invalid_tables();    /*  3 */
     t_trivial_success();   /*  1 */
     t_trivial_fail();      /*  1 */
@@ -581,4 +632,5 @@ main(UNUSED int argc, UNUSED char *argv[])
     t_s32_regs();          /* 18 */
     t_s64_regs();          /* 18 */
     t_f32_regs();          /* 18 */
+    t_f32_abnormal();      /* 12 */
 }
