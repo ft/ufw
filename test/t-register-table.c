@@ -613,7 +613,7 @@ t_f32_abnormal(void)
     a = register_get(&regs, 0, &v);
     cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "f32 can get value");
     cmp_ok(v.type, "==", REG_TYPE_FLOAT32, "Gotten value is type f32");
-    cmp_ok(v.value.f32, "==", 0., "Gotten value is type f32");
+    cmp_ok(v.value.f32, "==", 0., "Gotten value is correct value");
 }
 
 typedef enum SensorRegisterV2 {
