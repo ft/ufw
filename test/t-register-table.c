@@ -382,94 +382,192 @@ t_bfg2000(void)
                   REG_TYPE_FLOAT32, (RegisterValueU){ .f32 = 42e-6 });
 }
 
-static bool
-validate_u16(const RegisterEntry *e, const RegisterValue v)
-{
-    if (e->type != REG_TYPE_UINT16)
-        return false;
-
-    if (v.type != REG_TYPE_UINT16)
-        return false;
-
-    switch (v.value.u16) {
-    case 0x1000:
-        return true;
-    case 0x2000:
-        return true;
-    case 0x3000:
-        return true;
-    case 0x4000:
-        return true;
-    default:
-        return false;
-    }
-}
-
 #define RV(T,M,V) ((RegisterValue){ .type = REG_TYPE_##T, .value.M = V })
+#define F32EQ(A,B,EPS) ((A > (B-EPS)) && (A < (B+EPS)))
 
-static void
-t_u16_regs(void)
-{
-    RegisterTable rok = {
-        .area = (RegisterArea[]) {
-            MEMORY_AREA(0x0000ul, 0x100ul),
-            REGISTER_AREA_END
-        },
-        .entry = (RegisterEntry[]) {
-            REG_U16(     0, 0x0000ul,                 0x1234u),
-            REG_U16MIN(  1, 0x0001ul, 0x1000,         0x1000u),
-            REG_U16MAX(  2, 0x0002ul,         0x3000, 0x3000u),
-            REG_U16RANGE(3, 0x0003ul, 0x3000, 0x4000, 0x3fffu),
-            REG_U16FNC(  4, 0x0004ul, validate_u16,   0x3000u),
-            REGISTER_ENTRY_END
-        }
-    };
-    RegisterInit success = register_init(&rok);
-    cmp_ok(success.code, "==", REG_INIT_SUCCESS, "u16 table initialises");
-    RegisterAccess a = register_set(&rok, 0, RV(UINT16, u16, 0));
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 unconstrained min");
-    a = register_set(&rok, 0,  RV(UINT16, u16, UINT16_MAX));
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 unconstrained max");
+/* Here's a large macro that is used to generate a bunch of similar tests
+ * against the seven supported data-types that the register table suports. As
+ * with most macros, that's not an awesome solution. But it's better than
+ * typing it all out manually. */
 
-    a = register_set(&rok, 1, RV(UINT16, u16, 0x1000u));
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 min-constrained min");
-    a = register_set(&rok, 1, RV(UINT16, u16, 0x0fffu));
-    cmp_ok(a.code, "==", REG_ACCESS_RANGE, "u16 min-constrained min fail");
-    a = register_set(&rok, 1,  RV(UINT16, u16, UINT16_MAX));
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 min-constrained max");
+#define GENERATE_CONSTRAIN_TESTS(                                       \
+    TST,                                                                \
+    T,M,MM,                                                             \
+    VT_EPS,                                                             \
+    VLD,VLD_VAL,VLD_A,VLD_B,VLD_C,VLD_D,VLD_FAIL,                       \
+    VT_UNC_VAL,VT_UNC_MIN,VT_UNC_MAX,                                   \
+    VT_MIN_VAL,VT_MIN_MIN,VT_MIN_MAX,                                   \
+    VT_MAX_VAL,VT_MAX_MIN,VT_MAX_MAX,                                   \
+    VT_RAN_VAL,VT_RAN_MIN,VT_RAN_MAX)                                   \
+                                                                        \
+    static bool                                                         \
+    VLD(const RegisterEntry *e, const RegisterValue v)                  \
+    {                                                                   \
+        if (e->type != REG_TYPE_##T)                                    \
+            return false;                                               \
+                                                                        \
+        if (v.type != REG_TYPE_##T)                                     \
+            return false;                                               \
+                                                                        \
+        if (e->type == REG_TYPE_FLOAT32) {                              \
+            float eps = VT_EPS / 10.;                                   \
+            return (F32EQ(v.value.M, VLD_A, eps)                        \
+                    || F32EQ(v.value.M, VLD_B, eps)                     \
+                    || F32EQ(v.value.M, VLD_C, eps)                     \
+                    || F32EQ(v.value.M, VLD_D, eps));                   \
+        } else {                                                        \
+            return ((v.value.M == VLD_A)                                \
+                    || (v.value.M == VLD_B)                             \
+                    || (v.value.M == VLD_C)                             \
+                    || (v.value.M == VLD_D));                           \
+        }                                                               \
+    }                                                                   \
+                                                                        \
+    static void                                                         \
+    TST(void)                                                           \
+    {                                                                   \
+        RegisterTable rok = {                                           \
+            .area = (RegisterArea[]) {                                  \
+                MEMORY_AREA(0x0000ul, 0x100ul),                         \
+                REGISTER_AREA_END                                       \
+            },                                                          \
+            .entry = (RegisterEntry[]) {                                \
+                REG_##MM(       0, 0x0000ul,                         VT_UNC_VAL), \
+                REG_##MM##MIN(  1, 0x0010ul, VT_MIN_MIN,             VT_MIN_VAL), \
+                REG_##MM##MAX(  2, 0x0020ul,             VT_MAX_MAX, VT_MAX_VAL), \
+                REG_##MM##RANGE(3, 0x0030ul, VT_RAN_MIN, VT_RAN_MAX, VT_RAN_VAL), \
+                REG_##MM##FNC(  4, 0x0040ul, VLD,                    VLD_VAL), \
+                REGISTER_ENTRY_END                                      \
+            }                                                           \
+        };                                                              \
+        RegisterInit success = register_init(&rok);                     \
+        cmp_ok(success.code, "==", REG_INIT_SUCCESS, #M " table initialises"); \
+                                                                        \
+        RegisterAccess a = register_set(&rok, 0, RV(T, M, VT_UNC_MIN)); \
+        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " unconstrained min"); \
+        a = register_set(&rok, 0,  RV(T, M, VT_UNC_MAX));               \
+        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " unconstrained max"); \
+                                                                        \
+        a = register_set(&rok, 1, RV(T, M, VT_MIN_MIN));                \
+        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " min-constrained min"); \
+        a = register_set(&rok, 1, RV(T, M, VT_MIN_MIN - VT_EPS));       \
+        cmp_ok(a.code, "==", REG_ACCESS_RANGE, #M " min-constrained min fail"); \
+        a = register_set(&rok, 1,  RV(T, M, VT_MIN_MAX));               \
+        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " min-constrained max"); \
+                                                                        \
+        a = register_set(&rok, 2, RV(T, M, VT_MAX_MIN));                \
+        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " max-constrained min"); \
+        a = register_set(&rok, 2, RV(T, M, VT_MAX_MAX));                \
+        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " max-constrained max"); \
+        a = register_set(&rok, 2,  RV(T, M, VT_MAX_MAX + VT_EPS));      \
+        cmp_ok(a.code, "==", REG_ACCESS_RANGE, #M " max-constrained max fail"); \
+                                                                        \
+        a = register_set(&rok, 3, RV(T, M, VT_RAN_MIN));                \
+        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " range-constrained min"); \
+        a = register_set(&rok, 3,  RV(T, M, VT_RAN_MIN - VT_EPS));      \
+        cmp_ok(a.code, "==", REG_ACCESS_RANGE, #M " range-constrained min fail"); \
+        a = register_set(&rok, 3, RV(T, M, VT_RAN_MAX));                \
+        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " range-constrained max"); \
+        a = register_set(&rok, 3,  RV(T, M, VT_RAN_MAX + VT_EPS));      \
+        cmp_ok(a.code, "==", REG_ACCESS_RANGE, #M " range-constrained max fail"); \
+                                                                        \
+        a = register_set(&rok, 4, RV(T, M, VLD_A));                     \
+        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " fnc-constrained a"); \
+        a = register_set(&rok, 4, RV(T, M, VLD_B));                     \
+        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " fnc-constrained b"); \
+        a = register_set(&rok, 4, RV(T, M, VLD_C));                     \
+        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " fnc-constrained c"); \
+        a = register_set(&rok, 4, RV(T, M, VLD_D));                     \
+        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " fnc-constrained d"); \
+        a = register_set(&rok, 4, RV(T, M, VLD_FAIL));                  \
+        cmp_ok(a.code, "==", REG_ACCESS_RANGE, #M " fnc-constrained e fail"); \
+    }
 
-    a = register_set(&rok, 2, RV(UINT16, u16, 0));
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 max-constrained min");
-    a = register_set(&rok, 2, RV(UINT16, u16, 0x3000u));
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 max-constrained max");
-    a = register_set(&rok, 2,  RV(UINT16, u16, 0x3001u));
-    cmp_ok(a.code, "==", REG_ACCESS_RANGE, "u16 max-constrained max fail");
+GENERATE_CONSTRAIN_TESTS(t_u16_regs, UINT16, u16, U16,
+                         1u,
+                         validate_u16,
+                         0x1000u, 0x1000u, 0x2000u, 0x3000u, 0x4000u, 0x5000u,
+                         0x1234u, 0, UINT16_MAX,
+                         0x1000u, 0x1000u, UINT16_MAX,
+                         0x3000u, 0, 0x3000u,
+                         0x3fffu, 0x1000u, 0x4000u)
 
-    a = register_set(&rok, 3, RV(UINT16, u16, 0x3000u));
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 range-constrained min");
-    a = register_set(&rok, 3,  RV(UINT16, u16, 0x2fffu));
-    cmp_ok(a.code, "==", REG_ACCESS_RANGE, "u16 range-constrained max fail");
-    a = register_set(&rok, 3, RV(UINT16, u16, 0x4000u));
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 range-constrained max");
-    a = register_set(&rok, 3,  RV(UINT16, u16, 0x4001u));
-    cmp_ok(a.code, "==", REG_ACCESS_RANGE, "u16 range-constrained max fail");
+GENERATE_CONSTRAIN_TESTS(t_u32_regs, UINT32, u32, U32,
+                         1u,
+                         validate_u32,
+                         0x10000000ul, 0x10000000ul,
+                         0x20000000ul, 0x30000000ul, 0x40000000ul, 0x50000000ul,
+                         0x12340000ul, 0, UINT32_MAX,
+                         0x10000000ul, 0x10000000ul, UINT32_MAX,
+                         0x30000000ul, 0, 0x30000000ul,
+                         0x3ffffffful, 0x10000000ul, 0x40000000ul)
 
-    a = register_set(&rok, 4, RV(UINT16, u16, 0x1000u));
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 fnc-constrained a");
-    a = register_set(&rok, 4, RV(UINT16, u16, 0x2000u));
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 fnc-constrained b");
-    a = register_set(&rok, 4, RV(UINT16, u16, 0x3000u));
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 fnc-constrained c");
-    a = register_set(&rok, 4, RV(UINT16, u16, 0x4000u));
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "u16 fnc-constrained d");
-    a = register_set(&rok, 4, RV(UINT16, u16, 0x5000u));
-    cmp_ok(a.code, "==", REG_ACCESS_RANGE, "u16 fnc-constrained e fail");
-}
+GENERATE_CONSTRAIN_TESTS(t_u64_regs, UINT64, u64, U64,
+                         1ull,
+                         validate_u64,
+                         0x1000000000000000ull, 0x1000000000000000ull,
+                         0x2000000000000000ull, 0x3000000000000000ull,
+                         0x4000000000000000ull, 0x5000000000000000ull,
+                         0x1234000000000000ull, 0, UINT64_MAX,
+                         0x1000000000000000ull, 0x1000000000000000ull, UINT64_MAX,
+                         0x3000000000000000ull, 0, 0x3000000000000000ull,
+                         0x3fffffffffffffffull, 0x1000000000000000ull, 0x4000000000000000ull)
+
+GENERATE_CONSTRAIN_TESTS(t_s16_regs, SINT16, s16, S16,
+                         1,
+                         validate_s16,
+                         0x1000, 0x1000, 0x2000, -0x3000, -0x4000, 0x5000,
+                         -0x1234, INT16_MIN, INT16_MAX,
+                         0x1000, -0x1000, INT16_MAX,
+                         -0x3000, INT16_MIN, 0x3000,
+                         0x3fff, -0x1000, 0x4000)
+
+GENERATE_CONSTRAIN_TESTS(t_s32_regs, SINT32, s32, S32,
+                         1l,
+                         validate_s32,
+                         0x10000000l, 0x10000000l,
+                         0x20000000l, -0x30000000l, -0x40000000l, 0x50000000l,
+                         -0x12340000l, INT32_MIN, INT32_MAX,
+                         0x10000000l, -0x10000000l, INT32_MAX,
+                         -0x30000000l, INT32_MIN, 0x30000000l,
+                         0x3fffffffl, -0x10000000l, 0x40000000l)
+
+GENERATE_CONSTRAIN_TESTS(t_s64_regs, SINT64, s64, S64,
+                         1ll,
+                         validate_s64,
+                         0x1000000000000000ll, 0x1000000000000000ll,
+                         0x2000000000000000ll, -0x3000000000000000ll,
+                         -0x4000000000000000ll, 0x5000000000000000ll,
+                         -0x1234000000000000ll, INT64_MIN, INT64_MAX,
+                         0x1000000000000000ll, 0x1000000000000000ll, INT64_MAX,
+                         -0x3000000000000000ll, INT64_MIN, 0x3000000000000000ll,
+                         0x3fffffffffffffffll, -0x1000000000000000ll, 0x4000000000000000ll)
+
+#define F32_MIN -1e6
+#define F32_MAX  1e6
+
+GENERATE_CONSTRAIN_TESTS(
+    /* TST, T, M, MM */
+    t_f32_regs, FLOAT32, f32, F32,
+    /* VT_EPS */
+    0.1,
+    /* VLD */
+    validate_f32,
+    /* VLD_VAL, VLD_A, VLD_B, VLD_C, VLD_D, VLD_FAIL */
+    1e3, 1e3, 2e3, -3e3, -4e3, 5e3,
+    /* VT_UNC_VAL, VT_UNC_MIN, VT_UNC_MAX */
+    200e3, F32_MIN, F32_MAX,
+    /* VT_MIN_VAL, VT_MIN_MIN, VT_MIN_MAX */
+    300e3, -1e3, F32_MAX,
+    /* VT_MAX_VAL, VT_MAX_MIN, VT_MAX_MAX */
+    400e3, F32_MIN, 1e6,
+    /* VT_RAN_VAL, VT_RAN_MIN, VT_RAN_MAX */
+    500e3, -1e3, 800e3)
 
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(3+1+1+4+16+47+18);
+    plan(3+1+1+4+16+47+(7*18));
     t_invalid_tables();    /*  3 */
     t_trivial_success();   /*  1 */
     t_trivial_fail();      /*  1 */
@@ -477,4 +575,10 @@ main(UNUSED int argc, UNUSED char *argv[])
     t_entry_init_checks(); /* 16 */
     t_bfg2000();           /* 47 */
     t_u16_regs();          /* 18 */
+    t_u32_regs();          /* 18 */
+    t_u64_regs();          /* 18 */
+    t_s16_regs();          /* 18 */
+    t_s32_regs();          /* 18 */
+    t_s64_regs();          /* 18 */
+    t_f32_regs();          /* 18 */
 }
