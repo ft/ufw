@@ -1,4 +1,5 @@
 #include <math.h>
+#include <string.h>
 
 #include <tap.h>
 #include <common/compiler.h>
@@ -615,10 +616,91 @@ t_f32_abnormal(void)
     cmp_ok(v.value.f32, "==", 0., "Gotten value is type f32");
 }
 
+typedef enum SensorRegisterV2 {
+    V2_DEVICE_ID = 0,
+    V2_MAJOR_VERSION,
+    V2_MINOR_VERSION,
+    V2_PLASMA_KIND,
+    V2_AGE_OF_UNIVERSE,
+    V2_PHASE_FACTOR,
+    V2_TRIGGER_TICK
+} SensorRegisterV2;
+
+static RegisterTable bfg2000v2 = {
+    .area = (RegisterArea[]) {
+        MEMORY_AREA_RO(0x0000ul, 0x40ul),
+        MEMORY_AREA(0x1000ul, 0x40ul),
+        MEMORY_AREA(0x1040ul, 0x40ul),
+        REGISTER_AREA_END
+    },
+    .entry = (RegisterEntry[]) {
+        REG_U16(V2_DEVICE_ID,       0x0000ul, 0x234fu),
+        REG_U16(V2_MAJOR_VERSION,   0x0001ul, 2),
+        REG_U16(V2_MINOR_VERSION,   0x0002ul, 427),
+        REG_U32(V2_PLASMA_KIND,     0x1000ul, 0x12345678ul),
+        REG_U64(V2_AGE_OF_UNIVERSE, 0x1002ul, 0x8765432112345678ull),
+        REG_F32(V2_PHASE_FACTOR,    0x1006ul, -23.54),
+        REG_U32(V2_TRIGGER_TICK,    0x1009ul, 8002ul),
+        REGISTER_ENTRY_END
+    }
+};
+
+static void
+t_block_access(void)
+{
+    RegisterAtom buf[1024];
+    RegisterAccess a;
+
+    RegisterInit success = register_init(&bfg2000v2);
+    cmp_ok(success.code, "==", REG_INIT_SUCCESS, "BFG2000v2 initialises");
+
+    /* Reading the memory from one defined table entry has to work, if the
+     * register table initialised.*/
+    a = register_block_read(&bfg2000v2, 0x2, 1, buf);
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "V2_MINOR_VERSION reads");
+    cmp_ok(buf[0], "==", 427, "V2_MINOR_VERSION has correct value");
+
+    /* Now here's a spot in the address space, that's not mapped to memory.
+     * That's what we call a hole. Accessing those fails. This hole is located
+     * directly above a mapped area. */
+    a = register_block_read(&bfg2000v2, 0x40, 1, buf);
+    cmp_ok(a.code, "==", REG_ACCESS_NOENTRY, "0x40 is the start of a hole");
+    cmp_ok(a.address, "==", 0x40, "Address 0x40 is correctly signaled");
+
+    /* Starting out in mapped addresses, but reading into a hole also fails.
+     * And the system has to return the address where the error occured. */
+    a = register_block_read(&bfg2000v2, 0x3f, 2, buf);
+    cmp_ok(a.code, "==", REG_ACCESS_NOENTRY, "0x3f is okay, but 0x40 still a hole");
+    cmp_ok(a.address, "==", 0x40, "Address 0x40 is correctly signaled (partial)");
+
+    /* This is a direct hole again. It's directly below a mapped area. */
+    a = register_block_read(&bfg2000v2, 0xfff, 1, buf);
+    cmp_ok(a.code, "==", REG_ACCESS_NOENTRY, "0xfff is a hole");
+    cmp_ok(a.address, "==", 0xfff, "Address 0xfff is correctly signaled");
+
+    /* Starting in a hole fails. It doesn't matter if the block read would span
+     * into mapped memory eventually. */
+    a = register_block_read(&bfg2000v2, 0xfff, 2, buf);
+    cmp_ok(a.code, "==", REG_ACCESS_NOENTRY, "Still 0xfff is a hole");
+    cmp_ok(a.address, "==", 0xfff, "Address 0xfff is correctly signaled (partial)");
+
+    /* Now reading mapped memory that does not contain entries, will *work*.
+     * This register implementation will initialise all unmapped memory to all
+     * zero bits. Let's read 0x20 atoms starting at address 0x20. */
+    a = register_block_read(&bfg2000v2, 0x20, 0x20, buf);
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS,
+           "Reading a mapped but unoccupied chunk of memory works");
+    {
+        RegisterAtom expect[0x20];
+        memset(expect, 0u, 0x20 * sizeof(RegisterAtom));
+        cmp_mem(buf, expect, 0x20, "Unoccupied memory is initialised to zero");
+    }
+}
+
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(3+1+1+4+16+47+(7*18)+12);
+    plan(3+1+1+4+16+47+(7*18)+12+13);
     t_invalid_tables();    /*  3 */
     t_trivial_success();   /*  1 */
     t_trivial_fail();      /*  1 */
@@ -633,4 +715,5 @@ main(UNUSED int argc, UNUSED char *argv[])
     t_s64_regs();          /* 18 */
     t_f32_regs();          /* 18 */
     t_f32_abnormal();      /* 12 */
+    t_block_access();      /* 13 */
 }
