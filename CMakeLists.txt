@@ -67,6 +67,10 @@ target_include_directories(ufw-common
             ${CMAKE_CURRENT_BINARY_DIR}/include)
 
 target_link_libraries(ufw PUBLIC ufw-common)
+if (NOT ("${TOOLCHAIN_ID}" STREQUAL "ti-c2000"))
+  target_link_libraries(ufw PUBLIC m)
+endif()
+
 MakeStrictCompilerC(ufw)
 set_target_cpu(ufw)
 
