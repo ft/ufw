@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <math.h>
 #include <string.h>
 
@@ -695,12 +696,69 @@ t_block_access(void)
         memset(expect, 0u, 0x20 * sizeof(RegisterAtom));
         cmp_mem(buf, expect, 0x20, "Unoccupied memory is initialised to zero");
     }
+
+    /* Let's try and flood 0x100 words after 0x1000. That should fail, because
+     * we'll be touching memory holes. The contents of the memory registers in
+     * the 0x1000 area should not change with faulty write accesses. */
+    memset(buf, 0u, 0x100 * sizeof(RegisterAtom));
+    a = register_block_write(&bfg2000v2, 0x1000, 0x100, buf);
+    cmp_ok(a.code, "==", REG_ACCESS_NOENTRY, "Block write into hole fails");
+    /* 0x1080 is *correct*, because there are two areas adjacent to each other
+     * with no holes in between. Both are 0x40 bytes long; thus 0x1080. */
+    cmp_ok(a.address, "==", 0x1080,
+           "Block write error indicates correct address");
+    {
+        RegisterValue cur, def;
+        register_get(&bfg2000v2, V2_PLASMA_KIND, &cur);
+        register_default(&bfg2000v2, V2_PLASMA_KIND, &def);
+        cmp_ok(cur.type, "==", def.type,
+               "V2_PLASMA_KIND type unchanged [%s]", type2string(cur.type));
+        cmp_ok(cur.value.u32, "==", def.value.u32,
+               "V2_PLASMA_KIND value unchanged [0x%08"PRIx32"]", cur.value.u32);
+        register_get(&bfg2000v2, V2_AGE_OF_UNIVERSE, &cur);
+        register_default(&bfg2000v2, V2_AGE_OF_UNIVERSE, &def);
+        cmp_ok(cur.type, "==", def.type,
+               "V2_AGE_OF_UNIVERSE type unchanged [%s]", type2string(cur.type));
+        cmp_ok(cur.value.u64, "==", def.value.u64,
+               "V2_AGE_OF_UNIVERSE value unchanged [0x%016"PRIx64"]",
+               cur.value.u64);
+    }
+
+    /* Trying to write into Read-Only areas is also an error */
+    a = register_block_write(&bfg2000v2, 0x20, 0x02, buf);
+    cmp_ok(a.code, "==", REG_ACCESS_READONLY, "Block write into RO area fails");
+    cmp_ok(a.address, "==", 0x20, "Block write error indicates correct address");
+
+    /* Let's do a block write that succeeds and partially touches to register
+     * values. */
+    a = register_block_write(&bfg2000v2, 0x1001, 0x02, buf);
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "Correct block write succeeds");
+    {
+        RegisterValue cur;
+        register_get(&bfg2000v2, V2_PLASMA_KIND, &cur);
+        cmp_ok(cur.type, "==", REG_TYPE_UINT32,
+               "V2_PLASMA_KIND type unchanged [%s]",
+               type2string(REG_TYPE_UINT32));
+        /* Little endian means that the second word in a u32 register maps to
+         * the upper 16 bit. */
+        cmp_ok(cur.value.u32, "==", 0x00005678u,
+               "V2_PLASMA_KIND value unchanged [0x%08"PRIx32"]", cur.value.u32);
+        register_get(&bfg2000v2, V2_AGE_OF_UNIVERSE, &cur);
+        cmp_ok(cur.type, "==", REG_TYPE_UINT64,
+               "V2_AGE_OF_UNIVERSE type unchanged [%s]",
+               type2string(REG_TYPE_UINT64));
+        /* Similarly, the first word means the lower 16 bit. (Using ok(),
+         * because cmp_ok() does not support 64 bit values. */
+        ok((cur.value.u64 == 0x8765432112340000ull),
+           "V2_AGE_OF_UNIVERSE value unchanged [0x%08"PRIx64"]",
+           cur.value.u64);
+    }
 }
 
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(3+1+1+4+16+47+(7*18)+12+13);
+    plan(3+1+1+4+16+47+(7*18)+12+26);
     t_invalid_tables();    /*  3 */
     t_trivial_success();   /*  1 */
     t_trivial_fail();      /*  1 */
@@ -715,5 +773,5 @@ main(UNUSED int argc, UNUSED char *argv[])
     t_s64_regs();          /* 18 */
     t_f32_regs();          /* 18 */
     t_f32_abnormal();      /* 12 */
-    t_block_access();      /* 13 */
+    t_block_access();      /* 26 */
 }
