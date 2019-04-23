@@ -9,6 +9,7 @@
 #endif /* DEBUG */
 
 #include <assert.h>
+#include <ctype.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -59,8 +60,9 @@ static RegisterHandle ra_first_entry_of_next(RegisterTable*,
                                              RegisterHandle);
 
 /* Area utilities */
-static inline bool register_area_is_writeable(RegisterArea*);
-static inline bool register_area_is_readable(RegisterArea*);
+static inline bool register_area_can_write(const RegisterArea*);
+static inline bool register_area_is_writeable(const RegisterArea*);
+static inline bool register_area_is_readable(const RegisterArea*);
 static bool ra_addr_is_part_of(RegisterArea*, RegisterAddress);
 static inline bool ra_reg_is_part_of(RegisterArea*, RegisterEntry*);
 static bool ra_reg_fits_into(RegisterArea*, RegisterEntry*);
@@ -85,6 +87,12 @@ RegisterAccess ra_malformed_write(RegisterTable*,
                                   RegisterAddress,
                                   RegisterOffset,
                                   RegisterAtom*);
+
+/* Miscellaneous Utilities */
+
+static bool reg_is_hexstr(const char*, size_t);
+static RegisterAtom reg_c2a(int);
+static RegisterAtom reg_atom_from_hexstr(const char*, size_t);
 
 /*
  * Internal API implementation
@@ -441,13 +449,19 @@ reg_count_entries(RegisterEntry *e)
 }
 
 static inline bool
-register_area_is_writeable(RegisterArea *a)
+register_area_can_write(const RegisterArea *a)
 {
-    return ((a->write != NULL) && (BIT_ISSET(a->flags, REG_AF_WRITEABLE)));
+    return (a->write != NULL);
 }
 
 static inline bool
-register_area_is_readable(RegisterArea *a)
+register_area_is_writeable(const RegisterArea *a)
+{
+    return (register_area_can_write(a) && BIT_ISSET(a->flags,REG_AF_WRITEABLE));
+}
+
+static inline bool
+register_area_is_readable(const RegisterArea *a)
 {
     return ((a->read != NULL) && (BIT_ISSET(a->flags, REG_AF_READABLE)));
 }
@@ -665,6 +679,54 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr,
     return rv;
 }
 
+static bool
+reg_is_hexstr(const char *s, const size_t n)
+{
+    for (size_t idx = 0u; idx < n; ++idx) {
+        if (isxdigit(s[idx]) == false)
+            return false;
+    }
+
+    return true;
+}
+
+static RegisterAtom
+reg_c2a(int c)
+{
+    switch (c) {
+    case '1': return 1u;
+    case '2': return 2u;
+    case '3': return 3u;
+    case '4': return 4u;
+    case '5': return 5u;
+    case '6': return 6u;
+    case '7': return 7u;
+    case '8': return 8u;
+    case '9': return 9u;
+    case 'a': return 10u;
+    case 'b': return 11u;
+    case 'c': return 12u;
+    case 'd': return 13u;
+    case 'e': return 14u;
+    case 'f': return 15u;
+    default: return 0u;
+    }
+}
+
+static RegisterAtom
+reg_atom_from_hexstr(const char *s, const size_t n)
+{
+    RegisterAtom rv = 0u;
+
+    for (size_t idx = 0u; idx < n; ++idx) {
+        const size_t shift = (n-idx-1) * 4u;
+        const RegisterAtom v = reg_c2a(tolower(s[idx]));
+        rv |= (v & 0x0fu) << shift;
+    }
+
+    return rv;
+}
+
 /* Public API */
 
 RegisterInit
@@ -834,6 +896,13 @@ register_set(RegisterTable *t, RegisterHandle idx, const RegisterValue v)
     }
 
     a = e->area;
+
+    if (register_area_can_write(a) == false) {
+        rv.code = REG_ACCESS_READONLY;
+        rv.address = e->address;
+        return rv;
+    }
+
     success = rds_serdes[e->type].ser(v, raw);
 
     if (success == false) {
@@ -1059,5 +1128,48 @@ register_block_touches_hole(RegisterTable *t, RegisterAddress addr,
         rest -= used;
         addr += used;
     }
+    return rv;
+}
+
+RegisterAccess
+register_set_from_hexstr(RegisterTable *t, const RegisterAddress start,
+                         const char *str, const size_t n)
+{
+    RegisterAccess rv = REG_ACCESS_RESULT_INIT;
+
+    for (size_t idx = 0; idx < n; idx += 4u) {
+        const char *cur = str+idx;
+        const size_t cn = reg_min(4, n - idx);
+        const RegisterAddress ca = start + idx/4u;
+
+        const AreaHandle ah = ra_find_area_by_addr(t, ca);
+        if (ah >= t->areas) {
+            rv.code = REG_ACCESS_NOENTRY;
+            rv.address = ca;
+            return rv;
+        }
+
+        const RegisterArea *area = &t->area[ah];
+        if (register_area_can_write(area) == false) {
+            rv.code = REG_ACCESS_READONLY;
+            rv.address = ca;
+            return rv;
+        }
+
+        if (reg_is_hexstr(cur, cn) == false) {
+            rv.code = REG_ACCESS_INVALID;
+            rv.address = ca;
+            return rv;
+        }
+
+        const RegisterAtom value = reg_atom_from_hexstr(cur, cn);
+        const RegisterOffset o = ca - area->base;
+        const size_t size = rds_serdes[REG_TYPE_UINT16].size;
+        rv = area->write((RegisterArea*)area, &value, o, size);
+        if (rv.code != REG_ACCESS_SUCCESS) {
+            return rv;
+        }
+    }
+
     return rv;
 }

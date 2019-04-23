@@ -338,6 +338,9 @@ void register_block_write_unsafe(RegisterTable*, RegisterAddress,
 RegisterAccess register_block_touches_hole(RegisterTable*,
                                            RegisterAddress,
                                            RegisterOffset);
+RegisterAccess register_set_from_hexstr(RegisterTable*,
+                                        RegisterAddress,
+                                        const char*, size_t);
 
 static inline RegisterArea*
 register_area(RegisterTable *t, RegisterHandle reg)

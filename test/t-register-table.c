@@ -755,10 +755,38 @@ t_block_access(void)
     }
 }
 
+static void
+t_hexstring(void)
+{
+    char *sha1 = "123456789abcdef";
+    RegisterTable regs = {
+        .area = (RegisterArea[]) {
+            MEMORY_AREA(0x0000ul, 0x40ul),
+            REGISTER_AREA_END
+        },
+        .entry = (RegisterEntry[]) {
+            REG_U16(0, 0x0000ul, 0u),
+            REG_U16(1, 0x0001ul, 0u),
+            REG_U16(2, 0x0002ul, 0u),
+            REG_U16(3, 0x0003ul, 0u),
+            REGISTER_ENTRY_END
+        }
+    };
+
+    RegisterInit success = register_init(&regs);
+    cmp_ok(success.code, "==", REG_INIT_SUCCESS, "hexstr: regs initialises");
+    RegisterAccess acc = register_set_from_hexstr(&regs, 0u, sha1, 12u);
+    cmp_ok(success.code, "==", REG_ACCESS_SUCCESS, "hexstr: transfer worked");
+    cmp_ok(regs.area->mem[0], "==", 0x1234u, "hexstr: First word is correct");
+    cmp_ok(regs.area->mem[1], "==", 0x5678u, "hexstr: Second word is correct");
+    cmp_ok(regs.area->mem[2], "==", 0x9abcu, "hexstr: Third word is correct");
+    cmp_ok(regs.area->mem[3], "==", 0x0000u, "hexstr: Fourth word is correct");
+}
+
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(3+1+1+4+16+47+(7*18)+12+26);
+    plan(3+1+1+4+16+47+(7*18)+12+26+6);
     t_invalid_tables();    /*  3 */
     t_trivial_success();   /*  1 */
     t_trivial_fail();      /*  1 */
@@ -774,4 +802,5 @@ main(UNUSED int argc, UNUSED char *argv[])
     t_f32_regs();          /* 18 */
     t_f32_abnormal();      /* 12 */
     t_block_access();      /* 26 */
+    t_hexstring();         /*  6 */
 }
