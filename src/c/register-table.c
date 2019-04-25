@@ -683,7 +683,7 @@ static bool
 reg_is_hexstr(const char *s, const size_t n)
 {
     for (size_t idx = 0u; idx < n; ++idx) {
-        if (isxdigit(s[idx]) == false)
+        if (isxdigit((int)s[idx]) == false)
             return false;
     }
 
@@ -720,7 +720,7 @@ reg_atom_from_hexstr(const char *s, const size_t n)
 
     for (size_t idx = 0u; idx < n; ++idx) {
         const size_t shift = (n-idx-1) * 4u;
-        const RegisterAtom v = reg_c2a(tolower(s[idx]));
+        const RegisterAtom v = reg_c2a(tolower((int)s[idx]));
         rv |= (v & 0x0fu) << shift;
     }
 
