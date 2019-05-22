@@ -4,10 +4,6 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
-#ifndef DEBUG
-#define NDEBUG
-#endif /* DEBUG */
-
 #include <assert.h>
 #include <ctype.h>
 #include <math.h>
