@@ -18,5 +18,9 @@ set(CMAKE_C_FLAGS_INIT
 # Need to setup the linker so it doesn't fail with the simplest of test programs.
 set(CMAKE_EXE_LINKER_FLAGS_INIT "-static -nostartfiles -nodefaultlibs -nostdlib")
 
+set(OBJCOPY ${ARM_OBJCOPY})
+set(OBJDUMP ${ARM_OBJDUMP})
+set(SIZE ${ARM_SIZE})
+
 set(TOOLCHAIN_ID "gcc-arm")
 set(COMPILER_API "gnu")
