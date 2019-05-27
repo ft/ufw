@@ -3,7 +3,19 @@ if(__UFW_Libtap)
 endif()
 set(__UFW_Libtap 1)
 
-function(add_libtap _dir)
-  add_library(tap "${_dir}/tap.c")
-  target_include_directories(tap PUBLIC "${_dir}")
-endfunction()
+macro(add_libtap libtap_root)
+  include(InitialiseToolchain)
+  initialise_toolchain()
+
+  add_library(tap STATIC ${libtap_root}/tap.c)
+  target_include_directories(tap PUBLIC ${libtap_root})
+
+  # There are a couple of warnings in tap.c (mainly about unused parameters).
+  # I won't bother fixing them in third-party software and since there is no
+  # point in being distracted by them, I am not enabling strict warnings in
+  # this code.
+  #MakeStrictCompilerC(tap)
+
+  include(SetupTargetCPU)
+  set_target_cpu(tap)
+endmacro()
