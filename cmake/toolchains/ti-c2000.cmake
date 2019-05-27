@@ -1,4 +1,19 @@
-set(CGT_TOOLCHAIN_ROOT "/opt/ti/ti-cgt-c2000_18.1.2.LTS")
+if (NOT CGT_TOOLCHAINS)
+  set(CGT_TOOLCHAINS "/opt/ti/")
+endif()
+
+if (NOT CGT_TOOLCHAIN_ARCH)
+  set(CGT_TOOLCHAIN_ARCH "c2000")
+endif()
+
+if (NOT CGT_TOOLCHAIN_VERSION)
+  set(CGT_TOOLCHAIN_VERSION "18.1.2.LTS")
+endif()
+
+if (NOT CGT_TOOLCHAIN_ROOT)
+  set(CGT_TOOLCHAIN_ROOT
+    "${CGT_TOOLCHAINS}/ti-cgt-${CGT_TOOLCHAIN_ARCH}_${CGT_TOOLCHAIN_VERSION}")
+endif()
 
 # set target system
 set(CMAKE_SYSTEM_NAME Generic)
@@ -27,6 +42,9 @@ link_directories(${CGT_TOOLCHAIN_ROOT}/lib)
 set(CMAKE_CXX_COMPILER_ID_RUN TRUE)
 set(CMAKE_CXX_COMPILER_ID "TI")
 
+# Looks like CMake upstream does not support the C_STANDARD property with TI's
+# toolchains. Not cool. Default to the most recent language standards that the
+# toolchains we're using support out of the box.
 set(CMAKE_C_FLAGS_INIT "--c99 --preproc_with_compile")
 set(CMAKE_CXX_FLAGS_INIT "--c++03 --preproc_with_compile")
 
