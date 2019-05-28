@@ -1,0 +1,47 @@
+# Micro Framework Module Definition
+
+name: ufw
+
+cmake-modules: cmake/modules
+cmake-toolchains: cmake/toolchains
+
+cmake-third-party:
+  libtap:
+    include: add_libtap
+    module: Libtap
+
+dependencies:
+  - name: libtap
+    revision: master
+
+toolchains:
+  - name: gnu
+    architecture: native
+    version: default
+    interface: posix
+  - name: clang
+    architecture: native
+    version: default
+    interface: posix
+  - name: gnu-arm-none-eabi
+    architecture: cortex-m4-hardfp
+    version: default
+    interface: none
+  - name: ti-arm
+    architecture: cortex-m3
+    version: default
+    interface: none
+  - name: ti-c2000
+    architecture: c28x-float
+    version: default
+    interface: none
+
+buildtools:
+  - make
+  - ninja
+
+buildconfigs:
+  - debug
+  - relwithdebinfo
+  - minsizerel
+  - release
