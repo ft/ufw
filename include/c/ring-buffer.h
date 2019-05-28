@@ -73,12 +73,16 @@
 
 #define STATIC_RING_BUFFER_ADVANCE_HEAD__(NAME) \
     static inline void                          \
+    NAME##_advance_head(NAME *);                \
+    static inline void                          \
     NAME##_advance_head(NAME *c)                \
     {                                           \
         c->head = (c->head + 1) % c->datasize;  \
     }
 
 #define STATIC_RING_BUFFER_ADVANCE_TAIL__(NAME) \
+    static inline void                          \
+    NAME##_advance_tail(NAME *);                \
     static inline void                          \
     NAME##_advance_tail(NAME *c) {              \
         c->tail = (c->tail + 1) % c->datasize;  \
@@ -124,31 +128,31 @@
     }
 
 #define RING_BUFFER_EMPTY_API__(NAME)           \
-    bool NAME##_empty(NAME *);
+    bool NAME##_empty(const NAME *);
 
 #define RING_BUFFER_EMPTY__(NAME)               \
     bool                                        \
-    NAME##_empty(NAME *c)                       \
+    NAME##_empty(const NAME *c)                 \
     {                                           \
         return (c->tail == c->datasize);        \
     }
 
 #define RING_BUFFER_FULL_API__(NAME)            \
-    bool NAME##_full(NAME *);
+    bool NAME##_full(const NAME *);
 
 #define RING_BUFFER_FULL__(NAME)                \
     bool                                        \
-    NAME##_full(NAME *c)                        \
+    NAME##_full(const NAME *c)                  \
     {                                           \
         return (c->head == c->tail);            \
     }
 
 #define RING_BUFFER_SIZE_API__(NAME)            \
-    size_t NAME##_size(NAME *);
+    size_t NAME##_size(const NAME *);
 
 #define RING_BUFFER_SIZE__(NAME)                        \
     size_t                                              \
-    NAME##_size(NAME *c)                                \
+    NAME##_size(const NAME *c)                          \
     {                                                   \
         if (NAME##_empty(c))                            \
             return 0u;                                  \
@@ -156,7 +160,7 @@
         if (c->tail < c->head)                          \
             return (c->head - c->tail);                 \
                                                         \
-        return (c->datasize - c->tail + c->head);       \
+        return ((c->datasize - c->tail) + c->head);     \
     }
 
 #define RING_BUFFER_CLEAR_API__(NAME)           \

@@ -33,7 +33,7 @@ typedef struct {
 
 /* _done and _advance are target type agnostic */
 
-bool rb_iter_done(rb_iter *);
+bool rb_iter_done(const rb_iter *);
 size_t rb_iter_advance(rb_iter *);
 
 /* Construction and inspection are not; polymorphic macros */
@@ -43,15 +43,16 @@ size_t rb_iter_advance(rb_iter *);
     RING_BUFFER_ITER_INSPECT_API__(NAME,TYPE)
 
 #define RING_BUFFER_ITER(NAME,TYPE)             \
-    RING_BUFFER_ITER_CONSTRUCT__(NAME,TYPE)
+    RING_BUFFER_ITER_CONSTRUCT__(NAME,TYPE)     \
+    RING_BUFFER_ITER_INSPECT__(NAME,TYPE)
 
 #define RING_BUFFER_ITER_CONSTRUCT_API__(NAME)  \
-    void NAME##_iter(rb_iter *, NAME *,         \
+    void NAME##_iter(rb_iter *, const NAME *,   \
                      rb_iter_mode);
 
 #define RING_BUFFER_ITER_CONSTRUCT__(NAME,TYPE)                 \
     void                                                        \
-    NAME##_iter(rb_iter *iter, NAME *c,                         \
+    NAME##_iter(rb_iter *iter, const NAME *c,                   \
                 rb_iter_mode mode)                              \
     {                                                           \
         iter->size = c->datasize;                               \
@@ -66,13 +67,18 @@ size_t rb_iter_advance(rb_iter *);
             iter->index =                                       \
                 (c->head == 0) ? c->datasize - 1 : c->head - 1; \
             break;                                              \
+        default:                                                \
+            assert(false);                                      \
+            break;                                              \
         }                                                       \
     }
 
-#define RING_BUFFER_ITER_INSPECT_API__(NAME,TYPE)       \
-    static inline TYPE                                  \
-    NAME##_inspect(NAME *c,                             \
-                   rb_iter *iter)                       \
+#define RING_BUFFER_ITER_INSPECT_API__(NAME,TYPE)               \
+    TYPE NAME##_inspect(const NAME *c, const rb_iter *iter);
+
+#define RING_BUFFER_ITER_INSPECT__(NAME,TYPE)           \
+    TYPE                                                \
+    NAME##_inspect(const NAME *c, const rb_iter *iter)  \
     {                                                   \
         return c->data[iter->index];                    \
     }

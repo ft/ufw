@@ -17,7 +17,7 @@
  */
 
 bool
-rb_iter_done(rb_iter *iter)
+rb_iter_done(const rb_iter *iter)
 {
     return (iter->steps == 0);
 }
@@ -31,6 +31,10 @@ rb_iter_advance(rb_iter *iter)
         break;
     case RING_BUFFER_ITER_NEW_TO_OLD:
         iter->index = (iter->index == 0) ? iter->size - 1 : iter->index - 1;
+        break;
+    default:
+        /* Should never happen; break if it does. */
+        assert(false);
         break;
     }
 
