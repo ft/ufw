@@ -67,7 +67,7 @@ target_include_directories(ufw-common
             ${CMAKE_CURRENT_BINARY_DIR}/include)
 
 target_link_libraries(ufw PUBLIC ufw-common)
-if (NOT ("${TOOLCHAIN_ID}" STREQUAL "ti-c2000"))
+if (NOT ("${TOOLCHAIN_ID}" MATCHES "^ti-"))
   target_link_libraries(ufw PUBLIC m)
 endif()
 
