@@ -84,12 +84,12 @@ set(ENV{BUILD_VARIANT} \"${PARSED_ARGS_BUILD_VARIANT}\")
 execute_process(
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   COMMAND
-  \"${MICROFRAMEWORK_ROOT}/generate-artifacts\"
+  \"${MICROFRAMEWORK_ROOT}/bin/generate-artifacts\"
   doesnotmatter
   ${PARSED_ARGS_DESTINATION}
   \"++\"
   \"--\"
-  \"${MICROFRAMEWORK_ROOT}/git.sh\"
+  \"${MICROFRAMEWORK_ROOT}/vcs-integration/git.sh\"
   ${PARSED_ARGS_SCRIPTS}
   OUTPUT_VARIABLE GITINTNAME
   OUTPUT_STRIP_TRAILING_WHITESPACE)
