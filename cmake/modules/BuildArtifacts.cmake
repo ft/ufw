@@ -19,35 +19,55 @@ function(build_artifacts source)
           OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
           DEPENDS $<TARGET_FILE:${source}>
           COMMENT "Building binary file: ${dest}"
-          COMMAND ${ARM_OBJCOPY} -O binary
-                                 $<TARGET_FILE:${source}>
-                                 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest})
+          COMMAND ${OBJCOPY} -I elf32-little -O binary
+                             $<TARGET_FILE:${source}>
+                             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest})
+
+      elseif (${TOOLCHAIN_ID} STREQUAL "ti-arm" AND ${variant} STREQUAL "hex")
+        add_custom_command(
+          OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
+          DEPENDS ${source}
+          COMMENT "Building intel-hex file: ${dest}"
+          COMMAND ${TI_OBJDUMP} --intel
+                                --diag_wrap=off
+                                --quiet
+                                --memwidth=8
+                                --romwidth=32
+                                -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
+                                $<TARGET_FILE:${source}>)
 
       elseif (${variant} STREQUAL "hex")
         add_custom_command(
           OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
           DEPENDS $<TARGET_FILE:${source}>
           COMMENT "Building intel-hex file: ${dest}"
-          COMMAND ${ARM_OBJCOPY} -O ihex
-                                 $<TARGET_FILE:${source}>
-                                 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest})
+          COMMAND ${OBJCOPY} -O ihex
+                             $<TARGET_FILE:${source}>
+                             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest})
 
       elseif (${variant} STREQUAL "srec")
         add_custom_command(
           OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
           DEPENDS $<TARGET_FILE:${source}>
           COMMENT "Building motorola-s-record file: ${dest}"
-          COMMAND ${ARM_OBJCOPY} -O srec
-                                 $<TARGET_FILE:${source}>
-                                 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest})
+          COMMAND ${OBJCOPY} -O srec
+                             $<TARGET_FILE:${source}>
+                             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest})
 
+      elseif (${TOOLCHAIN_ID} STREQUAL "ti-arm" AND ${variant} STREQUAL "lst")
+        add_custom_command(
+          OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
+          DEPENDS ${source}
+          COMMENT "Building disassembly file: ${dest}"
+          COMMAND ${TI_DIS} $<TARGET_FILE:${source}>
+                            > ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest})
       elseif (${variant} STREQUAL "lst")
         add_custom_command(
           OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
           DEPENDS $<TARGET_FILE:${source}>
           COMMENT "Building disassembly file: ${dest}"
-          COMMAND ${ARM_OBJDUMP} -S $<TARGET_FILE:${source}>
-                                 > ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest})
+          COMMAND ${OBJDUMP} -S $<TARGET_FILE:${source}>
+                             > ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest})
 
       else ()
         message(FATAL_ERROR "Unknown artifact variant: ${variant}")
