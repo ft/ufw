@@ -6,6 +6,9 @@ cmake-modules: cmake/modules
 cmake-toolchains: cmake/toolchains
 
 cmake-third-party:
+  ufw:
+    include: setup_ufw
+    module: SetupUFW
   libtap:
     include: add_libtap
     module: Libtap

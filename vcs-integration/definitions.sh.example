@@ -1,0 +1,12 @@
+# This is an example for additional settings evaluated with vcs-integration.
+# This can set fall backs as well as entirely additional information.
+
+MAJOR_VERSION="0"
+MINOR_VERSION="1"
+PATCHLEVEL="0"
+
+HARDWARE_TYPE="${HARDWARE_TYPE:-blinky}"
+FIRMWARE_MCU="${FIRMWARE_MCU:-cortex-m4}"
+FIRMWARE_TYPE="${FIRMWARE_TYPE:-generic}"
+BUILD_PROFILE="${BUILD_PROFILE:-unknown}"
+BUILD_VARIANT="${BUILD_VARIANT:-unknown}"

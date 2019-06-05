@@ -1,0 +1,156 @@
+/**
+ * @file version.h.in
+ * @brief Project version information
+ *
+ * This file can be used to automatically generate a header file that reflects
+ * some version and build information of a project. If possible, much of the
+ * information is extracted from an underlying git repository.
+ *
+ * Note: Any data before the @@VERSION-H-START@@ tag-line is ignored and will
+ *       *NOT* be part of genrated output.
+ */
+
+@@VERSION-H-START@@
+
+#ifndef INC_VERSION_H
+#define INC_VERSION_H
+
+/*
+ * The basic versioning of the software follows the semantic versioning spec as
+ * per: http://semver.org — Semantic Versioning 2.0.0 — Short Description:
+ *
+ *  1. MAJOR version when you make incompatible API changes,
+ *
+ *  2. MINOR version when you add functionality in a backwards-compatible
+ *     manner, and
+ *
+ *  3. PATCH version when you make backwards-compatible bug fixes.
+ *
+ * Additional labels for pre-release and build metadata are available as exten-
+ * sions to the MAJOR.MINOR.PATCH format.
+ */
+
+/** Major version number of the software */
+#define MCU_MAJOR_VERSION @@MAJOR_VERSION@@
+
+/** Minor version number */
+#define MCU_MINOR_VERSION @@MINOR_VERSION@@
+
+/** Release Patch-level on top of last minor version */
+#define MCU_PATCHLEVEL @@PATCHLEVEL@@
+
+/** Signal whether or not major/minor/patch are based on a release tag. */
+#define GIT_VERSION_AVAILABLE @@__GIT_VERSION_AVAILABLE__@@
+
+/** Signal whether a release tag looks like "v*-rc*" */
+#define GIT_VERSION_IS_CANDIDATE @@__GIT_VERSION_IS_CANDIDATE__@@
+
+/** Signal whether a release tag looks like "v*-pre*" */
+#define GIT_VERSION_IS_PRE_RELEASE @@__GIT_VERSION_IS_PRE_RELEASE__@@
+
+/** Signal whether this build was based on a clean repository, that was
+ *  situated *exactly* on a release tag, that is neither a pre-release nor a
+ *  release-candidate tag; ie. the build looks like a proper release. */
+#define GIT_IS_CLEAN_RELEASE_BUILD @@__GIT_IS_CLEAN_RELEASE_BUILD__@@
+
+/**
+ * Additional version information from release tag
+ *
+ * The integration supports version tags of the following format:
+ *
+ *   vM.m.p[-FREEFORM]
+ *
+ * M, m and p are major, minor version and patch-level, as described before.
+ *
+ * The FREEFORM part may contain arbitrary data, to qualify a release further.
+ * For example, it may be used to mark release candidates, in which case a
+ * version tag may look like this:
+ *
+ *   "v1.2.27-rc1"
+ *
+ * ...in which case this datum reads "rc1".
+ */
+#define GIT_EXTRA @@__GIT_EXTRA__@@
+
+/**
+ * This entry reflects the number of commits in a git repository on top of the
+ * last annotated release tag, matching the glob "v[0-9]*".
+ */
+#define GIT_INCREMENT @@{__GIT_INCREMENT__:-0}@@
+
+/**
+ * The GIT_DIRTY flag is an integer (either 1 or 0), that signals changes in
+ * files, that are tracked by git, which are not committed yet, thus
+ * constituting a state that will be irreproducible in the future.
+ */
+#define GIT_DIRTY @@__GIT_DIRTY__@@
+
+/**
+ * This is a string of the first 12 hex digits from the SHA1 sum of the git
+ * commit that a software build was based upon.
+ */
+#define GIT_HASH @@__GIT_HASH__@@
+
+/**
+ * This is the name of the branch that was active when the software was built
+ * or "DetachedHead" in case the git repository was in detached head state.
+ */
+#define GIT_BRANCH @@__GIT_BRANCH__@@
+
+/**
+ * This reflects the first line of the git commit (basically its title) the
+ * build was based on, plus a date stamp and a short part of the commit's SHA1
+ * sum. Example:
+ *
+ *   "eaee0cb (Enable new ULP remarks in compiler, 2017-07-27)"
+ */
+#define GIT_DESCRIPTION @@__GIT_DESCRIPTION__@@
+
+/**
+ * This is a human readable version of the git-flavoured version information
+ * for the current build. Example:
+ *
+ *   "1.2.0-26-geaee0cb58a72-dirty"
+ */
+#define GIT_VERSION @@__GIT_VERSION__@@
+
+/**
+ * Describes the general firmware type, that is implemented by this software
+ * project. Examples:
+ *
+ *   "irtt-cp-generic"
+ *   "irtt-cp-current-qa"
+ *   "ildr120-qa-unit-pll"
+ *   "irtt-cx-integration-test-cv-mode"
+ */
+#define FIRMWARE_TYPE @@FIRMWARE_TYPE@@
+
+/**
+ * Describes the basic type of hardware, the software is intended to be used
+ * with. Examples:
+ *
+ *   "ildr120-dsc-v1"
+ *   "irtt-cp"
+ */
+#define HARDWARE_TYPE @@HARDWARE_TYPE@@
+
+/**
+ * This reflects the build-variant that was active during the build process.
+ * Examples:
+ *
+ *   "ClientPersonal"
+ *   "ClientVehicle"
+ *   "Generic"
+ */
+#define BUILD_VARIANT @@BUILD_VARIANT@@
+
+/**
+ * This reflects the build-profile that was active during the build process.
+ * Examples:
+ *
+ *   "Release"
+ *   "Debug"
+ */
+#define BUILD_PROFILE @@BUILD_PROFILE@@
+
+#endif /* INC_VERSION_H */

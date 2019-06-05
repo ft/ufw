@@ -1,0 +1,16 @@
+#!/bin/sh
+
+if test "$#" -lt 1 || test "$#" -gt 2; then
+    printf 'usage: print-version MICROFRAMEWORK_ROOT [OUTPUT_FILE]\n'
+    exit 1
+fi
+
+base="$1"
+. "$base/vcs-integration/git.sh"
+git_populate
+
+if test "x$2" = "x"; then
+    printf '%s\n' "$__GIT_VERSION__"
+else
+    printf '%s\n' "$__GIT_VERSION__" > "$2"
+fi

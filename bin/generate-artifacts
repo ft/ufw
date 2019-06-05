@@ -1,0 +1,99 @@
+#!/bin/sh
+
+base="$1"
+output="$2"
+extensions="$3"
+
+if test "x$base" = x || test "x$output" = x || test "x$extensions" = x; then
+    printf 'usage: generate-artifacts <BASENAME> <DESTINATION> <EXTENSION[s...]>' >&2
+    printf ' [-- FILES-TO-SOURCE...]\n' >&2
+    exit 1
+fi
+
+shift 3
+
+while test "$#" -gt 0 && test "x$1" != x--; do
+    extensions="${extensions} $1"
+    shift
+done
+
+if test "x$1" = x--; then
+    shift
+    for file in "$@"; do
+        case "$file" in
+        */*) ;;
+        *) file="./$file"
+        esac
+        . "$file"
+    done
+fi
+
+if test "x$MAJOR_VERSION" = x; then
+    printf 'artifacts: Basic information is missing.\n' >&2
+    printf 'artifacts: The results of this procedure will look way off!\n' >&2
+fi
+
+# This is the prefix used (in connection with a version tag from the *_VERSION
+# definitions above) to produce the final MCU firmware filenames.
+BITSTREAM_PREFIX="${HARDWARE_TYPE}"
+if test "$FIRMWARE_MCU" != unknown; then
+    BITSTREAM_PREFIX="${BITSTREAM_PREFIX}_${FIRMWARE_MCU}"
+fi
+if test "$FIRMWARE_TYPE" != generic; then
+    BITSTREAM_PREFIX="${BITSTREAM_PREFIX}_${FIRMWARE_TYPE}"
+fi
+if test "$BUILD_VARIANT" != unknown; then
+    BITSTREAM_PREFIX="${BITSTREAM_PREFIX}_${BUILD_VARIANT}"
+fi
+
+if type git_populate > /dev/null 2>&1; then
+    # User supplied git.sh in FILES-TO-SOURCE.
+    git_populate
+    git_got_info && git_amend_versions
+else
+    printf 'version.h: Git integration not loaded.' >&2
+    printf ' Lots of information will be blank!\n' >&2
+    git_got_info () { return 1; }
+fi
+
+if git_got_info; then
+    DESTINATION="${BITSTREAM_PREFIX}"
+    if git_exact_version; then
+        DESTINATION="${DESTINATION}_v${__GIT_VERSION__}"
+    else
+        if test "x${__GIT_BRANCH__}${GITINT_IGNORE_DETACHED_HEAD}" = "xDetachedHead1"; then
+            DESTINATION="${DESTINATION}_v${__GIT_VERSION__}"
+        else
+            DESTINATION="${DESTINATION}_${__GIT_BRANCH__}_v${__GIT_VERSION__}"
+        fi
+    fi
+else
+    # Fall back to information from definitions.sh
+    DESTINATION="${BITSTREAM_PREFIX}_v$MAJOR_VERSION"
+    DESTINATION="${DESTINATION}.$MINOR_VERSION"
+    DESTINATION="${DESTINATION}.${PATCHLEVEL}"
+    # We may have dirty-information, though:
+    if git_dirty; then
+        DESTINATION="${DESTINATION}-dirty"
+    fi
+fi
+
+if test "$BUILD_PROFILE" != unknown; then
+    DESTINATION="${DESTINATION}_${BUILD_PROFILE}"
+fi
+
+if test "$output" != '.'; then
+    DESTINATION="${output}/${DESTINATION}"
+fi
+
+if test "x$extensions" = "x++"; then
+    printf '%s\n' "$DESTINATION"
+    exit 0
+fi
+
+printf 'Producing versioned variants:\n'
+for ext in $extensions; do
+    printf '    file: %s\n' "$DESTINATION.$ext"
+    cp "${base}.$ext" "$DESTINATION.$ext"
+    chmod 0644 "$DESTINATION.$ext"
+done
