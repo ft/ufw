@@ -1,5 +1,6 @@
 #include <inttypes.h>
 #include <math.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <tap.h>
@@ -615,6 +616,14 @@ t_f32_abnormal(void)
     cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "f32 can get value");
     cmp_ok(v.type, "==", REG_TYPE_FLOAT32, "Gotten value is type f32");
     cmp_ok(v.value.f32, "==", 0., "Gotten value is correct value");
+
+    /* 122e9 so we can test for equality */
+    RegisterValue tv = RV(FLOAT32, u32, 0x51e33e22ul);
+    a = register_set(&regs, 0, RV(FLOAT32, f32, tv.value.f32));
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "f32 can set to 122e9");
+    a = register_get(&regs, 0, &v);
+    cmp_ok(v.value.u32, "==", tv.value.u32, "Gotten value is correct value");
+    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "Getting value succeeds");
 }
 
 typedef enum SensorRegisterV2 {
@@ -786,7 +795,7 @@ t_hexstring(void)
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(3+1+1+4+16+47+(7*18)+12+26+6);
+    plan(3+1+1+4+16+47+(7*18)+15+26+6);
     t_invalid_tables();    /*  3 */
     t_trivial_success();   /*  1 */
     t_trivial_fail();      /*  1 */
@@ -800,7 +809,8 @@ main(UNUSED int argc, UNUSED char *argv[])
     t_s32_regs();          /* 18 */
     t_s64_regs();          /* 18 */
     t_f32_regs();          /* 18 */
-    t_f32_abnormal();      /* 12 */
+    t_f32_abnormal();      /* 15 */
     t_block_access();      /* 26 */
     t_hexstring();         /*  6 */
+    return EXIT_SUCCESS;
 }

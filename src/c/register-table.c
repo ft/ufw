@@ -262,7 +262,7 @@ rds_f32_des(const RegisterAtom *r, RegisterValue *v)
     n |= ((uint32_t)*(r+1)) << 16u;
     v->value.u32 = n;
     v->type = REG_TYPE_FLOAT32;
-    return ((v->value.f32 == 0.) || (isnormal(v->value.f32) == false));
+    return ((v->value.f32 == 0.) || (isnormal(v->value.f32) == true));
 }
 
 #define rs(t) (sizeof(t) / sizeof(RegisterAtom))
