@@ -5,7 +5,7 @@ name: ufw
 cmake-modules: cmake/modules
 cmake-toolchains: cmake/toolchains
 
-cmake-third-party:
+cmake-extensions:
   ufw:
     include: setup_ufw
     module: SetupUFW
