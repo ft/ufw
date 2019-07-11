@@ -2,7 +2,8 @@
 
 input="$1"
 output="$2"
-output_bn="`basename $output`"
+output_bn=${output##*/}
+outdir=${output%/*}
 
 if test "x$input" = x || test "x$output" = x; then
     printf 'usage: generate-version-h <VERSION-H-TEMPLATE> <OUTPUT> [FILES-TO-SOURCE...]\n'
@@ -26,6 +27,11 @@ if type git_populate > /dev/null 2>&1; then
 else
     printf '%s: Git integration not loaded.' "${output_bn}"
     printf ' Lots of information will be blank!\n'
+fi
+
+if ! test -d "$outdir"; then
+    printf 'Output directory non-existent; Creating.\n' "$outdir"
+    mkdir -p "$outdir"
 fi
 
 if test -e "$output"; then
