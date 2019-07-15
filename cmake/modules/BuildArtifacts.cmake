@@ -96,7 +96,7 @@ function(build_artifacts source)
         add_custom_command(
           OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
           DEPENDS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${basename}.hex
-          COMMENT "Building bootloader file: ${dest}"
+          COMMENT "Building binary-image file: ${dest}"
           COMMAND objcopy --gap-fill 0xff -I ihex -O binary
                           ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${basename}.hex
                           ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest})
