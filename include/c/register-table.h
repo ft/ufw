@@ -375,9 +375,7 @@ register_untouch(RegisterTable *t, RegisterHandle reg)
 static inline bool
 register_was_touched(RegisterTable *t, RegisterHandle reg)
 {
-    const bool rc = BIT_ISSET(t->entry[reg].flags, REG_EF_TOUCHED);
-    register_untouch(t, reg);
-    return rc;
+    return BIT_ISSET(t->entry[reg].flags, REG_EF_TOUCHED);
 }
 
 #ifdef __cplusplus
