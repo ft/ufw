@@ -412,7 +412,7 @@ reg_taint_in_range(RegisterTable *t, RegisterAddress addr, RegisterOffset n)
             return;
         if (touch < 0)
             continue;
-        register_touch(t, REG_EF_TOUCHED);
+        register_touch(t, i);
     }
 }
 
