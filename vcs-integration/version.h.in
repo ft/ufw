@@ -42,15 +42,24 @@
 /** Signal whether or not major/minor/patch are based on a release tag. */
 #define GIT_VERSION_AVAILABLE @@__GIT_VERSION_AVAILABLE__@@
 
-/** Signal whether a release tag looks like "v*-rc*" */
+/** Signal whether a release tag looks like "v*-rc[0-9]+" */
 #define GIT_VERSION_IS_CANDIDATE @@__GIT_VERSION_IS_CANDIDATE__@@
 
-/** Signal whether a release tag looks like "v*-pre*" */
+/** The release candidate level indicated by the  "v*-rc[0-9]+" tag */
+#define GIT_CANDIDATE_LEVEL @@{__GIT_CANDIDATE_LEVEL__:-0}@@
+
+/** Signal whether a release tag looks like "v*-pre[0-9]+" */
 #define GIT_VERSION_IS_PRE_RELEASE @@__GIT_VERSION_IS_PRE_RELEASE__@@
 
-/** Signal whether this build was based on a clean repository, that was
- *  situated *exactly* on a release tag, that is neither a pre-release nor a
- *  release-candidate tag; ie. the build looks like a proper release. */
+/** The pre-release level indicated by the  "v*-rc[0-9]+" tag */
+#define GIT_PRE_RELEASE_LEVEL @@{__GIT_PRE_RELEASE_LEVEL__:-0}@@
+
+/**
+ * Signal whether this build was based on a clean repository, that was
+ * situated *exactly* on a release tag, that is neither a pre-release
+ * nor a release-candidate tag; Hence, the build looks like a proper
+ * release.
+ */
 #define GIT_IS_CLEAN_RELEASE_BUILD @@__GIT_IS_CLEAN_RELEASE_BUILD__@@
 
 /**

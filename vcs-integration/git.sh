@@ -16,7 +16,9 @@
 #         __GIT_VERSION__
 #         __GIT_VERSION_AVAILABLE__
 #         __GIT_VERSION_IS_CANDIDATE__
+#         __GIT_CANDIDATE_LEVEL__
 #         __GIT_VERSION_IS_PRE_RELEASE__
+#         __GIT_PRE_RELEASE_LEVEL__
 #         __GIT_IS_CLEAN_RELEASE_BUILD__
 #
 #   git_amend_versions: Overrides the MAJOR_VERSION, MINOR_VERSION and
@@ -112,6 +114,10 @@ git_is_clean_full_release () {
     return 0
 }
 
+git_str_is_int () {
+    expr match "$1" '^[0-9][0-9]*$' > /dev/null 2>&1
+}
+
 git_populate () {
     if _git_in_worktree_; then
         _git_branch_
@@ -160,8 +166,22 @@ git_populate () {
             __GIT_VERSION_IS_CANDIDATE__=0
             __GIT_VERSION_IS_PRE_RELEASE__=0
             case "$__GIT_EXTRA__" in
-            rc*) __GIT_VERSION_IS_CANDIDATE__=1 ;;
-            pre*) __GIT_VERSION_IS_PRE_RELEASE__=1 ;;
+            rc*) __GIT_VERSION_IS_CANDIDATE__=1
+                 n=${__GIT_EXTRA__#rc}
+                 if git_str_is_int "$n"; then
+                     __GIT_CANDIDATE_LEVEL__="$n"
+                 else
+                     __GIT_CANDIDATE_LEVEL__="0"
+                 fi
+                 ;;
+            pre*) __GIT_VERSION_IS_PRE_RELEASE__=1
+                  n=${__GIT_EXTRA__#pre}
+                  if git_str_is_int "$n"; then
+                      __GIT_PRE_RELEASE_LEVEL__="$n"
+                  else
+                      __GIT_PRE_RELEASE_LEVEL__="0"
+                  fi
+                  ;;
             esac
 
             # Determine increment from tag to head:
