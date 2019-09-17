@@ -28,11 +28,6 @@ if test "x$1" = x--; then
     done
 fi
 
-if test "x$MAJOR_VERSION" = x; then
-    printf 'artifacts: Basic information is missing.\n' >&2
-    printf 'artifacts: The results of this procedure will look way off!\n' >&2
-fi
-
 # This is the prefix used (in connection with a version tag from the *_VERSION
 # definitions above) to produce the final MCU firmware filenames.
 BITSTREAM_PREFIX="${HARDWARE_TYPE}"
@@ -69,6 +64,11 @@ if git_got_info; then
     fi
 else
     # Fall back to information from definitions.sh
+    if test "x$MAJOR_VERSION" = x; then
+        printf 'artifacts: Basic information is missing.\n' >&2
+        printf 'artifacts: The results of this procedure will look way off!\n' >&2
+    fi
+
     DESTINATION="${BITSTREAM_PREFIX}_v$MAJOR_VERSION"
     DESTINATION="${DESTINATION}.$MINOR_VERSION"
     DESTINATION="${DESTINATION}.${PATCHLEVEL}"
