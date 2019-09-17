@@ -66,7 +66,7 @@ macro(gitint_install)
   cmake_parse_arguments(
     PARSED_ARGS
     ""
-    "DESTINATION;BUILD_VARIANT"
+    "DESTINATION;BUILD_VARIANT;TARGET_MCU"
     "FILES;SCRIPTS"
     ${ARGN})
   if (NOT MICROFRAMEWORK_ROOT)
@@ -79,8 +79,12 @@ macro(gitint_install)
   if (NOT PARSED_ARGS_BUILD_VARIANT)
     set(PARSED_ARGS_BUILD_VARIANT "")
   endif()
+  if (NOT PARSED_ARGS_TARGET_MCU)
+    set(PARSED_ARGS_TARGET_MCU "")
+  endif()
   install(CODE "
 set(ENV{BUILD_VARIANT} \"${PARSED_ARGS_BUILD_VARIANT}\")
+set(ENV{IRTT_MCU} \"${PARSED_ARGS_TARGET_MCU}\")
 execute_process(
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   COMMAND
