@@ -1,66 +1,122 @@
+/**
+ * @file toolchain.h
+ * @brief Toolchain introspection API
+ */
+
 #ifndef INC_UFW_CONFIG_H
 #define INC_UFW_CONFIG_H
 
 /* Compiler Command Line API Identification */
 
-#cmakedefine UFW_CC_HAS_Wall @UFW_CC_HAS_Wall@
+/** Reflect C compiler's support for `-Wall` */
+#cmakedefine01 UFW_CC_HAS_Wall
+/** Reflect C compiler's support for `-Wextra` */
+#cmakedefine01 UFW_CC_HAS_Wextra
+/** Reflect C compiler's support for `-Werror` */
+#cmakedefine01 UFW_CC_HAS_Werror
+/** Reflect C compiler's support for `-Wasm` */
+#cmakedefine01 UFW_CC_HAS_Wasm
+/** Reflect C compiler's support for `-Wimplicit_fallthrough` */
+#cmakedefine01 UFW_CC_HAS_Wimplicit_fallthrough
+/** Reflect C compiler's support for `-Wimplicit-function-declaration` */
+#cmakedefine01 UFW_CC_HAS_Wimplicit_function_declaration
+/** Reflect C compiler's support for `-Wmissing-prototypes` */
+#cmakedefine01 UFW_CC_HAS_Wmissing_prototypes
+/** Reflect C compiler's support for `-Wnewline-eof` */
+#cmakedefine01 UFW_CC_HAS_Wnewline_eof
+/** Reflect C compiler's support for `-Wpacked` */
+#cmakedefine01 UFW_CC_HAS_Wpacked
+/** Reflect C compiler's support for `-Wpadded` */
+#cmakedefine01 UFW_CC_HAS_Wpadded
+/** Reflect C compiler's support for `-Wpedantic` */
+#cmakedefine01 UFW_CC_HAS_Wpedantic
+/** Reflect C compiler's support for `-Wredundant-decls` */
+#cmakedefine01 UFW_CC_HAS_Wredundant_decls
+/** Reflect C compiler's support for `-Wsequence-point` */
+#cmakedefine01 UFW_CC_HAS_Wsequence_point
+/** Reflect C compiler's support for `-Wshadow` */
+#cmakedefine01 UFW_CC_HAS_Wshadow
+/** Reflect C compiler's support for `-Wshift-sign-overflow` */
+#cmakedefine01 UFW_CC_HAS_Wshift_sign_overflow
+/** Reflect C compiler's support for `-Wstrict-prototypes` */
+#cmakedefine01 UFW_CC_HAS_Wstrict_prototypes
+/** Reflect C compiler's support for `-Wundef` */
+#cmakedefine01 UFW_CC_HAS_Wundef
+/** Reflect C compiler's support for `-Wused-but-marked-unused` */
+#cmakedefine01 UFW_CC_HAS_Wused_but_marked_unused
+/** Reflect C compiler's support for `-Wmisleading-indentation` */
+#cmakedefine01 UFW_CC_HAS_Wmisleading_indentation
 
-#cmakedefine UFW_CC_HAS_Wall @UFW_CC_HAS_Wall@
-#cmakedefine UFW_CC_HAS_Wextra @UFW_CC_HAS_Wextra@
-#cmakedefine UFW_CC_HAS_Werror @UFW_CC_HAS_Werror@
-#cmakedefine UFW_CC_HAS_Wasm @UFW_CC_HAS_Wasm@
-#cmakedefine UFW_CC_HAS_Wimplicit_fallthrough @UFW_CC_HAS_Wimplicit_fallthrough@
-#cmakedefine UFW_CC_HAS_Wimplicit_function_declaration @UFW_CC_HAS_Wimplicit_function_declaration@
-#cmakedefine UFW_CC_HAS_Wmissing_prototypes @UFW_CC_HAS_Wmissing_prototypes@
-#cmakedefine UFW_CC_HAS_Wnewline_eof @UFW_CC_HAS_Wnewline_eof@
-#cmakedefine UFW_CC_HAS_Wpacked @UFW_CC_HAS_Wpacked@
-#cmakedefine UFW_CC_HAS_Wpadded @UFW_CC_HAS_Wpadded@
-#cmakedefine UFW_CC_HAS_Wpedantic @UFW_CC_HAS_Wpedantic@
-#cmakedefine UFW_CC_HAS_Wredundant_decls @UFW_CC_HAS_Wredundant_decls@
-#cmakedefine UFW_CC_HAS_Wsequence_point @UFW_CC_HAS_Wsequence_point@
-#cmakedefine UFW_CC_HAS_Wshadow @UFW_CC_HAS_Wshadow@
-#cmakedefine UFW_CC_HAS_Wshift_sign_overflow @UFW_CC_HAS_Wshift_sign_overflow@
-#cmakedefine UFW_CC_HAS_Wstrict_prototypes @UFW_CC_HAS_Wstrict_prototypes@
-#cmakedefine UFW_CC_HAS_Wundef @UFW_CC_HAS_Wundef@
-#cmakedefine UFW_CC_HAS_Wused_but_marked_unused @UFW_CC_HAS_Wused_but_marked_unused@
-#cmakedefine UFW_CC_HAS_Wmisleading_indentation @UFW_CC_HAS_Wmisleading_indentation@
+/** Reflect C compiler's support for `__attribute__((cold))` */
+#cmakedefine01 UFW_CC_HAS_ATTRIBUTE_COLD
+/** Reflect C compiler's support for `__attribute__((deprecated))` */
+#cmakedefine01 UFW_CC_HAS_ATTRIBUTE_DEPRECATED
+/** Reflect C compiler's support for `__attribute__((hot))` */
+#cmakedefine01 UFW_CC_HAS_ATTRIBUTE_HOT
+/** Reflect C compiler's support for `__attribute__((noreturn))` */
+#cmakedefine01 UFW_CC_HAS_ATTRIBUTE_NORETURN
+/** Reflect C compiler's support for `__attribute__((packed))` */
+#cmakedefine01 UFW_CC_HAS_ATTRIBUTE_PACKED
+/** Reflect C compiler's support for `__attribute__((section))` */
+#cmakedefine01 UFW_CC_HAS_ATTRIBUTE_SECTION
+/** Reflect C compiler's support for `__attribute__((unused))` */
+#cmakedefine01 UFW_CC_HAS_ATTRIBUTE_UNUSED
+/** Reflect C compiler's support for `__attribute__((warn_unused_result))` */
+#cmakedefine01 UFW_CC_HAS_ATTRIBUTE_WARN_UNUSED_RESULT
+/** Reflect C compiler's support for `__builtin__((expect))` */
+#cmakedefine01 UFW_CC_HAS_BUILTIN_EXPECT
 
-#cmakedefine UFW_CC_HAS_ATTRIBUTE_COLD @UFW_CC_HAS_ATTRIBUTE_COLD@
-#cmakedefine UFW_CC_HAS_ATTRIBUTE_DEPRECATED @UFW_CC_HAS_ATTRIBUTE_DEPRECATED@
-#cmakedefine UFW_CC_HAS_ATTRIBUTE_HOT @UFW_CC_HAS_ATTRIBUTE_HOT@
-#cmakedefine UFW_CC_HAS_ATTRIBUTE_NORETURN @UFW_CC_HAS_ATTRIBUTE_NORETURN@
-#cmakedefine UFW_CC_HAS_ATTRIBUTE_PACKED @UFW_CC_HAS_ATTRIBUTE_PACKED@
-#cmakedefine UFW_CC_HAS_ATTRIBUTE_SECTION @UFW_CC_HAS_ATTRIBUTE_SECTION@
-#cmakedefine UFW_CC_HAS_ATTRIBUTE_UNUSED @UFW_CC_HAS_ATTRIBUTE_UNUSED@
-#cmakedefine UFW_CC_HAS_ATTRIBUTE_WARN_UNUSED_RESULT @UFW_CC_HAS_ATTRIBUTE_WARN_UNUSED_RESULT@
-#cmakedefine UFW_CC_HAS_BUILTIN_EXPECT @UFW_CC_HAS_BUILTIN_EXPECT@
+/** Reflect C++ compiler's support for `-Wall` */
+#cmakedefine01 UFW_CXX_HAS_Wall
+/** Reflect C++ compiler's support for `-Wextra` */
+#cmakedefine01 UFW_CXX_HAS_Wextra
+/** Reflect C++ compiler's support for `-Werror` */
+#cmakedefine01 UFW_CXX_HAS_Werror
+/** Reflect C++ compiler's support for `-Wasm` */
+#cmakedefine01 UFW_CXX_HAS_Wasm
+/** Reflect C++ compiler's support for `-Wimplicit-fallthrough` */
+#cmakedefine01 UFW_CXX_HAS_Wimplicit_fallthrough
+/** Reflect C++ compiler's support for `-Wnewline-eof` */
+#cmakedefine01 UFW_CXX_HAS_Wnewline_eof
+/** Reflect C++ compiler's support for `-Wpacked` */
+#cmakedefine01 UFW_CXX_HAS_Wpacked
+/** Reflect C++ compiler's support for `-Wpadded` */
+#cmakedefine01 UFW_CXX_HAS_Wpadded
+/** Reflect C++ compiler's support for `-Wpedantic` */
+#cmakedefine01 UFW_CXX_HAS_Wpedantic
+/** Reflect C++ compiler's support for `-Wredundant-decls` */
+#cmakedefine01 UFW_CXX_HAS_Wredundant_decls
+/** Reflect C++ compiler's support for `-Wsequence-point` */
+#cmakedefine01 UFW_CXX_HAS_Wsequence_point
+/** Reflect C++ compiler's support for `-Wshadow` */
+#cmakedefine01 UFW_CXX_HAS_Wshadow
+/** Reflect C++ compiler's support for `-Wshift-sign-overflow` */
+#cmakedefine01 UFW_CXX_HAS_Wshift_sign_overflow
+/** Reflect C++ compiler's support for `-Wundef` */
+#cmakedefine01 UFW_CXX_HAS_Wundef
+/** Reflect C++ compiler's support for `-Wused-but-marked-unused` */
+#cmakedefine01 UFW_CXX_HAS_Wused_but_marked_unused
+/** Reflect C++ compiler's support for `-Wmisleading-indentation` */
+#cmakedefine01 UFW_CXX_HAS_Wmisleading_indentation
 
-#cmakedefine UFW_CXX_HAS_Wall @UFW_CXX_HAS_Wall@
-#cmakedefine UFW_CXX_HAS_Wextra @UFW_CXX_HAS_Wextra@
-#cmakedefine UFW_CXX_HAS_Werror @UFW_CXX_HAS_Werror@
-#cmakedefine UFW_CXX_HAS_Wasm @UFW_CXX_HAS_Wasm@
-#cmakedefine UFW_CXX_HAS_Wimplicit_fallthrough @UFW_CXX_HAS_Wimplicit_fallthrough@
-#cmakedefine UFW_CXX_HAS_Wnewline_eof @UFW_CXX_HAS_Wnewline_eof@
-#cmakedefine UFW_CXX_HAS_Wpacked @UFW_CXX_HAS_Wpacked@
-#cmakedefine UFW_CXX_HAS_Wpadded @UFW_CXX_HAS_Wpadded@
-#cmakedefine UFW_CXX_HAS_Wpedantic @UFW_CXX_HAS_Wpedantic@
-#cmakedefine UFW_CXX_HAS_Wredundant_decls @UFW_CXX_HAS_Wredundant_decls@
-#cmakedefine UFW_CXX_HAS_Wsequence_point @UFW_CXX_HAS_Wsequence_point@
-#cmakedefine UFW_CXX_HAS_Wshadow @UFW_CXX_HAS_Wshadow@
-#cmakedefine UFW_CXX_HAS_Wshift_sign_overflow @UFW_CXX_HAS_Wshift_sign_overflow@
-#cmakedefine UFW_CXX_HAS_Wundef @UFW_CXX_HAS_Wundef@
-#cmakedefine UFW_CXX_HAS_Wused_but_marked_unused @UFW_CXX_HAS_Wused_but_marked_unused@
-#cmakedefine UFW_CXX_HAS_Wmisleading_indentation @UFW_CXX_HAS_Wmisleading_indentation@
-
-#cmakedefine UFW_CXX_HAS_ATTRIBUTE_COLD @UFW_CXX_HAS_ATTRIBUTE_COLD@
-#cmakedefine UFW_CXX_HAS_ATTRIBUTE_DEPRECATED @UFW_CXX_HAS_ATTRIBUTE_DEPRECATED@
-#cmakedefine UFW_CXX_HAS_ATTRIBUTE_HOT @UFW_CXX_HAS_ATTRIBUTE_HOT@
-#cmakedefine UFW_CXX_HAS_ATTRIBUTE_NORETURN @UFW_CXX_HAS_ATTRIBUTE_NORETURN@
-#cmakedefine UFW_CXX_HAS_ATTRIBUTE_PACKED @UFW_CXX_HAS_ATTRIBUTE_PACKED@
-#cmakedefine UFW_CXX_HAS_ATTRIBUTE_SECTION @UFW_CXX_HAS_ATTRIBUTE_SECTION@
-#cmakedefine UFW_CXX_HAS_ATTRIBUTE_UNUSED @UFW_CXX_HAS_ATTRIBUTE_UNUSED@
-#cmakedefine UFW_CXX_HAS_ATTRIBUTE_WARN_UNUSED_RESULT @UFW_CXX_HAS_ATTRIBUTE_WARN_UNUSED_RESULT@
-#cmakedefine UFW_CXX_HAS_BUILTIN_EXPECT @UFW_CXX_HAS_BUILTIN_EXPECT@
+/** Reflect C++ compiler's support for `__attribute__((cold))` */
+#cmakedefine01 UFW_CXX_HAS_ATTRIBUTE_COLD
+/** Reflect C++ compiler's support for `__attribute__((deprecated))` */
+#cmakedefine01 UFW_CXX_HAS_ATTRIBUTE_DEPRECATED
+/** Reflect C++ compiler's support for `__attribute__((hot))` */
+#cmakedefine01 UFW_CXX_HAS_ATTRIBUTE_HOT
+/** Reflect C++ compiler's support for `__attribute__((noreturn))` */
+#cmakedefine01 UFW_CXX_HAS_ATTRIBUTE_NORETURN
+/** Reflect C++ compiler's support for `__attribute__((packed))` */
+#cmakedefine01 UFW_CXX_HAS_ATTRIBUTE_PACKED
+/** Reflect C++ compiler's support for `__attribute__((section))` */
+#cmakedefine01 UFW_CXX_HAS_ATTRIBUTE_SECTION
+/** Reflect C++ compiler's support for `__attribute__((unused))` */
+#cmakedefine01 UFW_CXX_HAS_ATTRIBUTE_UNUSED
+/** Reflect C++ compiler's support for `__attribute__((warn_unused_result))` */
+#cmakedefine01 UFW_CXX_HAS_ATTRIBUTE_WARN_UNUSED_RESULT
+/** Reflect C++ compiler's support for `__builtin__((expect))` */
+#cmakedefine01 UFW_CXX_HAS_BUILTIN_EXPECT
 
 /* Language Extension Identification */
 
@@ -68,39 +124,48 @@
 
 /* C++ */
 
-#ifdef UFW_CXX_HAS_ATTRIBUTE_COLD
+#if (UFW_CXX_HAS_ATTRIBUTE_COLD > 0)
+/** Show if the active compiler has support for `__attribute__((cold))` */
 #define HAVE_COMPILER_ATTRIBUTE_COLD
 #endif /* UFW_CXX_HAS_ATTRIBUTE_COLD */
 
-#ifdef UFW_CXX_HAS_ATTRIBUTE_DEPRECATED
+#if (UFW_CXX_HAS_ATTRIBUTE_DEPRECATED > 0)
+/** Show if the active compiler has support for `__attribute__((deprecated))` */
 #define HAVE_COMPILER_ATTRIBUTE_DEPRECATED
 #endif /* UFW_CXX_HAS_ATTRIBUTE_DEPRECATED */
 
-#ifdef UFW_CXX_HAS_ATTRIBUTE_HOT
+#if (UFW_CXX_HAS_ATTRIBUTE_HOT > 0)
+/** Show if the active compiler has support for `__attribute__((hot))` */
 #define HAVE_COMPILER_ATTRIBUTE_HOT
 #endif /* UFW_CXX_HAS_ATTRIBUTE_HOT */
 
-#ifdef UFW_CXX_HAS_ATTRIBUTE_NORETURN
+#if (UFW_CXX_HAS_ATTRIBUTE_NORETURN > 0)
+/** Show if the active compiler has support for `__attribute__((noreturn))` */
 #define HAVE_COMPILER_ATTRIBUTE_NORETURN
 #endif /* UFW_CXX_HAS_ATTRIBUTE_NORETURN */
 
-#ifdef UFW_CXX_HAS_ATTRIBUTE_PACKED
+#if (UFW_CXX_HAS_ATTRIBUTE_PACKED > 0)
+/** Show if the active compiler has support for `__attribute__((packed))` */
 #define HAVE_COMPILER_ATTRIBUTE_PACKED
 #endif /* UFW_CXX_HAS_ATTRIBUTE_PACKED */
 
-#ifdef UFW_CXX_HAS_ATTRIBUTE_SECTION
+#if (UFW_CXX_HAS_ATTRIBUTE_SECTION > 0)
+/** Show if the active compiler has support for `__attribute__((section))` */
 #define HAVE_COMPILER_ATTRIBUTE_SECTION
 #endif /* UFW_CXX_HAS_ATTRIBUTE_SECTION */
 
-#ifdef UFW_CXX_HAS_ATTRIBUTE_UNUSED
+#if (UFW_CXX_HAS_ATTRIBUTE_UNUSED > 0)
+/** Show if the active compiler has support for `__attribute__((unused))` */
 #define HAVE_COMPILER_ATTRIBUTE_UNUSED
 #endif /* UFW_CXX_HAS_ATTRIBUTE_UNUSED */
 
-#ifdef UFW_CXX_HAS_ATTRIBUTE_WARN_UNUSED_RESULT
+#if (UFW_CXX_HAS_ATTRIBUTE_WARN_UNUSED_RESULT > 0)
+/** Show if the active compiler has support for `__attribute__((warn_unused_result))` */
 #define HAVE_COMPILER_ATTRIBUTE_WARN_UNUSED_RESULT
 #endif /* UFW_CXX_HAS_ATTRIBUTE_WARN_UNUSED_RESULT */
 
-#ifdef UFW_CXX_HAS_BUILTIN_EXPECT
+#if (UFW_CXX_HAS_BUILTIN_EXPECT > 0)
+/** Show if the active compiler has support for `__builtin__((expect))` */
 #define HAVE_COMPILER_BUILTIN_EXPECT
 #endif /* UFW_CXX_HAS_BUILTIN_EXPECT */
 
@@ -108,39 +173,48 @@
 
 /* C */
 
-#ifdef UFW_CC_HAS_ATTRIBUTE_COLD
+#if (UFW_CC_HAS_ATTRIBUTE_COLD > 0)
+/** Show if the active compiler has support for `__attribute__((cold))` */
 #define HAVE_COMPILER_ATTRIBUTE_COLD
 #endif /* UFW_CC_HAS_ATTRIBUTE_COLD */
 
-#ifdef UFW_CC_HAS_ATTRIBUTE_DEPRECATED
+#if (UFW_CC_HAS_ATTRIBUTE_DEPRECATED > 0)
+/** Show if the active compiler has support for `__attribute__((deprecated))` */
 #define HAVE_COMPILER_ATTRIBUTE_DEPRECATED
 #endif /* UFW_CC_HAS_ATTRIBUTE_DEPRECATED */
 
-#ifdef UFW_CC_HAS_ATTRIBUTE_HOT
+#if (UFW_CC_HAS_ATTRIBUTE_HOT > 0)
+/** Show if the active compiler has support for `__attribute__((hot))` */
 #define HAVE_COMPILER_ATTRIBUTE_HOT
 #endif /* UFW_CC_HAS_ATTRIBUTE_HOT */
 
-#ifdef UFW_CC_HAS_ATTRIBUTE_NORETURN
+#if (UFW_CC_HAS_ATTRIBUTE_NORETURN > 0)
+/** Show if the active compiler has support for `__attribute__((noreturn))` */
 #define HAVE_COMPILER_ATTRIBUTE_NORETURN
 #endif /* UFW_CC_HAS_ATTRIBUTE_NORETURN */
 
-#ifdef UFW_CC_HAS_ATTRIBUTE_PACKED
+#if (UFW_CC_HAS_ATTRIBUTE_PACKED > 0)
+/** Show if the active compiler has support for `__attribute__((packed))` */
 #define HAVE_COMPILER_ATTRIBUTE_PACKED
 #endif /* UFW_CC_HAS_ATTRIBUTE_PACKED */
 
-#ifdef UFW_CC_HAS_ATTRIBUTE_SECTION
+#if (UFW_CC_HAS_ATTRIBUTE_SECTION > 0)
+/** Show if the active compiler has support for `__attribute__((section))` */
 #define HAVE_COMPILER_ATTRIBUTE_SECTION
 #endif /* UFW_CC_HAS_ATTRIBUTE_SECTION */
 
-#ifdef UFW_CC_HAS_ATTRIBUTE_UNUSED
+#if (UFW_CC_HAS_ATTRIBUTE_UNUSED > 0)
+/** Show if the active compiler has support for `__attribute__((unused))` */
 #define HAVE_COMPILER_ATTRIBUTE_UNUSED
 #endif /* UFW_CC_HAS_ATTRIBUTE_UNUSED */
 
-#ifdef UFW_CC_HAS_ATTRIBUTE_WARN_UNUSED_RESULT
+#if (UFW_CC_HAS_ATTRIBUTE_WARN_UNUSED_RESULT > 0)
+/** Show if the active compiler has support for `__attribute__((warn_unused_result))` */
 #define HAVE_COMPILER_ATTRIBUTE_WARN_UNUSED_RESULT
 #endif /* UFW_CC_HAS_ATTRIBUTE_WARN_UNUSED_RESULT */
 
-#ifdef UFW_CC_HAS_BUILTIN_EXPECT
+#if (UFW_CC_HAS_BUILTIN_EXPECT > 0)
+/** Show if the active compiler has support for `__builtin__((expect))` */
 #define HAVE_COMPILER_BUILTIN_EXPECT
 #endif /* UFW_CC_HAS_BUILTIN_EXPECT */
 
@@ -148,8 +222,21 @@
 
 /* Toolchain Compatibility */
 
-#cmakedefine WITH_SYS_TYPES_H
+/** Reflect the availability of sys/types.h */
+#cmakedefine01 WITH_SYS_TYPES_H
+#if (WITH_SYS_TYPES_H == 0)
+#undef WITH_SYS_TYPES_H
+#endif /* WITH_SYS_TYPES_H */
+
+/** Reflect the availability of uint8_t */
+#cmakedefine01 WITH_UINT8_T
+#if (WITH_UINT8_T == 0)
+#undef WITH_UINT8_T
+#endif /* WITH_UINT8_T */
+
+#if (WITH_UINT8_T > 0)
+/** The size of uint8_t */
 #cmakedefine UINT8_T_SIZE @UINT8_T_SIZE@
-#cmakedefine WITH_UINT8_T
+#endif /* WITH_UINT8_T */
 
 #endif /* INC_UFW_CONFIG_H */
