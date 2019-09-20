@@ -79,3 +79,4 @@ MakeStrictCompilerC(ufw)
 set_target_cpu(ufw)
 
 add_subdirectory(test)
+add_subdirectory(doc)
