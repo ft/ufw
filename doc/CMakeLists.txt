@@ -8,7 +8,6 @@ if (DOXYGEN_FOUND)
     set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
     configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT})
-    message("Doxygen build started")
 
     add_custom_target(api-documentation ALL
       COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
