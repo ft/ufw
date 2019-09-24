@@ -33,9 +33,9 @@ function(GenerateGraphics_tex2pdf target source output)
     DEPENDS ${source}
     COMMENT "Building graphic file: ${output}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMAND lualatex ${CMAKE_CURRENT_SOURCE_DIR}/${source}
-    COMMAND pdfcrop ${output} cropped-${output}
-    COMMAND mv cropped-${output} ${output})
+    COMMAND pdflatex ${CMAKE_CURRENT_SOURCE_DIR}/${source}
+    && pdfcrop ${output} cropped-${output}
+    && mv cropped-${output} ${output})
 endfunction(GenerateGraphics_tex2pdf)
 
 function(GenerateGraphics_pdf2png target source output)
