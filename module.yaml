@@ -10,7 +10,7 @@ cmake-extensions:
     include: setup_ufw
     module: SetupUFW
   libtap:
-    include: add_libtap
+    include: add_libtap(${moduleroot})
     module: Libtap
 
 dependencies:
