@@ -65,6 +65,12 @@
 #cmakedefine01 UFW_CC_HAS_ATTRIBUTE_WARN_UNUSED_RESULT
 /** Reflect C compiler's support for `__builtin__((expect))` */
 #cmakedefine01 UFW_CC_HAS_BUILTIN_EXPECT
+/** Reflect C compiler's support for `__builtin_bswap16()` */
+#cmakedefine01 UFW_CC_HAS_BUILTIN_BSWAP16
+/** Reflect C compiler's support for `__builtin_bswap32()` */
+#cmakedefine01 UFW_CC_HAS_BUILTIN_BSWAP32
+/** Reflect C compiler's support for `__builtin_bswap64()` */
+#cmakedefine01 UFW_CC_HAS_BUILTIN_BSWAP64
 
 /** Reflect C++ compiler's support for `-Wall` */
 #cmakedefine01 UFW_CXX_HAS_Wall
@@ -117,6 +123,12 @@
 #cmakedefine01 UFW_CXX_HAS_ATTRIBUTE_WARN_UNUSED_RESULT
 /** Reflect C++ compiler's support for `__builtin__((expect))` */
 #cmakedefine01 UFW_CXX_HAS_BUILTIN_EXPECT
+/** Reflect C++ compiler's support for `__builtin_bswap16()` */
+#cmakedefine01 UFW_CXX_HAS_BUILTIN_BSWAP16
+/** Reflect C++ compiler's support for `__builtin_bswap32()` */
+#cmakedefine01 UFW_CXX_HAS_BUILTIN_BSWAP32
+/** Reflect C++ compiler's support for `__builtin_bswap64()` */
+#cmakedefine01 UFW_CXX_HAS_BUILTIN_BSWAP64
 
 /* Language Extension Identification */
 
@@ -169,6 +181,21 @@
 #define HAVE_COMPILER_BUILTIN_EXPECT
 #endif /* UFW_CXX_HAS_BUILTIN_EXPECT */
 
+#if (UFW_CXX_HAS_BUILTIN_BSWAP16 > 0)
+/** Show if the active compiler has support for `__builtin_bswap16()` */
+#define HAVE_COMPILER_BUILTIN_BSWAP16
+#endif /* UFW_CXX_HAS_BUILTIN_BSWAP16 */
+
+#if (UFW_CXX_HAS_BUILTIN_BSWAP32 > 0)
+/** Show if the active compiler has support for `__builtin_bswap32()` */
+#define HAVE_COMPILER_BUILTIN_BSWAP32
+#endif /* UFW_CXX_HAS_BUILTIN_BSWAP32 */
+
+#if (UFW_CXX_HAS_BUILTIN_BSWAP64 > 0)
+/** Show if the active compiler has support for `__builtin_bswap64()` */
+#define HAVE_COMPILER_BUILTIN_BSWAP64
+#endif /* UFW_CXX_HAS_BUILTIN_BSWAP64 */
+
 #else
 
 /* C */
@@ -217,6 +244,21 @@
 /** Show if the active compiler has support for `__builtin__((expect))` */
 #define HAVE_COMPILER_BUILTIN_EXPECT
 #endif /* UFW_CC_HAS_BUILTIN_EXPECT */
+
+#if (UFW_CC_HAS_BUILTIN_BSWAP16 > 0)
+/** Show if the active compiler has support for `__builtin_bswap16()` */
+#define HAVE_COMPILER_BUILTIN_BSWAP16
+#endif /* UFW_CC_HAS_BUILTIN_BSWAP16 */
+
+#if (UFW_CC_HAS_BUILTIN_BSWAP32 > 0)
+/** Show if the active compiler has support for `__builtin_bswap32()` */
+#define HAVE_COMPILER_BUILTIN_BSWAP32
+#endif /* UFW_CC_HAS_BUILTIN_BSWAP32 */
+
+#if (UFW_CC_HAS_BUILTIN_BSWAP64 > 0)
+/** Show if the active compiler has support for `__builtin_bswap64()` */
+#define HAVE_COMPILER_BUILTIN_BSWAP64
+#endif /* UFW_CC_HAS_BUILTIN_BSWAP64 */
 
 #endif /* __cplusplus */
 
