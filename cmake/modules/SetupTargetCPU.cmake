@@ -3,6 +3,8 @@ if(__UFW_SetupTargetCPU)
 endif()
 set(__UFW_SetupTargetCPU 1)
 
+include(TestBigEndian)
+
 function(add_target_link_flags _target _link_flags)
     set(new_link_flags ${_link_flags})
     get_target_property(existing_link_flags ${_target} LINK_FLAGS)
@@ -14,7 +16,12 @@ function(add_target_link_flags _target _link_flags)
     set_target_properties(${_target} PROPERTIES LINK_FLAGS ${new_link_flags})
 endfunction()
 
+function(add_target_endianness target endianness)
+  target_compile_definitions(${target} PUBLIC "SYSTEM_ENDIANNESS_${endianness}")
+endfunction()
+
 function(set_target_cpu_gcc_arm target _cpu)
+  add_target_endianness(${target} LITTLE)
   if (${_cpu} STREQUAL "cortex-m0")
     set(_flags -mthumb -mcpu=cortex-m0)
   elseif (${_cpu} STREQUAL "cortex-m0+")
@@ -45,6 +52,7 @@ function(set_target_cpu_gcc_arm target _cpu)
 endfunction()
 
 function(set_target_cpu_ti_arm target _cpu)
+  add_target_endianness(${target} LITTLE)
   if (${_cpu} STREQUAL "cortex-m3")
     set(_flags --silicon_version=7M3 --little_endian --code_state=16)
   elseif (${_cpu} STREQUAL "cortex-m4f")
@@ -57,6 +65,7 @@ function(set_target_cpu_ti_arm target _cpu)
 endfunction()
 
 function(set_target_cpu_ti_c28x target _cpu)
+  add_target_endianness(${target} LITTLE)
   if (${_cpu} STREQUAL "c28x-float")
     set(_flags -v28
       --large_memory_model
@@ -70,6 +79,18 @@ function(set_target_cpu_ti_c28x target _cpu)
   endif()
 
   target_compile_options(${target} PUBLIC ${_flags})
+endfunction()
+
+function(set_target_cpu_native target _cpu)
+  if (NOT (DEFINED HOST_BIG_ENDIAN))
+    test_big_endian(HOST_BIG_ENDIAN)
+    set(HOST_BIG_ENDIAN ${HOST_BIG_ENDIAN} PARENT_SCOPE)
+  endif()
+  if (HOST_BIG_ENDIAN EQUAL 0)
+    add_target_endianness(${target} LITTLE)
+  else()
+    add_target_endianness(${target} BIG)
+  endif()
 endfunction()
 
 function(set_target_cpu target)
@@ -96,9 +117,9 @@ function(set_target_cpu target)
   elseif ("${TOOLCHAIN_ID}" STREQUAL "ti-c2000")
     set_target_cpu_ti_c28x("${target}" "${PROJECT_TARGET_CPU}")
   elseif ("${TOOLCHAIN_ID}" STREQUAL "gcc-native")
-    # Nothing
+    set_target_cpu_native("${target}" "${PROJECT_TARGET_CPU}")
   elseif ("${TOOLCHAIN_ID}" STREQUAL "clang-native")
-    # Nothing
+    set_target_cpu_native("${target}" "${PROJECT_TARGET_CPU}")
   else()
     message(WARNING "-- set_target_cpu: Unknown TOOLCHAIN_ID ${TOOLCHAIN_ID}")
   endif()
