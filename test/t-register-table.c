@@ -569,7 +569,7 @@ GENERATE_CONSTRAIN_TESTS(
     /* VT_RAN_VAL, VT_RAN_MIN, VT_RAN_MAX */
     500e3, -1e3, 800e3)
 
-void
+static void
 t_f32_abnormal(void)
 {
     RegisterTable regs = {
@@ -785,7 +785,7 @@ t_hexstring(void)
     RegisterInit success = register_init(&regs);
     cmp_ok(success.code, "==", REG_INIT_SUCCESS, "hexstr: regs initialises");
     RegisterAccess acc = register_set_from_hexstr(&regs, 0u, sha1, 12u);
-    cmp_ok(success.code, "==", REG_ACCESS_SUCCESS, "hexstr: transfer worked");
+    cmp_ok(acc.code, "==", REG_ACCESS_SUCCESS, "hexstr: transfer worked");
     cmp_ok(regs.area->mem[0], "==", 0x1234u, "hexstr: First word is correct");
     cmp_ok(regs.area->mem[1], "==", 0x5678u, "hexstr: Second word is correct");
     cmp_ok(regs.area->mem[2], "==", 0x9abcu, "hexstr: Third word is correct");
