@@ -12,6 +12,7 @@ set(test_names)
 
 if (TARGET tap)
   list(APPEND test_names
+    t-binary-format
     t-register-table
     t-ring-buffer)
 endif()
