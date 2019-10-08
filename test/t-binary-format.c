@@ -5,6 +5,7 @@
 #include <tap.h>
 
 #include <common/compiler.h>
+
 #include <c/binary-format.h>
 
 /*
