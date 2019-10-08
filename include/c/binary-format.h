@@ -242,8 +242,8 @@ bf_ref_u16l(const bf_type *buf)
 #elif defined(SYSTEM_ENDIANNESS_LITTLE)
     return bf_ref_u16n(buf);
 #else
-    return ( (((uint_least16_t)buf[1]) << 8u)
-           |  ((uint_least16_t)buf[2]));
+    return ( (((uint_least16_t)buf[0]) << 8u)
+           |  ((uint_least16_t)buf[1]));
 #endif /* SYSTEM_ENDIANNESS_* */
 }
 
