@@ -1,4 +1,4 @@
-option(GENERATE_API_DOCUMENTATION "Generate API Documentation" ON)
+option(GENERATE_API_DOCUMENTATION "Generate API Documentation" OFF)
 find_package(Doxygen)
 
 if (DOXYGEN_FOUND)
