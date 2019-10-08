@@ -98,8 +98,8 @@ t_native_ref_signed(void)
 static void
 t_native_ref_float(void)
 {
-    const float f32 = (float)(1. / 123.3e12);
-    const double f64 = (double)(1. / 123.3e12);
+    const float f32 = 1.f / 123.3e12f;
+    const double f64 = 1. / 123.3e12;
 
     ok(f32 == bf_ref_f32n((uint8_t*)&f32),
        "Referencing f32 in native order works");
