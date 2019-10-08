@@ -42,12 +42,31 @@ if (UFW_UINT8_T_SIZE)
     set(WITH_UINT8_T 1)
 endif()
 
+include(CheckSymbolExists)
+check_symbol_exists(strlcat "string.h" UFW_COMPAT_HAVE_STRLCAT)
+check_symbol_exists(strlcpy "string.h" UFW_COMPAT_HAVE_STRLCPY)
+check_symbol_exists(strnlen "string.h" UFW_COMPAT_HAVE_STRNLEN)
+
 configure_file("${PROJECT_SOURCE_DIR}/include/common/toolchain.h.in"
                "${PROJECT_BINARY_DIR}/include/common/toolchain.h" )
 
-add_library(ufw STATIC src/c/logger.c
-                       src/c/ring-buffer-iter.c
-                       src/c/register-table.c)
+set(__ufw_sources src/c/logger.c
+                  src/c/ring-buffer-iter.c
+                  src/c/register-table.c)
+
+if (NOT UFW_COMPAT_HAVE_STRLCAT)
+  list(APPEND __ufw_sources src/c/strlcat.c)
+endif()
+
+if (NOT UFW_COMPAT_HAVE_STRLCPY)
+  list(APPEND __ufw_sources src/c/strlcpy.c)
+endif()
+
+if (NOT UFW_COMPAT_HAVE_STRNLEN)
+  list(APPEND __ufw_sources src/c/strnlen.c)
+endif()
+
+add_library(ufw STATIC ${__ufw_sources})
 
 set_property(TARGET ufw PROPERTY C_STANDARD 99)
 
