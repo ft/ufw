@@ -209,7 +209,7 @@ static void
 t_native_set_f32(void)
 {
     const float f32 = FLT_MAX;
-    float m32[] = { 0. };
+    float m32[] = { 0.f };
     float *p32;
 
     p32 = bf_set_f32n((uint8_t*)m32, f32);
@@ -412,7 +412,7 @@ t_big_set_f32(void)
 {
     const union { float f; uint32_t u; } f32 = { .u = 0x12345678ul };
     const uint8_t expect[] = { 0x12u, 0x34u, 0x56u, 0x78u };
-    float m32[] = { 0. };
+    float m32[] = { 0.f };
     float *p32;
 
     p32 = bf_set_f32b((uint8_t*)m32, f32.f);
@@ -619,7 +619,7 @@ t_little_set_f32(void)
 {
     const union { float f; uint32_t u; } f32 = { .u = 0x12345678ul };
     const uint8_t expect[] = { 0x78u, 0x56u, 0x34u, 0x12u };
-    float m32[] = { 0. };
+    float m32[] = { 0.f };
     float *p32;
 
     p32 = bf_set_f32l((uint8_t*)m32, f32.f);
