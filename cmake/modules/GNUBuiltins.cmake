@@ -32,7 +32,7 @@ function(CheckGNUBuiltin_bswap_n compiler width)
      }")
   set(_result "UFW_${compiler}_HAS_BUILTIN_BSWAP${width}")
   set(result ${_result})
-  check_c_source_compiles("${__UFW_GNUBuiltin_expect}" ${_result})
+  check_c_source_compiles("${__code}" ${_result})
   set(${result} ${_result} PARENT_SCOPE)
 endfunction()
 
