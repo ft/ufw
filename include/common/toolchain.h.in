@@ -3,8 +3,8 @@
  * @brief Toolchain introspection API
  */
 
-#ifndef INC_UFW_CONFIG_H
-#define INC_UFW_CONFIG_H
+#ifndef INC_UFW_TOOLCHAIN_H
+#define INC_UFW_TOOLCHAIN_H
 
 /* Compiler Command Line API Identification */
 
@@ -299,4 +299,4 @@
 #undef UFW_COMPAT_HAVE_STRNLEN
 #endif /* UFW_COMPAT_HAVE_STRNLEN */
 
-#endif /* INC_UFW_CONFIG_H */
+#endif /* INC_UFW_TOOLCHAIN_H */
