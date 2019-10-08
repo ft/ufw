@@ -21,19 +21,20 @@ RING_BUFFER_ITER_API(byte_buffer, uint8_t)
 RING_BUFFER(byte_buffer, uint8_t)
 RING_BUFFER_ITER(byte_buffer, uint8_t)
 
+#define BUFSIZE 16
+
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    const size_t bufsize = 16;
     const uint8_t data[] = { 11, 22, 33, 44, 55, 66, 77, 88 };
-    uint8_t buffer[bufsize];
+    uint8_t buffer[BUFSIZE];
     byte_buffer foo;
     rb_iter iter;
 
     plan(16);
 
     /* Initialise ring-buffer with buffer as its data-storage. */
-    byte_buffer_init(&foo, buffer, bufsize);
+    byte_buffer_init(&foo, buffer, BUFSIZE);
 
     /* Put data into the buffer. */
     for (size_t i = 0; i < sizeof(data); ++i)
