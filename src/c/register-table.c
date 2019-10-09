@@ -11,9 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef INC_REGISTER_TABLE_H
 #include <c/register-table.h>
-#endif /* INC_REGISTER_TABLE_H */
 
 /*
  * Internal API prototypes
