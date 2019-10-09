@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <c/binary-format.h>
 #include <c/register-table.h>
 
 /*
@@ -120,15 +121,14 @@ static bool
 rds_u16_ser(const RegisterValue v, RegisterAtom *r)
 {
     assert(v.type == REG_TYPE_UINT16);
-    *r = v.value.u16;
+    bf_set_u16l((uint_least8_t*)r, v.value.u16);
     return true;
 }
 
 static bool
 rds_u16_des(const RegisterAtom *r, RegisterValue *v)
 {
-    uint16_t n = *r;
-    v->value.u16 = n;
+    v->value.u16 = bf_ref_u16l((uint_least8_t*)r);
     v->type = REG_TYPE_UINT16;
     return true;
 }
@@ -137,17 +137,14 @@ static bool
 rds_u32_ser(const RegisterValue v, RegisterAtom *r)
 {
     assert(v.type == REG_TYPE_UINT32);
-    *r = v.value.u32 & 0xfffful;
-    *(r+1) = (v.value.u32 >> 16u) & 0xfffful;
+    bf_set_u32l((uint_least8_t*)r, v.value.u32);
     return true;
 }
 
 static bool
 rds_u32_des(const RegisterAtom *r, RegisterValue *v)
 {
-    uint32_t n = *r;
-    n |= ((uint32_t)*(r+1)) << 16u;
-    v->value.u32 = n;
+    v->value.u32 = bf_ref_u32l((uint_least8_t*)r);
     v->type = REG_TYPE_UINT32;
     return true;
 }
@@ -156,21 +153,14 @@ static bool
 rds_u64_ser(const RegisterValue v, RegisterAtom *r)
 {
     assert(v.type == REG_TYPE_UINT64);
-    *(r+0) = (v.value.u64 >>  0u) & 0xfffful;
-    *(r+1) = (v.value.u64 >> 16u) & 0xfffful;
-    *(r+2) = (v.value.u64 >> 32u) & 0xfffful;
-    *(r+3) = (v.value.u64 >> 48u) & 0xfffful;
+    bf_set_u64l((uint_least8_t*)r, v.value.u64);
     return true;
 }
 
 static bool
 rds_u64_des(const RegisterAtom *r, RegisterValue *v)
 {
-    uint64_t n = *r;
-    n |= ((uint64_t)*(r+1)) << 16u;
-    n |= ((uint64_t)*(r+2)) << 32u;
-    n |= ((uint64_t)*(r+3)) << 48u;
-    v->value.u64 = n;
+    v->value.u64 = bf_ref_u64l((uint_least8_t*)r);
     v->type = REG_TYPE_UINT64;
     return true;
 }
@@ -179,20 +169,14 @@ static bool
 rds_s16_ser(const RegisterValue v, RegisterAtom *r)
 {
     assert(v.type == REG_TYPE_SINT16);
-    /*
-     * This assumes that the machine that this runs on uses two's complement to
-     * encode negative numbers, which is the format this module uses in its re-
-     * presentation. This is true for all signed-ser/des functions for now.
-     */
-    *r = v.value.u16;
+    bf_set_s16l((uint_least8_t*)r, v.value.s16);
     return true;
 }
 
 static bool
 rds_s16_des(const RegisterAtom *r, RegisterValue *v)
 {
-    uint16_t n = *r;
-    v->value.u16 = n;
+    v->value.s16 = bf_ref_s16l((uint_least8_t*)r);
     v->type = REG_TYPE_SINT16;
     return true;
 }
@@ -201,17 +185,14 @@ static bool
 rds_s32_ser(const RegisterValue v, RegisterAtom *r)
 {
     assert(v.type == REG_TYPE_SINT32);
-    *r = v.value.u32 & 0xfffful;
-    *(r+1) = (v.value.u32 >> 16u) & 0xfffful;
+    bf_set_s32l((uint_least8_t*)r, v.value.s32);
     return true;
 }
 
 static bool
 rds_s32_des(const RegisterAtom *r, RegisterValue *v)
 {
-    uint32_t n = *r;
-    n |= ((uint32_t)*(r+1)) << 16u;
-    v->value.u32 = n;
+    v->value.s32 = bf_ref_s32l((uint_least8_t*)r);
     v->type = REG_TYPE_SINT32;
     return true;
 }
@@ -220,21 +201,14 @@ static bool
 rds_s64_ser(const RegisterValue v, RegisterAtom *r)
 {
     assert(v.type == REG_TYPE_SINT64);
-    *(r+0) = (v.value.u64 >>  0u) & 0xfffful;
-    *(r+1) = (v.value.u64 >> 16u) & 0xfffful;
-    *(r+2) = (v.value.u64 >> 32u) & 0xfffful;
-    *(r+3) = (v.value.u64 >> 48u) & 0xfffful;
+    bf_set_s64l((uint_least8_t*)r, v.value.s64);
     return true;
 }
 
 static bool
 rds_s64_des(const RegisterAtom *r, RegisterValue *v)
 {
-    uint64_t n = *r;
-    n |= ((uint64_t)*(r+1)) << 16u;
-    n |= ((uint64_t)*(r+2)) << 32u;
-    n |= ((uint64_t)*(r+3)) << 48u;
-    v->value.u64 = n;
+    v->value.s64 = bf_ref_s64l((uint_least8_t*)r);
     v->type = REG_TYPE_SINT64;
     return true;
 }
@@ -243,22 +217,16 @@ static bool
 rds_f32_ser(const RegisterValue v, RegisterAtom *r)
 {
     assert(v.type == REG_TYPE_FLOAT32);
-    /* Here is another assumption: The register table is supposed to represent
-     * 32 bit floating point numbers in IEEE754 format. And this assumes that
-     * the target architecture uses that one as well. */
     if ((v.value.f32 != 0.) && (isnormal(v.value.f32) == false))
         return false;
-    *r = v.value.u32 & 0xfffful;
-    *(r+1) = (v.value.u32 >> 16u) & 0xfffful;
+    bf_set_f32l((uint_least8_t*)r, v.value.f32);
     return true;
 }
 
 static bool
 rds_f32_des(const RegisterAtom *r, RegisterValue *v)
 {
-    uint32_t n = *r;
-    n |= ((uint32_t)*(r+1)) << 16u;
-    v->value.u32 = n;
+    v->value.f32 = bf_ref_f32l((uint_least8_t*)r);
     v->type = REG_TYPE_FLOAT32;
     return ((v->value.f32 == 0.) || (isnormal(v->value.f32) == true));
 }
