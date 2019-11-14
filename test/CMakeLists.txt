@@ -10,12 +10,14 @@ include(CheckIncludeFile)
 
 set(test_names)
 
-if (TARGET tap)
-  list(APPEND test_names
-    t-binary-format
-    t-register-table
-    t-ring-buffer)
+if (NOT TARGET tap)
+  return()
 endif()
+
+list(APPEND test_names
+  t-binary-format
+  t-register-table
+  t-ring-buffer)
 
 set(test_prgs)
 list(APPEND test_prgs)

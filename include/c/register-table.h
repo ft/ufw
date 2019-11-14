@@ -100,9 +100,6 @@ typedef enum RegisterType {
     REG_TYPE_FLOAT32
 } RegisterType;
 
-#define REG_LARGEST_DATUM uint64_t
-#define REG_SIZEOF_LARGEST_DATUM (sizeof(REG_LARGEST_DATUM) / sizeof(RegisterAtom))
-
 typedef union RegisterValueU {
     uint16_t u16;
     uint32_t u32;

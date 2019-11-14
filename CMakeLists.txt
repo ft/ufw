@@ -52,7 +52,8 @@ configure_file("${PROJECT_SOURCE_DIR}/include/common/toolchain.h.in"
 
 set(__ufw_sources src/c/logger.c
                   src/c/ring-buffer-iter.c
-                  src/c/register-table.c)
+                  src/c/register-table.c
+                  src/c/register-utilities.c)
 
 if (NOT UFW_COMPAT_HAVE_STRLCAT)
   list(APPEND __ufw_sources src/c/strlcat.c)

@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include <c/binary-format.h>
+#include <c/register-internal.h>
 #include <c/register-table.h>
 
 /*
@@ -46,8 +47,6 @@ static inline bool rv_check_cb(RegisterEntry*, const RegisterValue);
 static bool rv_validate(RegisterEntry*, const RegisterValue);
 
 /* Initialisation utilities */
-static inline bool is_end_of_areas(RegisterArea*);
-static inline bool is_end_of_entries(RegisterEntry*);
 static AreaHandle reg_count_areas(RegisterArea*);
 static RegisterHandle reg_count_entries(RegisterEntry*);
 static RegisterHandle ra_first_entry_of_next(RegisterTable*,
@@ -341,18 +340,6 @@ rv_validate(RegisterEntry *e, const RegisterValue v)
     }
 }
 
-static inline bool
-is_end_of_areas(RegisterArea *a)
-{
-    if (a->read != NULL || a->write != NULL)
-        return false;
-    if (a->size != 0 || a->base != 0)
-        return false;
-    if (a->mem != NULL)
-        return false;
-    return true;
-}
-
 static inline int
 reg_range_touches(RegisterEntry *e, RegisterAddress addr, RegisterOffset n)
 {
@@ -391,12 +378,6 @@ reg_count_areas(RegisterArea *a)
         a++;
     }
     return n;
-}
-
-static inline bool
-is_end_of_entries(RegisterEntry *e)
-{
-    return (e->type == REG_TYPE_INVALID);
 }
 
 static RegisterHandle
