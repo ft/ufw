@@ -40,7 +40,7 @@ register_table_print(FILE *fh, const char *prefix, const RegisterTable *t)
     RegisterHandle reg = 0;
     while ((reg < AREA_HANDLE_MAX) && !(is_end_of_entries(t->entry + reg))) {
         RegisterEntry *e = t->entry + reg;
-        fprintf(fh, "%s  RegisterEntryID: %" PRIu16 "\n", prefix, reg);
+        fprintf(fh, "%s  RegisterEntryID: %" PRIu32 "\n", prefix, reg);
         register_entry_print(fh, prefix, e);
         reg += 1;
     }
@@ -51,7 +51,8 @@ register_area_print(FILE *fh, const char *prefix, const RegisterArea *a)
 {
     fprintf(fh, "%s    Area Start: 0x%08" PRIx32 "\n", prefix, a->base);
     fprintf(fh, "%s    Area Size : 0x%08" PRIx32 "\n", prefix, a->size);
-    fprintf(fh, "%s    Area Flags: 0x%08" PRIx32 "\n", prefix, a->flags);
+    fprintf(fh, "%s    Area Flags: 0x%08" PRIx32 "\n", prefix,
+            (uint32_t)a->flags);
     fprintf(fh, "%s    Area has %s read method.\n", prefix,
             a->read == NULL ? "no" : "a");
     fprintf(fh, "%s    Area has %s write method.\n", prefix,
@@ -65,7 +66,8 @@ register_entry_print(FILE *fh, const char *prefix, const RegisterEntry *e)
             e->name != NULL ? e->name : "<UNNAMED-REGISTER>");
     fprintf(fh, "%s    Register Type   : %s\n", prefix,
             register_registertype_to_string(e->type));
-    fprintf(fh, "%s    Register Flags  : 0x%08" PRIx32 "\n", prefix, e->flags);
+    fprintf(fh, "%s    Register Flags  : 0x%08" PRIx32 "\n", prefix,
+            (uint32_t)e->flags);
     fprintf(fh, "%s    Register Address: 0x%08" PRIx32 "\n", prefix, e->address);
 }
 
