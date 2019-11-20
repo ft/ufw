@@ -756,7 +756,9 @@ register_init(RegisterTable *t)
      * memory to zero upon boot then...
      */
     for (AreaHandle i = 0ul; i < t->areas; ++i) {
-        memset(t->area[i].mem, 0, t->area[i].size * sizeof(RegisterAtom));
+        if (t->area[i].mem != NULL) {
+            memset(t->area[i].mem, 0, t->area[i].size * sizeof(RegisterAtom));
+        }
     }
 
     BIT_SET(t->flags, REG_TF_INITIALISED);
