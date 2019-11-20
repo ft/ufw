@@ -206,6 +206,18 @@ typedef struct RegisterTable {
 
 /* Public API prototypes */
 
+#define MAKE_CUSTOM_AREA(READ,WRITE,ADDR,SIZE,FLAGS)  \
+    { .read = READ,                                   \
+      .write = WRITE,                                 \
+      .flags = FLAGS,                                 \
+      .base = ADDR,                                   \
+      .size = SIZE,                                   \
+      .mem = NULL }
+
+#define CUSTOM_AREA(R,W,A,S) MAKE_CUSTOM_AREA(R,W,A,S,REG_AF_RW)
+#define CUSTOM_AREA_RO(R,A,S) MAKE_CUSTOM_AREA(R,NULL,A,S,REG_AF_READABLE)
+#define CUSTOM_AREA_WO(W,A,S) MAKE_CUSTOM_AREA(NULL,W,S,REG_AF_WRITEABLE)
+
 #define MAKE_MEMORY_AREA(ADDR,SIZE,FLAGS)   \
     { .read = reg_mem_read,                 \
       .write = reg_mem_write,               \
