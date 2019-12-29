@@ -51,6 +51,7 @@ configure_file("${PROJECT_SOURCE_DIR}/include/common/toolchain.h.in"
                "${PROJECT_BINARY_DIR}/include/common/toolchain.h" )
 
 set(__ufw_sources src/c/logger.c
+                  src/c/persistent-storage.c
                   src/c/ring-buffer-iter.c
                   src/c/register-table.c
                   src/c/register-utilities.c)

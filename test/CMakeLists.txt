@@ -17,6 +17,7 @@ endif()
 
 list(APPEND test_names
   t-binary-format
+  t-persistent-storage
   t-register-table
   t-ring-buffer)
 
