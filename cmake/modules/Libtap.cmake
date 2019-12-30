@@ -4,7 +4,7 @@ endif()
 set(__UFW_Libtap 1)
 
 macro(add_libtap libtap_root)
-  if (PROJECT_TARGET_CPU AND (${PROJECT_TARGET_CPU} STREQUAL "native"))
+  if ("${PROJECT_TARGET_CPU}" STREQUAL "native")
     include(InitialiseToolchain)
     initialise_toolchain()
 

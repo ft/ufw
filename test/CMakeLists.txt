@@ -11,6 +11,7 @@ include(CheckIncludeFile)
 set(test_names)
 
 if (NOT TARGET tap)
+  message(STATUS "Libtap wasn't found, giving up on test-suite!")
   return()
 endif()
 
