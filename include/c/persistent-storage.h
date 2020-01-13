@@ -21,6 +21,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 typedef uint16_t (*PersistentChksum16)(const unsigned char*, size_t, uint16_t);
 typedef uint32_t (*PersistentChksum32)(const unsigned char*, size_t, uint32_t);
 typedef size_t (*PersistentBlockRead)(void*, uint32_t, size_t);
@@ -97,5 +101,9 @@ PersistentAccess persistent_fetch_part(void*, PersistentStorage*,
                                        size_t, size_t);
 PersistentAccess persistent_store_part(PersistentStorage*, const void*,
                                        size_t, size_t);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* INC_PERSISTENT_STORE_H */
