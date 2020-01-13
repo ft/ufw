@@ -43,6 +43,14 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+#ifndef CXX_ALLOW_TYPE_PUNNING
+#warning "binary-format uses type punning, which is undefined behaviour in C++!"
+#warning "Your toolchain may allow it as an extension, but be advised!"
+#warning "To disable this warning, define the CXX_ALLOW_TYPE_PUNNING macro."
+#endif /* CXX_ALLOW_TYPE_PUNNING */
+#endif /* __cplusplus */
+
 /* Use toolchain information to decide whether or not __builtin_bswapXX() are
  * available. If not, use the usual mask-shift-or routine. */
 #include <common/toolchain.h>
