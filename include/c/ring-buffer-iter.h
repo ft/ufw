@@ -12,6 +12,10 @@
 
 #include "c/ring-buffer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /**
  * @addtogroup ufw
  * @{
@@ -87,5 +91,9 @@ size_t rb_iter_advance(rb_iter *);
  * @}
  * @}
  */
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* INC_RING_BUFFER_ITER_H */

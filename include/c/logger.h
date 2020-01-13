@@ -12,6 +12,10 @@
 #ifndef INC_LOGGER_H
 #define INC_LOGGER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /**
  * @addtogroup ufw
  * @{
@@ -75,5 +79,9 @@ void log_printf(LogLevel level, const char *frmt_msg, ...);
  * @}
  * @}
  */
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* INC_LOGGER_H */

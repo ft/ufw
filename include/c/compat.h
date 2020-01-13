@@ -16,6 +16,10 @@
 #include <stddef.h>
 #include <limits.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #ifndef SIZE_MAX
 #warning "No value for SIZE_MAX found!"
 #endif
@@ -48,5 +52,9 @@ size_t strlcpy(char *, const char *, size_t);
 #ifndef UFW_COMPAT_HAVE_STRNLEN
 size_t strnlen(const char *, size_t);
 #endif /* !UFW_COMPAT_HAVE_STRNLEN */
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* INC_UFW_COMPAT_H */
