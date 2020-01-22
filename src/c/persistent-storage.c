@@ -11,24 +11,24 @@ checksum_size(const PersistentStorage *store)
 {
     switch (store->checksum.type) {
     case PERSISTENT_CHECKSUM_16BIT:
-        return 2u;
+        return 16u / BITS_PER_BYTE;
     case PERSISTENT_CHECKSUM_32BIT: /* FALLTHROUGH */
     default:
-        return 4u;
+        return 32u / BITS_PER_BYTE;
     }
 }
 
 static inline void
 set_data_address(PersistentStorage *store)
 {
-    store->data.address = store->checksum.address + checksum_size(store);
+    store->data.address = store->checksum.address + store->checksum.size;
 }
 
 static uint16_t
 trivialsum(const unsigned char *data, size_t n, uint16_t init)
 {
     for (size_t i = 0u; i < n; ++i) {
-        init += data[i] & 0xffu;
+        init += data[i];
     }
 
     return init;
@@ -39,6 +39,7 @@ persistent_sum16(PersistentStorage *store, PersistentChksum16 f, uint16_t init)
 {
     store->checksum.initial.sum16 = init;
     store->checksum.type = PERSISTENT_CHECKSUM_16BIT;
+    store->checksum.size = checksum_size(store);
     store->checksum.process.c16 = f;
     set_data_address(store);
 }
@@ -48,6 +49,7 @@ persistent_sum32(PersistentStorage *store, PersistentChksum32 f, uint32_t init)
 {
     store->checksum.initial.sum32 = init;
     store->checksum.type = PERSISTENT_CHECKSUM_32BIT;
+    store->checksum.size = checksum_size(store);
     store->checksum.process.c32 = f;
     set_data_address(store);
 }
@@ -161,20 +163,16 @@ persistent_calculate_checksum(PersistentStorage *store)
 static PersistentAccess
 persistent_store_checksum(PersistentStorage *store, PersistentChecksum sum)
 {
-    unsigned char data[4u];
-    const size_t size = checksum_size(store);
+    const size_t size = store->checksum.size;
+    const uint32_t address = store->checksum.address;
 
-    const uint32_t value =
-        (store->checksum.type == PERSISTENT_CHECKSUM_32BIT)
-        ? sum.sum32 : sum.sum16;
-
-    for (size_t i = 0u; i < size; ++i) {
-        const unsigned int shift = 8u * i;
-        const uint32_t mask = 0xffull << shift;
-        data[i] = ((value & mask) >> shift) & 0xffu;
+    size_t n;
+    if (store->checksum.type == PERSISTENT_CHECKSUM_32BIT) {
+        n = store->block.write(address, &sum.sum32, size);
+    } else {
+        n = store->block.write(address, &sum.sum16, size);
     }
 
-    const size_t n = store->block.write(store->checksum.address, data, size);
     if (n != size) {
         return PERSISTENT_ACCESS_IO_ERROR;
     }
@@ -183,48 +181,25 @@ persistent_store_checksum(PersistentStorage *store, PersistentChecksum sum)
 }
 
 static struct maybe_sum
-persistent_current_sum16(PersistentStorage *store)
+persistent_fetch_checksum(PersistentStorage *store)
 {
-    unsigned char data[2u];
+    const size_t size = store->checksum.size;
+    const uint32_t address = store->checksum.address;
     struct maybe_sum rv;
-    rv.access = PERSISTENT_ACCESS_IO_ERROR;
-    const size_t n = store->block.read(data, store->checksum.address, 2u);
-    if (n != 2u) {
-        return rv;
-    }
     rv.access = PERSISTENT_ACCESS_SUCCESS;
-    rv.value.sum16 = (((data[1] & 0xffu) << 8u) | (data[0] & 0xffu));
-    return rv;
-}
 
-static struct maybe_sum
-persistent_current_sum32(PersistentStorage *store)
-{
-    unsigned char data[4u];
-    struct maybe_sum rv;
-    rv.access = PERSISTENT_ACCESS_IO_ERROR;
-    const size_t n = store->block.read(data, store->checksum.address, 4u);
-    if (n != 4u) {
-        return rv;
+    size_t n;
+    if (store->checksum.type == PERSISTENT_CHECKSUM_32BIT) {
+        n = store->block.read(&rv.value.sum32, address, size);
+    } else {
+        n = store->block.read(&rv.value.sum16, address, size);
     }
-    rv.access = PERSISTENT_ACCESS_SUCCESS;
-    rv.value.sum16 = ( ((data[3] & 0xffu) << 24u)
-                     | ((data[2] & 0xffu) << 16u)
-                     | ((data[1] & 0xffu) << 8u)
-                     |  (data[0] & 0xffu));
-    return rv;
-}
 
-static struct maybe_sum
-persistent_current_checksum(PersistentStorage *store)
-{
-    switch (store->checksum.type) {
-    case PERSISTENT_CHECKSUM_16BIT:
-        return persistent_current_sum16(store);
-    case PERSISTENT_CHECKSUM_32BIT: /* FALLTHROUGH */
-    default:
-        return persistent_current_sum32(store);
+    if (n != size) {
+        rv.access = PERSISTENT_ACCESS_IO_ERROR;
     }
+
+    return rv;
 }
 
 static bool
@@ -243,7 +218,7 @@ persistent_match(const PersistentStorage *store,
 PersistentAccess
 persistent_validate(PersistentStorage *store)
 {
-    const struct maybe_sum stored = persistent_current_checksum(store);
+    const struct maybe_sum stored = persistent_fetch_checksum(store);
     if (stored.access != PERSISTENT_ACCESS_SUCCESS) {
         return stored.access;
     }
@@ -292,7 +267,7 @@ persistent_store_part(PersistentStorage *store, const void *src,
     if ((offset == 0) && (n == store->data.size)) {
         sum = persistent_checksum(store, src);
     } else {
-        struct maybe_sum tmp = persistent_current_checksum(store);
+        struct maybe_sum tmp = persistent_fetch_checksum(store);
         if (tmp.access != PERSISTENT_ACCESS_SUCCESS) {
             return tmp.access;
         }
