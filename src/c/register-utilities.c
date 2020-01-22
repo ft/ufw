@@ -144,7 +144,8 @@ register_accesscode_to_string(RegisterAccessCode code)
         IDX2STR(REG_ACCESS_NOENTRY),
         IDX2STR(REG_ACCESS_RANGE),
         IDX2STR(REG_ACCESS_INVALID),
-        IDX2STR(REG_ACCESS_READONLY)
+        IDX2STR(REG_ACCESS_READONLY),
+        IDX2STR(REG_ACCESS_IO_ERROR)
     };
 
     return map[code];

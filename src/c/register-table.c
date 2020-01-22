@@ -670,6 +670,18 @@ reg_atom_from_hexstr(const char *s, const size_t n)
     return rv;
 }
 
+static bool
+need_to_load_default(const RegisterEntry *e)
+{
+    if (e->area->write == NULL)
+        return false;
+
+    if (BIT_ISSET(e->area->flags, REG_AF_SKIP_DEFAULTS))
+        return false;
+
+    return true;
+}
+
 /* Public API */
 
 RegisterInit
@@ -763,8 +775,6 @@ register_init(RegisterTable *t)
 
     BIT_SET(t->flags, REG_TF_INITIALISED);
     for (RegisterHandle i = 0ul; i < t->entries; ++i) {
-        RegisterAccess access;
-        RegisterValue def;
         RegisterEntry *e = &t->entry[i];
         /* Link into register table memory */
         bool success = reg_entry_is_in_memory(t, e);
@@ -776,16 +786,20 @@ register_init(RegisterTable *t)
         }
         e->area = &t->area[ra_find_area_by_addr(t, e->address)];
 
-        /* Load default value into register table */
-        def.value = e->default_value;
-        def.type = e->type;
-        access = register_set(t, i, def);
+        if (need_to_load_default(e)) {
+            RegisterAccess access;
+            RegisterValue def;
+            /* Load default value into register table */
+            def.value = e->default_value;
+            def.type = e->type;
+            access = register_set(t, i, def);
 
-        if (access.code != REG_ACCESS_SUCCESS) {
-            rv.code = REG_INIT_ENTRY_INVALID_DEFAULT;
-            rv.pos.entry = i;
-            BIT_CLEAR(t->flags, REG_TF_INITIALISED);
-            return rv;
+            if (access.code != REG_ACCESS_SUCCESS) {
+                rv.code = REG_INIT_ENTRY_INVALID_DEFAULT;
+                rv.pos.entry = i;
+                BIT_CLEAR(t->flags, REG_TF_INITIALISED);
+                return rv;
+            }
         }
     }
 

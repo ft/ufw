@@ -166,7 +166,8 @@ struct RegisterEntry {
 
 typedef enum RegisterAreaFlags {
     REG_AF_READABLE = (1u << 0u),
-    REG_AF_WRITEABLE = (1u << 1u)
+    REG_AF_WRITEABLE = (1u << 1u),
+    REG_AF_SKIP_DEFAULTS = (1u << 2u)
 } RegisterAreaFlags;
 
 #define REG_AF_RW (REG_AF_READABLE | REG_AF_WRITEABLE)
