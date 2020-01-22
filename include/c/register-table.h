@@ -45,7 +45,8 @@ typedef enum RegisterAccessCode {
     REG_ACCESS_NOENTRY,
     REG_ACCESS_RANGE,
     REG_ACCESS_INVALID,
-    REG_ACCESS_READONLY
+    REG_ACCESS_READONLY,
+    REG_ACCESS_IO_ERROR,
 } RegisterAccessCode;
 
 typedef struct RegisterAccess {
