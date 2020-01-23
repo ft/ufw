@@ -1,4 +1,3 @@
-#include <common/bit-operations.h>
 #include <c/persistent-storage.h>
 
 struct maybe_sum {
