@@ -386,7 +386,7 @@ persistent_store_part(PersistentStorage *store, const void *src,
     if ((offset == 0) && (n == store->data.size)) {
         sum = persistent_checksum(store, src);
     } else {
-        struct maybe_sum tmp = persistent_fetch_checksum(store);
+        struct maybe_sum tmp = persistent_calculate_checksum(store);
         if (tmp.access != PERSISTENT_ACCESS_SUCCESS) {
             return tmp.access;
         }
