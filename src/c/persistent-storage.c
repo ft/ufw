@@ -8,6 +8,7 @@
  * @file persistent-storage.c
  * @brief Persistent storage implementation
  */
+
 #include <c/persistent-storage.h>
 
 struct maybe_sum {
