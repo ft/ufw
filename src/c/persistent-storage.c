@@ -11,10 +11,10 @@ checksum_size(const PersistentStorage *store)
 {
     switch (store->checksum.type) {
     case PERSISTENT_CHECKSUM_16BIT:
-        return 16u / BITS_PER_BYTE;
+        return sizeof(uint16_t);
     case PERSISTENT_CHECKSUM_32BIT: /* FALLTHROUGH */
     default:
-        return 32u / BITS_PER_BYTE;
+        return sizeof(uint32_t);
     }
 }
 
