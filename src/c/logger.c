@@ -112,7 +112,7 @@ log_print_msg_type(LogLevel level) {
  * @param level The new log level
  *
  * The logging levels are defined in #LogLevel enumeration datatype.
- * The log message will be printed depending on the bit mask #logLevel.
+ * The log message will be printed depending on the bit mask #LogLevel.
  */
 void
 log_set_level(LogLevel level) {
