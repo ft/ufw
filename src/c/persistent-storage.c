@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2020 ufw workers, All rights reserved.
+ *
+ * Terms for redistribution and use can be found in LICENCE.
+ */
+
+/**
+ * @file persistent-storage.c
+ * @brief Persistent storage implementation
+ */
 #include <c/persistent-storage.h>
 
 struct maybe_sum {
