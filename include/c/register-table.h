@@ -341,10 +341,10 @@ RegisterAccess register_block_read(RegisterTable*, RegisterAddress,
 RegisterAccess register_block_write(RegisterTable*, RegisterAddress,
                                     RegisterOffset, RegisterAtom*);
 
-void register_block_read_unsafe(RegisterTable*, RegisterAddress,
-                                RegisterOffset, RegisterAtom*);
-void register_block_write_unsafe(RegisterTable*, RegisterAddress,
-                                 RegisterOffset, RegisterAtom*);
+RegisterAccess register_block_read_unsafe(RegisterTable*, RegisterAddress,
+                                          RegisterOffset, RegisterAtom*);
+RegisterAccess register_block_write_unsafe(RegisterTable*, RegisterAddress,
+                                           RegisterOffset, RegisterAtom*);
 
 RegisterAccess register_block_touches_hole(RegisterTable*,
                                            RegisterAddress,

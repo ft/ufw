@@ -68,7 +68,7 @@ static inline int ra_range_touches(RegisterArea*,
 /* Entry utilities */
 static void reg_taint_in_range(RegisterTable*, RegisterAddress, RegisterOffset);
 static bool reg_entry_is_in_memory(RegisterTable*, RegisterEntry*);
-static inline void reg_read_entry(RegisterEntry*, RegisterAtom*);
+static inline RegisterAccess reg_read_entry(RegisterEntry*, RegisterAtom*);
 static inline int reg_range_touches(RegisterEntry*,
                                     RegisterAddress,
                                     RegisterOffset);
@@ -465,10 +465,10 @@ reg_entry_is_in_memory(RegisterTable *t, RegisterEntry *e)
     return false;
 }
 
-static inline void
+static inline RegisterAccess
 reg_read_entry(RegisterEntry *e, RegisterAtom *buf)
 {
-    (void)e->area->read(e->area, buf, e->offset, rds_serdes[e->type].size);
+    return e->area->read(e->area, buf, e->offset, rds_serdes[e->type].size);
 }
 
 static inline int
@@ -602,7 +602,10 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr,
         }
 
         /* Fetch the entire memory of where the old entry is stored */
-        reg_read_entry(e, raw);
+        rv = reg_read_entry(e, raw);
+        if (rv.code != REG_ACCESS_SUCCESS) {
+            return rv;
+        }
         memcpy(raw + rs, buf + bs, rlen * sizeof(RegisterAtom));
 
         /* Try the deserialiser, fail if it fails */
@@ -870,8 +873,7 @@ register_set(RegisterTable *t, RegisterHandle idx, const RegisterValue v)
         return rv;
     }
 
-    a->write(a, raw, e->offset, rds_serdes[e->type].size);
-    return rv;
+    return a->write(a, raw, e->offset, rds_serdes[e->type].size);
 }
 
 RegisterAccess
@@ -897,7 +899,10 @@ register_get(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
 
     e = &t->entry[idx];
     a = e->area;
-    a->read(a, raw, e->offset, rds_serdes[e->type].size);
+    rv = a->read(a, raw, e->offset, rds_serdes[e->type].size);
+    if (rv.code != REG_ACCESS_SUCCESS) {
+        return rv;
+    }
     success = rds_serdes[e->type].des(raw, v);
 
     if (success == false) {
@@ -935,10 +940,11 @@ register_default(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
 /* These _unsafe() functions are marked unsafe for a reason. You should make
  * sure before using it, that the block access they are asked to do is NOT
  * going to try to touch any memory holes! */
-void
+RegisterAccess
 register_block_read_unsafe(RegisterTable *t, RegisterAddress addr,
                            RegisterOffset n, RegisterAtom *buf)
 {
+    RegisterAccess rv;
     RegisterOffset rest = n;
     while (rest > 0ull) {
         AreaHandle an = ra_find_area_by_addr(t, addr);
@@ -951,7 +957,10 @@ register_block_read_unsafe(RegisterTable *t, RegisterAddress addr,
         readn = reg_min(a->base + a->size - addr, rest);
 
         if (register_area_is_readable(a)) {
-            a->read(a, buf, offset, readn);
+            rv = a->read(a, buf, offset, readn);
+            if (rv.code != REG_ACCESS_SUCCESS) {
+                return rv;
+            }
         } else {
             /* Memory that can't be read reads back zeroes */
             memset(buf + offset, 0, sizeof(RegisterAtom) * readn);
@@ -961,12 +970,15 @@ register_block_read_unsafe(RegisterTable *t, RegisterAddress addr,
         addr += readn;
         rest -= readn;
     }
+    rv = (RegisterAccess)REG_ACCESS_RESULT_INIT;
+    return rv;
 }
 
-void
+RegisterAccess
 register_block_write_unsafe(RegisterTable *t, RegisterAddress addr,
                             RegisterOffset n, RegisterAtom *buf)
 {
+    RegisterAccess rv;
     RegisterOffset rest = n;
     while (rest > 0ull) {
         AreaHandle an = ra_find_area_by_addr(t, addr);
@@ -977,11 +989,16 @@ register_block_write_unsafe(RegisterTable *t, RegisterAddress addr,
         a = &t->area[an];
         offset = addr - a->base;
         writen = reg_min(a->base + a->size - addr, rest);
-        a->write(a, buf, offset, writen);
+        rv = a->write(a, buf, offset, writen);
+        if (rv.code != REG_ACCESS_SUCCESS) {
+            return rv;
+        }
         buf += writen;
         addr += writen;
         rest -= writen;
     }
+    rv = (RegisterAccess)REG_ACCESS_RESULT_INIT;
+    return rv;
 }
 
 RegisterAccess
@@ -1003,8 +1020,7 @@ register_block_read(RegisterTable *t, RegisterAddress addr,
     if (rv.code != REG_ACCESS_SUCCESS)
         return rv;
 
-    register_block_read_unsafe(t, addr, n, buf);
-    return rv;
+    return register_block_read_unsafe(t, addr, n, buf);
 }
 
 RegisterAccess
@@ -1042,7 +1058,10 @@ register_block_write(RegisterTable *t, RegisterAddress addr,
      * chunk of memory into the referenced register table. Since we checked for
      * all errors before hand, it is safe to use this function. */
 
-    register_block_write_unsafe(t, addr, n, buf);
+    rv = register_block_write_unsafe(t, addr, n, buf);
+    if (rv.code != REG_ACCESS_SUCCESS) {
+        return rv;
+    }
     reg_taint_in_range(t, addr, n);
     return rv;
 }
