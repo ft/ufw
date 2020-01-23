@@ -34,6 +34,17 @@ trivialsum(const unsigned char *data, size_t n, uint16_t init)
     return init;
 }
 
+
+/**
+ * Set up PersistentStorage to use a given 16-bit checksum algorithm
+ *
+ * @param  store   Pointer to the instance to initialise
+ * @param  f       Callback function that implements checksum algorithm
+ * @param  init    Initial value to feed into the checksum algorithm
+ *
+ * @return void
+ * @sideeffects store is mutated as advertised
+ */
 void
 persistent_sum16(PersistentStorage *store, PersistentChksum16 f, uint16_t init)
 {
@@ -44,6 +55,16 @@ persistent_sum16(PersistentStorage *store, PersistentChksum16 f, uint16_t init)
     set_data_address(store);
 }
 
+/**
+ * Set up PersistentStorage to use a given 32-bit checksum algorithm
+ *
+ * @param  store   Pointer to the instance to initialise
+ * @param  f       Callback function that implements checksum algorithm
+ * @param  init    Initial value to feed into the checksum algorithm
+ *
+ * @return void
+ * @sideeffects store is mutated as advertised
+ */
 void
 persistent_sum32(PersistentStorage *store, PersistentChksum32 f, uint32_t init)
 {
@@ -54,6 +75,21 @@ persistent_sum32(PersistentStorage *store, PersistentChksum32 f, uint32_t init)
     set_data_address(store);
 }
 
+/**
+ * Initialise PersistentStorage instance
+ *
+ * The default checksum is a trivial mod-16 addition across all words stored in
+ * managed data portion. You may want to assign a more sophisticated algorithm
+ * using ‘persistent_sum16’ or ‘persistent_sum32’.
+ *
+ * @param  store   Pointer to the instance to initialise
+ * @param  size    Size of data portion to manage
+ * @param  rd      Callback function for block reads to medium
+ * @param  wr      Callback function for block writes to medium
+ *
+ * @return void
+ * @sideeffects store is mutated as advertised
+ */
 void
 persistent_init(PersistentStorage *store,
                 const size_t size,
@@ -96,6 +132,19 @@ persistent_checksum(const PersistentStorage *store, const void *src)
     return rv;
 }
 
+/**
+ * Move PersistentStorage inside of target medium
+ *
+ * By default an instance is placed at address zero in the medium accessed by
+ * the read and write callbacks. This function allows the user the define the
+ * address to place this particular instance.
+ *
+ * @param  store    Pointer to the instance to initialise
+ * @param  address  Address to place instance in on target medium
+ *
+ * @return void
+ * @sideeffects store is mutated as advertised
+ */
 void
 persistent_place(PersistentStorage *store, uint32_t address)
 {
@@ -103,6 +152,23 @@ persistent_place(PersistentStorage *store, uint32_t address)
     set_data_address(store);
 }
 
+/**
+ * Supply PersistentStorage with auxiliary buffer
+ *
+ * By default, when reading data from the target medium in bulk in order to
+ * calculate the checksum of the instance's data part, the system reads data
+ * word by word.
+ *
+ * Often times it is beneficial for performance to read data in larger chunks.
+ * This function allows the user to assign a chunk of memory to the system for
+ * it to be used in such situations.
+ *
+ * @param  store    Pointer to the instance to initialise
+ * @param  address  Address to place instance in on target medium
+ *
+ * @return void
+ * @sideeffects store is mutated as advertised
+ */
 void
 persistent_buffer(PersistentStorage *store, unsigned char *buffer, size_t n)
 {
@@ -215,6 +281,17 @@ persistent_match(const PersistentStorage *store,
     }
 }
 
+/**
+ * Validate the a PersistentStorage instance
+ *
+ * Read the checksum stored, recalculate over the managed data portion and
+ * compare.
+ *
+ * @return PERSISTENT_ACCESS_SUCCESS in case validation succeeded;
+ *         PERSISTENT_ACCESS_INVALID_DATA in case it didn't; and
+ *         PERSISTENT_ACCESS_IO_ERROR in case IO failed.
+ * @sideeffects None, except the IO to the medium. No mutation of data.
+ */
 PersistentAccess
 persistent_validate(PersistentStorage *store)
 {
@@ -230,6 +307,17 @@ persistent_validate(PersistentStorage *store)
     return valid ? PERSISTENT_ACCESS_SUCCESS : PERSISTENT_ACCESS_INVALID_DATA;
 }
 
+/**
+ * Fetch part of the data portion of PersistentStorage instance
+ *
+ * @param  dst     Pointer to destination buffer to read into
+ * @param  store   Pointer to PersistentStorage instance to use
+ * @param  offset  Offset to start reading at inside of data portion
+ * @param  n       Amount of words to read from data portion
+ *
+ * @return Error condition via PersistentAccess data type.
+ * @sideeffects Fills dst as described.
+ */
 PersistentAccess
 persistent_fetch_part(void *dst, PersistentStorage *store,
                       size_t offset, size_t n)
@@ -243,12 +331,32 @@ persistent_fetch_part(void *dst, PersistentStorage *store,
     return (read == n) ? PERSISTENT_ACCESS_SUCCESS : PERSISTENT_ACCESS_IO_ERROR;
 }
 
+/**
+ * Fetch all of the data portion of PersistentStorage instance
+ *
+ * @param  dst     Pointer to destination buffer to read into
+ * @param  store   Pointer to PersistentStorage instance to use
+ *
+ * @return Error condition via PersistentAccess data type.
+ * @sideeffects Fills dst as described.
+ */
 PersistentAccess
 persistent_fetch(void *dst, PersistentStorage *store)
 {
     return persistent_fetch_part(dst, store, 0, store->data.size);
 }
 
+/**
+ * Store part of the data portion into PersistentStorage instance
+ *
+ * @param  store   Pointer to PersistentStorage instance to use
+ * @param  src     Pointer to source buffer to read from
+ * @param  offset  Offset to start storing to inside of data portion
+ * @param  n       Amount of words to put into data portion
+ *
+ * @return Error condition via PersistentAccess data type.
+ * @sideeffects Fills data portion of PersistentStorage instance as described.
+ */
 PersistentAccess
 persistent_store_part(PersistentStorage *store, const void *src,
                       size_t offset, size_t n)
@@ -277,6 +385,15 @@ persistent_store_part(PersistentStorage *store, const void *src,
     return persistent_store_checksum(store, sum);
 }
 
+/**
+ * Store all of the data portion into PersistentStorage instance
+ *
+ * @param  store   Pointer to PersistentStorage instance to use
+ * @param  src     Pointer to source buffer to read from
+ *
+ * @return Error condition via PersistentAccess data type.
+ * @sideeffects Fills data portion of PersistentStorage instance as described.
+ */
 PersistentAccess
 persistent_store(PersistentStorage *store, const void *src)
 {
