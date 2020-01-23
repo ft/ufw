@@ -163,8 +163,9 @@ persistent_place(PersistentStorage *store, uint32_t address)
  * This function allows the user to assign a chunk of memory to the system for
  * it to be used in such situations.
  *
- * @param  store    Pointer to the instance to initialise
- * @param  address  Address to place instance in on target medium
+ * @param  store    Pointer to the instance to configure
+ * @param  buffer   Pointer to the buffer to assign to the instance
+ * @param  n        Size of buffer
  *
  * @return void
  * @sideeffects store is mutated as advertised
