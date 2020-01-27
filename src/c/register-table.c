@@ -1151,3 +1151,46 @@ register_set_from_hexstr(RegisterTable *t, const RegisterAddress start,
 
     return rv;
 }
+
+/**
+ * Transfer Data from one area into another
+ *
+ * This function requires one of the areas (either source or destination) to be
+ * system memory backened. REG_ACCESS_INVALID is returned if neither area
+ * satisfies this requirement.
+ *
+ * The function transfers either the size of the source area or the size of the
+ * destination area, depending on which of the two contains the least amount of
+ * data.
+ *
+ * @param  dst    Handle to destination area
+ * @param  src    Handle to source area
+ *
+ * @return Error condition arising from copy process.
+ * @sideeffects Source area data is transferred into destination area.
+ */
+RegisterAccess
+register_mcopy(RegisterTable *t, AreaHandle dst, AreaHandle src)
+{
+    RegisterAccess rv = REG_ACCESS_RESULT_INIT;
+    if ((t->area[dst].mem == NULL) && (t->area[src].mem == NULL)) {
+        rv.code = REG_ACCESS_INVALID;
+        return rv;
+    }
+
+    RegisterArea *da = &(t->area[dst]);
+    RegisterArea *sa = &(t->area[src]);
+    const size_t n = (da->size < sa->size) ? da->size : sa->size;
+
+    if ((t->area[dst].mem != NULL) && (t->area[src].mem != NULL)) {
+        /* Both areas are memory backed; just use memcpy */
+        memcpy(da->mem, sa->mem, n * sizeof(RegisterAtom));
+        return rv;
+    } else if (t->area[dst].mem == NULL) {
+        /* Destination buffer has to be accessed via its block-write API */
+        return da->write(da, sa->mem, 0u, n);
+    } else {
+        /* Source buffer has to be accessed via its block-read API */
+        return sa->read(sa, da->mem, 0u, n);
+    }
+}

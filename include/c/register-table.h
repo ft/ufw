@@ -353,6 +353,8 @@ RegisterAccess register_set_from_hexstr(RegisterTable*,
                                         RegisterAddress,
                                         const char*, size_t);
 
+RegisterAccess register_mcopy(RegisterTable*, AreaHandle, AreaHandle);
+
 static inline RegisterArea*
 register_area(RegisterTable *t, RegisterHandle reg)
 {
