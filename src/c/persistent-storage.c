@@ -219,12 +219,12 @@ persistent_calculate_checksum(PersistentStorage *store)
 
         switch (store->checksum.type) {
         case PERSISTENT_CHECKSUM_16BIT:
-            rv.value.sum16 = store->checksum.process.c16(data, bsize,
+            rv.value.sum16 = store->checksum.process.c16(data, toget,
                                                          rv.value.sum16);
             break;
         case PERSISTENT_CHECKSUM_32BIT: /* FALLTHROUGH */
         default:
-            rv.value.sum32 = store->checksum.process.c32(data, bsize,
+            rv.value.sum32 = store->checksum.process.c32(data, toget,
                                                          rv.value.sum32);
             break;
         }
