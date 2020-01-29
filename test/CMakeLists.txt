@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.8.2)
 
 if (((NOT PROJECT_TARGET_CPU) OR (NOT ${PROJECT_TARGET_CPU} STREQUAL "native"))
     AND CMAKE_CROSSCOMPILING)
