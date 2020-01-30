@@ -140,6 +140,7 @@ register_accesscode_to_string(RegisterAccessCode code)
 
     static char *map[] = {
         IDX2STR(REG_ACCESS_SUCCESS),
+        IDX2STR(REG_ACCESS_FAILURE),
         IDX2STR(REG_ACCESS_UNINITIALISED),
         IDX2STR(REG_ACCESS_NOENTRY),
         IDX2STR(REG_ACCESS_RANGE),
