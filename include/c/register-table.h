@@ -233,38 +233,42 @@ typedef struct RegisterTable {
 #define MEMORY_AREA_RO(A,S) MAKE_MEMORY_AREA(A,S,REG_AF_READABLE)
 #define MEMORY_AREA_WO(A,S) MAKE_MEMORY_AREA(A,S,REG_AF_WRITEABLE)
 
+#ifdef REGISTER_TABLE_WITH_NAMES
+#define REGCOMMON(IDX,ADDR,TYPE,MEMBER,DEFAULT) \
+    .type = TYPE,                               \
+    .default_value.MEMBER = DEFAULT,            \
+    .address = ADDR,                            \
+    .name = #IDX
+#else
+#define REGCOMMON(IDX,ADDR,TYPE,MEMBER,DEFAULT) \
+    .type = TYPE,                               \
+    .default_value.MEMBER = DEFAULT,            \
+    .address = ADDR,                            \
+    .name = NULL
+#endif
+
 #define MAKE_REGISTER(IDX,ADDR,TYPE,MEMBER,DEFAULT)         \
-    [IDX] = { .type = TYPE,                                 \
-              .default_value.MEMBER = DEFAULT,              \
-              .address = ADDR, .name = #IDX,                \
+    [IDX] = { REGCOMMON(IDX,ADDR,TYPE,MEMBER,DEFAULT),      \
               .check.type = REGV_TYPE_TRIVIAL }
 
 #define MAKE_MIN_REGISTER(IDX,ADDR,TYPE,MEMBER,DEFAULT,MIN) \
-    [IDX] = { .type = TYPE,                                 \
-              .default_value.MEMBER = DEFAULT,              \
-              .address = ADDR, .name = #IDX,                \
+    [IDX] = { REGCOMMON(IDX,ADDR,TYPE,MEMBER,DEFAULT),      \
               .check.type = REGV_TYPE_MIN,                  \
               .check.arg.min.MEMBER = MIN }
 
 #define MAKE_MAX_REGISTER(IDX,ADDR,TYPE,MEMBER,DEFAULT,MAX) \
-    [IDX] = { .type = TYPE,                                 \
-              .default_value.MEMBER = DEFAULT,              \
-              .address = ADDR, .name = #IDX,                \
+    [IDX] = { REGCOMMON(IDX,ADDR,TYPE,MEMBER,DEFAULT),      \
               .check.type = REGV_TYPE_MAX,                  \
               .check.arg.max.MEMBER = MAX }
 
 #define MAKE_RANGE_REGISTER(IDX,ADDR,TYPE,MEMBER,DEFAULT,MIN,MAX)       \
-    [IDX] = { .type = TYPE,                                             \
-              .default_value.MEMBER = DEFAULT,                          \
-              .address = ADDR, .name = #IDX,                            \
+    [IDX] = { REGCOMMON(IDX,ADDR,TYPE,MEMBER,DEFAULT),                  \
               .check.type = REGV_TYPE_RANGE,                            \
               .check.arg.range.min.MEMBER = MIN,                        \
               .check.arg.range.max.MEMBER = MAX }
 
 #define MAKE_VALIDATOR_REGISTER(IDX,ADDR,TYPE,MEMBER,DEFAULT,FNC)       \
-    [IDX] = { .type = TYPE,                                             \
-              .default_value.MEMBER = DEFAULT,                          \
-              .address = ADDR, .name = #IDX,                            \
+    [IDX] = { REGCOMMON(IDX,ADDR,TYPE,MEMBER,DEFAULT),                  \
               .check.type = REGV_TYPE_CALLBACK,                         \
               .check.arg.cb = FNC }
 
