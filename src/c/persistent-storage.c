@@ -9,6 +9,8 @@
  * @brief Persistent storage implementation
  */
 
+#include <string.h>
+
 #include <c/persistent-storage.h>
 
 struct maybe_sum {
@@ -409,4 +411,65 @@ PersistentAccess
 persistent_store(PersistentStorage *store, const void *src)
 {
     return persistent_store_part(store, src, 0, store->data.size);
+}
+
+static PersistentAccess
+persistent_writen(PersistentStorage *store,
+                  uint32_t address, unsigned char item, size_t k)
+{
+    PersistentAccess rv;
+    unsigned char buf;
+    unsigned char *data;
+    size_t bsize;
+
+    rv = PERSISTENT_ACCESS_IO_ERROR;
+
+    if (store->buffer.data != NULL) {
+        data = store->buffer.data;
+        bsize = store->buffer.size;
+    } else {
+        data = &buf;
+        bsize = 1u;
+    }
+
+    memset(data, item, bsize);
+    size_t rest = k;
+
+    while (rest > 0u) {
+        const size_t toput = (rest > bsize) ? bsize : rest;
+        const size_t n = store->block.write(address, data, toput);
+
+        if (n != toput) {
+            return rv;
+        }
+
+        rest -= toput;
+        address += toput;
+    }
+
+    rv = PERSISTENT_ACCESS_SUCCESS;
+    return rv;
+}
+
+/**
+ * Set all memory of a persistency instance to a given value
+ *
+ * This procedure overrides all memory referenced by a persistency instance.
+ * This includes the memory where the instance's checksum is stored!
+ *
+ * @param  store   Pointer to PersistentStorage instance to use
+ * @param  item    Value to set all memory referenced by store to
+ *
+ * @return Error condition via PersistentAccess data type.
+ * @sideeffects Sets all memory of p to item.
+ */
+PersistentAccess
+persistent_reset(PersistentStorage *store, unsigned char item)
+{
+    const PersistentAccess rv =
+        persistent_writen(store, store->checksum.address,
+                          item, store->checksum.size);
+    if (rv != PERSISTENT_ACCESS_SUCCESS)
+        return rv;
+    return persistent_writen(store, store->data.address, item, store->data.size);
 }

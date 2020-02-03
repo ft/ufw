@@ -160,6 +160,7 @@ PersistentAccess persistent_fetch_part(void*, PersistentStorage*,
                                        size_t, size_t);
 PersistentAccess persistent_store_part(PersistentStorage*, const void*,
                                        size_t, size_t);
+PersistentAccess persistent_reset(PersistentStorage*, unsigned char);
 
 #ifdef __cplusplus
 }
