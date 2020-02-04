@@ -461,7 +461,7 @@ persistent_writen(PersistentStorage *store,
  * @param  item    Value to set all memory referenced by store to
  *
  * @return Error condition via PersistentAccess data type.
- * @sideeffects Sets all memory of p to item.
+ * @sideeffects Sets all memory of store to item.
  */
 PersistentAccess
 persistent_reset(PersistentStorage *store, unsigned char item)
