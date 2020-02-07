@@ -1,0 +1,15 @@
+-logic_opt on               # Logic optimisation
+-ir off                     # off: allows RLOC processing
+-pr off                     # Pack registers in I/O
+-ol high                    # Overall effort level
+-xe n                       # Extra effort level (n < c)
+-r 8                        # Use all 8 register in the slice
+-global_opt speed           # Global optimisation for speed
+-equivalent_register_removal on
+-detail                     # More detailed map report
+-t 1
+-xt 0
+-lc off
+-power off
+-mt 2                       # Multi-Threading
+

@@ -1,0 +1,4 @@
+-v 3                    # Verbosity of the report [1 to 32000]
+-s 3                    # Overwrite speed grade
+-n 3                    # Report paths per endpoint
+-fastpaths              # Report the fastest paths

@@ -1,0 +1,6 @@
+setMode -bscan
+setCable -port aut -server localhost:3121
+identify -inferir
+assignFile -p 1 -file "@file@"
+program -p 1
+quit

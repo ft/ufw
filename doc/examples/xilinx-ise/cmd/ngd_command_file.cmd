@@ -1,0 +1,3 @@
+-dd _ngo
+-sd ipcore_dir
+-nt timestamp                           # Netlist translation type
