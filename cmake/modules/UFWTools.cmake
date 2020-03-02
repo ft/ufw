@@ -29,7 +29,6 @@ define_property(
   FULL_DOCS "Name of Embedded Board defined by target.")
 
 function(ufw_set_property target prop value)
-  message(STATUS "Setting property ${prop} to ${value} on target ${target}")
   set_target_properties(${target} PROPERTIES UFW_${prop} ${value})
 endfunction()
 
