@@ -28,6 +28,11 @@ define_property(
   BRIEF_DOCS "Name of Embedded Board defined by target."
   FULL_DOCS "Name of Embedded Board defined by target.")
 
+define_property(
+  TARGET PROPERTY UFW_BOARD_DEFAULT_LINKERSCRIPT
+  BRIEF_DOCS "Default linker script to use with a board."
+  FULL_DOCS "Default linker script to use with a board.")
+
 function(ufw_set_property target prop value)
   set_target_properties(${target} PROPERTIES UFW_${prop} ${value})
 endfunction()
