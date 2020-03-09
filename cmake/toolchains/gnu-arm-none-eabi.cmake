@@ -15,8 +15,7 @@ set(ARM_SIZE ${ARM_TOOLCHAIN_DIR}/arm-none-eabi-size)
 set(CMAKE_C_FLAGS_INIT
     "-fdata-sections -ffunction-sections -frecord-gcc-switches -pipe")
 
-# Need to setup the linker so it doesn't fail with the simplest of test programs.
-set(CMAKE_EXE_LINKER_FLAGS_INIT "-nostartfiles")
+set(CMAKE_EXE_LINKER_FLAGS "--specs=nosys.specs" CACHE INTERNAL "")
 
 set(OBJCOPY ${ARM_OBJCOPY})
 set(OBJDUMP ${ARM_OBJDUMP})
