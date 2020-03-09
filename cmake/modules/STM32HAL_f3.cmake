@@ -4,6 +4,7 @@ endif()
 set(__UFW_STM32HAL_f3 1)
 
 set(__UFW_STM32HAL_f3_HIGH_SOURCES
+  stm32f3xx_hal.c
   stm32f3xx_hal_adc.c
   stm32f3xx_hal_adc_ex.c
   stm32f3xx_hal_can.c
