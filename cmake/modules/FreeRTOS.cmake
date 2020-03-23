@@ -5,13 +5,12 @@ set(__UFW_FreeRTOS 1)
 
 function(use_freertos)
   cmake_parse_arguments(PA "" "TARGET;PORTABLE;HEAP" "" ${ARGN})
-  if (NOT PA_PORTABLE)
-    message(FATAL_ERROR "use_freertos: Supply PORTABLE argument!")
-  endif()
   if (NOT PA_TARGET)
     message(FATAL_ERROR "use_freertos: Supply TARGET argument!")
   endif()
-  set(portable_root ${__UFW_ROOT_FREERTOS_KERNEL}/portable/${PA_PORTABLE})
+  if (PA_PORTABLE)
+    set(portable_root ${__UFW_ROOT_FREERTOS_KERNEL}/portable/${PA_PORTABLE})
+  endif()
   set(kernel_files
     ${__UFW_ROOT_FREERTOS_KERNEL}/croutine.c
     ${__UFW_ROOT_FREERTOS_KERNEL}/event_groups.c
@@ -20,11 +19,13 @@ function(use_freertos)
     ${__UFW_ROOT_FREERTOS_KERNEL}/stream_buffer.c
     ${__UFW_ROOT_FREERTOS_KERNEL}/tasks.c
     ${__UFW_ROOT_FREERTOS_KERNEL}/timers.c)
-  file(GLOB portable_files
-    LIST_DIRECTORIES false
-    "${portable_root}/*.c"
-    "${portable_root}/*.asm"
-    "${portable_root}/*.s")
+  if (portable_root)
+    file(GLOB portable_files
+      LIST_DIRECTORIES false
+      "${portable_root}/*.c"
+      "${portable_root}/*.asm"
+      "${portable_root}/*.s")
+  endif()
   target_sources(${PA_TARGET} PUBLIC ${kernel_files} ${portable_files})
   if (PA_HEAP)
     target_sources(${PA_TARGET} PUBLIC
