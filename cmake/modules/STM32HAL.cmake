@@ -25,6 +25,7 @@ macro(__ufw_use_stm32_hal kind name suffix)
   set(library stm32-hal-${suffix}-${_cpu})
   ufw_prefix(sources
     ${__UFW_ROOT_STM32_HAL}/Src/ ${__UFW_STM32HAL_${_cpu}_${kind}_SOURCES})
+  ufw_filter_nonexistent("${sources}" sources "${library}")
   add_library(${library} STATIC ${sources})
   target_include_directories(${library} PUBLIC ${__UFW_ROOT_STM32_HAL}/Inc)
   target_link_libraries(${library} PUBLIC board-config st-cmsis-${_cpu})
