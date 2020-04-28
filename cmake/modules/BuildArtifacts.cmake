@@ -4,7 +4,7 @@ endif()
 set(__UFW_BuildArtifacts 1)
 
 function(build_artifacts source)
-  cmake_parse_arguments(PA "" "" "VARIANTS;WITHOUT_SECTIONS" ${ARGN})
+  cmake_parse_arguments(PA "" "SDK_DIR" "VARIANTS;WITHOUT_SECTIONS" ${ARGN})
   get_filename_component(basename ${source} NAME_WE)
   set(artifacts)
   if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
@@ -41,6 +41,32 @@ function(build_artifacts source)
                                 --romwidth=32
                                 -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
                                 $<TARGET_FILE:${source}>)
+
+      elseif (${TOOLCHAIN_ID} STREQUAL "ti-arm" AND ${variant} STREQUAL "oad")
+
+        set(dest ${basename}.ti-oad.bin)
+        if (NOT PA_SDK_DIR)
+          message(FATAL_ERROR "build_artifacts, variant=oad: SDK_DIR not specifed.")
+        endif()
+
+        set(oad_image_tool "${PA_SDK_DIR}/tools/common/oad/oad_image_tool")
+        if (NOT EXISTS "${oad_image_tool}")
+          message(FATAL_ERROR "build_artifacts, variant=oad: ${oad_image_tool} does not exist")
+        endif()
+
+        set(oad_private_key "${PA_SDK_DIR}/tools/common/oad/private.pem")
+        if (NOT EXISTS "${oad_private_key}")
+          message(FATAL_ERROR "build_artifacts, variant=oad: ${oad_private_key} does not exist")
+        endif()
+
+        add_custom_command(
+          OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
+          DEPENDS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${basename}.hex
+          COMMENT "Building OAD-compatible binary file: ${dest}"
+          COMMAND ${oad_image_tool} ccs ${CMAKE_CURRENT_SOURCE_DIR} 7
+                                    -hex1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${basename}.hex
+                                    -k ${oad_private_key}
+                                    -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${basename}.ti-oad)
 
       elseif (${variant} STREQUAL "hex")
         add_custom_command(
