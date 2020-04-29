@@ -63,10 +63,11 @@ function(build_artifacts source)
           OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
           DEPENDS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${basename}.hex
           COMMENT "Building OAD-compatible binary file: ${dest}"
-          COMMAND ${oad_image_tool} ccs ${CMAKE_CURRENT_SOURCE_DIR} 7
-                                    -hex1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${basename}.hex
-                                    -k ${oad_private_key}
-                                    -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${basename}.ti-oad)
+          COMMAND ${oad_image_tool} --verbose
+                                    --HexPath1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${basename}.hex
+                                    --keyFile ${oad_private_key}
+                                    -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${basename}.ti-oad
+                                    ccs ${CMAKE_CURRENT_SOURCE_DIR} 7)
 
       elseif (${variant} STREQUAL "hex")
         add_custom_command(
