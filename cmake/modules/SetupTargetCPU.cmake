@@ -94,6 +94,9 @@ function(set_target_cpu_native target _cpu)
 endfunction()
 
 function(set_target_cpu target)
+  if (ZEPHYR_TOOLCHAIN_VARIANT)
+    return()
+  endif()
   if (NOT PROJECT_TARGET_CPU)
     # This needs to be set in the build-tree's board file.
     message(FATAL_ERROR "-- PROJECT_TARGET_CPU is not set! Giving up.")
