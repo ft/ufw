@@ -13,25 +13,12 @@ if (NOT WITH_INITIALISE_TOOLCHAIN)
 endif()
 
 if (WITH_INITIALISE_TOOLCHAIN)
-  if (NOT COMPILER_API)
-    message(STATUS "COMPILER_API unset; assuming GNU")
-    set(COMPILER_API gnu)
-  endif()
-  if (NOT TOOLCHAIN_ID)
-    message(STATUS "TOOLCHAIN_ID unset; assuming gcc-native")
-    set(TOOLCHAIN_ID gcc-native)
-  endif()
   initialise_toolchain()
 else()
   message(FATAL_ERROR "InitialiseToolchain missing! Giving up!")
 endif()
 
 include(SetupTargetCPU)
-if (NOT PROJECT_TARGET_CPU)
-  message(STATUS "PROJECT_TARGET_CPU unset; assuming default")
-  set(PROJECT_TARGET_CPU native)
-endif()
-
 include(CheckIncludeFile)
 check_include_file("sys/types.h" WITH_SYS_TYPES_H)
 
@@ -69,19 +56,10 @@ if (NOT UFW_COMPAT_HAVE_STRNLEN)
 endif()
 
 add_library(ufw STATIC ${__ufw_sources})
-
 set_property(TARGET ufw PROPERTY C_STANDARD 99)
-
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "debug" AND "${COMPILER_API}" STREQUAL "gnu")
-  if ("${TOOLCHAIN_ID}" STREQUAL "gcc-native")
-    target_compile_options(ufw PUBLIC
-      -fsanitize=address,undefined -fno-omit-frame-pointer)
-  elseif ("${TOOLCHAIN_ID}" STREQUAL "clang-native")
-    target_compile_options(ufw PUBLIC
-      -fsanitize=address,undefined,integer -fno-omit-frame-pointer)
-  endif()
+if (${CMAKE_BUILD_TYPE} STREQUAL Debug)
+  ufw_toolchain(ufw FEATURES sanitize-address sanitize-undefined-behaviour)
 endif()
-
 add_library(ufw++ INTERFACE)
 target_include_directories(ufw++
   INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
