@@ -22,6 +22,7 @@ function(build_in_target_dir)
     -DCMAKE_BUILD_TYPE=${PA_BUILDCFG}
     -DCMAKE_TOOLCHAIN_FILE=${MICROFRAMEWORK_ROOT}/cmake/toolchains/${PA_TOOLCHAIN}.cmake
     -DTARGET_BOARD=${PA_BOARD}
+    -DUFW_RECURSIVE_RUN=1
     -DCMAKE_EXPORT_COMPILE_COMMANDS=on
     INSTALL_DIR ${__install_prefix__}
     BUILD_ALWAYS 1

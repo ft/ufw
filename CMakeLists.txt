@@ -74,6 +74,9 @@ if (NOT ("${TOOLCHAIN_ID}" MATCHES "^ti-"))
   target_link_libraries(ufw PUBLIC m)
 endif()
 
+if (UFW_RECURSIVE_RUN)
+  install(TARGETS ufw)
+endif()
 MakeStrictCompilerC(ufw)
 set_target_cpu(ufw)
 
