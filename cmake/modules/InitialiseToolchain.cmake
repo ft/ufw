@@ -7,6 +7,7 @@ include(GNUAttributes)
 include(GNUBuiltins)
 include(GNUCompilerWarnings)
 include(TICompilerWarnings)
+include(ToolchainFeatures)
 
 function(ufw_toolchain_id_adjust compiler outvar)
   if (${compiler} STREQUAL gnu)
@@ -114,6 +115,7 @@ macro(initialise_toolchain)
       message(WARNING "${_tag}: Unknown COMPILER_API: ${COMPILER_API}")
     endif()
 
+    ufw_check_toolchain_features(${with_c_lang} ${with_cxx_lang})
     set(__UFW_ToolchainInitialised 1)
   endif()
 

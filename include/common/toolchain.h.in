@@ -262,6 +262,20 @@
 
 #endif /* __cplusplus */
 
+/* Toolchain Extensions */
+
+/** Reflect toolchain support for address sanitizer */
+#cmakedefine01 UFW_TOOLCHAIN_FEATURE_SANITIZE_ADDRESS
+#if (UFW_TOOLCHAIN_FEATURE_SANITIZE_ADDRESS > 0)
+#define HAVE_TOOLCHAIN_FEATURE_SANITIZE_ADDRESS
+#endif /* UFW_TOOLCHAIN_FEATURE_SANITIZE_ADDRESS */
+
+/** Reflect toolchain support for undefined behaviour sanitizer */
+#cmakedefine01 UFW_TOOLCHAIN_FEATURE_SANITIZE_UNDEFINED_BEHAVIOUR
+#if (UFW_TOOLCHAIN_FEATURE_SANITIZE_UNDEFINED_BEHAVIOUR > 0)
+#define HAVE_TOOLCHAIN_FEATURE_SANITIZE_UNDEFINED_BEHAVIOUR
+#endif /* UFW_TOOLCHAIN_FEATURE_SANITIZE_UNDEFINED_BEHAVIOUR */
+
 /* Toolchain Compatibility */
 
 /** Reflect the availability of sys/types.h */
