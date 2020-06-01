@@ -99,3 +99,14 @@ function(ufw_toolchain target)
     __ufw_target_enable_feature(${target} ${feature})
   endforeach()
 endfunction()
+
+function(ufw_force_compat outvar)
+  # With zephr's minimal libc, cmake's test for existing symbols will probably
+  # fail, because the test will likely use newlib (at least on ARM) which im-
+  # plements these, which leads to false positives.
+  if (CONFIG_MINIMAL_LIBC AND "${CONFIG_MINIMAL_LIBC}" STREQUAL y)
+    set(${outvar} 1 PARENT_SCOPE)
+  else()
+    set(${outvar} 0 PARENT_SCOPE)
+  endif()
+endfunction()

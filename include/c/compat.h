@@ -1,8 +1,6 @@
 #ifndef INC_UFW_COMPAT_H
 #define INC_UFW_COMPAT_H
 
-#include <string.h>
-
 #include <common/toolchain.h>
 
 #ifdef WITH_SYS_TYPES_H
