@@ -4,7 +4,7 @@ endif()
 set(__UFW_BuildArtifacts 1)
 
 function(build_artifacts source)
-  cmake_parse_arguments(PA "" "" "VARIANTS" ${ARGN})
+  cmake_parse_arguments(PA "" "" "VARIANTS;WITHOUT_SECTIONS" ${ARGN})
   get_filename_component(basename ${source} NAME_WE)
   set(artifacts)
   if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
@@ -15,11 +15,17 @@ function(build_artifacts source)
       set(dest "${basename}.${variant}")
 
       if (${variant} STREQUAL "bin")
+        set(__remove)
+        if (PA_WITHOUT_SECTIONS)
+          foreach (section ${PA_WITHOUT_SECTIONS})
+            list(APPEND __remove "-R" "${section}")
+          endforeach()
+        endif()
         add_custom_command(
           OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
           DEPENDS $<TARGET_FILE:${source}>
           COMMENT "Building binary file: ${dest}"
-          COMMAND ${OBJCOPY} -I elf32-little -O binary
+          COMMAND ${OBJCOPY} ${__remove} -I elf32-little -O binary
                              $<TARGET_FILE:${source}>
                              ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest})
 
