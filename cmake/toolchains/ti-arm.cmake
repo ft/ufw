@@ -31,7 +31,7 @@ find_program(TI_OBJDUMP NAMES armhex PATHS ${CGT_TOOLCHAIN_ROOT}/bin NO_DEFAULT_
 find_program(TI_LD NAMES armcl PATHS ${CGT_TOOLCHAIN_ROOT}/bin NO_DEFAULT_PATH)
 find_program(TI_DIS NAMES armdis PATHS ${CGT_TOOLCHAIN_ROOT}/bin NO_DEFAULT_PATH)
 
-include_directories(${CGT_TOOLCHAIN_ROOT}/include)
+include_directories(SYSTEM ${CGT_TOOLCHAIN_ROOT}/include)
 link_directories(${CGT_TOOLCHAIN_ROOT}/lib)
 
 # Seems like CMake's compiler integration for TI's compilers lacks support for
