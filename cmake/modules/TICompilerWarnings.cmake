@@ -33,14 +33,18 @@ list(APPEND __UFW_TI_DEFAULT_FLAGS
   --advice:performance=all)
 
 function(TIMakeStrictCCompiler target)
-  list(APPEND _flags ${__UFW_TI_DEFAULT_FLAGS} ${__UFW_TI_MISRA_STRING})
+  cmake_parse_arguments(PARSED_ARGS "" "LEVEL" "" ${ARGN})
+  list(APPEND _flags ${__UFW_TI_DEFAULT_FLAGS})
+  if (PARSED_ARGS_LEVEL STREQUAL "misra")
+    list(APPEND _flags ${__UFW_TI_MISRA_STRING})
+  endif()
   if (_flags)
     target_compile_options(${target} PRIVATE ${_flags})
   endif()
 endfunction()
 
 function(TIMakeStrictCXXCompiler target)
-  TIMakeStrictCCompiler(${target})
+  TIMakeStrictCCompiler(${target} ${ARGN})
 endfunction()
 
 function(TIMakeFatallyStrictCCompiler target)
