@@ -18,8 +18,14 @@
 #cmakedefine01 UFW_CC_HAS_Wasm
 /** Reflect C compiler's support for `-Wimplicit_fallthrough` */
 #cmakedefine01 UFW_CC_HAS_Wimplicit_fallthrough
+/** Reflect C compiler's support for `-Werror=implicit-function-declaration` */
+#cmakedefine01 UFW_CC_HAS_Wimplicit_function_declaration_error
 /** Reflect C compiler's support for `-Wimplicit-function-declaration` */
 #cmakedefine01 UFW_CC_HAS_Wimplicit_function_declaration
+/** Reflect C compiler's support for `-Werror=implicit-int` */
+#cmakedefine01 UFW_CC_HAS_Wimplicit_int_error
+/** Reflect C compiler's support for `-Wimplicit-int` */
+#cmakedefine01 UFW_CC_HAS_Wimplicit_int
 /** Reflect C compiler's support for `-Wmissing-prototypes` */
 #cmakedefine01 UFW_CC_HAS_Wmissing_prototypes
 /** Reflect C compiler's support for `-Wnewline-eof` */
