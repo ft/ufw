@@ -50,13 +50,17 @@ function(define_board name)
     target_link_libraries(${interface} INTERFACE ${PA_LIBRARIES})
   endif()
 
-  add_library(${objects} OBJECT EXCLUDE_FROM_ALL ${PA_SOURCES})
-  target_include_directories(${objects} PUBLIC
-    $<TARGET_PROPERTY:${interface},INTERFACE_INCLUDE_DIRECTORIES>)
-  target_include_directories(${objects} SYSTEM PUBLIC
-    $<TARGET_PROPERTY:${interface},INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>)
-  target_compile_definitions(${objects} PUBLIC
-    $<TARGET_PROPERTY:${interface},INTERFACE_COMPILE_DEFINITIONS>)
+  if (PA_SOURCES)
+    add_library(${objects} OBJECT EXCLUDE_FROM_ALL ${PA_SOURCES})
+    target_include_directories(${objects} PUBLIC
+      $<TARGET_PROPERTY:${interface},INTERFACE_INCLUDE_DIRECTORIES>)
+    target_include_directories(${objects} SYSTEM PUBLIC
+      $<TARGET_PROPERTY:${interface},INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>)
+    target_compile_definitions(${objects} PUBLIC
+      $<TARGET_PROPERTY:${interface},INTERFACE_COMPILE_DEFINITIONS>)
+  else()
+    add_custom_target(${objects})
+  endif()
 
   ufw_set_property(${objects} BOARD_NAME ${name})
   if (PA_ARCHITECTURE)
