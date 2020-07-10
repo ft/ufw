@@ -286,13 +286,14 @@
 
 /** Reflect the availability of uint8_t */
 #cmakedefine01 WITH_UINT8_T
-#if (WITH_UINT8_T == 0)
-#undef WITH_UINT8_T
-#endif /* WITH_UINT8_T */
 
 #if (WITH_UINT8_T > 0)
 /** The size of uint8_t */
 #cmakedefine UINT8_T_SIZE @UINT8_T_SIZE@
+#endif /* WITH_UINT8_T */
+
+#if (WITH_UINT8_T == 0)
+#undef WITH_UINT8_T
 #endif /* WITH_UINT8_T */
 
 /** Reflect the availability of strlcat() */
