@@ -6,6 +6,7 @@
 #       following parameters, if it can:
 #
 #         __GIT_BRANCH__
+#         __GIT_COMMITDATE__
 #         __GIT_DESCRIPTION__
 #         __GIT_DIRTY__
 #         __GIT_HASH__
@@ -51,6 +52,10 @@ _git_version_ () {
 
 _git_increment_ () {
     REPLY="$(git rev-list --count "$1"..HEAD)"
+}
+
+_git_commitdate_ () {
+    REPLY="$(date -d @"$(git show -s --format=%ct --date=local $1)" '+%Y-%m-%d')"
 }
 
 _git_hash_ () {
@@ -122,6 +127,9 @@ git_populate () {
     if _git_in_worktree_; then
         _git_branch_
         __GIT_BRANCH__="$REPLY"
+
+        _git_commitdate_
+        __GIT_COMMITDATE__="$REPLY"
 
         _git_description_
         __GIT_DESCRIPTION__="$REPLY"

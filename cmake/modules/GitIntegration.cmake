@@ -62,6 +62,33 @@ macro(generate_revision_file)
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 endmacro()
 
+macro(generate_commitdate_file)
+  cmake_parse_arguments(
+    PARSED_ARGS
+    ""
+    "TARGET;OUTPUT"
+    ""
+    ${ARGN})
+  if (NOT MICROFRAMEWORK_ROOT)
+    message(FATAL_ERROR "MICROFRAMEWORK_ROOT is not set! Cannot continue.")
+  endif()
+  if (NOT PARSED_ARGS_TARGET)
+    message(FATAL_ERROR "TARGET is not set!")
+  endif()
+  if (NOT PARSED_ARGS_OUTPUT)
+    message(FATAL_ERROR "OUTPUT is not set!")
+  endif()
+
+  add_custom_target(${PARSED_ARGS_TARGET})
+  add_custom_command(
+    TARGET "${PARSED_ARGS_TARGET}"
+    COMMAND
+    "${MICROFRAMEWORK_ROOT}/bin/print-commitdate"
+    "${MICROFRAMEWORK_ROOT}"
+    "${PARSED_ARGS_OUTPUT}"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+endmacro()
+
 macro(gitint_install)
   cmake_parse_arguments(
     PARSED_ARGS
