@@ -4,7 +4,7 @@ endif()
 set(__UFW_SetupUFW 1)
 
 function(ufw_add_board name)
-  cmake_parse_arguments(PA "" "BUILDSYSTEM" "TOOLCHAINS;BUILDTYPES" ${ARGN})
+  cmake_parse_arguments(PA "" "BUILDSYSTEM" "TOOLCHAINS;BUILDTYPES;OPTIONS" ${ARGN})
   set(boards ${UFW_TOPLEVEL_BOARDS})
   list(FIND boards ${name} already_defined)
   if (${already_defined} GREATER_EQUAL 0)
@@ -20,6 +20,7 @@ function(ufw_add_board name)
   endif()
   set(UFW_TOPLEVEL_BOARD_BUILDTYPES_${name} ${PA_BUILDTYPES} PARENT_SCOPE)
   set(UFW_TOPLEVEL_BOARD_TOOLCHAINS_${name} ${PA_TOOLCHAINS} PARENT_SCOPE)
+  set(UFW_TOPLEVEL_BOARD_OPTIONS_${name} ${PA_OPTIONS} PARENT_SCOPE)
   if (PA_BUILDSYSTEM)
     set(UFW_TOPLEVEL_BOARD_BUILDSYSTEM_${name} ${PA_BUILDSYSTEM} PARENT_SCOPE)
   endif()
@@ -32,6 +33,7 @@ macro(ufw_recursive_dispatch)
         foreach (cfg ${UFW_TOPLEVEL_BOARD_BUILDTYPES_${board}})
           build_in_target_dir(
             BOARD ${board}
+            OPTIONS "${UFW_TOPLEVEL_BOARD_OPTIONS_${board}}"
             TOOLCHAIN ${chain}
             BUILDCFG ${cfg})
         endforeach()

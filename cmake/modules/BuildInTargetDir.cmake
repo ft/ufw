@@ -11,13 +11,16 @@ function(build_in_target_dir)
   endif()
 
   set(__single_args BOARD TOOLCHAIN BUILDCFG)
-  cmake_parse_arguments(PA "" "${__single_args}" "" ${ARGN})
+  cmake_parse_arguments(PA "" "${__single_args}" "OPTIONS" ${ARGN})
   set(__install_prefix__
     "${UFW_ARTIFACTS_DIRECTORY}/${PA_BOARD}/${PA_TOOLCHAIN}/${PA_BUILDCFG}")
+  set(__cmake_args__ ${PA_OPTIONS})
+  list(TRANSFORM __cmake_args__ PREPEND "-D")
   ExternalProject_Add("build-${PA_BOARD}_${PA_TOOLCHAIN}_${PA_BUILDCFG}"
     PREFIX "build-${PA_BOARD}/${PA_TOOLCHAIN}/${PA_BUILDCFG}"
     SOURCE_DIR "${PROJECT_SOURCE_DIR}"
     CMAKE_ARGS
+    ${__cmake_args__}
     -DCMAKE_INSTALL_PREFIX=${__install_prefix__}
     -DCMAKE_BUILD_TYPE=${PA_BUILDCFG}
     -DCMAKE_TOOLCHAIN_FILE=${MICROFRAMEWORK_ROOT}/cmake/toolchains/${PA_TOOLCHAIN}.cmake
