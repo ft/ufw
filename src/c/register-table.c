@@ -1198,48 +1198,48 @@ register_mcopy(RegisterTable *t, AreaHandle dst, AreaHandle src)
 bool
 register_value_compare(const RegisterValue *a, const RegisterValue *b)
 {
-	if (a->type != b->type)
-		return false;
+    if (a->type != b->type)
+        return false;
 
-	switch (a->type) {
-	case REG_TYPE_UINT16:
-		return (a->value.u16 == b->value.u16);
-	case REG_TYPE_UINT32:
-		return (a->value.u32 == b->value.u32);
-	case REG_TYPE_UINT64:
-		return (a->value.u64 == b->value.u64);
-	case REG_TYPE_SINT16:
-		return (a->value.s16 == b->value.s16);
-	case REG_TYPE_SINT32:
-		return (a->value.s32 == b->value.s32);
-	case REG_TYPE_SINT64:
-		return (a->value.s64 == b->value.s64);
-	case REG_TYPE_FLOAT32:
-		return (a->value.f32 == b->value.f32);
-	default:
-		return false;
-	}
+    switch (a->type) {
+    case REG_TYPE_UINT16:
+        return (a->value.u16 == b->value.u16);
+    case REG_TYPE_UINT32:
+        return (a->value.u32 == b->value.u32);
+    case REG_TYPE_UINT64:
+        return (a->value.u64 == b->value.u64);
+    case REG_TYPE_SINT16:
+        return (a->value.s16 == b->value.s16);
+    case REG_TYPE_SINT32:
+        return (a->value.s32 == b->value.s32);
+    case REG_TYPE_SINT64:
+        return (a->value.s64 == b->value.s64);
+    case REG_TYPE_FLOAT32:
+        return (a->value.f32 == b->value.f32);
+    default:
+        return false;
+    }
 }
 
 RegisterAccess
 register_compare(RegisterTable *t, RegisterHandle a, RegisterHandle b)
 {
-	RegisterAccess rv;
-	RegisterValue av, bv;
+    RegisterAccess rv;
+    RegisterValue av, bv;
 
-	rv = register_get(t, a, &av);
-	if (rv.code != REG_ACCESS_SUCCESS) {
-		return rv;
-	}
-	rv = register_get(t, b, &bv);
-	if (rv.code != REG_ACCESS_SUCCESS) {
-		return rv;
-	}
+    rv = register_get(t, a, &av);
+    if (rv.code != REG_ACCESS_SUCCESS) {
+        return rv;
+    }
+    rv = register_get(t, b, &bv);
+    if (rv.code != REG_ACCESS_SUCCESS) {
+        return rv;
+    }
 
-	if (register_value_compare(&av, &bv)) {
-		rv.code = REG_ACCESS_SUCCESS;
-	} else {
-		rv.code = REG_ACCESS_FAILURE;
-	}
-	return rv;
+    if (register_value_compare(&av, &bv)) {
+        rv.code = REG_ACCESS_SUCCESS;
+    } else {
+        rv.code = REG_ACCESS_FAILURE;
+    }
+    return rv;
 }
