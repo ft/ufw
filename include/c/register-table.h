@@ -357,6 +357,7 @@ RegisterAccess register_block_touches_hole(RegisterTable*,
 RegisterAccess register_set_from_hexstr(RegisterTable*,
                                         RegisterAddress,
                                         const char*, size_t);
+RegisterAccess register_sanitise(RegisterTable*);
 
 RegisterAccess register_mcopy(RegisterTable*, AreaHandle, AreaHandle);
 bool register_value_compare(const RegisterValue*, const RegisterValue*);

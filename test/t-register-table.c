@@ -792,10 +792,47 @@ t_hexstring(void)
     cmp_ok(regs.area->mem[3], "==", 0x0000u, "hexstr: Fourth word is correct");
 }
 
+static void
+t_sanitise(void)
+{
+    RegisterTable regs = {
+        .area = (RegisterArea[]) {
+            MEMORY_AREA(0x0000ul, 0x40ul),
+            REGISTER_AREA_END
+        },
+        .entry = (RegisterEntry[]) {
+            REG_U16RANGE(0, 0x0000ul,  10u, 100u,  20u),
+            REG_U16MIN(  1, 0x0001ul,  20u,        30u),
+            REG_U16MAX(  2, 0x0002ul,       200u,  40u),
+            REG_U16RANGE(3, 0x0003ul, 100u, 200u, 150u),
+            REGISTER_ENTRY_END
+        }
+    };
+
+    RegisterInit success = register_init(&regs);
+    cmp_ok(success.code, "==", REG_INIT_SUCCESS, "sanitise: regs initialises");
+
+    /* Write stuff into memory outside the control of the system: */
+    regs.area->mem[0] =   0u;
+    regs.area->mem[1] =  10u;
+    regs.area->mem[2] = 201u;
+    regs.area->mem[3] = 200u;
+
+    RegisterAccess acc = register_sanitise(&regs);
+    cmp_ok(acc.code, "==", REG_ACCESS_SUCCESS, "sanitise: process succeeded");
+
+    cmp_ok(regs.area->mem[0], "==", 20u, "sanitise: reg[0] reset to default");
+    cmp_ok(regs.area->mem[1], "==", 30u, "sanitise: reg[1] reset to default");
+    cmp_ok(regs.area->mem[2], "==", 40u, "sanitise: reg[2] reset to default");
+    cmp_ok(regs.area->mem[3], "==", 200u,
+           "sanitise: reg[3] was set to a value within constaints"
+           " and therefore stays like this");
+}
+
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(3+1+1+4+16+47+(7*18)+15+26+6);
+    plan(3+1+1+4+16+47+(7*18)+15+26+6+6);
     t_invalid_tables();    /*  3 */
     t_trivial_success();   /*  1 */
     t_trivial_fail();      /*  1 */
@@ -812,5 +849,6 @@ main(UNUSED int argc, UNUSED char *argv[])
     t_f32_abnormal();      /* 15 */
     t_block_access();      /* 26 */
     t_hexstring();         /*  6 */
+    t_sanitise();          /*  6 */
     return EXIT_SUCCESS;
 }

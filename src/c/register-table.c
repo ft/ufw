@@ -72,6 +72,8 @@ static inline RegisterAccess reg_read_entry(RegisterEntry*, RegisterAtom*);
 static inline int reg_range_touches(RegisterEntry*,
                                     RegisterAddress,
                                     RegisterOffset);
+static RegisterAccess reg_entry_sane(RegisterTable*, RegisterHandle);
+static RegisterAccess reg_entry_load_default(RegisterTable*, RegisterHandle);
 
 /* Block write utilities */
 static RegisterAccess ra_writeable(RegisterTable*,
@@ -354,6 +356,38 @@ reg_range_touches(RegisterEntry *e, RegisterAddress addr, RegisterOffset n)
         return 1;
 
     return 0;
+}
+
+static RegisterAccess
+reg_entry_sane(RegisterTable *t, RegisterHandle reg)
+{
+    RegisterAccess rv;
+    RegisterValue current;
+
+    /* _get() runs the deserialiser; if it fails, this fails. */
+    rv = register_get(t, reg, &current);
+    if (rv.code != REG_ACCESS_SUCCESS) {
+        return rv;
+    }
+
+    /* Make sure the current value is fits into table constraints */
+    if (rv_validate(t->entry + reg, current)) {
+        rv.code = REG_ACCESS_SUCCESS;
+        rv.address = 0u;
+    } else {
+        rv.code = REG_ACCESS_RANGE;
+        rv.address = reg;
+    }
+    return rv;
+}
+
+static RegisterAccess
+reg_entry_load_default(RegisterTable *t, RegisterHandle reg)
+{
+    RegisterEntry *e = t->entry + reg;
+    const RegisterValue def = { .value = e->default_value,
+                                .type = e->type };
+    return register_set(t, reg, def);
 }
 
 static void
@@ -1241,5 +1275,39 @@ register_compare(RegisterTable *t, RegisterHandle a, RegisterHandle b)
     } else {
         rv.code = REG_ACCESS_FAILURE;
     }
+    return rv;
+}
+
+RegisterAccess
+register_sanitise(RegisterTable *t)
+{
+    RegisterAccess rv = { .code = REG_ACCESS_SUCCESS, .address = 0u };
+
+    if (BIT_ISSET(t->flags, REG_TF_INITIALISED) == false) {
+        rv.code = REG_ACCESS_UNINITIALISED;
+        return rv;
+    }
+
+    for (RegisterOffset i = 0ul; i < t->entries; ++i) {
+        RegisterAccess access;
+        access = reg_entry_sane(t, i);
+        switch (access.code) {
+        case REG_ACCESS_SUCCESS:
+            break;
+        case REG_ACCESS_INVALID: /* FALLTHROUGH */
+        case REG_ACCESS_RANGE:
+            access = reg_entry_load_default(t, i);
+            if (access.code != REG_ACCESS_SUCCESS) {
+                return access;
+            }
+            break;
+        default:
+            /* Everything shouldn't ever happen */
+            return access;
+        }
+
+        register_untouch(t, i);
+    }
+
     return rv;
 }
