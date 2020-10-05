@@ -1,67 +1,17 @@
+/**
+ * @file compat.h
+ * @brief Top level compatibility header
+ *
+ * This header includes all compatbility layers at once. It is mainly added for
+ * backward compatibility. Consider using the compatibility portion you
+ * actually need.
+ */
+
 #ifndef INC_UFW_COMPAT_H
 #define INC_UFW_COMPAT_H
 
 #include <common/toolchain.h>
-
-/*
- * Provide ssize_t for toolchains/targets that do not support it by
- * implementing <sys/types.h>.
- */
-
-#ifdef WITH_SYS_TYPES_H
-#include <sys/types.h>
-
-#else
-
-#ifndef _SSIZE_T_DECLARED
-
-#include <stdint.h>
-#include <stddef.h>
-#include <limits.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-#ifndef SIZE_MAX
-#warning "No value for SIZE_MAX found!"
-#endif
-
-#if SIZE_MAX == UINT_MAX
-typedef int ssize_t;
-#define _SSIZE_T_DECLARED
-
-#elif SIZE_MAX == ULONG_MAX
-typedef long int ssize_t;
-#define _SSIZE_T_DECLARED
-
-#else
-#error "How big is ssize_t?"
-
-#endif /* SIZE_MAX */
-#endif /* !_SSIZE_T_DECLARED */
-#endif /* WITH_SYS_TYPES_H */
-
-
-/*
- * Declare OpenBSD style string operation if configuration couldn't find them
- * in the system's std-c lib.
- */
-
-#ifndef UFW_COMPAT_HAVE_STRLCAT
-size_t strlcat(char *, const char *, size_t);
-#endif /* !UFW_COMPAT_HAVE_STRLCAT */
-
-#ifndef UFW_COMPAT_HAVE_STRLCPY
-size_t strlcpy(char *, const char *, size_t);
-#endif /* !UFW_COMPAT_HAVE_STRLCPY */
-
-#ifndef UFW_COMPAT_HAVE_STRNLEN
-size_t strnlen(const char *, size_t);
-#endif /* !UFW_COMPAT_HAVE_STRNLEN */
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+#include <c/compat/ssize-t.h>
+#include <c/compat/strings.h>
 
 #endif /* INC_UFW_COMPAT_H */

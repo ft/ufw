@@ -16,7 +16,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <c/compat.h>
+#include <c/compat/strings.h>
 size_t strlen (const char *);
 
 /*
