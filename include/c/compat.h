@@ -11,6 +11,7 @@
 #define INC_UFW_COMPAT_H
 
 #include <common/toolchain.h>
+#include <c/compat/math-constants.h>
 #include <c/compat/ssize-t.h>
 #include <c/compat/strings.h>
 
