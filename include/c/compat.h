@@ -3,6 +3,11 @@
 
 #include <common/toolchain.h>
 
+/*
+ * Provide ssize_t for toolchains/targets that do not support it by
+ * implementing <sys/types.h>.
+ */
+
 #ifdef WITH_SYS_TYPES_H
 #include <sys/types.h>
 
@@ -34,10 +39,14 @@ typedef long int ssize_t;
 #error "How big is ssize_t?"
 
 #endif /* SIZE_MAX */
-
 #endif /* !_SSIZE_T_DECLARED */
-
 #endif /* WITH_SYS_TYPES_H */
+
+
+/*
+ * Declare OpenBSD style string operation if configuration couldn't find them
+ * in the system's std-c lib.
+ */
 
 #ifndef UFW_COMPAT_HAVE_STRLCAT
 size_t strlcat(char *, const char *, size_t);
