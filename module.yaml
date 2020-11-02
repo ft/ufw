@@ -12,6 +12,9 @@ cmake-extensions:
   arm-cmsis:
     include: add_arm_cmsis
     module: ArmCmsis
+  freertos-system:
+    include: add_freertos
+    module: FreeRTOS
   libtap:
     include: add_libtap(${moduleroot})
     module: Libtap
