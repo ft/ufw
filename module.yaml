@@ -7,13 +7,13 @@ cmake-toolchains: cmake/toolchains
 
 cmake-extensions:
   ufw:
-    include: setup_ufw
+    include: setup_ufw(${moduleroot})
     module: SetupUFW
   arm-cmsis:
-    include: add_arm_cmsis
+    include: add_arm_cmsis(${moduleroot})
     module: ArmCmsis
   freertos-system:
-    include: add_freertos
+    include: add_freertos(${moduleroot})
     module: FreeRTOS
   libtap:
     include: add_libtap(${moduleroot})
