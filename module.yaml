@@ -9,6 +9,9 @@ cmake-extensions:
   ufw:
     include: setup_ufw
     module: SetupUFW
+  arm-cmsis:
+    include: add_arm_cmsis
+    module: ArmCmsis
   libtap:
     include: add_libtap(${moduleroot})
     module: Libtap
