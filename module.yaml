@@ -18,6 +18,16 @@ cmake-extensions:
   libtap:
     include: add_libtap(${moduleroot})
     module: Libtap
+  st-cmsis:
+    include: add_st_cmsis(${moduleroot})
+    module: STCmsis
+  stm32-hal:
+    include: add_stm32_hal(${moduleroot})
+    module: STM32HAL
+
+cmake-extension-variants:
+  st-cmsis: ^st-cmsis-device-.*$
+  stm32-hal: ^stm32[^x]*xx-hal-driver$
 
 dependencies:
   - name: libtap
