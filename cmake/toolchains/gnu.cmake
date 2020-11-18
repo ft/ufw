@@ -14,8 +14,8 @@ set(TOOLCHAIN_FEATURES
   sanitize-undefined-behaviour)
 
 set(TOOLCHAIN_FEATURE_SANITIZE_ADDRESS
-  COMPILER_OPTIONS -fsanitize=address
-  LINKER_OPTIONS   -fsanitize=address
+  COMPILER_OPTIONS -fsanitize=address -fno-omit-frame-pointer
+  LINKER_OPTIONS   -fsanitize=address -fno-omit-frame-pointer
   LINKER_LIBRARIES -lasan)
 
 set(TOOLCHAIN_FEATURE_SANITIZE_INTEGER

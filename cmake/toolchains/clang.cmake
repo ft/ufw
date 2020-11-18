@@ -15,8 +15,8 @@ set(TOOLCHAIN_FEATURES
   fuzzer-libfuzzer)
 
 set(TOOLCHAIN_FEATURE_SANITIZE_ADDRESS
-  COMPILER_OPTIONS -fsanitize=address
-  LINKER_OPTIONS   -fsanitize=address)
+  COMPILER_OPTIONS -fsanitize=address -fno-omit-frame-pointer
+  LINKER_OPTIONS   -fsanitize=address -fno-omit-frame-pointer)
 
 set(TOOLCHAIN_FEATURE_SANITIZE_COVERAGE_FAST
   COMPILER_OPTIONS -fsanitize-coverage=func
