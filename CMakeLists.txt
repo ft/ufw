@@ -71,7 +71,15 @@ set_target_cpu(ufw)
 ufw_toolchain(ufw FEATURES sanitize-address
                            sanitize-integer
                            sanitize-undefined-behaviour)
+
+if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "native")
+  add_library(ufw-nosan STATIC ${__ufw_sources})
+  set_property(TARGET ufw-nosan PROPERTY C_STANDARD 99)
+  MakeStrictCompilerC(ufw-nosan)
+  set_target_cpu(ufw-nosan)
+  target_link_libraries(ufw-nosan PUBLIC ufw-common)
 endif()
+
 add_library(ufw++ INTERFACE)
 target_include_directories(ufw++
   INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
