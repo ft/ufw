@@ -5,6 +5,7 @@
 
 #include <tap.h>
 #include <common/compiler.h>
+#define REGISTER_TABLE_WITH_NAMES
 #include <c/register-table.h>
 
 static void
