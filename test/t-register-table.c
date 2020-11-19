@@ -278,9 +278,9 @@ test_register_value(RegisterTable *t, RegisterHandle reg,
                register_name(t, reg));
         break;
     case REG_TYPE_UINT64:
-        cmp_ok(v.value.u64, "==", def.u64,
-               "%s: Default value checks out",
-               register_name(t, reg));
+        ok(v.value.u64 == def.u64,
+           "%s: Default value checks out",
+           register_name(t, reg));
         break;
     case REG_TYPE_SINT16:
         cmp_ok(v.value.s16, "==", def.s16,
@@ -293,9 +293,9 @@ test_register_value(RegisterTable *t, RegisterHandle reg,
                register_name(t, reg));
         break;
     case REG_TYPE_SINT64:
-        cmp_ok(v.value.s64, "==", def.s64,
-               "%s: Default value checks out",
-               register_name(t, reg));
+        ok(v.value.s64 == def.s64,
+           "%s: Default value checks out",
+           register_name(t, reg));
         break;
     default:
         cmp_ok(v.value.f32, "==", def.f32,
@@ -726,11 +726,11 @@ t_block_access(void)
                "V2_PLASMA_KIND value unchanged [0x%08"PRIx32"]", cur.value.u32);
         register_get(&bfg2000v2, V2_AGE_OF_UNIVERSE, &cur);
         register_default(&bfg2000v2, V2_AGE_OF_UNIVERSE, &def);
-        cmp_ok(cur.type, "==", def.type,
-               "V2_AGE_OF_UNIVERSE type unchanged [%s]", type2string(cur.type));
-        cmp_ok(cur.value.u64, "==", def.value.u64,
-               "V2_AGE_OF_UNIVERSE value unchanged [0x%016"PRIx64"]",
-               cur.value.u64);
+        ok(cur.type == def.type,
+           "V2_AGE_OF_UNIVERSE type unchanged [%s]", type2string(cur.type));
+        ok(cur.value.u64 == def.value.u64,
+           "V2_AGE_OF_UNIVERSE value unchanged [0x%016"PRIx64"]",
+           cur.value.u64);
     }
 
     /* Trying to write into Read-Only areas is also an error */
