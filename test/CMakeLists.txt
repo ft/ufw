@@ -25,9 +25,9 @@ set(test_prgs)
 list(APPEND test_prgs)
 foreach (tst ${test_names})
   add_executable(${tst} ${tst}.c)
-  if (${CMAKE_BUILD_TYPE} STREQUAL Debug)
-    ufw_toolchain(${tst} FEATURES sanitize-address sanitize-undefined-behaviour)
-  endif()
+  ufw_toolchain(${tst} FEATURES sanitize-address
+                                sanitize-integer
+                                sanitize-undefined-behaviour)
   target_link_libraries(${tst} PRIVATE ufw tap)
   MakeStrictCompilerC(${tst})
   MakeFatalCompilerC(${tst})

@@ -65,8 +65,12 @@ endif()
 
 add_library(ufw STATIC ${__ufw_sources})
 set_property(TARGET ufw PROPERTY C_STANDARD 99)
-if (${CMAKE_BUILD_TYPE} STREQUAL Debug)
-  ufw_toolchain(ufw FEATURES sanitize-address sanitize-undefined-behaviour)
+MakeStrictCompilerC(ufw)
+set_target_cpu(ufw)
+
+ufw_toolchain(ufw FEATURES sanitize-address
+                           sanitize-integer
+                           sanitize-undefined-behaviour)
 endif()
 add_library(ufw++ INTERFACE)
 target_include_directories(ufw++
@@ -87,8 +91,6 @@ if (UFW_RECURSIVE_RUN)
     TARGETS ufw
     DESTINATION lib)
 endif()
-MakeStrictCompilerC(ufw)
-set_target_cpu(ufw)
 
 add_subdirectory(test)
 add_subdirectory(doc)
