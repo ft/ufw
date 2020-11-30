@@ -37,6 +37,26 @@
  * @endcode
  */
 #ifdef HAVE_COMPILER_ATTRIBUTE_UNUSED
+/* ST defined UNUSED like this: #define UNUSED(x) (void)x which is meant to be
+ * used like this:
+ *
+ * void
+ * foo(int a, int b)
+ * {
+ *     UNUSED(b);
+ *     return a * 2;
+ * }
+ *
+ * With attributes, this becomes:
+ *
+ * void foo(int a, UNUSED int b) ...
+ *
+ * Which is arguably preferable. In order to use this with ST headers in play
+ * as well, include this header *after* the ST system headers.
+ */
+#ifdef UNUSED
+#undef UNUSED
+#endif /* UNUSED */
 #define UNUSED __attribute__((unused))
 #else
 #define UNUSED
