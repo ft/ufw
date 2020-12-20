@@ -20,9 +20,11 @@ extern "C" {
 #endif
 
 void plan(long unsigned int);
-bool ufw_test_ok(const char*, long unsigned int, bool, const char*, ...);
+bool ufw_test_ok(const char*, long unsigned int,
+                 bool, const char*,
+                 const char*, ...);
 
-#define ok(...) ufw_test_ok(__FILE__, __LINE__, __VA_ARGS__)
+#define ok(expr, ...) ufw_test_ok(__FILE__, __LINE__, expr, #expr, __VA_ARGS__)
 
 #ifdef __cplusplus
 }

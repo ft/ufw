@@ -22,7 +22,8 @@ plan(long unsigned int n)
 }
 
 bool
-ufw_test_ok(const char *file, long unsigned int line, bool result,
+ufw_test_ok(const char *file, long unsigned int line,
+            bool result, const char *expr,
             const char *format, ...)
 {
     va_list ap;
@@ -36,7 +37,10 @@ ufw_test_ok(const char *file, long unsigned int line, bool result,
         printf("not ok - ");
         vprintf(format, ap);
         putchar('\n');
-        printf("# %s:%lu: result == false\n", file, line);
+        printf("#\n# failed test at:\n");
+        printf("#   file: %s\n", file);
+        printf("#   line: %lu\n", line);
+        printf("#   expr: (%s) => false\n#\n", expr);
     }
 
     va_end(ap);
