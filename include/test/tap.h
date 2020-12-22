@@ -28,7 +28,10 @@ bool ufw_test_ok(const char*, long unsigned int,
 
 void print_word_hex(void*, size_t, size_t);
 
-#define ok(expr, ...) ufw_test_ok(__FILE__, __LINE__, expr, #expr, __VA_ARGS__)
+#define ok(expr, ...)                           \
+    ufw_test_ok(__FILE__, __LINE__,             \
+                expr, #expr,                    \
+                __VA_ARGS__)
 
 #define unless(x) if (!(x))
 
