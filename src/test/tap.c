@@ -70,6 +70,28 @@ ufw_test_ok(const char *file, long unsigned int line,
     return result;
 }
 
+bool
+ufw_test_cmp_mem(const char *file, long unsigned int line,
+                 const void *a, const char *an,
+                 const void *b, const char *bn,
+                 size_t n,
+                 const char *format, ...)
+{
+    const bool result = (memcmp(a, b, n) == 0);
+    va_list ap;
+
+    va_start(ap, format);
+    tap_result(result, file, line, format, ap);
+    va_end(ap);
+
+    if (result == false) {
+        printf("#   expr: (memcmp(%s, %s, %lu) == 0) => false\n#\n",
+               an, bn, (long unsigned int)n);
+    }
+
+    return result;
+}
+
 static const char digits[] = {
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
     'a', 'b', 'c', 'd', 'e', 'f' };

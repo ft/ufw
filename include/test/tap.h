@@ -24,6 +24,11 @@ void plan(long unsigned int);
 bool ufw_test_ok(const char*, long unsigned int,
                  bool, const char*,
                  const char*, ...);
+bool ufw_test_cmp_mem(const char*, long unsigned int,
+                      const void*, const char*,
+                      const void*, const char*,
+                      size_t,
+                      const char*, ...);
 
 
 void print_word_hex(void*, size_t, size_t);
@@ -32,6 +37,13 @@ void print_word_hex(void*, size_t, size_t);
     ufw_test_ok(__FILE__, __LINE__,             \
                 expr, #expr,                    \
                 __VA_ARGS__)
+
+#define cmp_mem(a, b, n, ...)                   \
+    ufw_test_cmp_mem(__FILE__, __LINE__,        \
+                     a, #a,                     \
+                     b, #b,                     \
+                     n,                         \
+                     __VA_ARGS__)
 
 #define unless(x) if (!(x))
 
