@@ -15,11 +15,35 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <common/bit-operations.h>
 #include <common/compiler.h>
 #include <common/toolchain.h>
 #include <test/tap.h>
+
+static void tap_result(
+    const bool, const char*, unsigned long, const char*, va_list);
+
+static void
+tap_result(const bool result,
+           const char *file, unsigned long line,
+           const char *fmt, va_list ap)
+{
+    if (result == false) {
+        fputs("not ", stdout);
+    }
+
+    fputs("ok - ", stdout);
+    vprintf(fmt, ap);
+    putchar('\n');
+
+    if (result == false) {
+        printf("#\n# failed test at:\n");
+        printf("#   file: %s\n", file);
+        printf("#   line: %lu\n", line);
+    }
+}
 
 void
 plan(long unsigned int n)
@@ -33,19 +57,12 @@ ufw_test_ok(const char *file, long unsigned int line,
             const char *format, ...)
 {
     va_list ap;
-    va_start(ap, format);
 
-    if (result == true) {
-        printf("ok - ");
-        vprintf(format, ap);
-        putchar('\n');
-    } else {
-        printf("not ok - ");
-        vprintf(format, ap);
-        putchar('\n');
-        printf("#\n# failed test at:\n");
-        printf("#   file: %s\n", file);
-        printf("#   line: %lu\n", line);
+    va_start(ap, format);
+    tap_result(result, file, line, format, ap);
+    va_end(ap);
+
+    if (result == false) {
         printf("#   expr: (%s) => false\n#\n", expr);
     }
 
