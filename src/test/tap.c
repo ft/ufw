@@ -9,7 +9,6 @@
  * @brief Minimal TAP emitting testing module
  */
 
-#include <ctype.h>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -17,7 +16,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <common/bit-operations.h>
 #include <common/compiler.h>
 #include <common/toolchain.h>
 #include <test/tap.h>
@@ -86,79 +84,15 @@ ufw_test_cmp_mem(const char *file, long unsigned int line,
 
     if (result == false) {
         printf("#   expr: (memcmp(%s, %s, %lu) == 0) => false\n#\n",
-               an, bn, (long unsigned int)n);
+               an, bn, (unsigned long int)n);
+        printf("# Expressions: a: (%s) b: (%s)\n#\n", an, bn);
+        fputs("# memdiff:\n#\n", stdout);
+        size_t differences = memdiff(a, b, n);
+        printf("#\n# Found differences in %lu of %lu byte(s).\n#\n",
+               (unsigned long int)differences, (unsigned long int)n);
     }
 
     return result;
-}
-
-static const char digits[] = {
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-    'a', 'b', 'c', 'd', 'e', 'f' };
-
-void
-print_word_hex(void *memory, const size_t bytes, size_t columns)
-{
-    const size_t bits_per_digit = 4u;
-    const size_t bits_per_byte = (size_t)BITS_PER_BYTE;
-    const size_t bits_per_word = bits_per_byte * bytes;
-    const size_t digitsteps = bits_per_byte / bits_per_digit;
-    const size_t steps = bits_per_word / bits_per_byte;
-    size_t step, pad;
-
-    if (bytes > columns)
-        columns = bytes;
-
-    unsigned char *ptr = memory;
-    /* Print hexadecimal data dump */
-    for (step = 0u; step < steps; ++step) {
-        if (step > 0 && (step % 8) == 0)
-            putchar(' ');
-        for (size_t j = digitsteps; j > 0; --j) {
-            const unsigned int digit
-                = BIT_GET(*ptr, bits_per_digit, (j-1) * bits_per_digit);
-            putchar(digits[digit]);
-        }
-        ptr++;
-        putchar(' ');
-    }
-    /* Pad to a given column width */
-    if (bytes < columns) {
-        size_t rest = columns - bytes;
-        size_t spaces = step + rest;
-        for (pad = step; pad < spaces; ++pad) {
-            if (pad > 0 && (pad % 8) == 0)
-                putchar(' ');
-            for (size_t j = digitsteps; j > 0; --j) {
-                putchar(' ');
-            }
-            ptr++;
-            putchar(' ');
-        }
-    }
-    /* Print printable-characters after data dump, similar to hexdump */
-    fputs(" | ", stdout);
-    ptr = memory;
-    for (step = 0u; step < bytes; ++step) {
-        const char ch = *ptr;
-        if (step > 0 && (step % 8) == 0)
-            putchar(' ');
-        if (isprint(ch) && (isspace(ch) == false))
-            putchar(ch);
-        else
-            putchar('.');
-        ptr++;
-    }
-    /* Pad printable-characters to a given column width as well */
-    if (bytes < columns) {
-        size_t rest = step + columns - bytes;
-        for (pad = step; pad < rest; ++pad) {
-            if (pad > 0 && (pad % 8) == 0)
-                putchar(' ');
-            putchar(' ');
-        }
-    }
-    fputs(" |\n", stdout);
 }
 
 #define define_printer(N,T)                                             \
@@ -174,9 +108,9 @@ print_word_hex(void *memory, const size_t bytes, size_t columns)
     printf("#   oct:  a: o%0"  #No Po "\n", ls);                \
     printf("#         b: o%0"  #No Po "\n", rs);                \
     printf("#   mem:  a: ");                                    \
-    print_word_hex(&ls, sizeof(ls), sizeof(ls));                \
+    print_word_hex(&ls, 0u, sizeof(ls), sizeof(ls));            \
     printf("#         b: ");                                    \
-    print_word_hex(&rs, sizeof(rs), sizeof(rs));                \
+    print_word_hex(&rs, 0u, sizeof(rs), sizeof(rs));            \
     printf("#\n");
 
 #define unsupported(N,T)                                                \
@@ -188,9 +122,9 @@ print_word_hex(void *memory, const size_t bytes, size_t columns)
     printf("# Expressions: a: (%s) b: (%s)\n#\n", nls, nrs);            \
     printf("#   test/tap: Unsupported data-type: " #T  "\n#\n");        \
     printf("#   mem:  a: ");                                            \
-    print_word_hex(&ls, sizeof(ls), sizeof(ls));                        \
+    print_word_hex(&ls, 0u, sizeof(ls), sizeof(ls));                    \
     printf("#         b: ");                                            \
-    print_word_hex(&rs, sizeof(rs), sizeof(rs));                        \
+    print_word_hex(&rs, 0u, sizeof(rs), sizeof(rs));                    \
     printf("#\n");
 
 

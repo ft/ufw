@@ -31,7 +31,8 @@ bool ufw_test_cmp_mem(const char*, long unsigned int,
                       const char*, ...);
 
 
-void print_word_hex(void*, size_t, size_t);
+size_t memdiff(const void*, const void*, size_t);
+void print_word_hex(const void*, size_t, size_t, size_t);
 
 #define ok(expr, ...)                           \
     ufw_test_ok(__FILE__, __LINE__,             \

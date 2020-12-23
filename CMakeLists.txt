@@ -94,7 +94,9 @@ if (NOT ("${TOOLCHAIN_ID}" MATCHES "^ti-"))
   target_link_libraries(ufw PUBLIC m)
 endif()
 
-add_library(ufw-tap STATIC src/test/tap.c)
+add_library(ufw-tap STATIC
+  src/test/memdiff.c
+  src/test/tap.c)
 target_link_libraries(ufw-tap PUBLIC ufw-common)
 set_property(TARGET ufw-tap PROPERTY C_STANDARD 99)
 set_target_cpu(ufw-tap)
