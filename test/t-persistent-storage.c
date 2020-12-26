@@ -4,8 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <tap.h>
 #include <common/compiler.h>
+#include <test/tap.h>
+
 #include <c/persistent-storage.h>
 
 #define BUFFER_SIZE 128u
@@ -62,7 +63,9 @@ t_simple_store(unsigned char *b, size_t n, bool corrupt)
         persistent_buffer(&store, b, n);
 
     success = persistent_store(&store, &set1);
-    cmp_ok(success, "==", PERSISTENT_ACCESS_SUCCESS, "set1 was stored");
+    unless (ok(success == PERSISTENT_ACCESS_SUCCESS, "set1 was stored")) {
+        pru16(success, PERSISTENT_ACCESS_SUCCESS);
+    }
 
     if (corrupt) {
         for (size_t i = 0u; i < BUFFER_SIZE; ++i) {
@@ -71,18 +74,23 @@ t_simple_store(unsigned char *b, size_t n, bool corrupt)
                 break;
             }
         }
-        cmp_ok(persistent_validate(&store),
-               "==",
-               PERSISTENT_ACCESS_INVALID_DATA,
-               "Stored data failed to validate");
+        success = persistent_validate(&store);
+        unless (ok(success == PERSISTENT_ACCESS_INVALID_DATA,
+                   "Stored data failed to validate")) {
+            pru16(success, PERSISTENT_ACCESS_INVALID_DATA);
+        }
         return;
     }
 
-    cmp_ok(persistent_validate(&store), "==", PERSISTENT_ACCESS_SUCCESS,
-           "Stored data validated");
+    success = persistent_validate(&store);
+    unless (ok(success == PERSISTENT_ACCESS_SUCCESS, "Stored data validated")) {
+        pru16(success, PERSISTENT_ACCESS_SUCCESS);
+    }
 
-    persistent_fetch(&set2, &store);
-    cmp_ok(success, "==", PERSISTENT_ACCESS_SUCCESS, "set2 was fetched");
+    success = persistent_fetch(&set2, &store);
+    unless (ok(success == PERSISTENT_ACCESS_SUCCESS, "set2 was fetched")) {
+        pru16(success, PERSISTENT_ACCESS_SUCCESS);
+    }
 
     cmp_mem(&set1, &set2, sizeof(struct cfg),
             "fetch put contents of set1 into set2");
@@ -92,8 +100,10 @@ t_simple_store(unsigned char *b, size_t n, bool corrupt)
                                     offsetof(struct cfg, a),
                                     sizeof(foo));
 
-    cmp_ok(success, "==", PERSISTENT_ACCESS_SUCCESS,
-           "part foo was fetched successfully");
+    unless (ok(success == PERSISTENT_ACCESS_SUCCESS,
+               "part foo was fetched successfully")) {
+        pru16(success, PERSISTENT_ACCESS_SUCCESS);
+    }
     ok(foo == set1.a, "foo has correct value");
 }
 

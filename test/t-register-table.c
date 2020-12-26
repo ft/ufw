@@ -3,10 +3,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <tap.h>
 #include <common/compiler.h>
+#include <test/tap.h>
+
 #define REGISTER_TABLE_WITH_NAMES
 #include <c/register-table.h>
+
+#define cmp_code(a, op, b, ...)                 \
+    unless (ok(a op b, __VA_ARGS__)) {          \
+        pru32(a, b);                            \
+    }                                           \
 
 static void
 t_invalid_tables(void)
@@ -27,12 +33,12 @@ t_invalid_tables(void)
     };
 
     RegisterInit success = register_init(r_null);
-    cmp_ok(success.code, "==", REG_INIT_TABLE_INVALID,
-           "NULL register table fails");
+    cmp_code(success.code, ==, REG_INIT_TABLE_INVALID,
+             "NULL register table fails");
     success = register_init(&r_areas_null);
-    cmp_ok(success.code, "==", REG_INIT_TABLE_INVALID, "NULL r.area fails");
+    cmp_code(success.code, ==, REG_INIT_TABLE_INVALID, "NULL r.area fails");
     success = register_init(&r_entries_null);
-    cmp_ok(success.code, "==", REG_INIT_TABLE_INVALID, "NULL r.entry fails");
+    cmp_code(success.code, ==, REG_INIT_TABLE_INVALID, "NULL r.entry fails");
 }
 
 static void
@@ -51,7 +57,7 @@ t_trivial_success(void)
     };
 
     RegisterInit success = register_init(&registers);
-    cmp_ok(success.code, "==", REG_INIT_SUCCESS, "One area table succeeds");
+    cmp_code(success.code, ==, REG_INIT_SUCCESS, "One area table succeeds");
 }
 
 static void
@@ -68,7 +74,7 @@ t_trivial_fail(void)
     };
 
     RegisterInit success = register_init(&registers);
-    cmp_ok(success.code, "==", REG_INIT_NO_AREAS, "Trivial table fails");
+    cmp_code(success.code, ==, REG_INIT_NO_AREAS, "Trivial table fails");
 }
 
 static void
@@ -107,16 +113,16 @@ t_area_init_checks(void)
     };
 
     RegisterInit success = register_init(&r_overlap);
-    cmp_ok(success.code, "==", REG_INIT_AREA_ADDRESS_OVERLAP,
-           "Area overlap detected");
+    cmp_code(success.code, ==, REG_INIT_AREA_ADDRESS_OVERLAP,
+             "Area overlap detected");
     success = register_init(&r_just_no_overlap);
-    cmp_ok(success.code, "==", REG_INIT_SUCCESS,
-           "Adjacent areas without gap in between succeeds");
+    cmp_code(success.code, ==, REG_INIT_SUCCESS,
+             "Adjacent areas without gap in between succeeds");
     success = register_init(&r_area_order);
-    cmp_ok(success.code, "==", REG_INIT_AREA_INVALID_ORDER,
-           "Area order is not proper");
-    cmp_ok(success.pos.area, "==", 1,
-           "  ...area at index 1 yielded the error");
+    cmp_code(success.code, ==, REG_INIT_AREA_INVALID_ORDER,
+             "Area order is not proper");
+    cmp_code(success.pos.area, ==, 1,
+             "  ...area at index 1 yielded the error");
 }
 
 static void
@@ -171,54 +177,54 @@ t_entry_init_checks(void)
     };
 
     RegisterInit success = register_init(&r_overlap);
-    cmp_ok(success.code, "==", REG_INIT_ENTRY_ADDRESS_OVERLAP,
-           "Entry overlap detected");
+    cmp_code(success.code, ==, REG_INIT_ENTRY_ADDRESS_OVERLAP,
+             "Entry overlap detected");
     success = register_init(&r_just_no_overlap);
-    cmp_ok(success.code, "==", REG_INIT_SUCCESS,
-           "Adjacent entries without gap in between succeeds");
+    cmp_code(success.code, ==, REG_INIT_SUCCESS,
+             "Adjacent entries without gap in between succeeds");
     success = register_init(&r_entry_order);
-    cmp_ok(success.code, "==", REG_INIT_ENTRY_INVALID_ORDER,
-           "Entry order is not proper");
-    cmp_ok(success.pos.entry, "==", 1,
-           "  ...entry at index 1 yielded the error");
+    cmp_code(success.code, ==, REG_INIT_ENTRY_INVALID_ORDER,
+             "Entry order is not proper");
+    cmp_code(success.pos.entry, ==, 1,
+             "  ...entry at index 1 yielded the error");
     success = register_init(&r_with_hole);
-    cmp_ok(success.code, "==", REG_INIT_ENTRY_IN_MEMORY_HOLE,
-           "Entry in memory hole");
-    cmp_ok(success.pos.entry, "==", 0,
-           "  ...entry at index 0 yielded the error");
+    cmp_code(success.code, ==, REG_INIT_ENTRY_IN_MEMORY_HOLE,
+             "Entry in memory hole");
+    cmp_code(success.pos.entry, ==, 0,
+             "  ...entry at index 0 yielded the error");
     r_with_hole.entry[0].address = 0xfful;
     success = register_init(&r_with_hole);
-    cmp_ok(success.code, "==", REG_INIT_ENTRY_IN_MEMORY_HOLE,
-           "Entry still in memory hole (part of it)");
-    cmp_ok(success.pos.entry, "==", 0,
-           "  ...entry at index 0 yielded the error");
+    cmp_code(success.code, ==, REG_INIT_ENTRY_IN_MEMORY_HOLE,
+             "Entry still in memory hole (part of it)");
+    cmp_code(success.pos.entry, ==, 0,
+             "  ...entry at index 0 yielded the error");
     r_with_hole.entry[0].address = 0xfeul;
     success = register_init(&r_with_hole);
-    cmp_ok(success.code, "==", REG_INIT_SUCCESS,
-           "Entry completely in memory succeeds");
+    cmp_code(success.code, ==, REG_INIT_SUCCESS,
+             "Entry completely in memory succeeds");
     r_with_hole.entry[0].address = 0x1feul;
     success = register_init(&r_with_hole);
-    cmp_ok(success.code, "==", REG_INIT_ENTRY_IN_MEMORY_HOLE,
-           "Entry in memory hole again");
-    cmp_ok(success.pos.entry, "==", 0,
-           "  ...entry at index 0 yielded the error");
+    cmp_code(success.code, ==, REG_INIT_ENTRY_IN_MEMORY_HOLE,
+             "Entry in memory hole again");
+    cmp_code(success.pos.entry, ==, 0,
+             "  ...entry at index 0 yielded the error");
     r_with_hole.entry[0].address = 0x1fful;
     success = register_init(&r_with_hole);
-    cmp_ok(success.code, "==", REG_INIT_ENTRY_IN_MEMORY_HOLE,
-           "Entry still in memory hole (part of it)");
-    cmp_ok(success.pos.entry, "==", 0,
-           "  ...entry at index 0 yielded the error");
+    cmp_code(success.code, ==, REG_INIT_ENTRY_IN_MEMORY_HOLE,
+             "Entry still in memory hole (part of it)");
+    cmp_code(success.pos.entry, ==, 0,
+             "  ...entry at index 0 yielded the error");
     r_with_hole.entry[0].address = 0x200ul;
     success = register_init(&r_with_hole);
-    cmp_ok(success.code, "==", REG_INIT_SUCCESS,
-           "Entry completely in memory succeeds");
+    cmp_code(success.code, ==, REG_INIT_SUCCESS,
+             "Entry completely in memory succeeds");
     r_with_hole.entry[1].check.type = REGV_TYPE_MIN;
     r_with_hole.entry[1].check.arg.range.min.u32 = 0x3000ul;
     success = register_init(&r_with_hole);
-    cmp_ok(success.code, "==", REG_INIT_ENTRY_INVALID_DEFAULT,
-           "Entry default value does not pass inspection");
-    cmp_ok(success.pos.entry, "==", 1,
-           "  ...entry at index 1 yielded the error");
+    cmp_code(success.code, ==, REG_INIT_ENTRY_INVALID_DEFAULT,
+             "Entry default value does not pass inspection");
+    cmp_code(success.pos.entry, ==, 1,
+             "  ...entry at index 1 yielded the error");
 }
 
 typedef enum SensorRegister {
@@ -260,48 +266,55 @@ test_register_value(RegisterTable *t, RegisterHandle reg,
     RegisterAccess success;
     RegisterValue v;
     success = register_default(t, reg, &v);
-    cmp_ok(success.code, "==", REG_ACCESS_SUCCESS,
-           "%s: Accessing default value works",
+    cmp_code(success.code, ==, REG_ACCESS_SUCCESS,
+             "%s: Accessing default value works",
            register_name(t, reg));
-    cmp_ok(v.type, "==", type,
-           "%s: Default value has correct type [%s]",
-           register_name(t, reg),
-           type2string(type));
+    cmp_code(v.type, ==, type,
+             "%s: Default value has correct type [%s]",
+             register_name(t, reg),
+             type2string(type));
     switch (type) {
     case REG_TYPE_UINT16:
-        cmp_ok(v.value.u16, "==", def.u16,
-               "%s: Default value checks out",
-               register_name(t, reg));
+        unless (ok(v.value.u16 == def.u16, "%s: Default value checks out",
+                   register_name(t, reg))) {
+            pru16(v.value.u16, def.u16);
+        }
         break;
     case REG_TYPE_UINT32:
-        cmp_ok(v.value.u32, "==", def.u32,
-               "%s: Default value checks out",
-               register_name(t, reg));
+        unless (ok(v.value.u32 == def.u32, "%s: Default value checks out",
+                   register_name(t, reg))) {
+            pru32(v.value.u32, def.u32);
+        }
         break;
     case REG_TYPE_UINT64:
-        ok(v.value.u64 == def.u64,
-           "%s: Default value checks out",
-           register_name(t, reg));
+        unless (ok(v.value.u64 == def.u64, "%s: Default value checks out",
+                   register_name(t, reg))) {
+            pru64(v.value.u64, def.u64);
+        }
         break;
     case REG_TYPE_SINT16:
-        cmp_ok(v.value.s16, "==", def.s16,
-               "%s: Default value checks out",
-               register_name(t, reg));
+        unless (ok(v.value.s16 == def.s16, "%s: Default value checks out",
+                   register_name(t, reg))) {
+            prs16(v.value.s16, def.s16);
+        }
         break;
     case REG_TYPE_SINT32:
-        cmp_ok(v.value.s32, "==", def.s32,
-               "%s: Default value checks out",
-               register_name(t, reg));
+        unless (ok(v.value.s32 == def.s32, "%s: Default value checks out",
+                   register_name(t, reg))) {
+            prs32(v.value.s32, def.s32);
+        }
         break;
     case REG_TYPE_SINT64:
-        ok(v.value.s64 == def.s64,
-           "%s: Default value checks out",
-           register_name(t, reg));
+        unless (ok(v.value.s64 == def.s64, "%s: Default value checks out",
+                   register_name(t, reg))) {
+            prs64(v.value.s64, def.s64);
+        }
         break;
     default:
-        cmp_ok(v.value.f32, "==", def.f32,
-               "%s: Default value checks out",
-               register_name(t, reg));
+        unless (ok(v.value.f32 == def.f32, "%s: Default value checks out",
+                   register_name(t, reg))) {
+            prf32(v.value.f32, def.f32);
+        }
         break;
     }
 }
@@ -312,12 +325,12 @@ test_register(RegisterTable *t, RegisterHandle reg, RegisterAddress area,
               RegisterType type, RegisterValueU def)
 {
     test_register_value(t, reg, type, def);          /* 3 */
-    cmp_ok(register_area(t, reg)->base, "==", area,  /* 1 */
-           "%s: Is in the correct area",
-           register_name(t, reg));
-    cmp_ok(register_offset(t, reg), "==", offset,    /* 1 */
-           "%s: Offset in area is correct",
-           register_name(t, reg));
+    cmp_code(register_area(t, reg)->base, ==, area,  /* 1 */
+             "%s: Is in the correct area",
+             register_name(t, reg));
+    cmp_code(register_offset(t, reg), ==, offset,    /* 1 */
+             "%s: Offset in area is correct",
+             register_name(t, reg));
 }
 
 static RegisterTable bfg2000 = {
@@ -346,30 +359,30 @@ t_bfg2000(void)
 
     init_success = register_init(&bfg2000);
     /* Check initialisation results: 12 */
-    cmp_ok(init_success.code, "==", REG_INIT_SUCCESS,
-           "BFG2000 register table initialises");
-    cmp_ok(bfg2000.areas, "==", 3u,
-           "BFG2000 has the correct number of areas");
-    cmp_ok(bfg2000.entries, "==", 7u,
-           "BFG2000 has the correct number of entries");
-    cmp_ok(bfg2000.area[0].entry.count, "==", 3u,
-           "BFG2000 area[0] has three entries");
-    cmp_ok(bfg2000.area[0].entry.first, "==", 0u,
-           "  ...first is 0");
-    cmp_ok(bfg2000.area[0].entry.last, "==", 2u,
-           "  ...last is 2");
-    cmp_ok(bfg2000.area[1].entry.count, "==", 3u,
-           "BFG2000 area[1] has three entries");
-    cmp_ok(bfg2000.area[1].entry.first, "==", 3u,
-           "  ...first is 3");
-    cmp_ok(bfg2000.area[1].entry.last, "==", 5u,
-           "  ...last is 5");
-    cmp_ok(bfg2000.area[2].entry.count, "==", 1u,
-           "BFG2000 area[2] has one entry");
-    cmp_ok(bfg2000.area[2].entry.first, "==", 6u,
-           "  ...first is 6");
-    cmp_ok(bfg2000.area[2].entry.last, "==", 6u,
-           "  ...as is last.");
+    cmp_code(init_success.code, ==, REG_INIT_SUCCESS,
+             "BFG2000 register table initialises");
+    cmp_code(bfg2000.areas, ==, 3u,
+             "BFG2000 has the correct number of areas");
+    cmp_code(bfg2000.entries, ==, 7u,
+             "BFG2000 has the correct number of entries");
+    cmp_code(bfg2000.area[0].entry.count, ==, 3u,
+             "BFG2000 area[0] has three entries");
+    cmp_code(bfg2000.area[0].entry.first, ==, 0u,
+             "  ...first is 0");
+    cmp_code(bfg2000.area[0].entry.last, ==, 2u,
+             "  ...last is 2");
+    cmp_code(bfg2000.area[1].entry.count, ==, 3u,
+             "BFG2000 area[1] has three entries");
+    cmp_code(bfg2000.area[1].entry.first, ==, 3u,
+             "  ...first is 3");
+    cmp_code(bfg2000.area[1].entry.last, ==, 5u,
+             "  ...last is 5");
+    cmp_code(bfg2000.area[2].entry.count, ==, 1u,
+             "BFG2000 area[2] has one entry");
+    cmp_code(bfg2000.area[2].entry.first, ==, 6u,
+             "  ...first is 6");
+    cmp_code(bfg2000.area[2].entry.last, ==, 6u,
+             "  ...as is last.");
 
     /* Check default values and register meta-data: 7 * 5 = 35 */
     test_register(&bfg2000, SENSOR_DEVICE_ID, 0, 0,
@@ -447,46 +460,46 @@ t_bfg2000(void)
             }                                                           \
         };                                                              \
         RegisterInit success = register_init(&rok);                     \
-        cmp_ok(success.code, "==", REG_INIT_SUCCESS, #M " table initialises"); \
+        cmp_code(success.code, ==, REG_INIT_SUCCESS, #M " table initialises"); \
                                                                         \
         RegisterAccess a = register_set(&rok, 0, RV(T, M, VT_UNC_MIN)); \
-        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " unconstrained min"); \
+        cmp_code(a.code, ==, REG_ACCESS_SUCCESS, #M " unconstrained min"); \
         a = register_set(&rok, 0,  RV(T, M, VT_UNC_MAX));               \
-        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " unconstrained max"); \
+        cmp_code(a.code, ==, REG_ACCESS_SUCCESS, #M " unconstrained max"); \
                                                                         \
         a = register_set(&rok, 1, RV(T, M, VT_MIN_MIN));                \
-        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " min-constrained min"); \
+        cmp_code(a.code, ==, REG_ACCESS_SUCCESS, #M " min-constrained min"); \
         a = register_set(&rok, 1, RV(T, M, VT_MIN_MIN - VT_EPS));       \
-        cmp_ok(a.code, "==", REG_ACCESS_RANGE, #M " min-constrained min fail"); \
+        cmp_code(a.code, ==, REG_ACCESS_RANGE, #M " min-constrained min fail"); \
         a = register_set(&rok, 1,  RV(T, M, VT_MIN_MAX));               \
-        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " min-constrained max"); \
+        cmp_code(a.code, ==, REG_ACCESS_SUCCESS, #M " min-constrained max"); \
                                                                         \
         a = register_set(&rok, 2, RV(T, M, VT_MAX_MIN));                \
-        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " max-constrained min"); \
+        cmp_code(a.code, ==, REG_ACCESS_SUCCESS, #M " max-constrained min"); \
         a = register_set(&rok, 2, RV(T, M, VT_MAX_MAX));                \
-        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " max-constrained max"); \
+        cmp_code(a.code, ==, REG_ACCESS_SUCCESS, #M " max-constrained max"); \
         a = register_set(&rok, 2,  RV(T, M, VT_MAX_MAX + VT_EPS));      \
-        cmp_ok(a.code, "==", REG_ACCESS_RANGE, #M " max-constrained max fail"); \
+        cmp_code(a.code, ==, REG_ACCESS_RANGE, #M " max-constrained max fail"); \
                                                                         \
         a = register_set(&rok, 3, RV(T, M, VT_RAN_MIN));                \
-        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " range-constrained min"); \
+        cmp_code(a.code, ==, REG_ACCESS_SUCCESS, #M " range-constrained min"); \
         a = register_set(&rok, 3,  RV(T, M, VT_RAN_MIN - VT_EPS));      \
-        cmp_ok(a.code, "==", REG_ACCESS_RANGE, #M " range-constrained min fail"); \
+        cmp_code(a.code, ==, REG_ACCESS_RANGE, #M " range-constrained min fail"); \
         a = register_set(&rok, 3, RV(T, M, VT_RAN_MAX));                \
-        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " range-constrained max"); \
+        cmp_code(a.code, ==, REG_ACCESS_SUCCESS, #M " range-constrained max"); \
         a = register_set(&rok, 3,  RV(T, M, VT_RAN_MAX + VT_EPS));      \
-        cmp_ok(a.code, "==", REG_ACCESS_RANGE, #M " range-constrained max fail"); \
+        cmp_code(a.code, ==, REG_ACCESS_RANGE, #M " range-constrained max fail"); \
                                                                         \
         a = register_set(&rok, 4, RV(T, M, VLD_A));                     \
-        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " fnc-constrained a"); \
+        cmp_code(a.code, ==, REG_ACCESS_SUCCESS, #M " fnc-constrained a"); \
         a = register_set(&rok, 4, RV(T, M, VLD_B));                     \
-        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " fnc-constrained b"); \
+        cmp_code(a.code, ==, REG_ACCESS_SUCCESS, #M " fnc-constrained b"); \
         a = register_set(&rok, 4, RV(T, M, VLD_C));                     \
-        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " fnc-constrained c"); \
+        cmp_code(a.code, ==, REG_ACCESS_SUCCESS, #M " fnc-constrained c"); \
         a = register_set(&rok, 4, RV(T, M, VLD_D));                     \
-        cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, #M " fnc-constrained d"); \
+        cmp_code(a.code, ==, REG_ACCESS_SUCCESS, #M " fnc-constrained d"); \
         a = register_set(&rok, 4, RV(T, M, VLD_FAIL));                  \
-        cmp_ok(a.code, "==", REG_ACCESS_RANGE, #M " fnc-constrained e fail"); \
+        cmp_code(a.code, ==, REG_ACCESS_RANGE, #M " fnc-constrained e fail"); \
     }
 
 GENERATE_CONSTRAIN_TESTS(t_u16_regs, UINT16, u16, U16,
@@ -585,46 +598,50 @@ t_f32_abnormal(void)
     };
 
     RegisterInit success = register_init(&regs);
-    cmp_ok(success.code, "==", REG_INIT_ENTRY_INVALID_DEFAULT,
-           "f32 can't default to NAN");
+    cmp_code(success.code, ==, REG_INIT_ENTRY_INVALID_DEFAULT,
+             "f32 can't default to NAN");
     regs.entry[0].default_value.f32 = -NAN;
     success = register_init(&regs);
-    cmp_ok(success.code, "==", REG_INIT_ENTRY_INVALID_DEFAULT,
-           "f32 can't default to -NAN");
+    cmp_code(success.code, ==, REG_INIT_ENTRY_INVALID_DEFAULT,
+             "f32 can't default to -NAN");
     regs.entry[0].default_value.f32 = INFINITY;
     success = register_init(&regs);
-    cmp_ok(success.code, "==", REG_INIT_ENTRY_INVALID_DEFAULT,
-           "f32 can't default to INFINITY");
+    cmp_code(success.code, ==, REG_INIT_ENTRY_INVALID_DEFAULT,
+             "f32 can't default to INFINITY");
     regs.entry[0].default_value.f32 = -INFINITY;
     success = register_init(&regs);
-    cmp_ok(success.code, "==", REG_INIT_ENTRY_INVALID_DEFAULT,
-           "f32 can't default to -INFINITY");
+    cmp_code(success.code, ==, REG_INIT_ENTRY_INVALID_DEFAULT,
+             "f32 can't default to -INFINITY");
     regs.entry[0].default_value.f32 = 0.;
     success = register_init(&regs);
-    cmp_ok(success.code, "==", REG_INIT_SUCCESS, "f32 with zero works");
+    cmp_code(success.code, ==, REG_INIT_SUCCESS, "f32 with zero works");
 
     RegisterAccess a = register_set(&regs, 0, RV(FLOAT32, f32, NAN));
-    cmp_ok(a.code, "==", REG_ACCESS_INVALID, "f32 can't set to NAN");
+    cmp_code(a.code, ==, REG_ACCESS_INVALID, "f32 can't set to NAN");
     a = register_set(&regs, 0, RV(FLOAT32, f32, -NAN));
-    cmp_ok(a.code, "==", REG_ACCESS_INVALID, "f32 can't set to -NAN");
+    cmp_code(a.code, ==, REG_ACCESS_INVALID, "f32 can't set to -NAN");
     a = register_set(&regs, 0, RV(FLOAT32, f32, INFINITY));
-    cmp_ok(a.code, "==", REG_ACCESS_INVALID, "f32 can't set to INFINITY");
+    cmp_code(a.code, ==, REG_ACCESS_INVALID, "f32 can't set to INFINITY");
     a = register_set(&regs, 0, RV(FLOAT32, f32, -INFINITY));
-    cmp_ok(a.code, "==", REG_ACCESS_INVALID, "f32 can't set to -INFINITY");
+    cmp_code(a.code, ==, REG_ACCESS_INVALID, "f32 can't set to -INFINITY");
 
     RegisterValue v;
     a = register_get(&regs, 0, &v);
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "f32 can get value");
-    cmp_ok(v.type, "==", REG_TYPE_FLOAT32, "Gotten value is type f32");
-    cmp_ok(v.value.f32, "==", 0., "Gotten value is correct value");
+    cmp_code(a.code, ==, REG_ACCESS_SUCCESS, "f32 can get value");
+    cmp_code(v.type, ==, REG_TYPE_FLOAT32, "Gotten value is type f32");
+    unless (ok(v.value.f32 == 0., "Gotten value is correct value")) {
+        prf32(v.value.f32, 0.);
+    }
 
     /* 122e9 so we can test for equality */
     RegisterValue tv = RV(FLOAT32, u32, 0x51e33e22ul);
     a = register_set(&regs, 0, RV(FLOAT32, f32, tv.value.f32));
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "f32 can set to 122e9");
+    cmp_code(a.code, ==, REG_ACCESS_SUCCESS, "f32 can set to 122e9");
     a = register_get(&regs, 0, &v);
-    cmp_ok(v.value.u32, "==", tv.value.u32, "Gotten value is correct value");
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "Getting value succeeds");
+    unless (ok(v.value.u32 == tv.value.u32, "Gotten value is correct value")) {
+        prf32(v.value.f32, tv.value.u32);
+    }
+    cmp_code(a.code, ==, REG_ACCESS_SUCCESS, "Getting value succeeds");
 }
 
 typedef enum SensorRegisterV2 {
@@ -663,44 +680,44 @@ t_block_access(void)
     RegisterAccess a;
 
     RegisterInit success = register_init(&bfg2000v2);
-    cmp_ok(success.code, "==", REG_INIT_SUCCESS, "BFG2000v2 initialises");
-
+    cmp_code(success.code, ==, REG_INIT_SUCCESS, "BFG2000v2 initialises");
+    
     /* Reading the memory from one defined table entry has to work, if the
      * register table initialised.*/
     a = register_block_read(&bfg2000v2, 0x2, 1, buf);
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "V2_MINOR_VERSION reads");
-    cmp_ok(buf[0], "==", 427, "V2_MINOR_VERSION has correct value");
-
+    cmp_code(a.code, ==, REG_ACCESS_SUCCESS, "V2_MINOR_VERSION reads");
+    cmp_code(buf[0], ==, 427, "V2_MINOR_VERSION has correct value");
+    
     /* Now here's a spot in the address space, that's not mapped to memory.
      * That's what we call a hole. Accessing those fails. This hole is located
      * directly above a mapped area. */
     a = register_block_read(&bfg2000v2, 0x40, 1, buf);
-    cmp_ok(a.code, "==", REG_ACCESS_NOENTRY, "0x40 is the start of a hole");
-    cmp_ok(a.address, "==", 0x40, "Address 0x40 is correctly signaled");
-
+    cmp_code(a.code, ==, REG_ACCESS_NOENTRY, "0x40 is the start of a hole");
+    cmp_code(a.address, ==, 0x40, "Address 0x40 is correctly signaled");
+    
     /* Starting out in mapped addresses, but reading into a hole also fails.
      * And the system has to return the address where the error occured. */
     a = register_block_read(&bfg2000v2, 0x3f, 2, buf);
-    cmp_ok(a.code, "==", REG_ACCESS_NOENTRY, "0x3f is okay, but 0x40 still a hole");
-    cmp_ok(a.address, "==", 0x40, "Address 0x40 is correctly signaled (partial)");
-
+    cmp_code(a.code, ==, REG_ACCESS_NOENTRY, "0x3f is okay, but 0x40 still a hole");
+    cmp_code(a.address, ==, 0x40, "Address 0x40 is correctly signaled (partial)");
+    
     /* This is a direct hole again. It's directly below a mapped area. */
     a = register_block_read(&bfg2000v2, 0xfff, 1, buf);
-    cmp_ok(a.code, "==", REG_ACCESS_NOENTRY, "0xfff is a hole");
-    cmp_ok(a.address, "==", 0xfff, "Address 0xfff is correctly signaled");
-
+    cmp_code(a.code, ==, REG_ACCESS_NOENTRY, "0xfff is a hole");
+    cmp_code(a.address, ==, 0xfff, "Address 0xfff is correctly signaled");
+    
     /* Starting in a hole fails. It doesn't matter if the block read would span
      * into mapped memory eventually. */
     a = register_block_read(&bfg2000v2, 0xfff, 2, buf);
-    cmp_ok(a.code, "==", REG_ACCESS_NOENTRY, "Still 0xfff is a hole");
-    cmp_ok(a.address, "==", 0xfff, "Address 0xfff is correctly signaled (partial)");
-
+    cmp_code(a.code, ==, REG_ACCESS_NOENTRY, "Still 0xfff is a hole");
+    cmp_code(a.address, ==, 0xfff, "Address 0xfff is correctly signaled (partial)");
+    
     /* Now reading mapped memory that does not contain entries, will *work*.
      * This register implementation will initialise all unmapped memory to all
      * zero bits. Let's read 0x20 atoms starting at address 0x20. */
     a = register_block_read(&bfg2000v2, 0x20, 0x20, buf);
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS,
-           "Reading a mapped but unoccupied chunk of memory works");
+    cmp_code(a.code, ==, REG_ACCESS_SUCCESS,
+             "Reading a mapped but unoccupied chunk of memory works");
     {
         RegisterAtom expect[0x20];
         memset(expect, 0u, 0x20 * sizeof(RegisterAtom));
@@ -712,56 +729,62 @@ t_block_access(void)
      * the 0x1000 area should not change with faulty write accesses. */
     memset(buf, 0u, 0x100 * sizeof(RegisterAtom));
     a = register_block_write(&bfg2000v2, 0x1000, 0x100, buf);
-    cmp_ok(a.code, "==", REG_ACCESS_NOENTRY, "Block write into hole fails");
+    cmp_code(a.code, ==, REG_ACCESS_NOENTRY, "Block write into hole fails");
     /* 0x1080 is *correct*, because there are two areas adjacent to each other
      * with no holes in between. Both are 0x40 bytes long; thus 0x1080. */
-    cmp_ok(a.address, "==", 0x1080,
-           "Block write error indicates correct address");
+    cmp_code(a.address, ==, 0x1080,
+             "Block write error indicates correct address");
     {
         RegisterValue cur, def;
         register_get(&bfg2000v2, V2_PLASMA_KIND, &cur);
         register_default(&bfg2000v2, V2_PLASMA_KIND, &def);
-        cmp_ok(cur.type, "==", def.type,
-               "V2_PLASMA_KIND type unchanged [%s]", type2string(cur.type));
-        cmp_ok(cur.value.u32, "==", def.value.u32,
-               "V2_PLASMA_KIND value unchanged [0x%08"PRIx32"]", cur.value.u32);
+        cmp_code(cur.type, ==, def.type,
+                 "V2_PLASMA_KIND type unchanged [%s]", type2string(cur.type));
+        unless (ok(cur.value.u32 == def.value.u32,
+                   "V2_PLASMA_KIND value unchanged")) {
+            pru32(cur.value.u32, def.value.u32);
+        }
         register_get(&bfg2000v2, V2_AGE_OF_UNIVERSE, &cur);
         register_default(&bfg2000v2, V2_AGE_OF_UNIVERSE, &def);
-        ok(cur.type == def.type,
-           "V2_AGE_OF_UNIVERSE type unchanged [%s]", type2string(cur.type));
-        ok(cur.value.u64 == def.value.u64,
-           "V2_AGE_OF_UNIVERSE value unchanged [0x%016"PRIx64"]",
-           cur.value.u64);
+        unless (ok(cur.type == def.type,
+                   "V2_AGE_OF_UNIVERSE type unchanged [%s]",
+                   type2string(cur.type))) {
+            pru32(cur.type, def.type);
+        }
+        unless (ok(cur.value.u64 == def.value.u64,
+                   "V2_AGE_OF_UNIVERSE value unchanged")) {
+            pru64(cur.value.u64, def.value.u64);
+        }
     }
 
     /* Trying to write into Read-Only areas is also an error */
     a = register_block_write(&bfg2000v2, 0x20, 0x02, buf);
-    cmp_ok(a.code, "==", REG_ACCESS_READONLY, "Block write into RO area fails");
-    cmp_ok(a.address, "==", 0x20, "Block write error indicates correct address");
-
+    cmp_code(a.code, ==, REG_ACCESS_READONLY, "Block write into RO area fails");
+    cmp_code(a.address, ==, 0x20, "Block write error indicates correct address");
+    
     /* Let's do a block write that succeeds and partially touches to register
      * values. */
     a = register_block_write(&bfg2000v2, 0x1001, 0x02, buf);
-    cmp_ok(a.code, "==", REG_ACCESS_SUCCESS, "Correct block write succeeds");
+    cmp_code(a.code, ==, REG_ACCESS_SUCCESS, "Correct block write succeeds");
     {
         RegisterValue cur;
         register_get(&bfg2000v2, V2_PLASMA_KIND, &cur);
-        cmp_ok(cur.type, "==", REG_TYPE_UINT32,
-               "V2_PLASMA_KIND type unchanged [%s]",
-               type2string(REG_TYPE_UINT32));
+        cmp_code(cur.type, ==, REG_TYPE_UINT32,
+                 "V2_PLASMA_KIND type unchanged [%s]",
+                 type2string(REG_TYPE_UINT32));
         /* Little endian means that the second word in a u32 register maps to
          * the upper 16 bit. */
-        cmp_ok(cur.value.u32, "==", 0x00005678u,
-               "V2_PLASMA_KIND value unchanged [0x%08"PRIx32"]", cur.value.u32);
+        cmp_code(cur.value.u32, ==, 0x00005678u,
+                 "V2_PLASMA_KIND value unchanged [0x%08"PRIx32"]", cur.value.u32);
         register_get(&bfg2000v2, V2_AGE_OF_UNIVERSE, &cur);
-        cmp_ok(cur.type, "==", REG_TYPE_UINT64,
-               "V2_AGE_OF_UNIVERSE type unchanged [%s]",
-               type2string(REG_TYPE_UINT64));
-        /* Similarly, the first word means the lower 16 bit. (Using ok(),
-         * because cmp_ok() does not support 64 bit values. */
-        ok((cur.value.u64 == 0x8765432112340000ull),
-           "V2_AGE_OF_UNIVERSE value unchanged [0x%08"PRIx64"]",
-           cur.value.u64);
+        cmp_code(cur.type, ==, REG_TYPE_UINT64,
+                 "V2_AGE_OF_UNIVERSE type unchanged [%s]",
+                 type2string(REG_TYPE_UINT64));
+        /* Similarly, the first word means the lower 16 bit. */
+        unless (ok((cur.value.u64 == 0x8765432112340000ull),
+                   "V2_AGE_OF_UNIVERSE value unchanged")) {
+            pru64(cur.value.u64, 0x8765432112340000ull);
+        }
     }
 }
 
@@ -784,13 +807,12 @@ t_hexstring(void)
     };
 
     RegisterInit success = register_init(&regs);
-    cmp_ok(success.code, "==", REG_INIT_SUCCESS, "hexstr: regs initialises");
+    cmp_code(success.code, ==, REG_INIT_SUCCESS, "hexstr: regs initialises");
     RegisterAccess acc = register_set_from_hexstr(&regs, 0u, sha1, 12u);
-    cmp_ok(acc.code, "==", REG_ACCESS_SUCCESS, "hexstr: transfer worked");
-    cmp_ok(regs.area->mem[0], "==", 0x1234u, "hexstr: First word is correct");
-    cmp_ok(regs.area->mem[1], "==", 0x5678u, "hexstr: Second word is correct");
-    cmp_ok(regs.area->mem[2], "==", 0x9abcu, "hexstr: Third word is correct");
-    cmp_ok(regs.area->mem[3], "==", 0x0000u, "hexstr: Fourth word is correct");
+    cmp_code(acc.code, ==, REG_ACCESS_SUCCESS, "hexstr: transfer worked");
+    uint16_t expect[] = { 0x1234u, 0x5678u, 0x9abcu, 0x0000u };
+    cmp_mem(regs.area->mem, expect, 4u * sizeof(uint16_t),
+            "hexstr sets up memory correctly.");
 }
 
 static void
@@ -811,8 +833,8 @@ t_sanitise(void)
     };
 
     RegisterInit success = register_init(&regs);
-    cmp_ok(success.code, "==", REG_INIT_SUCCESS, "sanitise: regs initialises");
-
+    cmp_code(success.code, ==, REG_INIT_SUCCESS, "sanitise: regs initialises");
+    
     /* Write stuff into memory outside the control of the system: */
     regs.area->mem[0] =   0u;
     regs.area->mem[1] =  10u;
@@ -820,20 +842,17 @@ t_sanitise(void)
     regs.area->mem[3] = 200u;
 
     RegisterAccess acc = register_sanitise(&regs);
-    cmp_ok(acc.code, "==", REG_ACCESS_SUCCESS, "sanitise: process succeeded");
-
-    cmp_ok(regs.area->mem[0], "==", 20u, "sanitise: reg[0] reset to default");
-    cmp_ok(regs.area->mem[1], "==", 30u, "sanitise: reg[1] reset to default");
-    cmp_ok(regs.area->mem[2], "==", 40u, "sanitise: reg[2] reset to default");
-    cmp_ok(regs.area->mem[3], "==", 200u,
-           "sanitise: reg[3] was set to a value within constaints"
-           " and therefore stays like this");
+    cmp_code(acc.code, ==, REG_ACCESS_SUCCESS, "sanitise: process succeeded");
+    
+    uint16_t expect[] = { 20u, 30u, 40u, 200u };
+    cmp_mem(regs.area->mem, expect, 4u * sizeof(uint16_t),
+            "sanitise sets up memory correctly, obeying constraints");
 }
 
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(3+1+1+4+16+47+(7*18)+15+26+6+6);
+    plan(3+1+1+4+16+47+(7*18)+15+26+3+3);
     t_invalid_tables();    /*  3 */
     t_trivial_success();   /*  1 */
     t_trivial_fail();      /*  1 */
@@ -849,7 +868,7 @@ main(UNUSED int argc, UNUSED char *argv[])
     t_f32_regs();          /* 18 */
     t_f32_abnormal();      /* 15 */
     t_block_access();      /* 26 */
-    t_hexstring();         /*  6 */
-    t_sanitise();          /*  6 */
+    t_hexstring();         /*  3 */
+    t_sanitise();          /*  3 */
     return EXIT_SUCCESS;
 }

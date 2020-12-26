@@ -2,9 +2,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <tap.h>
-
 #include <common/compiler.h>
+#include <test/tap.h>
 
 #include <c/binary-format.h>
 

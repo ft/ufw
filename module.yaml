@@ -28,7 +28,3 @@ cmake-extensions:
 cmake-extension-variants:
   st-cmsis: ^st-cmsis-device-.*$
   stm32-hal: ^stm32[^x]*xx-hal-driver$
-
-dependencies:
-  - name: libtap
-    revision: master

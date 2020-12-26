@@ -10,11 +10,6 @@ include(CheckIncludeFile)
 
 set(test_names)
 
-if (NOT TARGET tap)
-  message(STATUS "Libtap wasn't found, giving up on test-suite!")
-  return()
-endif()
-
 list(APPEND test_names
   t-binary-format
   t-persistent-storage
@@ -28,7 +23,7 @@ foreach (tst ${test_names})
   ufw_toolchain(${tst} FEATURES sanitize-address
                                 sanitize-integer
                                 sanitize-undefined-behaviour)
-  target_link_libraries(${tst} PRIVATE ufw tap)
+  target_link_libraries(${tst} PRIVATE ufw ufw-tap)
   MakeStrictCompilerC(${tst})
   MakeFatalCompilerC(${tst})
   set_target_cpu(${tst})
