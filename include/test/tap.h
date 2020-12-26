@@ -20,7 +20,8 @@
 extern "C" {
 #endif
 
-void plan(long unsigned int);
+/* TAP worker API */
+
 bool ufw_test_ok(const char*, long unsigned int,
                  bool, const char*,
                  const char*, ...);
@@ -30,9 +31,9 @@ bool ufw_test_cmp_mem(const char*, long unsigned int,
                       size_t,
                       const char*, ...);
 
+/* TAP user API */
 
-size_t memdiff(const void*, const void*, size_t);
-void print_word_hex(const void*, size_t, size_t, size_t);
+void plan(long unsigned int);
 
 #define ok(expr, ...)                           \
     ufw_test_ok(__FILE__, __LINE__,             \
@@ -46,7 +47,14 @@ void print_word_hex(const void*, size_t, size_t, size_t);
                      n,                         \
                      __VA_ARGS__)
 
+/* Generic utilities for tests */
+
+size_t memdiff(const void*, const void*, size_t);
+void print_word_hex(const void*, size_t, size_t, size_t);
+
 #define unless(x) if (!(x))
+
+/* Output utilities */
 
 #define declare_printer(N,T)                                    \
     void ufw_test_pr ## N(const char*, T, const char*, T)
