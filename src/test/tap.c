@@ -19,6 +19,8 @@
 #include <common/toolchain.h>
 #include <test/tap.h>
 
+static long unsigned int test_count = 0u;
+
 static void tap_result(
     const bool, const char*, unsigned long, const char*, va_list);
 
@@ -27,11 +29,12 @@ tap_result(const bool result,
            const char *file, unsigned long line,
            const char *fmt, va_list ap)
 {
+    test_count++;
     if (result == false) {
         fputs("not ", stdout);
     }
 
-    fputs("ok - ", stdout);
+    printf("ok %lu - ", test_count);
     vprintf(fmt, ap);
     putchar('\n');
 
@@ -46,6 +49,7 @@ void
 plan(long unsigned int n)
 {
     printf("1..%lu\n", n);
+    test_count = 0u;
 }
 
 bool
