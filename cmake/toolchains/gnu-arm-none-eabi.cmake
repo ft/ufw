@@ -15,7 +15,7 @@ set(ARM_SIZE ${ARM_TOOLCHAIN_DIR}/arm-none-eabi-size)
 set(CMAKE_C_FLAGS_INIT
     "-fdata-sections -ffunction-sections -frecord-gcc-switches -pipe")
 
-set(CMAKE_EXE_LINKER_FLAGS "--specs=nosys.specs" CACHE INTERNAL "")
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 set(OBJCOPY ${ARM_OBJCOPY})
 set(OBJDUMP ${ARM_OBJDUMP})
