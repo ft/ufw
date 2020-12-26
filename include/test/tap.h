@@ -73,8 +73,10 @@ declare_printer(s16,  int16_t);
 
 declare_printer(u32, uint32_t);
 declare_printer(s32,  int32_t);
+declare_printer(f32,  float);
 #define pru32(ls, rs) ufw_test_pru32(#ls, ls, #rs, rs)
 #define prs32(ls, rs) ufw_test_prs32(#ls, ls, #rs, rs)
+#define prf32(ls, rs) ufw_test_prf32(#ls, ls, #rs, rs)
 
 declare_printer(u64, uint64_t);
 declare_printer(s64,  int64_t);

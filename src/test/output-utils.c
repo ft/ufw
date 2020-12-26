@@ -24,6 +24,16 @@
     print_word_hex(&rs, 0u, sizeof(rs), sizeof(rs));            \
     printf("#\n");
 
+#define printer_body_simple(P)                                  \
+    printf("# Expressions: a: (%s) b: (%s)\n#\n", nls, nrs);    \
+    printf("#   dec:  a: %"        P  "\n", ls);                \
+    printf("#         b: %"        P  "\n", rs);                \
+    printf("#   mem:  a: ");                                    \
+    print_word_hex(&ls, 0u, sizeof(ls), sizeof(ls));            \
+    printf("#         b: ");                                    \
+    print_word_hex(&rs, 0u, sizeof(rs), sizeof(rs));            \
+    printf("#\n");
+
 #define unsupported(N,T)                                                \
     void                                                                \
     ufw_test_pr ## N(const char *nls, UNUSED T ls,                      \
@@ -47,6 +57,7 @@ define_printer(u16, uint16_t) { printer_body(PRIu16, PRIx16,  4, PRIo16,  6); }
 define_printer(s16,  int16_t) { printer_body(PRId16, PRIx16,  4, PRIo16,  6); }
 define_printer(u32, uint32_t) { printer_body(PRIu32, PRIx32,  8, PRIo32, 11); }
 define_printer(s32,  int32_t) { printer_body(PRId32, PRIx32,  8, PRIo32, 11); }
+define_printer(f32,  float)   { printer_body_simple("f"); }
 #if defined(PRId64) && defined(PRIx64) && defined (PRIo64)
 define_printer(u64, uint64_t) { printer_body(PRIu64, PRIx64, 16, PRIo64, 22); }
 define_printer(s64,  int64_t) { printer_body(PRId64, PRIx64, 16, PRIo64, 22); }
