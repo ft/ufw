@@ -4,8 +4,10 @@ include(UFWTest)
 ufw_test_init()
 
 set(test_names)
+if (WITH_UINT8_T)
+  list(APPEND test_names t-binary-format)
+endif()
 list(APPEND test_names
-  t-binary-format
   t-persistent-storage
   t-register-table
   t-ring-buffer)
