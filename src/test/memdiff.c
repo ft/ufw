@@ -387,6 +387,7 @@ memdiff(const void *a, const void *b, size_t n)
         .position = 0u, .count = 0u };
 
     A.valid = false;
+    A.lineoffset = 0u;
     for (;;) {
         B = finddiff(&diff);
         if (rundiff(&diff, &A, &B) == false) {
