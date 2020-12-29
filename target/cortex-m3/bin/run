@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# This is the emulation-based program runner for the ufw test-suite. This
+# script runs an ARM Cortex-M3 program via QEMU. It enables semihosting, and
+# disables all graphical output. That way, stdio is connected to that of the
+# QEMU process.
+#
+# This also disables reboot, when the program being run issues a system reset
+# command, which makes QEMU exit instead.
+#
+# With both of these features in place, it is possible to run Cortex-M3 appli-
+# cations in QEMU and have them exit after they are done, which is perfect for
+# running ufw's test-suite. That test-suite uses TAP output, which means this
+# script is suitable for prove(1)'s ‘--exec’ option.
+
+exec qemu-system-arm      \
+     -cpu cortex-m3       \
+     -machine lm3s6965evb \
+     -no-reboot           \
+     -semihosting         \
+     -nographic           \
+     -monitor null        \
+     -vga none            \
+     -serial none         \
+     -kernel "$@"
