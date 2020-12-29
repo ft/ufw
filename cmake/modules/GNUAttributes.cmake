@@ -37,6 +37,12 @@ set(__UFW_GNUAttribute_unused
   "int foo __attribute__((unused));
    int main(void) { return 0; }")
 
+set(__UFW_GNUAttribute_weak_alias
+  "void bar(void);
+   void bar(void) { return; }
+   void foo(void) __attribute__((weak, alias(\"bar\")));
+   int main(void) { return 0; }")
+
 set(__UFW_GNUAttribute_warn_unused_result
   "struct foo { int a; int b; };
    __attribute__((warn_unused_result))
@@ -85,6 +91,12 @@ macro(CheckGNUAttribute_C_unused)
     FAIL_REGEX "${__UFW_GNUAttributes_warning_fail}")
 endmacro()
 
+macro(CheckGNUAttribute_C_weak_alias)
+  check_c_source_compiles("${__UFW_GNUAttribute_weak_alias}"
+    UFW_CC_HAS_ATTRIBUTE_WEAK_ALIAS
+    FAIL_REGEX "${__UFW_GNUAttributes_warning_fail}")
+endmacro()
+
 macro(CheckGNUAttribute_C_warn_unused_result)
   check_c_source_compiles("${__UFW_GNUAttribute_warn_unused_result}"
     UFW_CC_HAS_ATTRIBUTE_WARN_UNUSED_RESULT
@@ -99,6 +111,7 @@ macro(CheckAllGNUAttributes_C)
   CheckGNUAttribute_C_packed()
   CheckGNUAttribute_C_section()
   CheckGNUAttribute_C_unused()
+  CheckGNUAttribute_C_weak_alias()
   CheckGNUAttribute_C_warn_unused_result()
 endmacro()
 
@@ -145,6 +158,12 @@ macro(CheckGNUAttribute_CXX_unused)
     FAIL_REGEX "${__UFW_GNUAttributes_warning_fail}")
 endmacro()
 
+macro(CheckGNUAttribute_CXX_weak_alias)
+  check_c_source_compiles("${__UFW_GNUAttribute_weak_alias}"
+    UFW_CXX_HAS_ATTRIBUTE_WEAK_ALIAS
+    FAIL_REGEX "${__UFW_GNUAttributes_warning_fail}")
+endmacro()
+
 macro(CheckGNUAttribute_CXX_warn_unused_result)
   check_cxx_source_compiles("${__UFW_GNUAttribute_warn_unused_result}"
     UFW_CXX_HAS_ATTRIBUTE_WARN_UNUSED_RESULT
@@ -159,5 +178,6 @@ macro(CheckAllGNUAttributes_CXX)
   CheckGNUAttribute_CXX_packed()
   CheckGNUAttribute_CXX_section()
   CheckGNUAttribute_CXX_unused()
+  CheckGNUAttribute_CXX_weak_alias()
   CheckGNUAttribute_CXX_warn_unused_result()
 endmacro()

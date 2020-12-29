@@ -63,6 +63,21 @@
 #endif /* HAVE_COMPILER_ATTRIBUTE_UNUSED */
 
 /**
+ * Define a weak alias for a symbol
+ *
+ * This allows user code to override the definition of a symbol.
+
+ * @code
+ * void _ufw_isr_system_tick(void) WEAK_ALIAS(_ufw_isr_fallback);
+ * @endcode
+ */
+#ifdef HAVE_COMPILER_ATTRIBUTE_WEAK_ALIAS
+#define WEAK_ALIAS(x) __attribute__ ((weak, alias(#x)))
+#else
+#define WEAK_ALIAS
+#endif /* HAVE_COMPILER_ATTRIBUTE_UNUSED */
+
+/**
  * Tell the compiler that function will never ever return.
  *
  * @code

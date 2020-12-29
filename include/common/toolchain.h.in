@@ -61,6 +61,8 @@
 #cmakedefine01 UFW_CC_HAS_ATTRIBUTE_SECTION
 /** Reflect C compiler's support for `__attribute__((unused))` */
 #cmakedefine01 UFW_CC_HAS_ATTRIBUTE_UNUSED
+/** Reflect C compiler's support for `__attribute__((weak, alias(...)))` */
+#cmakedefine01 UFW_CC_HAS_ATTRIBUTE_WEAK_ALIAS
 /** Reflect C compiler's support for `__attribute__((warn_unused_result))` */
 #cmakedefine01 UFW_CC_HAS_ATTRIBUTE_WARN_UNUSED_RESULT
 /** Reflect C compiler's support for `__builtin__((expect))` */
@@ -119,6 +121,8 @@
 #cmakedefine01 UFW_CXX_HAS_ATTRIBUTE_SECTION
 /** Reflect C++ compiler's support for `__attribute__((unused))` */
 #cmakedefine01 UFW_CXX_HAS_ATTRIBUTE_UNUSED
+/** Reflect C++ compiler's support for `__attribute__((weak, alias(...)))` */
+#cmakedefine01 UFW_CC_HAS_ATTRIBUTE_WEAK_ALIAS
 /** Reflect C++ compiler's support for `__attribute__((warn_unused_result))` */
 #cmakedefine01 UFW_CXX_HAS_ATTRIBUTE_WARN_UNUSED_RESULT
 /** Reflect C++ compiler's support for `__builtin__((expect))` */
@@ -170,6 +174,11 @@
 /** Show if the active compiler has support for `__attribute__((unused))` */
 #define HAVE_COMPILER_ATTRIBUTE_UNUSED
 #endif /* UFW_CXX_HAS_ATTRIBUTE_UNUSED */
+
+#if (UFW_CXX_HAS_ATTRIBUTE_WEAK_ALIAS > 0)
+/** Show if the active compiler has support for `__attribute__((weak, alias(...)))` */
+#define HAVE_COMPILER_ATTRIBUTE_WEAK_ALIAS
+#endif /* UFW_CXX_HAS_ATTRIBUTE_WEAK_ALIAS */
 
 #if (UFW_CXX_HAS_ATTRIBUTE_WARN_UNUSED_RESULT > 0)
 /** Show if the active compiler has support for `__attribute__((warn_unused_result))` */
@@ -234,6 +243,11 @@
 /** Show if the active compiler has support for `__attribute__((unused))` */
 #define HAVE_COMPILER_ATTRIBUTE_UNUSED
 #endif /* UFW_CC_HAS_ATTRIBUTE_UNUSED */
+
+#if (UFW_CC_HAS_ATTRIBUTE_WEAK_ALIAS > 0)
+/** Show if the active compiler has support for `__attribute__((weak, alias(...)))` */
+#define HAVE_COMPILER_ATTRIBUTE_WEAK_ALIAS
+#endif /* UFW_CC_HAS_ATTRIBUTE_WEAK_ALIAS */
 
 #if (UFW_CC_HAS_ATTRIBUTE_WARN_UNUSED_RESULT > 0)
 /** Show if the active compiler has support for `__attribute__((warn_unused_result))` */
