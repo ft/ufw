@@ -1,6 +1,9 @@
 cmake_minimum_required (VERSION 3.8.2)
 project(ufw C CXX)
 
+include(CTest)
+enable_testing()
+
 if ((NOT CMAKE_BUILD_TYPE) OR ("${CMAKE_BUILD_TYPE}" STREQUAL ""))
   set(CMAKE_BUILD_TYPE "debug")
 endif()
