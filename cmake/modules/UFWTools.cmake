@@ -10,28 +10,28 @@ define_property(
 
 define_property(
   TARGET PROPERTY UFW_BOARD_CPU_FAMILY
-  BRIEF_DOCS "Name of Embedded Board defined by target."
-  FULL_DOCS "Name of Embedded Board defined by target.")
+  BRIEF_DOCS "Family of the CPU used by defined board."
+  FULL_DOCS "Family of the CPU used by defined board.")
 
 define_property(
   TARGET PROPERTY UFW_BOARD_CPU_HANDLE
-  BRIEF_DOCS "Name of Embedded Board defined by target."
-  FULL_DOCS "Name of Embedded Board defined by target.")
+  BRIEF_DOCS "Full name of CPU used by defined board."
+  FULL_DOCS "Full name of CPU used by defined board.")
 
 define_property(
   TARGET PROPERTY UFW_BOARD_CPU_VENDOR
-  BRIEF_DOCS "Name of Embedded Board defined by target."
-  FULL_DOCS "Name of Embedded Board defined by target.")
+  BRIEF_DOCS "Name of vendor of CPU used by defined board."
+  FULL_DOCS "Name of vendor of CPU used by defined board.")
 
 define_property(
   TARGET PROPERTY UFW_BOARD_ARCHITECTURE
-  BRIEF_DOCS "Name of Embedded Board defined by target."
-  FULL_DOCS "Name of Embedded Board defined by target.")
+  BRIEF_DOCS "Architecture of CPU used by defined board."
+  FULL_DOCS "Architecture of CPU used by defined board.")
 
 define_property(
   TARGET PROPERTY UFW_BOARD_DEFAULT_LINKERSCRIPT
-  BRIEF_DOCS "Default linker script to use with a board."
-  FULL_DOCS "Default linker script to use with a board.")
+  BRIEF_DOCS "Linkerscript used for defined board."
+  FULL_DOCS "Linkerscript used for defined board.")
 
 function(ufw_set_property target prop value)
   set_target_properties(${target} PROPERTIES UFW_${prop} ${value})
