@@ -128,7 +128,7 @@
 /** Reflect C++ compiler's support for `__attribute__((unused))` */
 #cmakedefine01 UFW_CXX_HAS_ATTRIBUTE_UNUSED
 /** Reflect C++ compiler's support for `__attribute__((weak, alias(...)))` */
-#cmakedefine01 UFW_CC_HAS_ATTRIBUTE_WEAK_ALIAS
+#cmakedefine01 UFW_CXX_HAS_ATTRIBUTE_WEAK_ALIAS
 /** Reflect C++ compiler's support for `__attribute__((warn_unused_result))` */
 #cmakedefine01 UFW_CXX_HAS_ATTRIBUTE_WARN_UNUSED_RESULT
 /** Reflect C++ compiler's support for `__builtin__((expect))` */
