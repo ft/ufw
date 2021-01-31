@@ -128,7 +128,8 @@ _ufw_system_reset(void)
 /* Default interrupt service routine */
 
 void
-_ufw_isr_fallback(void) {
+_ufw_isr_fallback(void)
+{
     for (;;) {
         asm(" nop");
     }
