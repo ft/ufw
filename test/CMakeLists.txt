@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.8.2)
 
+if (DEFINED UFW_ZEPHYR_KERNEL)
+  return()
+endif()
+
 include(UFWTest)
 ufw_test_init()
 
