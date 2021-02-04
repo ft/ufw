@@ -18,7 +18,7 @@ function(ufw_test_qemu arch with_qemu)
 endfunction()
 
 function(ufw_get_test_runner var)
-  if (${PROJECT_TARGET_CPU} STREQUAL cortex-m3)
+  if ("${PROJECT_TARGET_CPU}" STREQUAL cortex-m3)
     set(${var} "${MICROFRAMEWORK_ROOT}/target/cortex-m3/bin/run" PARENT_SCOPE)
   else()
     set(${var} "" PARENT_SCOPE)
