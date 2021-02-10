@@ -93,7 +93,7 @@ macro(gitint_install)
   cmake_parse_arguments(
     PARSED_ARGS
     ""
-    "DESTINATION;BUILD_VARIANT;TARGET_MCU"
+    "DESTINATION;BUILD_VARIANT;LATEST_ARTIFACTS;TARGET_MCU"
     "FILES;SCRIPTS"
     ${ARGN})
   if (NOT MICROFRAMEWORK_ROOT)
@@ -109,6 +109,22 @@ macro(gitint_install)
   if (NOT PARSED_ARGS_TARGET_MCU)
     set(PARSED_ARGS_TARGET_MCU "")
   endif()
+
+  if (DEFINED PARSED_ARGS_LATEST_ARTIFACTS)
+  install(CODE "
+foreach (srcfile ${PARSED_ARGS_FILES})
+  if(NOT EXISTS \${srcfile})
+    message(SEND_ERROR \"File \${srcfile} not found.\")
+  endif()
+  get_filename_component(_EXT_ \"\${srcfile}\" EXT)
+  get_filename_component(_REALPATH_ \"\${srcfile}\" REALPATH)
+  set(_OFILE_ \"${PARSED_ARGS_DESTINATION}/latest/${PARSED_ARGS_LATEST_ARTIFACTS}\${_EXT_}\")
+  message(\"-- Installing to \${_OFILE_}\")
+  execute_process(COMMAND cmake -E copy_if_different \${_REALPATH_} \${_OFILE_})
+endforeach()
+")
+  endif()
+
   install(CODE "
 set(ENV{BUILD_VARIANT} \"${PARSED_ARGS_BUILD_VARIANT}\")
 set(ENV{IRTT_MCU} \"${PARSED_ARGS_TARGET_MCU}\")
