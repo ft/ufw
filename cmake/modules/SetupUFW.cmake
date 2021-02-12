@@ -30,7 +30,7 @@ function(ufw_add_zephyr name)
   cmake_parse_arguments(PA
     ""
     "KERNEL;APPLICATION;BUILDSYSTEM;MODULE_ROOT"
-    "BOARDS;BUILDTYPES;MODULES;OPTIONS;TOOLCHAINS"
+    "BOARDS;BUILDTYPES;KCONFIG;MODULES;OPTIONS;TOOLCHAINS"
     ${ARGN})
   if (NOT PA_KERNEL)
     set(PA_KERNEL ${CMAKE_SOURCE_DIR}/zephyr/kernel)
@@ -76,6 +76,7 @@ function(ufw_add_zephyr name)
   set(UFW_ZEPHYR_BOARDS_${name} ${PA_BOARDS} PARENT_SCOPE)
 
   set(UFW_ZEPHYR_KERNEL_${name} ${PA_KERNEL} PARENT_SCOPE)
+  set(UFW_ZEPHYR_KCONFIG_${name} ${PA_KCONFIG} PARENT_SCOPE)
   set(UFW_ZEPHYR_OPTIONS_${name} ${PA_OPTIONS} PARENT_SCOPE)
 
   set(UFW_ZEPHYR_MODULE_ROOT_${name} ${PA_MODULE_ROOT} PARENT_SCOPE)
@@ -113,6 +114,7 @@ macro(ufw_recursive_dispatch)
               TOOLCHAIN ${chain}
               BUILDCFG ${cfg}
               KERNEL "${UFW_ZEPHYR_KERNEL_${zapp}}"
+              KCONFIG "${UFW_ZEPHYR_KCONFIG_${zapp}}"
               OPTIONS "${UFW_ZEPHYR_OPTIONS_${zapp}}"
               MODULE_ROOT "${UFW_ZEPHYR_MODULE_ROOT_${zapp}}"
               MODULES "${UFW_ZEPHYR_MODULES_${zapp}}")
