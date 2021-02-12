@@ -1,0 +1,16 @@
+CMake Build Type to Zephyr Build Optimisation Mapping
+-----------------------------------------------------
+
+The kconfig snippets contained within this directory try to map the usual CMake
+build type nomenclature to zephyr's kconfig options.  Here is a run down of the
+involved options and what they do with respect to the GNU toolchain's compiler.
+
+  - CONFIG_SIZE_OPTIMIZATIONS If set to 'y', enables -Os.
+  - CONFIG_SPEED_OPTIMIZATIONS If set to 'y', enables -O2.
+  - CONFIG_DEBUG_OPTIMIZATIONS: If set to 'y', enables -Og.
+  - CONFIG_NO_OPTIMIZATIONS: If set to 'y', enables -O0.
+
+The CMAKE_BUILD_TYPE variable is lower-cased  and if a corresponding .conf file
+exists in this  directory, it is loaded at configuration  time. For example, if
+the build type  is configured to be "Release" this  causes "release.conf" to be
+loaded.
