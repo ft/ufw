@@ -61,7 +61,6 @@ if test "x$1" = x--; then
     done
 fi
 
-set -x
 if test "x$HARDWARE_TYPE" != x; then
     # Backward compatibility
     FIRMWARE_NAME="$HARDWARE_TYPE"
@@ -78,7 +77,6 @@ fi
 if test "$BUILD_VARIANT" != default; then
     BITSTREAM_PREFIX="${BITSTREAM_PREFIX}_${BUILD_VARIANT}"
 fi
-set +x
 
 if type git_populate > /dev/null 2>&1; then
     # User supplied git.sh in FILES-TO-SOURCE.
