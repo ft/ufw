@@ -113,6 +113,7 @@ macro(ufw_recursive_dispatch)
               BOARD ${board}
               TOOLCHAIN ${chain}
               BUILDCFG ${cfg}
+              ROOT "${UFW_ZEPHYR_APPLICATION_${zapp}}"
               KERNEL "${UFW_ZEPHYR_KERNEL_${zapp}}"
               KCONFIG "${UFW_ZEPHYR_KCONFIG_${zapp}}"
               OPTIONS "${UFW_ZEPHYR_OPTIONS_${zapp}}"

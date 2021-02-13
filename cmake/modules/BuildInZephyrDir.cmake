@@ -157,7 +157,7 @@ function(ufw_zephyr_add_kconfig lst)
 endfunction()
 
 function(ufw_build_zephyr)
-  set(__single_args APPLICATION BOARD BUILDCFG KERNEL MODULE_ROOT TOOLCHAIN)
+  set(__single_args APPLICATION BOARD BUILDCFG KERNEL MODULE_ROOT ROOT TOOLCHAIN)
   set(__multi_args KCONFIG MODULES OPTIONS)
   cmake_parse_arguments(PA "" "${__single_args}" "${__multi_args}" ${ARGN})
   if (${UFW_ZEPHYR_DEBUG})
@@ -201,7 +201,7 @@ function(ufw_build_zephyr)
   endif()
 
   if (DEFINED kconfig_files)
-    set(kconfig_files "-DCONF_FILE=${kconfig_files}")
+    set(kconfig_files "-DOVERLAY_CONFIG=${kconfig_files}")
   endif()
 
   ExternalProject_Add("zephyr-${PA_APPLICATION}_${PA_BOARD}_${tc_name}_${PA_BUILDCFG}"
@@ -212,6 +212,7 @@ function(ufw_build_zephyr)
     -DCMAKE_INSTALL_PREFIX=${__install_prefix__}
     -DUFW_RECURSIVE_RUN=1
     -DUFW_ZEPHYR_KERNEL=${PA_KERNEL}
+    -DAPPLICATION_SOURCE_DIR=${PA_ROOT}
     -DBOARD=${PA_BOARD}
     ${tc_args}
     ${module_params}
