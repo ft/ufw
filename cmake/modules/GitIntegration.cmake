@@ -92,25 +92,42 @@ endmacro()
 macro(gitint_install)
   cmake_parse_arguments(
     PARSED_ARGS
-    ""
-    "DESTINATION;BUILD_VARIANT;LATEST_ARTIFACTS;TARGET_MCU"
+    "LATEST_ARTIFACTS"
+    "DESTINATION;BUILD_VARIANT;NAME;TARGET_MCU;TYPE"
     "FILES;SCRIPTS"
     ${ARGN})
   if (NOT MICROFRAMEWORK_ROOT)
     message(FATAL_ERROR "MICROFRAMEWORK_ROOT is not set! Cannot continue.")
   endif()
+  set(GENERATE_OPTIONS)
   if (NOT PARSED_ARGS_DESTINATION)
     set(PARSED_ARGS_DESTINATION "${CMAKE_INSTALL_PREFIX}")
   endif()
 
-  if (NOT PARSED_ARGS_BUILD_VARIANT)
-    set(PARSED_ARGS_BUILD_VARIANT "")
-  endif()
-  if (NOT PARSED_ARGS_TARGET_MCU)
-    set(PARSED_ARGS_TARGET_MCU "")
+  if (DEFINED PARSED_ARGS_BUILD_VARIANT)
+    list(APPEND GENERATE_OPTIONS -b "${PARSED_ARGS_BUILD_VARIANT}")
   endif()
 
-  if (DEFINED PARSED_ARGS_LATEST_ARTIFACTS)
+  if (DEFINED PARSED_ARGS_TARGET_MCU)
+    list(APPEND GENERATE_OPTIONS -m "${PARSED_ARGS_TARGET_MCU}")
+  endif()
+
+  if (DEFINED PARSED_ARGS_NAME)
+    list(APPEND GENERATE_OPTIONS -n "${PARSED_ARGS_NAME}")
+  else()
+    set(PARSED_ARGS_NAME "${PROJECT_NAME}")
+  endif()
+
+  if (DEFINED PARSED_ARGS_TYPE)
+    list(APPEND GENERATE_OPTIONS -t "${PARSED_ARGS_TARGET_TYPE}")
+  endif()
+
+  if (DEFINED CMAKE_BUILD_TYPE)
+    string(TOLOWER "${CMAKE_BUILD_TYPE}" profile)
+    list(APPEND GENERATE_OPTIONS -p "${profile}")
+  endif()
+
+  if (PARSED_ARGS_LATEST_ARTIFACTS)
   install(CODE "
 foreach (srcfile ${PARSED_ARGS_FILES})
   if(NOT EXISTS \${srcfile})
@@ -118,7 +135,7 @@ foreach (srcfile ${PARSED_ARGS_FILES})
   endif()
   get_filename_component(_EXT_ \"\${srcfile}\" EXT)
   get_filename_component(_REALPATH_ \"\${srcfile}\" REALPATH)
-  set(_OFILE_ \"${PARSED_ARGS_DESTINATION}/latest/${PARSED_ARGS_LATEST_ARTIFACTS}\${_EXT_}\")
+  set(_OFILE_ \"${PARSED_ARGS_DESTINATION}/latest/${PARSED_ARGS_NAME}\${_EXT_}\")
   message(\"-- Installing to \${_OFILE_}\")
   execute_process(COMMAND cmake -E copy_if_different \${_REALPATH_} \${_OFILE_})
 endforeach()
@@ -126,12 +143,11 @@ endforeach()
   endif()
 
   install(CODE "
-set(ENV{BUILD_VARIANT} \"${PARSED_ARGS_BUILD_VARIANT}\")
-set(ENV{IRTT_MCU} \"${PARSED_ARGS_TARGET_MCU}\")
 execute_process(
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   COMMAND
   \"${MICROFRAMEWORK_ROOT}/bin/generate-artifacts\"
+  ${GENERATE_OPTIONS}
   doesnotmatter
   ${PARSED_ARGS_DESTINATION}
   \"++\"

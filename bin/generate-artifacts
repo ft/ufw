@@ -1,5 +1,38 @@
 #!/bin/sh
 
+FIRMWARE_NAME=no-name
+FIRMWARE_MCU=unknown
+FIRMWARE_TYPE=generic
+BUILD_VARIANT=default
+BUILD_PROFILE=unknown
+
+MAJOR_VERSION=0
+MINOR_VERSION=0
+PATCHLEVEL=0
+
+is_opt () {
+    case "$1" in
+    -*) return 0 ;;
+    *) return 1 ;;
+    esac
+}
+
+while is_opt "$1"; do
+    opt="$1"
+    value="$2"
+    shift 2
+    case "$opt" in
+    -n) FIRMWARE_NAME="$value" ;;
+    -m) FIRMWARE_MCU="$value"  ;;
+    -t) FIRMWARE_TYPE="$value" ;;
+    -b) BUILD_VARIANT="$value" ;;
+    -p) BUILD_PROFILE="$value" ;;
+    *) printf 'Unknown option: %s\n' "$opt"
+       exit 1
+       ;;
+    esac
+done
+
 base="$1"
 output="$2"
 extensions="$3"
@@ -28,18 +61,24 @@ if test "x$1" = x--; then
     done
 fi
 
+set -x
+if test "x$HARDWARE_TYPE" != x; then
+    # Backward compatibility
+    FIRMWARE_NAME="$HARDWARE_TYPE"
+fi
 # This is the prefix used (in connection with a version tag from the *_VERSION
 # definitions above) to produce the final MCU firmware filenames.
-BITSTREAM_PREFIX="${HARDWARE_TYPE}"
+BITSTREAM_PREFIX="${FIRMWARE_NAME}"
 if test "$FIRMWARE_MCU" != unknown; then
     BITSTREAM_PREFIX="${BITSTREAM_PREFIX}_${FIRMWARE_MCU}"
 fi
 if test "$FIRMWARE_TYPE" != generic; then
     BITSTREAM_PREFIX="${BITSTREAM_PREFIX}_${FIRMWARE_TYPE}"
 fi
-if test "$BUILD_VARIANT" != unknown; then
+if test "$BUILD_VARIANT" != default; then
     BITSTREAM_PREFIX="${BITSTREAM_PREFIX}_${BUILD_VARIANT}"
 fi
+set +x
 
 if type git_populate > /dev/null 2>&1; then
     # User supplied git.sh in FILES-TO-SOURCE.
@@ -63,12 +102,6 @@ if git_got_info; then
         fi
     fi
 else
-    # Fall back to information from definitions.sh
-    if test "x$MAJOR_VERSION" = x; then
-        printf 'artifacts: Basic information is missing.\n' >&2
-        printf 'artifacts: The results of this procedure will look way off!\n' >&2
-    fi
-
     DESTINATION="${BITSTREAM_PREFIX}_v$MAJOR_VERSION"
     DESTINATION="${DESTINATION}.$MINOR_VERSION"
     DESTINATION="${DESTINATION}.${PATCHLEVEL}"
