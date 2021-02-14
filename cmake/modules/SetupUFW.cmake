@@ -90,44 +90,59 @@ endfunction()
 
 macro(ufw_recursive_dispatch)
   if (NOT UFW_RECURSIVE_RUN)
-    foreach (board ${UFW_TOPLEVEL_BOARDS})
-      foreach (chain ${UFW_TOPLEVEL_BOARD_TOOLCHAINS_${board}})
-        foreach (cfg ${UFW_TOPLEVEL_BOARD_BUILDTYPES_${board}})
-          build_in_target_dir(
-            BOARD ${board}
-            OPTIONS "${UFW_TOPLEVEL_BOARD_OPTIONS_${board}}"
-            TOOLCHAIN ${chain}
-            BUILDCFG ${cfg})
-        endforeach()
-      endforeach()
-    endforeach()
-    if (NOT DEFINED UFW_ZEPHYR_DEBUG)
-      set(UFW_ZEPHYR_DEBUG False)
-    endif()
-    foreach (zapp ${UFW_ZEPHYR_APPLICATIONS})
-      foreach (board ${UFW_ZEPHYR_BOARDS_${zapp}})
-        foreach (chain ${UFW_ZEPHYR_TOOLCHAINS_${zapp}})
-          foreach (cfg ${UFW_ZEPHYR_BUILDTYPES_${zapp}})
-            ufw_build_zephyr(
-              APPLICATION ${zapp}
+    if (NOT ((DEFINED UFW_PICK_BOARD) OR (DEFINED UFW_PICK_ZEPHYR)))
+      foreach (board ${UFW_TOPLEVEL_BOARDS})
+        foreach (chain ${UFW_TOPLEVEL_BOARD_TOOLCHAINS_${board}})
+          foreach (cfg ${UFW_TOPLEVEL_BOARD_BUILDTYPES_${board}})
+            build_in_target_dir(
               BOARD ${board}
+              OPTIONS "${UFW_TOPLEVEL_BOARD_OPTIONS_${board}}"
               TOOLCHAIN ${chain}
-              BUILDCFG ${cfg}
-              ROOT "${UFW_ZEPHYR_APPLICATION_${zapp}}"
-              KERNEL "${UFW_ZEPHYR_KERNEL_${zapp}}"
-              KCONFIG "${UFW_ZEPHYR_KCONFIG_${zapp}}"
-              OPTIONS "${UFW_ZEPHYR_OPTIONS_${zapp}}"
-              MODULE_ROOT "${UFW_ZEPHYR_MODULE_ROOT_${zapp}}"
-              MODULES "${UFW_ZEPHYR_MODULES_${zapp}}")
+              BUILDCFG ${cfg})
           endforeach()
         endforeach()
-      endforeach()
-    endforeach()
-    return()
-  endif()
+      endforeach() # UFW_TOPLEVEL_BOARDS
+
+      if (NOT DEFINED UFW_ZEPHYR_DEBUG)
+        set(UFW_ZEPHYR_DEBUG False)
+      endif()
+      foreach (zapp ${UFW_ZEPHYR_APPLICATIONS})
+        foreach (board ${UFW_ZEPHYR_BOARDS_${zapp}})
+          foreach (chain ${UFW_ZEPHYR_TOOLCHAINS_${zapp}})
+            foreach (cfg ${UFW_ZEPHYR_BUILDTYPES_${zapp}})
+              ufw_build_zephyr(
+                APPLICATION ${zapp}
+                BOARD ${board}
+                TOOLCHAIN ${chain}
+                BUILDCFG ${cfg}
+                ROOT "${UFW_ZEPHYR_APPLICATION_${zapp}}"
+                KERNEL "${UFW_ZEPHYR_KERNEL_${zapp}}"
+                KCONFIG "${UFW_ZEPHYR_KCONFIG_${zapp}}"
+                OPTIONS "${UFW_ZEPHYR_OPTIONS_${zapp}}"
+                MODULE_ROOT "${UFW_ZEPHYR_MODULE_ROOT_${zapp}}"
+                MODULES "${UFW_ZEPHYR_MODULES_${zapp}}")
+            endforeach()
+          endforeach()
+        endforeach()
+      endforeach() # ZEPHYR_APPLICATIONS
+      return()
+    elseif (DEFINED UFW_PICK_ZEPHYR)
+      ufw_setup_zephyr(
+        APPLICATION ${UFW_PICK_ZEPHYR}
+        BOARDS "${UFW_ZEPHYR_BOARDS_${UFW_PICK_ZEPHYR}}"
+        TOOLCHAINS "${UFW_ZEPHYR_TOOLCHAINS_${UFW_PICK_ZEPHYR}}"
+        BUILDCFGS "${UFW_ZEPHYR_BUILDTYPES_${UFW_PICK_ZEPHYR}}"
+        ROOT "${UFW_ZEPHYR_APPLICATION_${UFW_PICK_ZEPHYR}}"
+        KERNEL "${UFW_ZEPHYR_KERNEL_${UFW_PICK_ZEPHYR}}"
+        KCONFIG "${UFW_ZEPHYR_KCONFIG_${UFW_PICK_ZEPHYR}}"
+        OPTIONS "${UFW_ZEPHYR_OPTIONS_${UFW_PICK_ZEPHYR}}"
+        MODULE_ROOT "${UFW_ZEPHYR_MODULE_ROOT_${UFW_PICK_ZEPHYR}}"
+        MODULES "${UFW_ZEPHYR_MODULES_${UFW_PICK_ZEPHYR}}")
+    endif() # UFW_PICK_*
+  endif() # UFW_RECURSIVE_RUN
   if (DEFINED UFW_ZEPHYR_KERNEL)
     set(Zephyr_ROOT "${UFW_ZEPHYR_KERNEL}")
-    find_package(Zephyr)
+    find_package(Zephyr REQUIRED)
   endif()
 endmacro()
 
