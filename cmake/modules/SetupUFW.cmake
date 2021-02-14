@@ -141,6 +141,7 @@ macro(ufw_recursive_dispatch)
     endif() # UFW_PICK_*
   endif() # UFW_RECURSIVE_RUN
   if (DEFINED UFW_ZEPHYR_KERNEL)
+    set(APPLICATION_SOURCE_DIR ${APPLICATION_SOURCE_DIR} CACHE PATH "Application Source Directory")
     set(Zephyr_ROOT "${UFW_ZEPHYR_KERNEL}")
     find_package(Zephyr REQUIRED)
   endif()
