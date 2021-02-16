@@ -6,9 +6,9 @@ set(__UFW_GitIntegration 1)
 macro(generate_version_h)
   cmake_parse_arguments(
     PARSED_ARGS
-    ""
+    "SYSTEM_VERSION"
     "TARGET;TEMPLATE;OUTPUT"
-    "SCRIPTS"
+    "SCRIPTS;EXPANSIONS"
     ${ARGN})
   if (NOT MICROFRAMEWORK_ROOT)
     message(FATAL_ERROR "MICROFRAMEWORK_ROOT is not set! Cannot continue.")
@@ -23,6 +23,17 @@ macro(generate_version_h)
     message(FATAL_ERROR "OUTPUT is not set!")
   endif()
 
+  if (${PARSED_ARGS_SYSTEM_VERSION})
+    set(UFW_SYSTEM_WITH_VERSION_H 1)
+    set(UFW_SYSTEM_VERSION_HEADER ${PARSED_ARGS_OUTPUT})
+  else()
+    if (DEFINED UFW_SYSTEM_WITH_VERSION_H AND DEFINED UFW_SYSTEM_VERSION_HEADER)
+      list(APPEND PARSED_ARGS_EXPANSIONS
+        WITH_SYSTEM_VERSION_H=${UFW_SYSTEM_WITH_VERSION_H}
+        SYSTEM_VERSION_H=${UFW_SYSTEM_VERSION_HEADER})
+    endif()
+  endif()
+
   add_custom_target(${PARSED_ARGS_TARGET})
   add_custom_command(
     TARGET "${PARSED_ARGS_TARGET}"
@@ -32,6 +43,7 @@ macro(generate_version_h)
     "${PARSED_ARGS_OUTPUT}"
     ${PARSED_ARGS_SCRIPTS}
     "${MICROFRAMEWORK_ROOT}/vcs-integration/git.sh"
+    -- ${PARSED_ARGS_EXPANSIONS}
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 endmacro()
 

@@ -14,6 +14,8 @@ shift 2
 
 for file in "$@"; do
     case "$file" in
+    --) shift;
+        break ;;
     */*) ;;
     *) file="./$file"
     esac
@@ -58,6 +60,21 @@ version_h_header () {
 EOF
 }
 
+cmdline_expansion () {
+    __exp=${1#\{}
+    __exp=${__exp%%:*}
+    __exp=${__exp%\}}
+    for t in "$@"; do
+        case "$t" in
+        "$__exp"=*) REPLY="${t#*=}"
+                return 0
+                ;;
+        *) ;;
+        esac
+    done
+    return 1
+}
+
 extract_tag () {
     REPLY="$1"
     REPLY="${REPLY#*@@}"
@@ -66,11 +83,17 @@ extract_tag () {
 
 expand_tag () {
     tag="$1"
-    parameter=${tag#@@}
-    parameter=${parameter%@@}
-    dollar='$'
-    quote='"'
-    eval "REPLY=${quote}${dollar}${parameter}${quote}"
+    shift
+    if cmdline_expansion "$tag" "$@"; then
+        # Nothing, just forward $REPLY from cmdline_expansion.
+        true
+    else
+        parameter=${tag#@@}
+        parameter=${parameter%@@}
+        dollar='$'
+        quote='"'
+        eval "REPLY=${quote}${dollar}${parameter}${quote}"
+    fi
 }
 
 strip_quote () {
@@ -110,11 +133,12 @@ print_interleaved () {
 
 maybe_expand () {
     line="$1"
+    shift
     case "$line" in
     *@@*@@*)
         extract_tag "$line"
         tag="$REPLY"
-        expand_tag "$tag"
+        expand_tag "$tag" "$@"
         value="$REPLY"
         if test "$tag" = "__GIT_HASH__"; then
             # Force GIT_HASH to be a string.
@@ -138,7 +162,7 @@ while IFS= read -r line; do
         fi
         continue
     fi
-    maybe_expand "$line"
+    maybe_expand "$line" "$@"
 done < "$input" > "$stage"
 
 if test "$stage" != "$output"; then

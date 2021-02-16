@@ -12,13 +12,8 @@
 
 @@VERSION-H-START@@
 
-#ifndef INC_VERSION_H
-#define INC_VERSION_H
-
-#if @@{WITH_SYSTEM_VERSION_H:-0}@@
-#include @@{SYSTEM_VERSION_H:-disabled}@@
-#define WITH_SYSTEM_VERSION_H
-#endif
+#ifndef INC_SYSTEM_VERSION_H
+#define INC_SYSTEM_VERSION_H
 
 /*
  * The basic versioning of the software follows the semantic versioning spec as
@@ -35,29 +30,29 @@
  * sions to the MAJOR.MINOR.PATCH format.
  */
 
-/** Major version number of the software */
-#define MCU_MAJOR_VERSION @@MAJOR_VERSION@@
+/** Major version number of the system */
+#define SYSTEM_MAJOR_VERSION @@MAJOR_VERSION@@
 
 /** Minor version number */
-#define MCU_MINOR_VERSION @@MINOR_VERSION@@
+#define SYSTEM_MINOR_VERSION @@MINOR_VERSION@@
 
 /** Release Patch-level on top of last minor version */
-#define MCU_PATCHLEVEL @@PATCHLEVEL@@
+#define SYSTEM_PATCHLEVEL @@PATCHLEVEL@@
 
 /** Signal whether or not major/minor/patch are based on a release tag. */
-#define GIT_VERSION_AVAILABLE @@__GIT_VERSION_AVAILABLE__@@
+#define SYSTEM_GIT_VERSION_AVAILABLE @@__GIT_VERSION_AVAILABLE__@@
 
 /** Signal whether a release tag looks like "v*-rc[0-9]+" */
-#define GIT_VERSION_IS_CANDIDATE @@__GIT_VERSION_IS_CANDIDATE__@@
+#define SYSTEM_GIT_VERSION_IS_CANDIDATE @@__GIT_VERSION_IS_CANDIDATE__@@
 
 /** The release candidate level indicated by the  "v*-rc[0-9]+" tag */
-#define GIT_CANDIDATE_LEVEL @@{__GIT_CANDIDATE_LEVEL__:-0}@@
+#define SYSTEM_GIT_CANDIDATE_LEVEL @@{__GIT_CANDIDATE_LEVEL__:-0}@@
 
 /** Signal whether a release tag looks like "v*-pre[0-9]+" */
-#define GIT_VERSION_IS_PRE_RELEASE @@__GIT_VERSION_IS_PRE_RELEASE__@@
+#define SYSTEM_GIT_VERSION_IS_PRE_RELEASE @@__GIT_VERSION_IS_PRE_RELEASE__@@
 
 /** The pre-release level indicated by the  "v*-rc[0-9]+" tag */
-#define GIT_PRE_RELEASE_LEVEL @@{__GIT_PRE_RELEASE_LEVEL__:-0}@@
+#define SYSTEM_GIT_PRE_RELEASE_LEVEL @@{__GIT_PRE_RELEASE_LEVEL__:-0}@@
 
 /**
  * Signal whether this build was based on a clean repository, that was
@@ -65,7 +60,7 @@
  * nor a release-candidate tag; Hence, the build looks like a proper
  * release.
  */
-#define GIT_IS_CLEAN_RELEASE_BUILD @@__GIT_IS_CLEAN_RELEASE_BUILD__@@
+#define SYSTEM_GIT_IS_CLEAN_RELEASE_BUILD @@__GIT_IS_CLEAN_RELEASE_BUILD__@@
 
 /**
  * Additional version information from release tag
@@ -84,32 +79,32 @@
  *
  * ...in which case this datum reads "rc1".
  */
-#define GIT_EXTRA @@__GIT_EXTRA__@@
+#define SYSTEM_GIT_EXTRA @@__GIT_EXTRA__@@
 
 /**
  * This entry reflects the number of commits in a git repository on top of the
  * last annotated release tag, matching the glob "v[0-9]*".
  */
-#define GIT_INCREMENT @@{__GIT_INCREMENT__:-0}@@
+#define SYSTEM_GIT_INCREMENT @@{__GIT_INCREMENT__:-0}@@
 
 /**
  * The GIT_DIRTY flag is an integer (either 1 or 0), that signals changes in
  * files, that are tracked by git, which are not committed yet, thus
  * constituting a state that will be irreproducible in the future.
  */
-#define GIT_DIRTY @@__GIT_DIRTY__@@
+#define SYSTEM_GIT_DIRTY @@__GIT_DIRTY__@@
 
 /**
  * This is a string of the first 12 hex digits from the SHA1 sum of the git
  * commit that a software build was based upon.
  */
-#define GIT_HASH @@__GIT_HASH__@@
+#define SYSTEM_GIT_HASH @@__GIT_HASH__@@
 
 /**
  * This is the name of the branch that was active when the software was built
  * or "DetachedHead" in case the git repository was in detached head state.
  */
-#define GIT_BRANCH @@__GIT_BRANCH__@@
+#define SYSTEM_GIT_BRANCH @@__GIT_BRANCH__@@
 
 /**
  * This reflects the first line of the git commit (basically its title) the
@@ -118,7 +113,7 @@
  *
  *   "eaee0cb (Enable new ULP remarks in compiler, 2017-07-27)"
  */
-#define GIT_DESCRIPTION @@__GIT_DESCRIPTION__@@
+#define SYSTEM_GIT_DESCRIPTION @@__GIT_DESCRIPTION__@@
 
 /**
  * This is a human readable version of the git-flavoured version information
@@ -126,45 +121,6 @@
  *
  *   "1.2.0-26-geaee0cb58a72-dirty"
  */
-#define GIT_VERSION @@__GIT_VERSION__@@
+#define SYSTEM_GIT_VERSION @@__GIT_VERSION__@@
 
-/**
- * Describes the general firmware type, that is implemented by this software
- * project. Examples:
- *
- *   "irtt-cp-generic"
- *   "irtt-cp-current-qa"
- *   "ildr120-qa-unit-pll"
- *   "irtt-cx-integration-test-cv-mode"
- */
-#define FIRMWARE_TYPE @@FIRMWARE_TYPE@@
-
-/**
- * Describes the basic type of hardware, the software is intended to be used
- * with. Examples:
- *
- *   "ildr120-dsc-v1"
- *   "irtt-cp"
- */
-#define HARDWARE_TYPE @@HARDWARE_TYPE@@
-
-/**
- * This reflects the build-variant that was active during the build process.
- * Examples:
- *
- *   "ClientPersonal"
- *   "ClientVehicle"
- *   "Generic"
- */
-#define BUILD_VARIANT @@BUILD_VARIANT@@
-
-/**
- * This reflects the build-profile that was active during the build process.
- * Examples:
- *
- *   "Release"
- *   "Debug"
- */
-#define BUILD_PROFILE @@BUILD_PROFILE@@
-
-#endif /* INC_VERSION_H */
+#endif /* INC_SYSTEM_VERSION_H */
