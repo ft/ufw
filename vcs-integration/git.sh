@@ -124,6 +124,22 @@ git_str_is_int () {
 }
 
 git_populate () {
+    __GIT_BRANCH__=''
+    __GIT_COMMITDATE__=''
+    __GIT_DESCRIPTION__=''
+    __GIT_DIRTY__=0
+    __GIT_HASH__=''
+    __GIT_INCREMENT__=0
+    __GIT_MAJOR__=0
+    __GIT_MINOR__=0
+    __GIT_PATCHLEVEL__=0
+    __GIT_VERSION__=''
+    __GIT_VERSION_AVAILABLE__=0
+    __GIT_VERSION_IS_CANDIDATE__=0
+    __GIT_CANDIDATE_LEVEL__=0
+    __GIT_VERSION_IS_PRE_RELEASE__=0
+    __GIT_PRE_RELEASE_LEVEL__=0
+    __GIT_IS_CLEAN_RELEASE_BUILD__=0
     if _git_in_worktree_; then
         _git_branch_
         __GIT_BRANCH__="$REPLY"
