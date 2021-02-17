@@ -10,6 +10,11 @@ if test "x$input" = x || test "x$output" = x; then
     exit 1
 fi
 
+if ! test -f "$input"; then
+    printf 'generate-version-h error: Input file does not exist: %s\n' "$input" >&2
+    exit 1
+fi
+
 shift 2
 
 for file in "$@"; do
