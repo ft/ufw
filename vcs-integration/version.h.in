@@ -129,22 +129,23 @@
 #define GIT_VERSION @@__GIT_VERSION__@@
 
 /**
+ * A familiar name for the firmware implemented by the project.
+ * Example: "sample-blinky"
+ */
+#define FIRMWARE_NAME @@FIRMWARE_NAME@@
+
+/**
  * Describes the general firmware type, that is implemented by this software
  * project. Examples:
  *
- *   "irtt-cp-generic"
- *   "irtt-cp-current-qa"
- *   "ildr120-qa-unit-pll"
- *   "irtt-cx-integration-test-cv-mode"
+ *   "generic"
+ *   "bootloader"
  */
 #define FIRMWARE_TYPE @@FIRMWARE_TYPE@@
 
 /**
  * Describes the basic type of hardware, the software is intended to be used
- * with. Examples:
- *
- *   "ildr120-dsc-v1"
- *   "irtt-cp"
+ * with. Example: "fantastic-board"
  */
 #define HARDWARE_TYPE @@HARDWARE_TYPE@@
 
@@ -152,9 +153,8 @@
  * This reflects the build-variant that was active during the build process.
  * Examples:
  *
- *   "ClientPersonal"
- *   "ClientVehicle"
- *   "Generic"
+ *   "generic"
+ *   "minimal-current"
  */
 #define BUILD_VARIANT @@BUILD_VARIANT@@
 
@@ -162,8 +162,8 @@
  * This reflects the build-profile that was active during the build process.
  * Examples:
  *
- *   "Release"
- *   "Debug"
+ *   "release"
+ *   "debug"
  */
 #define BUILD_PROFILE @@BUILD_PROFILE@@
 

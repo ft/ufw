@@ -1,12 +1,17 @@
 #!/bin/sh
 
+MICROFRAMEWORK_ROOT="$1"
+shift
+
+. "${MICROFRAMEWORK_ROOT}/vcs-integration/build-information.sh"
+
 input="$1"
 output="$2"
 output_bn=${output##*/}
 outdir=${output%/*}
 
 if test "x$input" = x || test "x$output" = x; then
-    printf 'usage: generate-version-h <VERSION-H-TEMPLATE> <OUTPUT> [FILES-TO-SOURCE...]\n'
+    printf 'usage: generate-version-h <UFW-ROOT> [OPTION(s)] <VERSION-H-TEMPLATE> <OUTPUT> [FILES-TO-SOURCE...]\n'
     exit 1
 fi
 
@@ -24,14 +29,23 @@ for file in "$@"; do
     */*) ;;
     *) file="./$file"
     esac
+    if ! test -f "$file"; then
+        printf 'Script file does not exist: %s\n' "$file" >&2
+        exit 1
+    fi
     . "$file"
 done
 
+git_populate
 if type git_populate > /dev/null 2>&1; then
     # User supplied git.sh in FILES-TO-SOURCE.
     git_populate
     git_got_info && git_amend_versions
 else
+    GIT_VERSION_AVAILABLE=0
+    GIT_VERSION_IS_CANDIDATE=0
+    GIT_VERSION_IS_PRE_RELEASE=0
+    GIT_DIRTY=0
     printf '%s: Git integration not loaded.' "${output_bn}"
     printf ' Lots of information will be blank!\n'
 fi

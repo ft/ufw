@@ -3,11 +3,46 @@ if(__UFW_GitIntegration)
 endif()
 set(__UFW_GitIntegration 1)
 
+function(gitint_options prefix outvar)
+  set(GENERATE_OPTIONS)
+
+  if (DEFINED ${prefix}BUILD_VARIANT)
+    list(APPEND GENERATE_OPTIONS -b "${${prefix}BUILD_VARIANT}")
+  endif()
+
+  if (DEFINED ${prefix}TARGET_MCU)
+    list(APPEND GENERATE_OPTIONS -m "${${prefix}TARGET_MCU}")
+  endif()
+
+  if (DEFINED ${prefix}NAME)
+    list(APPEND GENERATE_OPTIONS -n "${${prefix}NAME}")
+  else()
+    set(${prefix}NAME "${PROJECT_NAME}")
+  endif()
+
+  if (DEFINED ${prefix}TYPE)
+    list(APPEND GENERATE_OPTIONS -t "${${prefix}TARGET_TYPE}")
+  endif()
+
+  if (DEFINED CMAKE_BUILD_TYPE AND (NOT "${CMAKE_BUILD_TYPE}" STREQUAL ""))
+    string(TOLOWER "${CMAKE_BUILD_TYPE}" profile)
+    list(APPEND GENERATE_OPTIONS -p "${profile}")
+  endif()
+
+  if (DEFINED TARGET_BOARD AND (NOT "${TARGET_BOARD}" STREQUAL ""))
+    list(APPEND GENERATE_OPTIONS -h "${TARGET_BOARD}")
+  elseif (DEFINED BOARD AND (NOT "${BOARD}" STREQUAL ""))
+    list(APPEND GENERATE_OPTIONS -h "${BOARD}")
+  endif()
+
+  set(${outvar} "${GENERATE_OPTIONS}" PARENT_SCOPE)
+endfunction()
+
 macro(generate_version_h)
   cmake_parse_arguments(
     PARSED_ARGS
     "SYSTEM_VERSION"
-    "TARGET;TEMPLATE;OUTPUT"
+    "BUILD_VARIANT;NAME;TARGET;TARGET_MCU;TEMPLATE;OUTPUT;TYPE"
     "SCRIPTS;EXPANSIONS"
     ${ARGN})
   if (NOT MICROFRAMEWORK_ROOT)
@@ -22,6 +57,10 @@ macro(generate_version_h)
   if (NOT PARSED_ARGS_OUTPUT)
     message(FATAL_ERROR "OUTPUT is not set!")
   endif()
+
+  set(GENERATE_OPTIONS)
+  gitint_options(PARSED_ARGS_ GENERATE_OPTIONS)
+  message(STATUS "DEBUG: ARGS: [${GENERATE_OPTIONS}]")
 
   if (${PARSED_ARGS_SYSTEM_VERSION})
     set(UFW_SYSTEM_WITH_VERSION_H 1)
@@ -39,6 +78,8 @@ macro(generate_version_h)
     TARGET "${PARSED_ARGS_TARGET}"
     COMMAND
     "${MICROFRAMEWORK_ROOT}/bin/generate-version-h"
+    "${MICROFRAMEWORK_ROOT}"
+    ${GENERATE_OPTIONS}
     "${PARSED_ARGS_TEMPLATE}"
     "${PARSED_ARGS_OUTPUT}"
     ${PARSED_ARGS_SCRIPTS}
@@ -111,33 +152,14 @@ macro(gitint_install)
   if (NOT MICROFRAMEWORK_ROOT)
     message(FATAL_ERROR "MICROFRAMEWORK_ROOT is not set! Cannot continue.")
   endif()
-  set(GENERATE_OPTIONS)
+
   if (NOT PARSED_ARGS_DESTINATION)
     set(PARSED_ARGS_DESTINATION "${CMAKE_INSTALL_PREFIX}")
   endif()
 
-  if (DEFINED PARSED_ARGS_BUILD_VARIANT)
-    list(APPEND GENERATE_OPTIONS -b "${PARSED_ARGS_BUILD_VARIANT}")
-  endif()
-
-  if (DEFINED PARSED_ARGS_TARGET_MCU)
-    list(APPEND GENERATE_OPTIONS -m "${PARSED_ARGS_TARGET_MCU}")
-  endif()
-
-  if (DEFINED PARSED_ARGS_NAME)
-    list(APPEND GENERATE_OPTIONS -n "${PARSED_ARGS_NAME}")
-  else()
-    set(PARSED_ARGS_NAME "${PROJECT_NAME}")
-  endif()
-
-  if (DEFINED PARSED_ARGS_TYPE)
-    list(APPEND GENERATE_OPTIONS -t "${PARSED_ARGS_TARGET_TYPE}")
-  endif()
-
-  if (DEFINED CMAKE_BUILD_TYPE)
-    string(TOLOWER "${CMAKE_BUILD_TYPE}" profile)
-    list(APPEND GENERATE_OPTIONS -p "${profile}")
-  endif()
+  set(GENERATE_OPTIONS)
+  gitint_options(PARSED_ARGS_ GENERATE_OPTIONS)
+  message(STATUS "DEBUG: [${GENERATE_OPTIONS}]")
 
   if (PARSED_ARGS_LATEST_ARTIFACTS)
   install(CODE "
@@ -159,9 +181,10 @@ execute_process(
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   COMMAND
   \"${MICROFRAMEWORK_ROOT}/bin/generate-artifacts\"
+  \"${MICROFRAMEWORK_ROOT}\"
   ${GENERATE_OPTIONS}
   doesnotmatter
-  ${PARSED_ARGS_DESTINATION}
+  \"${PARSED_ARGS_DESTINATION}\"
   \"++\"
   \"--\"
   \"${MICROFRAMEWORK_ROOT}/vcs-integration/git.sh\"

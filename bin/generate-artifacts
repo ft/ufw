@@ -1,44 +1,16 @@
 #!/bin/sh
 
-FIRMWARE_NAME=no-name
-FIRMWARE_MCU=unknown
-FIRMWARE_TYPE=generic
-BUILD_VARIANT=default
-BUILD_PROFILE=unknown
+MICROFRAMEWORK_ROOT="$1"
+shift
 
-MAJOR_VERSION=0
-MINOR_VERSION=0
-PATCHLEVEL=0
-
-is_opt () {
-    case "$1" in
-    -*) return 0 ;;
-    *) return 1 ;;
-    esac
-}
-
-while is_opt "$1"; do
-    opt="$1"
-    value="$2"
-    shift 2
-    case "$opt" in
-    -n) FIRMWARE_NAME="$value" ;;
-    -m) FIRMWARE_MCU="$value"  ;;
-    -t) FIRMWARE_TYPE="$value" ;;
-    -b) BUILD_VARIANT="$value" ;;
-    -p) BUILD_PROFILE="$value" ;;
-    *) printf 'Unknown option: %s\n' "$opt"
-       exit 1
-       ;;
-    esac
-done
+. "${MICROFRAMEWORK_ROOT}/vcs-integration/build-information.sh"
 
 base="$1"
 output="$2"
 extensions="$3"
 
 if test "x$base" = x || test "x$output" = x || test "x$extensions" = x; then
-    printf 'usage: generate-artifacts <BASENAME> <DESTINATION> <EXTENSION[s...]>' >&2
+    printf 'usage: generate-artifacts <UFW-ROOT> [OPTION(s)] <BASENAME> <DESTINATION> <EXTENSION[s...]>' >&2
     printf ' [-- FILES-TO-SOURCE...]\n' >&2
     exit 1
 fi
@@ -61,10 +33,6 @@ if test "x$1" = x--; then
     done
 fi
 
-if test "x$HARDWARE_TYPE" != x; then
-    # Backward compatibility
-    FIRMWARE_NAME="$HARDWARE_TYPE"
-fi
 # This is the prefix used (in connection with a version tag from the *_VERSION
 # definitions above) to produce the final MCU firmware filenames.
 BITSTREAM_PREFIX="${FIRMWARE_NAME}"
