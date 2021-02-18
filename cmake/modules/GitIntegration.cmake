@@ -156,6 +156,10 @@ macro(gitint_install)
     set(PARSED_ARGS_DESTINATION "${CMAKE_INSTALL_PREFIX}")
   endif()
 
+  if (NOT PARSED_ARGS_NAME)
+    set(PARSED_ARGS_NAME ${PROJECT_NAME})
+  endif()
+
   set(GENERATE_OPTIONS)
   gitint_options(PARSED_ARGS_ GENERATE_OPTIONS)
 
