@@ -17,7 +17,7 @@ function(gitint_options prefix outvar)
   if (DEFINED ${prefix}NAME)
     list(APPEND GENERATE_OPTIONS -n "${${prefix}NAME}")
   else()
-    set(${prefix}NAME "${PROJECT_NAME}")
+    list(APPEND GENERATE_OPTIONS -n "${PROJECT_NAME}")
   endif()
 
   if (DEFINED ${prefix}TYPE)
