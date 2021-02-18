@@ -60,7 +60,6 @@ macro(generate_version_h)
 
   set(GENERATE_OPTIONS)
   gitint_options(PARSED_ARGS_ GENERATE_OPTIONS)
-  message(STATUS "DEBUG: ARGS: [${GENERATE_OPTIONS}]")
 
   if (${PARSED_ARGS_SYSTEM_VERSION})
     set(UFW_SYSTEM_WITH_VERSION_H 1)
@@ -159,7 +158,6 @@ macro(gitint_install)
 
   set(GENERATE_OPTIONS)
   gitint_options(PARSED_ARGS_ GENERATE_OPTIONS)
-  message(STATUS "DEBUG: [${GENERATE_OPTIONS}]")
 
   if (PARSED_ARGS_LATEST_ARTIFACTS)
   install(CODE "
