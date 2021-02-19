@@ -213,6 +213,7 @@ function(ufw_build_zephyr)
     ${__cmake_args__}
     -DCMAKE_INSTALL_PREFIX=${__install_prefix__}
     -DUFW_RECURSIVE_RUN=1
+    -DUFW_ZEPHYR_APPLICATION=${PA_APPLICATION}
     -DUFW_ZEPHYR_KERNEL=${PA_KERNEL}
     -DAPPLICATION_SOURCE_DIR=${PA_ROOT}
     -DBOARD=${PA_BOARD}
