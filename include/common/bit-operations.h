@@ -39,6 +39,11 @@
 /** Number of bits in an unsigned integer */
 #define BITS_PER_UNSIGNED (sizeof(unsigned int) * BITS_PER_BYTE)
 
+#ifdef BITS_PER_LONG
+/* Zephyr defines this too, so in order to be able to use this without being
+ * warned, undefine beforehand. */
+#undef BITS_PER_LONG
+#endif /* BITS_PER_LONG */
 /** Number of bits in an unsigned long integer */
 #define BITS_PER_LONG (sizeof(unsigned long int) * BITS_PER_BYTE)
 
@@ -49,6 +54,10 @@
  * Unsigned int generators
  */
 
+#ifdef BIT
+/* Zephyr compatibility. */
+#undef BIT
+#endif /* BIT */
 /**
  * Unsigned integer where the nth bit is set
  *
@@ -87,6 +96,10 @@
  */
 #define BIT_GET(container, n, o) ((container & BIT_ONES(n,o)) >> o)
 
+#ifdef BIT_MASK
+/* Zephyr compatibility. */
+#undef BIT_MASK
+#endif /* BIT_MASK */
 /**
  * Set a bit in a block of unsigned int words
  *
