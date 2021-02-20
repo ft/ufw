@@ -82,7 +82,7 @@
  * @return Unsigned integer as described.
  * @sideeffects None
  */
-#define BIT_ONES(n, o) ((~0u) >> (BITS_PER_UNSIGNED - n) << o)
+#define BIT_ONES(n, o) ((~0u) >> (BITS_PER_UNSIGNED - (n)) << (o))
 
 /**
  * Extract a string of bits from an unsigned integer container
@@ -94,7 +94,7 @@
  * @return The string of bits moved to offset zero
  * @sideeffects None
  */
-#define BIT_GET(container, n, o) ((container & BIT_ONES(n,o)) >> o)
+#define BIT_GET(container, n, o) ((container & BIT_ONES(n,o)) >> (o))
 
 #ifdef BIT_MASK
 /* Zephyr compatibility. */
@@ -159,7 +159,7 @@
  * @return Unsigned long integer as described.
  * @sideeffects None
  */
-#define BITL_ONES(n, o) ((~0ul) >> (BITS_PER_LONG - n) << o)
+#define BITL_ONES(n, o) ((~0ul) >> (BITS_PER_LONG - (n)) << (o))
 
 /**
  * Extract a string of bits from an long unsigned integer container
@@ -171,7 +171,7 @@
  * @return The string of bits moved to offset zero
  * @sideeffects None
  */
-#define BITL_GET(container, n, o) ((container & BITL_ONES(n,o)) >> o)
+#define BITL_GET(container, n, o) ((container & BITL_ONES(n,o)) >> (o))
 
 /**
  * Set a bit in a block of unsigned long int words
@@ -233,7 +233,7 @@
  * @return Unsigned long integer as described.
  * @sideeffects None
  */
-#define BITLL_ONES(n, o) ((~0ull) >> (BITS_PER_LONG_LONG - n) << o)
+#define BITLL_ONES(n, o) ((~0ull) >> (BITS_PER_LONG_LONG - (n)) << (o))
 
 /**
  * Extract a string of bits from an long long unsigned integer container
@@ -245,7 +245,7 @@
  * @return The string of bits moved to offset zero
  * @sideeffects None
  */
-#define BITLL_GET(container, n, o) ((container & BITLL_ONES(n,o)) >> o)
+#define BITLL_GET(container, n, o) ((container & BITLL_ONES(n,o)) >> (o))
 
 /**
  * Set a bit in a block of unsigned long long int words
