@@ -11,7 +11,7 @@ function(GenerateGraphics_svg2pdf target source output)
     DEPENDS ${source}
     COMMENT "Building graphic file: ${output}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMAND inkscape --export-pdf ${output} ${CMAKE_CURRENT_SOURCE_DIR}/${source})
+    COMMAND inkscape --export-type=pdf --export-filename=${output} ${CMAKE_CURRENT_SOURCE_DIR}/${source})
 endfunction(GenerateGraphics_svg2pdf)
 
 function(GenerateGraphics_svg2png target source output)
@@ -22,7 +22,7 @@ function(GenerateGraphics_svg2png target source output)
     DEPENDS ${source}
     COMMENT "Building graphic file: ${output}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMAND inkscape --export-png ${output} ${CMAKE_CURRENT_SOURCE_DIR}/${source})
+    COMMAND inkscape --export-type=png --export-filename=${output} ${CMAKE_CURRENT_SOURCE_DIR}/${source})
 endfunction(GenerateGraphics_svg2png)
 
 function(GenerateGraphics_tex2pdf target source output)
