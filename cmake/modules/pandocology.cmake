@@ -198,7 +198,7 @@ endfunction()
 function(add_document)
     set(options          EXPORT_ARCHIVE NO_EXPORT_PRODUCT EXPORT_PDF DIRECT_TEX_TO_PDF VERBOSE)
     set(oneValueArgs     TARGET OUTPUT_FILE PRODUCT_DIRECTORY)
-    set(multiValueArgs   SOURCES RESOURCE_FILES RESOURCE_DIRS PANDOC_DIRECTIVES DEPENDS)
+    set(multiValueArgs   SOURCES RESOURCE_FILES RESOURCE_DIRS TEXINPUTS PANDOC_DIRECTIVES DEPENDS)
     cmake_parse_arguments(ADD_DOCUMENT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
     # this is because `make clean` will dangerously clean up source files
@@ -235,6 +235,12 @@ function(add_document)
         if ("${ADD_DOCUMENT_TARGET}" STREQUAL "${ADD_DOCUMENT_OUTPUT_FILE}")
             message(FATAL_ERROR "Target '${ADD_DOCUMENT_TARGET}': Must different from OUTPUT_FILE")
         endif()
+    endif()
+
+    set(TEXINPUTS ".:")
+    if (ADD_DOCUMENT_TEXINPUTS)
+      list(JOIN ADD_DOCUMENT_TEXINPUTS ":" TEXINPUTS)
+      set(TEXINPUTS ".:${TEXINPUTS}:")
     endif()
 
     set(output_file ${ADD_DOCUMENT_OUTPUT_FILE})
@@ -327,7 +333,7 @@ function(add_document)
             OUTPUT  ${output_file} # note that this is in the build directory
             DEPENDS ${build_sources} ${build_resources} ${ADD_DOCUMENT_DEPENDS}
             COMMAND ${CMAKE_COMMAND} -E make_directory ${native_product_directory}
-            COMMAND ${PANDOC_EXECUTABLE} ${native_build_sources} ${ADD_DOCUMENT_PANDOC_DIRECTIVES} -o ${native_output_file}
+            COMMAND ${CMAKE_COMMAND} -E env TEXINPUTS="${TEXINPUTS}" ${PANDOC_EXECUTABLE} ${native_build_sources} ${ADD_DOCUMENT_PANDOC_DIRECTIVES} -o ${native_output_file}
             )
         add_to_make_clean(${output_file})
     endif()
