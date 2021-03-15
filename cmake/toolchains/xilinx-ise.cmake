@@ -1,4 +1,4 @@
-set(XILINX_ISE_ROOT "/opt/Xilinx/ISE/14.7/ISE_DS/ISE/bin/lin64")
+set(XILINX_ISE_ROOT "/opt/xilinx-ise/14.7/ISE_DS/ISE/bin/lin64")
 
 # set target system
 set(CMAKE_SYSTEM_NAME Generic)
