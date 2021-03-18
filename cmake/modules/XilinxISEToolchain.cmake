@@ -3,6 +3,17 @@ if(__XilinxISEToolchain)
 endif()
 set(__XilinxISEToolchain 1)
 
+function(xilinx_licence_file var)
+  if (DEFINED ${var})
+    return()
+  endif()
+  if (NOT ("$ENV{${var}}" STREQUAL ""))
+    set(${var} $ENV{${var}} PARENT_SCOPE)
+  else()
+    set(${var} "/usr/share/xilinx-ise/xilinx.lic" PARENT_SCOPE)
+  endif()
+endfunction()
+
 function(generate_project_file output sources)
     unset(prj_file_lines)
 
@@ -32,8 +43,10 @@ function(add_syntax_check top_module)
     generate_project_file(${project_file} "${PA_SOURCES}")
     file(WRITE ${script} "elaborate\n-ifn ${project_file}\n-ifmt mixed")
 
+    xilinx_licence_file(XILINXD_LICENSE_FILE)
     add_custom_target(syntax-check
         COMMAND
+        ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_XST}
         -intstyle ${PA_VERBOSITY}
         -ifn ${script}
@@ -97,9 +110,11 @@ function(add_bitstream top_module uc_file)
         list(APPEND vhdl_sources "${CMAKE_CURRENT_BINARY_DIR}/ipcore_dir/${core_name}.vhd")
     endforeach()
 
+    xilinx_licence_file(XILINXD_LICENSE_FILE)
     add_custom_command(OUTPUT
         ${output_bn}.ngc
         COMMAND
+        ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_XST}
         -intstyle ${PA_VERBOSITY}
         -ifn ${xst_build_script}
@@ -123,6 +138,7 @@ function(add_bitstream top_module uc_file)
     add_custom_command(OUTPUT
         ${output_bn}.ngd
         COMMAND
+        ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_NGDBUILD}
         -intstyle ${PA_VERBOSITY}
         ${ngc_ngd_build_verbosity}              # ngcbuild and ngdbuild PA_VERBOSITY
@@ -142,6 +158,7 @@ function(add_bitstream top_module uc_file)
         ${output_bn}_map.ncd
         ${output_bn}.pcf
         COMMAND
+        ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_MAP}
         -intstyle ${PA_VERBOSITY}
         -w                          # Overwrite existing output files
@@ -159,6 +176,7 @@ function(add_bitstream top_module uc_file)
     add_custom_command(OUTPUT
         ${output_bn}.ncd
         COMMAND
+        ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_PAR}
         -intstyle ${PA_VERBOSITY}
         -w                          # Overwrite existing output files
@@ -176,6 +194,7 @@ function(add_bitstream top_module uc_file)
     add_custom_command(OUTPUT
         ${output_bn}.twr
         COMMAND
+        ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_TRCE}
         -intstyle ${PA_VERBOSITY}
         -f ${TWR_COMMAND_FILE}  # FPGA specific configuration
@@ -193,6 +212,7 @@ function(add_bitstream top_module uc_file)
     add_custom_command(OUTPUT
         ${output_bn}.bit
         COMMAND
+        ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_BITGEN}
         -intstyle ${PA_VERBOSITY}
         -w                              # Overwrite existing output files
@@ -210,9 +230,11 @@ function(add_bitstream top_module uc_file)
 endfunction()
 
 function(add_bin input_files output)
+    xilinx_licence_file(XILINXD_LICENSE_FILE)
     add_custom_command(OUTPUT
         ${output}
         COMMAND
+        ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_PROMGEN}
         -intstyle ${XILINX_VERBOSITY}
         -w                              # Overwrite existing output files
@@ -229,9 +251,11 @@ function(add_bin input_files output)
 endfunction()
 
 function(add_mcs source dest prom)
+    xilinx_licence_file(XILINXD_LICENSE_FILE)
     add_custom_command(OUTPUT
         ${dest}
         COMMAND
+        ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_PROMGEN}
         -intstyle ${XILINX_VERBOSITY}
         -w                              # Overwrite existing output files
@@ -257,8 +281,10 @@ function(program_jtag file)
         "${CMAKE_CURRENT_BINARY_DIR}/impact_program_jtag.cmd")
     configure_file(${IMPACT_JTAG_SCRIPT_INPUT} ${impact_jtag_script} @ONLY)
 
+    xilinx_licence_file(XILINXD_LICENSE_FILE)
     add_custom_target(program-jtag
         COMMAND
+        ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_IMPACT}
         -batch ${impact_jtag_script}
         DEPENDS
@@ -278,8 +304,10 @@ function(program_prom file)
         "${CMAKE_CURRENT_BINARY_DIR}/impact_program_prom.cmd")
     configure_file(${IMPACT_PROM_SCRIPT_INPUT} ${impact_prom_script} @ONLY)
 
+    xilinx_licence_file(XILINXD_LICENSE_FILE)
     add_custom_target(program-prom
         COMMAND
+        ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_IMPACT}
         -batch ${impact_prom_script}
         DEPENDS
@@ -297,10 +325,12 @@ function(add_ipcore ip_core dest)
     configure_file("${project}/coregen.cgp"
         "${dest}/coregen.cgp" COPYONLY)
 
+    xilinx_licence_file(XILINXD_LICENSE_FILE)
     add_custom_command(OUTPUT ${dest}/${core_name}.vhd
         COMMAND
         [ -f ${dest}/${core_name}.vhd ] ||
         ${CMAKE_COMMAND} -E env --unset=_JAVA_OPTIONS
+        ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_COREGEN}
         -p ${dest}
         -b ${ip_core}
