@@ -51,6 +51,44 @@ function(set_target_cpu_gcc_arm target _cpu)
   set_target_properties(${target} PROPERTIES LINK_FLAGS "${_flags_str}")
 endfunction()
 
+function(set_target_cpu_clang_arm target _cpu)
+  set_target_cpu_gcc_arm(${target} ${_cpu})
+
+  # Set the flags for lld
+  if (${_cpu} STREQUAL "cortex-m0")
+    list(APPEND _flags "-L${CMAKE_SYSROOT}/lib/thumb/v6-m")
+  elseif (${_cpu} STREQUAL "cortex-m0+")
+    list(APPEND _flags "-L${CMAKE_SYSROOT}/lib/thumb/v6-m")
+  elseif (${_cpu} STREQUAL "cortex-m1")
+    list(APPEND _flags "-L${CMAKE_SYSROOT}/lib/thumb/v6-m")
+  elseif (${_cpu} STREQUAL "cortex-m3")
+    list(APPEND _flags "-L${CMAKE_SYSROOT}/lib/thumb/v7-m")
+  elseif (${_cpu} STREQUAL "cortex-m4")
+    list(APPEND _flags "-L${CMAKE_SYSROOT}/lib/thumb/v7e-m")
+  elseif (${_cpu} STREQUAL "cortex-m4-softfp")
+    list(APPEND _flags "-L${CMAKE_SYSROOT}/lib/thumb/v7e-m/fpv4-sp/softfp")
+  elseif (${_cpu} STREQUAL "cortex-m4-hardfp")
+    list(APPEND _flags "-L${CMAKE_SYSROOT}/lib/thumb/v7e-m/fpv4-sp/hard")
+  elseif (${_cpu} STREQUAL "cortex-m7")
+    list(APPEND _flags "-L${CMAKE_SYSROOT}/lib/thumb/v7e-m")
+  elseif (${_cpu} STREQUAL "cortex-m7-softfp")
+    list(APPEND _flags "-L${CMAKE_SYSROOT}/lib/thumb/v7e-m/fpv4-sp/softfp")
+  elseif (${_cpu} STREQUAL "cortex-m7-hardfp")
+    list(APPEND _flags "-L${CMAKE_SYSROOT}/lib/thumb/v7e-m/fpv4-sp/hard")
+  else()
+    message(WARNING "-- ${TOOLCHAIN_ID}: Unsupported PROJECT_TARGET_CPU: ${_cpu}")
+  endif()
+
+  # TODO: Setting this allows to link -lc and -lm. In order to link against
+  # -lgcc, we would need to ask gcc with `-print-libgcc-file-name` and to
+  # statically link that library into the target. Maybe it is just better, to
+  # wait that libclang_rt.builtins-arm.a will be precompiled available. See
+  # also: https://interrupt.memfault.com/blog/arm-cortexm-with-llvm-clang
+
+  string(REPLACE ";" " " _flags_str "${_flags}")
+  add_target_link_flags(${target} "${_flags_str}")
+endfunction()
+
 function(set_target_cpu_ti_arm target _cpu)
   add_target_endianness(${target} LITTLE)
   if (${_cpu} STREQUAL "cortex-m3")
@@ -117,6 +155,8 @@ function(set_target_cpu target)
 
   if ("${TOOLCHAIN_ID}" STREQUAL "gcc-arm")
     set_target_cpu_gcc_arm("${target}" "${PROJECT_TARGET_CPU}")
+  elseif ("${TOOLCHAIN_ID}" STREQUAL "clang-arm")
+    set_target_cpu_clang_arm("${target}" "${PROJECT_TARGET_CPU}")
   elseif ("${TOOLCHAIN_ID}" STREQUAL "ti-arm")
     set_target_cpu_ti_arm("${target}" "${PROJECT_TARGET_CPU}")
   elseif ("${TOOLCHAIN_ID}" STREQUAL "ti-c2000")

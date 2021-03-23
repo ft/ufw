@@ -19,7 +19,8 @@ find_path(sysroot_root arm-none-eabi
   HINTS /usr/lib ${TOOLCHAIN_PATH} ENV CLANG_ARM_NONE_EABI_TOOLCHAIN_PATH REQUIRED)
 set(CMAKE_SYSROOT "${sysroot_root}/arm-none-eabi")
 
-set(CMAKE_EXE_LINKER_FLAGS_INIT "-fuse-ld=bfd -static -nostartfiles -nodefaultlibs -nostdlib")
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+set(CMAKE_EXE_LINKER_FLAGS_INIT "-fuse-ld=lld -nostdlib")
 
 set(TOOLCHAIN_ID "clang-arm")
 set(COMPILER_API "gnu")
