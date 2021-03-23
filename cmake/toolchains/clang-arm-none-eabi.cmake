@@ -11,9 +11,11 @@ set(CMAKE_C_COMPILER_TARGET ${triple})
 set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_CXX_COMPILER_TARGET ${triple})
 
-# TODO: This needs to be much more generic. Works with current Debian packages
-# for this toolchain, though.
-set(CMAKE_SYSROOT /usr/lib/arm-none-eabi)
+# Either use cmake -DTOOLCHAIN_PATH=/path/to/toolchain or set the environment
+# variable CLANG_ARM_NONE_EABI_TOOLCHAIN_PATH
+find_path(sysroot_root arm-none-eabi
+  HINTS /usr/lib ${TOOLCHAIN_PATH} ENV CLANG_ARM_NONE_EABI_TOOLCHAIN_PATH REQUIRED)
+set(CMAKE_SYSROOT "${sysroot_root}/arm-none-eabi")
 
 set(CMAKE_EXE_LINKER_FLAGS_INIT "-fuse-ld=bfd -static -nostartfiles -nodefaultlibs -nostdlib")
 
