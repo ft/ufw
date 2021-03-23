@@ -10,6 +10,8 @@ set(CMAKE_C_COMPILER clang)
 set(CMAKE_C_COMPILER_TARGET ${triple})
 set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_CXX_COMPILER_TARGET ${triple})
+SET(CMAKE_ASM_COMPILER clang)
+SET(CMAKE_ASM_COMPILER_TARGET ${triple})
 
 # Either use cmake -DTOOLCHAIN_PATH=/path/to/toolchain or set the environment
 # variable CLANG_ARM_NONE_EABI_TOOLCHAIN_PATH
