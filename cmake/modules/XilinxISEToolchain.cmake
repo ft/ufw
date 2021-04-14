@@ -19,11 +19,17 @@ function(generate_project_file output sources)
 
     set(ip_cores ${sources})
     set(vhdl_sources ${sources})
+    set(verilog_sources ${sources})
     list(FILTER ip_cores INCLUDE REGEX "^.*\.xco$")
     list(FILTER vhdl_sources INCLUDE REGEX "^.*\.vhd$")
+    list(FILTER verilog_sources INCLUDE REGEX "^.*\.v$")
 
     foreach(src ${vhdl_sources})
         set(prj_file_lines "${prj_file_lines}vhdl work \"${src}\"\n")
+    endforeach()
+
+    foreach(src ${verilog_sources})
+        set(prj_file_lines "${prj_file_lines}verilog work \"${src}\"\n")
     endforeach()
 
     foreach(core ${ip_cores})
@@ -102,8 +108,10 @@ function(add_bitstream top_module uc_file)
 
     set(ip_cores ${PA_SOURCES})
     set(vhdl_sources ${PA_SOURCES})
+    set(verilog_sources ${PA_SOURCES})
     list(FILTER ip_cores INCLUDE REGEX "^.*\.xco$")
     list(FILTER vhdl_sources INCLUDE REGEX "^.*\.vhd$")
+    list(FILTER verilog_sources INCLUDE REGEX "^.*\.v$")
 
     foreach(core ${ip_cores})
         get_filename_component(core_name ${core} NAME_WE)
@@ -125,6 +133,7 @@ function(add_bitstream top_module uc_file)
         ${xst_build_script}
         ${ip_cores}
         ${vhdl_sources}
+        ${verilog_sources}
         COMMENT
         "XST - Xilinx synthesis tool to generate the netlist file"
         )
