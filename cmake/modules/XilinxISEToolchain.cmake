@@ -334,6 +334,12 @@ function(add_ipcore ip_core dest)
     configure_file("${project}/coregen.cgp"
         "${dest}/coregen.cgp" COPYONLY)
 
+    set(deps)
+    foreach (dep ${ARGN})
+      get_filename_component(name ${dep} NAME_WE)
+      list(APPEND deps ${dest}/${name}.vhd)
+    endforeach()
+
     xilinx_licence_file(XILINXD_LICENSE_FILE)
     add_custom_command(OUTPUT ${dest}/${core_name}.vhd
         COMMAND
@@ -347,5 +353,17 @@ function(add_ipcore ip_core dest)
         DEPENDS
         ${dest}/coregen.cgp
         ${ip_core}
-        )
+        ${deps})
+endfunction()
+
+function(add_ipcores dest)
+  set(prev)
+  foreach (core ${ARGN})
+    if ("${prev}" STREQUAL "")
+      add_ipcore(${core} ${dest})
+    else()
+      add_ipcore(${core} ${dest} ${prev})
+    endif()
+    set(prev ${core})
+  endforeach()
 endfunction()
