@@ -239,6 +239,11 @@ function(add_bitstream top_module uc_file)
 endfunction()
 
 function(add_bin input_files output)
+    cmake_parse_arguments(PA "WITHOUT_DEPENDENCIES" "" "" ${ARGN})
+    set(deps)
+    if (NOT PA_WITHOUT_DEPENDENCIES)
+      set(deps ${input_files})
+    endif()
     xilinx_licence_file(XILINXD_LICENSE_FILE)
     add_custom_command(OUTPUT
         ${output}
@@ -253,7 +258,7 @@ function(add_bin input_files output)
         ${input_files}
         -o "${output}"
         DEPENDS
-        ${input_files}
+        ${deps}
         COMMENT
         "PROMGen - Generate binary files"
         )
