@@ -239,14 +239,22 @@ function(add_bitstream top_module uc_file)
 endfunction()
 
 function(add_bin input_files output)
+    # If the input files to for a binary image are generated in separate build
+    # processes, that cannot be seen by the dependency tracker of the build
+    # system the add_bin called is used in, it may be useful to disengage any
+    # and all dependency tracking for this step any just execute it every time.
+    #
+    # That's where the WITHOUT_DEPENDENCIES keyword comes in. It creates a
+    # target without dependencies (a PHONY target in make speak) that just
+    # rebuilds the output file. The output file name must not contain any
+    # slashes in this use case!
     cmake_parse_arguments(PA "WITHOUT_DEPENDENCIES" "" "" ${ARGN})
     set(deps)
     if (NOT PA_WITHOUT_DEPENDENCIES)
       set(deps ${input_files})
     endif()
     xilinx_licence_file(XILINXD_LICENSE_FILE)
-    add_custom_command(OUTPUT
-        ${output}
+    set(_common_
         COMMAND
         ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_PROMGEN}
@@ -260,8 +268,12 @@ function(add_bin input_files output)
         DEPENDS
         ${deps}
         COMMENT
-        "PROMGen - Generate binary files"
-        )
+        "PROMGen - Generate binary files")
+    if (PA_WITHOUT_DEPENDENCIES)
+      add_custom_target(${output} ${_common_})
+    else()
+      add_custom_command(OUTPUT ${output} ${_common_} DEPENDS ${deps})
+    endif()
 endfunction()
 
 function(add_mcs source dest prom)
