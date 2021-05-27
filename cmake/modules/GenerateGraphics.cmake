@@ -55,7 +55,7 @@ function(GenerateGraphics_pdf2png target source output)
                     ${output})
 endfunction(GenerateGraphics_pdf2png)
 
-function(GenerateGraphics_puml2png target source output)
+function(GenerateGraphics_puml target source output type)
   add_custom_target(gen_${output} DEPENDS ${output})
   add_dependencies(${target} gen_${output})
   add_custom_command(
@@ -63,10 +63,10 @@ function(GenerateGraphics_puml2png target source output)
     DEPENDS ${source}
     COMMENT "Building graphic file: ${output}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMAND plantuml -verbose
+    COMMAND plantuml -verbose -t${type}
                      -o ${CMAKE_CURRENT_BINARY_DIR}
                      ${CMAKE_CURRENT_SOURCE_DIR}/${source})
-endfunction(GenerateGraphics_puml2png)
+endfunction(GenerateGraphics_puml)
 
 set(GenerateGraphics_supported_sources .svg .tex .puml)
 
@@ -86,7 +86,7 @@ function(generate_graphic)
       elseif (${extension} STREQUAL .svg)
         GenerateGraphics_svg2pdf(${PA_TARGET} ${PA_SOURCE} ${output})
       elseif (${extension} STREQUAL .puml)
-        message(FATAL_ERROR "Unsupported target-format for PlantUML: ${variant}")
+        GenerateGraphics_puml(${PA_TARGET} ${PA_SOURCE} ${output} ${variant})
       endif()
     elseif (${variant} STREQUAL "png")
       if (${extension} STREQUAL .tex)
@@ -97,7 +97,7 @@ function(generate_graphic)
       elseif (${extension} STREQUAL .svg)
         GenerateGraphics_svg2png(${PA_TARGET} ${PA_SOURCE} ${output})
       elseif (${extension} STREQUAL .puml)
-        GenerateGraphics_puml2png(${PA_TARGET} ${PA_SOURCE} ${output})
+        GenerateGraphics_puml(${PA_TARGET} ${PA_SOURCE} ${output} ${variant})
       endif()
     else()
       message(FATAL_ERROR "Unsupport target-format: ${variant}")
