@@ -849,10 +849,121 @@ t_sanitise(void)
             "sanitise sets up memory correctly, obeying constraints");
 }
 
+static int
+f_cb_increment(RegisterTable *t, RegisterHandle h, UNUSED void *arg)
+{
+    RegisterValue v;
+    register_get(t, h, &v);
+    v.value.u16 += 1u;
+    register_set(t, h, v);
+    return 0;
+}
+
+static void
+t_iterate_empty(void)
+{
+    RegisterTable empty = {
+        .area = (RegisterArea[]) {
+            MEMORY_AREA(0x0000ul, 0x40ul),
+            REGISTER_AREA_END
+        },
+        .entry = (RegisterEntry[]) {
+            REGISTER_ENTRY_END
+        }
+    };
+
+    RegisterInit success = register_init(&empty);
+    cmp_code(success.code, ==, REG_INIT_SUCCESS, "iterate: empty initialises");
+
+    RegisterAccess acc = register_foreach_in(&empty, 0, REGISTER_ADDRESS_MAX,
+                                             f_cb_increment, NULL);
+    cmp_code(acc.code, ==, REG_ACCESS_SUCCESS,
+             "iteration with empty table succeeds");
+}
+
+static void
+t_iterate_single(void)
+{
+    RegisterTable t = {
+        .area = (RegisterArea[]) {
+            MEMORY_AREA(0x0000ul, 0x40ul),
+            REGISTER_AREA_END
+        },
+        .entry = (RegisterEntry[]) {
+            REG_U16(0, 0x0000ul, 0u),
+            REG_U16(1, 0x0001ul, 1u),
+            REG_U16(2, 0x0002ul, 2u),
+            REG_U16(3, 0x0003ul, 3u),
+            REGISTER_ENTRY_END
+        }
+    };
+
+    RegisterInit success = register_init(&t);
+    cmp_code(success.code, ==, REG_INIT_SUCCESS, "iterate single: t initialises");
+
+    RegisterAccess acc = register_foreach_in(&t, 0, REGISTER_ADDRESS_MAX,
+                                             f_cb_increment, NULL);
+    cmp_code(acc.code, ==, REG_ACCESS_SUCCESS,
+             "iteration with some registers succeeds");
+
+    RegisterValue v;
+    for (RegisterHandle r = 0u; r < 4u; ++r) {
+        register_get(&t, r, &v);
+        ok(v.value.u16 == r + 1u,
+           "t_iterate_single: t[%"PRIu16"] == %"PRIu16" (+1)", r, r + 1u);
+    }
+
+    acc = register_foreach_in(&t, 1u, 2u, f_cb_increment, NULL);
+    cmp_code(acc.code, ==, REG_ACCESS_SUCCESS,
+             "iteration with some registers succeeds again");
+
+    for (RegisterHandle r = 1u; r < 3u; ++r) {
+        register_get(&t, r, &v);
+        ok(v.value.u16 == r + 2u,
+           "t_iterate_single: t[%"PRIu16"] == %"PRIu16" (+2)", r, r + 2u);
+    }
+    register_get(&t, 0, &v);
+    ok(v.value.u16 == 1u, "t_iterate_single: t[0] == 1 (still)");
+    register_get(&t, 3, &v);
+    ok(v.value.u16 == 4u, "t_iterate_single: t[3] == 4 (still)");
+}
+
+static void
+t_iterate_miss(void)
+{
+    RegisterTable t = {
+        .area = (RegisterArea[]) {
+            MEMORY_AREA(0x0000ul, 0x40ul),
+            REGISTER_AREA_END
+        },
+        .entry = (RegisterEntry[]) {
+            REG_U16(0, 0x0000ul, 0u),
+            REG_U16(1, 0x0001ul, 1u),
+            REG_U16(2, 0x0002ul, 2u),
+            REG_U16(3, 0x0003ul, 3u),
+            REGISTER_ENTRY_END
+        }
+    };
+
+    RegisterInit success = register_init(&t);
+    cmp_code(success.code, ==, REG_INIT_SUCCESS, "iterate miss: t initialises");
+
+    RegisterAccess acc = register_foreach_in(&t, 4u, 64u, f_cb_increment, NULL);
+    cmp_code(acc.code, ==, REG_ACCESS_SUCCESS,
+             "iteration with some registers succeeds");
+
+    RegisterValue v;
+    for (RegisterHandle r = 0u; r < 4u; ++r) {
+        register_get(&t, r, &v);
+        ok(v.value.u16 == r,
+           "t_iterate_single: t[%"PRIu16"] == %"PRIu16" (still)", r, r);
+    }
+}
+
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(3+1+1+4+16+47+(7*18)+15+26+3+3);
+    plan(3+1+1+4+16+47+(7*18)+15+26+3+3+2+11+6);
     t_invalid_tables();    /*  3 */
     t_trivial_success();   /*  1 */
     t_trivial_fail();      /*  1 */
@@ -870,5 +981,8 @@ main(UNUSED int argc, UNUSED char *argv[])
     t_block_access();      /* 26 */
     t_hexstring();         /*  3 */
     t_sanitise();          /*  3 */
+    t_iterate_empty();     /*  2 */
+    t_iterate_single();    /* 11 */
+    t_iterate_miss();      /*  6 */
     return EXIT_SUCCESS;
 }

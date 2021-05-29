@@ -207,6 +207,8 @@ typedef struct RegisterTable {
     RegisterEntry *entry;
 } RegisterTable;
 
+typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
+
 /* Public API prototypes */
 
 #define MAKE_CUSTOM_AREA(READ,WRITE,ADDR,SIZE,FLAGS)  \
@@ -362,6 +364,10 @@ RegisterAccess register_sanitise(RegisterTable*);
 RegisterAccess register_mcopy(RegisterTable*, AreaHandle, AreaHandle);
 bool register_value_compare(const RegisterValue*, const RegisterValue*);
 RegisterAccess register_compare(RegisterTable*, RegisterHandle, RegisterHandle);
+
+RegisterAccess register_foreach_in(RegisterTable*,
+                                   RegisterAddress, RegisterOffset,
+                                   registerCallback, void*);
 
 static inline RegisterArea*
 register_area(RegisterTable *t, RegisterHandle reg)

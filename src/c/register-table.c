@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <common/compiler.h>
 #include <c/binary-format.h>
 #include <c/register-internal.h>
 #include <c/register-table.h>
@@ -83,6 +84,28 @@ RegisterAccess ra_malformed_write(RegisterTable*,
                                   RegisterAddress,
                                   RegisterOffset,
                                   RegisterAtom*);
+
+/* Iteration */
+
+struct maybe_area {
+    bool valid;
+    AreaHandle handle;
+};
+
+struct maybe_register {
+    bool valid;
+    RegisterHandle handle;
+};
+
+static struct maybe_area find_area(const RegisterTable*,
+                                   AreaHandle, AreaHandle,
+                                   RegisterAddress);
+static struct maybe_register find_reg(const RegisterTable*t,
+                                      RegisterHandle, RegisterHandle,
+                                      RegisterAddress);
+static RegisterAccess reg_iterate(RegisterTable*,
+                                  RegisterHandle, RegisterAddress,
+                                  registerCallback, void*);
 
 /* Miscellaneous Utilities */
 
@@ -1310,4 +1333,137 @@ register_sanitise(RegisterTable *t)
     }
 
     return rv;
+}
+
+/* Linear search: Simple and likely sufficient with short register tables. We
+ * can replace with with bisection if this turns out not to be the case. */
+
+static struct maybe_area
+find_area(const RegisterTable *t,
+          AreaHandle first, AreaHandle last,
+          RegisterAddress addr)
+{
+    struct maybe_area rv = { .valid = true, .handle = 0 };
+
+    for (AreaHandle i = first; i <= last; i++) {
+        if (ra_addr_is_part_of(t->area + i, addr)) {
+            rv.handle = i;
+            return rv;
+        }
+    }
+
+    rv.valid = false;
+    return rv;
+}
+
+static struct maybe_register
+find_reg(const RegisterTable *t,
+         RegisterHandle first, RegisterHandle last,
+         RegisterAddress addr)
+{
+    struct maybe_register rv = { .valid = true, .handle = 0 };
+
+    for (RegisterHandle i = first; i <= last; i++) {
+        if (reg_range_touches(t->entry + i, addr, 1u) == 0) {
+            rv.handle = i;
+            return rv;
+        }
+    }
+
+    rv.valid = false;
+    return rv;
+}
+
+static RegisterAccess
+reg_iterate(RegisterTable *t,
+            RegisterHandle start, RegisterAddress end,
+            registerCallback f, void *arg)
+{
+    RegisterAccess rv = { .code = REG_ACCESS_SUCCESS, .address = 0u };
+    RegisterHandle last = t->entries - 1u;
+
+    while (start <= last && t->entry[start].address <= end) {
+        int iret = f(t, start, arg);
+
+        if (LIKELY(iret == 0)) {
+            start++;
+            continue;
+        } else if (iret < 0) {
+            rv.code = REG_ACCESS_FAILURE;
+            rv.address = t->entry[start].address;
+            return rv;
+        } else {
+            return rv;
+        }
+    }
+
+    return rv;
+}
+
+/**
+ * Call a function for each register defined within a range of addresses
+ *
+ * This function is lenient towards issues like memory holes. Which means, that
+ * you can easily iterate over all the registers in a register table by doing:
+ *
+ * @code
+ * register_foreach_in(t, REGISTER_ADDRESS_MAX,  REGISTER_OFFSET_MAX, f, NULL);
+ * @endcode
+ *
+ * The iteration process stops whenever an iteration function returns a
+ * non-zero value. A negative value will stop the iteration signaling failure.
+ * A positive value will stop the iteration process signaling success.
+ *
+ * @param  t       The register table to work within
+ * @param  addr    Start of the address range to work in
+ * @param  off     Length of the range to work in
+ * @param  f       Callback function to call on registers
+ * @param  arg     Additional argument to pass to f
+ *
+ * @return REG_ACCESS_INVALID if the table isn't initialised;
+ *         REG_ACCESS_FAILURE if a callback returns a negative value; the
+ *         address field of the return value is set to the address of the entry
+ *         at this point; REG_ACCESS_SUCCESS otherwise.
+ *
+ * @sideeffects The iteration process itself is pure, but a callback function
+ *              may introduce sideeffects
+ */
+RegisterAccess
+register_foreach_in(RegisterTable *t,
+                    RegisterAddress addr, RegisterOffset off,
+                    registerCallback f, void *arg)
+{
+    RegisterAccess rv = { .code = REG_ACCESS_SUCCESS, .address = 0u };
+
+    if (BIT_ISSET(t->flags, REG_TF_INITIALISED) == false) {
+        /* Can't do anything with a table that's not initialised. */
+        rv.code = REG_ACCESS_INVALID;
+        return rv;
+    } else if (off == 0u || t->entries == 0u) {
+        /* If the table has no entries, we're done with no work. */
+        return rv;
+    }
+
+    /*
+     * Find the first register in the given range.
+     *
+     * If addr is mapped, first looking up by area, then by entry within that
+     * area works with the least amount of operations. If addr is not mapped,
+     * we're performing the look-up over all entries within the table.
+     */
+    struct maybe_area startarea = find_area(t, 0, t->areas - 1u, addr);
+    struct maybe_register startreg;
+
+    if (startarea.valid) {
+        const RegisterHandle first = t->area[startarea.handle].entry.first;
+        const RegisterHandle last = t->area[startarea.handle].entry.last;
+        startreg = find_reg(t, first, last, addr);
+    } else {
+        startreg = find_reg(t, 0, t->entries - 1u, addr);
+    }
+
+    if (startreg.valid == false)
+        return rv;
+
+    return reg_iterate(t, startreg.handle, addr + off - 1u, f, arg);
 }
