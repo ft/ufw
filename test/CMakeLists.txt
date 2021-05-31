@@ -12,6 +12,7 @@ if (WITH_UINT8_T)
   list(APPEND test_names t-binary-format)
 endif()
 list(APPEND test_names
+  t-convolution-low-pass
   t-persistent-storage
   t-register-table
   t-ring-buffer)
