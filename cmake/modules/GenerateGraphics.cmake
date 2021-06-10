@@ -68,7 +68,19 @@ function(GenerateGraphics_puml target source output type)
                      ${CMAKE_CURRENT_SOURCE_DIR}/${source})
 endfunction(GenerateGraphics_puml)
 
-set(GenerateGraphics_supported_sources .svg .tex .puml)
+function(GenerateGraphics_uxf target source output type)
+  add_custom_target(gen_${output} DEPENDS ${output})
+  add_dependencies(${target} gen_${output})
+  add_custom_command(
+    OUTPUT ${output}
+    DEPENDS ${source}
+    COMMENT "Building graphic file: ${output}"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND umlet -action=convert -format=${type} -filename=${CMAKE_CURRENT_SOURCE_DIR}/${source}
+                  -output=${CMAKE_CURRENT_BINARY_DIR}/${output})
+endfunction(GenerateGraphics_uxf)
+
+set(GenerateGraphics_supported_sources .svg .tex .puml .uxf)
 
 function(generate_graphic)
   cmake_parse_arguments(PA "" "SOURCE;TARGET" "FORMATS" ${ARGN})
@@ -87,6 +99,8 @@ function(generate_graphic)
         GenerateGraphics_svg2pdf(${PA_TARGET} ${PA_SOURCE} ${output})
       elseif (${extension} STREQUAL .puml)
         GenerateGraphics_puml(${PA_TARGET} ${PA_SOURCE} ${output} ${variant})
+      elseif (${extension} STREQUAL .uxf)
+        GenerateGraphics_uxf(${PA_TARGET} ${PA_SOURCE} ${output} ${variant})
       endif()
     elseif (${variant} STREQUAL "png")
       if (${extension} STREQUAL .tex)
@@ -98,6 +112,8 @@ function(generate_graphic)
         GenerateGraphics_svg2png(${PA_TARGET} ${PA_SOURCE} ${output})
       elseif (${extension} STREQUAL .puml)
         GenerateGraphics_puml(${PA_TARGET} ${PA_SOURCE} ${output} ${variant})
+      elseif (${extension} STREQUAL .uxf)
+        GenerateGraphics_uxf(${PA_TARGET} ${PA_SOURCE} ${output} ${variant})
       endif()
     else()
       message(FATAL_ERROR "Unsupport target-format: ${variant}")
