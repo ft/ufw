@@ -140,7 +140,12 @@ macro(ufw_recursive_dispatch)
   endif() # UFW_RECURSIVE_RUN
   if (DEFINED UFW_ZEPHYR_KERNEL)
     set(APPLICATION_SOURCE_DIR ${APPLICATION_SOURCE_DIR} CACHE PATH "Application Source Directory")
+    # This is, so CMake's find_package will find the right place
+    # for ZephyrConfig.cmake:
     set(Zephyr_ROOT "${UFW_ZEPHYR_KERNEL}")
+    # This is, so Zephyr's CMake magic doesn't pick up other zephyr
+    # kernels from other prefixes such as ~/src.
+    set(ZEPHYR_BASE "${UFW_ZEPHYR_KERNEL}")
     find_package(Zephyr REQUIRED)
   endif()
 endmacro()
