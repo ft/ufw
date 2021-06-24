@@ -6,18 +6,24 @@ set(__UFW_SetupTargetCPU 1)
 include(TestBigEndian)
 
 function(add_target_link_flags _target _link_flags)
-    set(new_link_flags ${_link_flags})
-    get_target_property(existing_link_flags ${_target} LINK_FLAGS)
-    if(existing_link_flags)
-        set(new_link_flags "${new_link_flags} ${existing_link_flags}")
-    else()
-        message("No existing link flags found: ${existing_link_flags}")
-    endif()
-    set_target_properties(${_target} PROPERTIES LINK_FLAGS ${new_link_flags})
+  set_property(TARGET ${_target} APPEND_STRING PROPERTY LINK_FLAGS " ${_link_flags}")
 endfunction()
 
 function(add_target_endianness target endianness)
   target_compile_definitions(${target} PUBLIC "SYSTEM_ENDIANNESS_${endianness}")
+endfunction()
+
+function(get_library_dir lib arch_flags result)
+  find_program(gcc arm-none-eabi-gcc
+    HINTS ${TOOLCHAIN_PATH} ENV GNU_ARM_NONE_EABI_TOOLCHAIN_PATH REQUIRED)
+
+  execute_process(COMMAND ${gcc} ${arch_flags} -print-file-name=${lib}
+    OUTPUT_VARIABLE lib_path
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+  get_filename_component(lib_dir "${lib_path}" DIRECTORY)
+
+  set("${result}" "${lib_dir}" PARENT_SCOPE)
 endfunction()
 
 function(set_target_cpu_gcc_arm target _cpu)
@@ -49,6 +55,17 @@ function(set_target_cpu_gcc_arm target _cpu)
   target_compile_options(${target} PUBLIC ${_flags})
   string(REPLACE ";" " " _flags_str "${_flags}")
   set_target_properties(${target} PROPERTIES LINK_FLAGS "${_flags_str}")
+
+  if ((CMAKE_C_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+    get_library_dir(libc.a "${_flags}" libc_path)
+    get_library_dir(libm.a "${_flags}" libm_path)
+    get_library_dir(libgcc.a "${_flags}" libgcc_path)
+    add_target_link_flags(${target} "-Wl,-L${libc_path} -Wl,-L${libm_path} -Wl,-L${libgcc_path}")
+  endif()
+endfunction()
+
+function(set_target_cpu_clang_arm target cpu)
+  set_target_cpu_gcc_arm(${target} ${cpu})
 endfunction()
 
 function(set_target_cpu_ti_arm target _cpu)
@@ -117,6 +134,8 @@ function(set_target_cpu target)
 
   if ("${TOOLCHAIN_ID}" STREQUAL "gcc-arm")
     set_target_cpu_gcc_arm("${target}" "${PROJECT_TARGET_CPU}")
+  elseif ("${TOOLCHAIN_ID}" STREQUAL "clang-arm")
+    set_target_cpu_clang_arm("${target}" "${PROJECT_TARGET_CPU}")
   elseif ("${TOOLCHAIN_ID}" STREQUAL "ti-arm")
     set_target_cpu_ti_arm("${target}" "${PROJECT_TARGET_CPU}")
   elseif ("${TOOLCHAIN_ID}" STREQUAL "ti-c2000")
