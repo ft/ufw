@@ -3,6 +3,8 @@ if(__XilinxISEToolchain)
 endif()
 set(__XilinxISEToolchain 1)
 
+include(FakeTimeSupport)
+
 function(xilinx_licence_file var)
   if (DEFINED ${var})
     return()
@@ -49,9 +51,11 @@ function(add_syntax_check top_module)
     generate_project_file(${project_file} "${PA_SOURCES}")
     file(WRITE ${script} "elaborate\n-ifn ${project_file}\n-ifmt mixed")
 
+    make_faketime_prefix(FAKETIME_PREFIX)
     xilinx_licence_file(XILINXD_LICENSE_FILE)
     add_custom_target(syntax-check
         COMMAND
+        ${FAKETIME_PREFIX}
         ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_XST}
         -intstyle ${PA_VERBOSITY}
@@ -118,10 +122,12 @@ function(add_bitstream top_module uc_file)
         list(APPEND vhdl_sources "${CMAKE_CURRENT_BINARY_DIR}/ipcore_dir/${core_name}.vhd")
     endforeach()
 
+    make_faketime_prefix(FAKETIME_PREFIX)
     xilinx_licence_file(XILINXD_LICENSE_FILE)
     add_custom_command(OUTPUT
         ${output_bn}.ngc
         COMMAND
+        ${FAKETIME_PREFIX}
         ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_XST}
         -intstyle ${PA_VERBOSITY}
@@ -144,9 +150,11 @@ function(add_bitstream top_module uc_file)
         set(ngc_ngd_build_verbosity "-verbose")
     endif ()
 
+    make_faketime_prefix(FAKETIME_PREFIX)
     add_custom_command(OUTPUT
         ${output_bn}.ngd
         COMMAND
+        ${FAKETIME_PREFIX}
         ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_NGDBUILD}
         -intstyle ${PA_VERBOSITY}
@@ -167,6 +175,7 @@ function(add_bitstream top_module uc_file)
         ${output_bn}_map.ncd
         ${output_bn}.pcf
         COMMAND
+        ${FAKETIME_PREFIX}
         ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_MAP}
         -intstyle ${PA_VERBOSITY}
@@ -185,6 +194,7 @@ function(add_bitstream top_module uc_file)
     add_custom_command(OUTPUT
         ${output_bn}.ncd
         COMMAND
+        ${FAKETIME_PREFIX}
         ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_PAR}
         -intstyle ${PA_VERBOSITY}
@@ -203,6 +213,7 @@ function(add_bitstream top_module uc_file)
     add_custom_command(OUTPUT
         ${output_bn}.twr
         COMMAND
+        ${FAKETIME_PREFIX}
         ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_TRCE}
         -intstyle ${PA_VERBOSITY}
@@ -221,6 +232,7 @@ function(add_bitstream top_module uc_file)
     add_custom_command(OUTPUT
         ${output_bn}.bit
         COMMAND
+        ${FAKETIME_PREFIX}
         ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_BITGEN}
         -intstyle ${PA_VERBOSITY}
@@ -256,6 +268,7 @@ function(add_bin input_files output)
     xilinx_licence_file(XILINXD_LICENSE_FILE)
     set(_common_
         COMMAND
+        ${FAKETIME_PREFIX}
         ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_PROMGEN}
         -intstyle ${XILINX_VERBOSITY}
@@ -277,10 +290,12 @@ function(add_bin input_files output)
 endfunction()
 
 function(add_mcs source dest prom)
+    make_faketime_prefix(FAKETIME_PREFIX)
     xilinx_licence_file(XILINXD_LICENSE_FILE)
     add_custom_command(OUTPUT
         ${dest}
         COMMAND
+        ${FAKETIME_PREFIX}
         ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_PROMGEN}
         -intstyle ${XILINX_VERBOSITY}
@@ -307,9 +322,11 @@ function(program_jtag file)
         "${CMAKE_CURRENT_BINARY_DIR}/impact_program_jtag.cmd")
     configure_file(${IMPACT_JTAG_SCRIPT_INPUT} ${impact_jtag_script} @ONLY)
 
+    make_faketime_prefix(FAKETIME_PREFIX)
     xilinx_licence_file(XILINXD_LICENSE_FILE)
     add_custom_target(program-jtag
         COMMAND
+        ${FAKETIME_PREFIX}
         ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_IMPACT}
         -batch ${impact_jtag_script}
@@ -330,9 +347,11 @@ function(program_prom file)
         "${CMAKE_CURRENT_BINARY_DIR}/impact_program_prom.cmd")
     configure_file(${IMPACT_PROM_SCRIPT_INPUT} ${impact_prom_script} @ONLY)
 
+    make_faketime_prefix(FAKETIME_PREFIX)
     xilinx_licence_file(XILINXD_LICENSE_FILE)
     add_custom_target(program-prom
         COMMAND
+        ${FAKETIME_PREFIX}
         ${CMAKE_COMMAND} -E env XILINXD_LICENSE_FILE="${XILINXD_LICENSE_FILE}"
         ${XIL_IMPACT}
         -batch ${impact_prom_script}
