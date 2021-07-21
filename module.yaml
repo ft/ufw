@@ -24,7 +24,10 @@ cmake-extensions:
   stm32-hal:
     include: add_stm32_hal(${moduleroot})
     module: STM32HAL
+  zephyr-modules:
+    include: "# zephyr-module/kernel: ${moduleroot}"
 
 cmake-extension-variants:
   st-cmsis: ^st-cmsis-device-.*$
   stm32-hal: ^stm32[^x]*xx-hal-driver$
+  zephyr-modules: ^zephyr-.*$
