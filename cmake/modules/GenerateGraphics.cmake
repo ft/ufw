@@ -29,10 +29,10 @@ endif()
 function(ufw_inkscape_make_command type input output outvar)
   if ("${UFW_INKSCAPE_VERSION}" EQUAL 0)
     set(cmd "${UFW_INKSCAPE_EXECUTABLE}"
-            --export-pdf ${output} ${input})
+            --export-${type} ${output} ${input})
   else()
     set(cmd "${UFW_INKSCAPE_EXECUTABLE}"
-            --export-type=pdf --export-filename=${output} ${input})
+            --export-type=${type} --export-filename=${output} ${input})
   endif()
   set(${outvar} ${cmd} PARENT_SCOPE)
 endfunction()
