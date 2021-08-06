@@ -3,26 +3,64 @@ if(__UFW_GenerateGraphics)
 endif()
 set(__UFW_GenerateGraphics 1)
 
+find_program(UFW_INKSCAPE_EXECUTABLE inkscape)
+
+execute_process(
+  COMMAND "${UFW_INKSCAPE_EXECUTABLE}" --version
+  OUTPUT_VARIABLE UFW_INKSCAPE_VERSION
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  RESULT_VARIABLE UFW_INKSCAPE_VERSION_RESULT)
+
+
+if ("${UFW_INKSCAPE_VERSION_RESULT}" EQUAL 0)
+  if ("${UFW_INKSCAPE_VERSION}" MATCHES "^.nkscape *([0-9]+)\.")
+    set(UFW_INKSCAPE_VERSION "${CMAKE_MATCH_1}")
+  else()
+    set(UFW_INKSCAPE_VERSION 0)
+  endif()
+  message(STATUS
+    "inkscape: ${UFW_INKSCAPE_EXECUTABLE}; major version: ${UFW_INKSCAPE_VERSION}")
+else()
+  message(WARNING "inkscape executable not found on system!")
+  set(UFW_INKSCAPE_VERSION 0)
+endif()
+
+
+function(ufw_inkscape_make_command type input output outvar)
+  if ("${UFW_INKSCAPE_VERSION}" EQUAL 0)
+    set(cmd "${UFW_INKSCAPE_EXECUTABLE}"
+            --export-pdf ${output} ${input})
+  else()
+    set(cmd "${UFW_INKSCAPE_EXECUTABLE}"
+            --export-type=pdf --export-filename=${output} ${input})
+  endif()
+  set(${outvar} ${cmd} PARENT_SCOPE)
+endfunction()
+
 function(GenerateGraphics_svg2pdf target source output)
   add_custom_target(gen_${output} DEPENDS ${output})
   add_dependencies(${target} gen_${output})
+  ufw_inkscape_make_command(
+    pdf "${CMAKE_CURRENT_SOURCE_DIR}/${source}" "${output}" cmd)
   add_custom_command(
     OUTPUT ${output}
     DEPENDS ${source}
     COMMENT "Building graphic file: ${output}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMAND inkscape --export-pdf ${output} ${CMAKE_CURRENT_SOURCE_DIR}/${source})
+    COMMAND ${cmd})
 endfunction(GenerateGraphics_svg2pdf)
 
 function(GenerateGraphics_svg2png target source output)
   add_custom_target(gen_${output} DEPENDS ${output})
   add_dependencies(${target} gen_${output})
+  ufw_inkscape_make_command(
+    png "${CMAKE_CURRENT_SOURCE_DIR}/${source}" "${output}" cmd)
   add_custom_command(
     OUTPUT ${output}
     DEPENDS ${source}
     COMMENT "Building graphic file: ${output}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMAND inkscape --export-png ${output} ${CMAKE_CURRENT_SOURCE_DIR}/${source})
+    COMMAND ${cmd})
 endfunction(GenerateGraphics_svg2png)
 
 function(GenerateGraphics_tex2pdf target source output)
