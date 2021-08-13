@@ -1,0 +1,131 @@
+-------------------------------
+  User-visible changes in ufw
+-------------------------------
+
+* scratch → v1.0.0 (released 2021-08-14):
+
+** Miscellaneous
+
+- First system release from scratch.
+
+** Diffstat:
+
+    .clang-format                                 |   89 +
+    .gitignore                                    |   29 +
+    AUTHORS                                       |    9 +
+    CMakeLists.txt                                |  120 +
+    HACKING                                       |   94 +
+    LICENCE                                       |   25 +
+    README                                        |   42 +
+    bin/generate-artifacts                        |   98 +
+    bin/generate-version-h                        |  198 ++
+    bin/print-commitdate                          |   16 +
+    bin/print-version                             |   16 +
+    cmake/kconfig/README                          |   16 +
+    cmake/kconfig/debug.conf                      |    4 +
+    cmake/kconfig/minsizerel.conf                 |    4 +
+    cmake/kconfig/release.conf                    |    4 +
+    cmake/kconfig/relwithdebinfo.conf             |    4 +
+    cmake/modules/ArmCmsis.cmake                  |   10 +
+    cmake/modules/BuildArtifacts.cmake            |  166 ++
+    cmake/modules/BuildInTargetDir.cmake          |   33 +
+    cmake/modules/BuildInZephyrDir.cmake          |  289 ++
+    cmake/modules/FakeTimeSupport.cmake           |   18 +
+    cmake/modules/FreeRTOS.cmake                  |  101 +
+    cmake/modules/GNUAttributes.cmake             |  183 ++
+    cmake/modules/GNUBuiltins.cmake               |   59 +
+    cmake/modules/GNUCompilerWarnings.cmake       |  171 ++
+    cmake/modules/GenerateGraphics.cmake          |  161 ++
+    cmake/modules/GitIntegration.cmake            |  210 ++
+    cmake/modules/HardwareAbstraction.cmake       |   81 +
+    cmake/modules/InitialiseToolchain.cmake       |  222 ++
+    cmake/modules/Libtap.cmake                    |   25 +
+    cmake/modules/Newlib.cmake                    |   16 +
+    cmake/modules/STCmsis.cmake                   |   14 +
+    cmake/modules/STM32HAL.cmake                  |   59 +
+    cmake/modules/STM32HAL_f0.cmake               |   69 +
+    cmake/modules/STM32HAL_f1.cmake               |   68 +
+    cmake/modules/STM32HAL_f2.cmake               |   74 +
+    cmake/modules/STM32HAL_f3.cmake               |   80 +
+    cmake/modules/STM32HAL_f4.cmake               |   97 +
+    cmake/modules/STM32HAL_f7.cmake               |   97 +
+    cmake/modules/STM32HAL_g0.cmake               |   70 +
+    cmake/modules/STM32HAL_g4.cmake               |   91 +
+    cmake/modules/STM32HAL_h7.cmake               |  123 +
+    cmake/modules/STM32HAL_l0.cmake               |   73 +
+    cmake/modules/STM32HAL_l1.cmake               |   67 +
+    cmake/modules/STM32HAL_l4.cmake               |  112 +
+    cmake/modules/STM32HAL_l5.cmake               |  100 +
+    cmake/modules/STM32HAL_wb.cmake               |   77 +
+    cmake/modules/SetupTargetCPU.cmake            |  131 +
+    cmake/modules/SetupUFW.cmake                  |  221 ++
+    cmake/modules/TICompilerWarnings.cmake        |   69 +
+    cmake/modules/ToolchainFeatures.cmake         |  114 +
+    cmake/modules/UFWTest.cmake                   |  111 +
+    cmake/modules/UFWTools.cmake                  |   96 +
+    cmake/modules/XilinxISEToolchain.cmake        |  405 +++
+    cmake/modules/pandocology.cmake               |  431 +++
+    cmake/toolchains/clang-arm-none-eabi.cmake    |   21 +
+    cmake/toolchains/clang.cmake                  |   42 +
+    cmake/toolchains/gnu-arm-none-eabi.cmake      |   25 +
+    cmake/toolchains/gnu.cmake                    |   27 +
+    cmake/toolchains/ti-arm.cmake                 |   59 +
+    cmake/toolchains/ti-c2000.cmake               |   65 +
+    cmake/toolchains/xilinx-ise.cmake             |   31 +
+    doc/CMakeLists.txt                            |   20 +
+    doc/Doxyfile.in                               | 2484 +++++++++++++++++
+    .../xilinx-ise/cmd/bitgen_command_file.cmd    |   29 +
+    .../xilinx-ise/cmd/impact_program_jtag.cmd.in |    6 +
+    .../xilinx-ise/cmd/map_command_file.cmd       |   15 +
+    .../xilinx-ise/cmd/ngd_command_file.cmd       |    3 +
+    .../xilinx-ise/cmd/par_command_file.cmd       |    3 +
+    .../xilinx-ise/cmd/twr_command_file.cmd       |    4 +
+    doc/examples/xilinx-ise/target.cmake          |   19 +
+    .../xilinx-ise/tcl/process_properties.tcl     |  328 +++
+    .../xilinx-ise/tcl/project_properties.tcl     |    9 +
+    .../xilinx-ise/xst/synthesis_script.xst.in    |   55 +
+    include/c/binary-format.h                     |  533 ++++
+    include/c/compat.h                            |   18 +
+    include/c/compat/math-constants.h             |   85 +
+    include/c/compat/ssize-t.h                    |   52 +
+    include/c/compat/strings.h                    |   31 +
+    include/c/convolution-low-pass.h              |  139 +
+    include/c/logger.h                            |   87 +
+    include/c/persistent-storage.h                |  169 ++
+    include/c/register-internal.h                 |   46 +
+    include/c/register-table.h                    |  412 +++
+    include/c/register-utilities.h                |   25 +
+    include/c/ring-buffer-iter.h                  |   99 +
+    include/c/ring-buffer.h                       |  192 ++
+    include/common/bit-operations.h               |  354 +++
+    include/common/compiler.h                     |  252 ++
+    include/common/toolchain.h.in                 |  337 +++
+    include/test/tap.h                            |   90 +
+    module.yaml                                   |   33 +
+    src/c/logger.c                                |  175 ++
+    src/c/persistent-storage.c                    |  475 ++++
+    src/c/register-table.c                        | 1469 ++++++++++
+    src/c/register-utilities.c                    |  213 ++
+    src/c/ring-buffer-iter.c                      |   48 +
+    src/c/strlcat.c                               |   56 +
+    src/c/strlcpy.c                               |   50 +
+    src/c/strnlen.c                               |   31 +
+    src/test/memdiff.c                            |  401 +++
+    src/test/output-utils.c                       |   67 +
+    src/test/tap.c                                |   99 +
+    target/cortex-m3/bin/run                      |   25 +
+    target/cortex-m3/init/startup.c               |  158 ++
+    target/cortex-m3/ld/arm-cortex-qemu.ld        |  137 +
+    test/.gitignore                               |   12 +
+    test/CMakeLists.txt                           |   33 +
+    test/t-binary-format.c                        |  676 +++++
+    test/t-convolution-low-pass.c                 |  106 +
+    test/t-persistent-storage.c                   |  122 +
+    test/t-register-table.c                       |  988 +++++++
+    test/t-ring-buffer.c                          |   61 +
+    vcs-integration/build-information.sh          |   35 +
+    vcs-integration/definitions.sh.example        |   12 +
+    vcs-integration/git.sh                        |  250 ++
+    vcs-integration/system-version.h.in           |  126 +
+    vcs-integration/version.h.in                  |  170 ++
+    118 files changed, 17556 insertions(+)
