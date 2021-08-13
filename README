@@ -14,7 +14,7 @@ portable enabling, and more.
 Commonly, ‘ufw’ is part of a larger  source-tree that leverages it to build em-
 bedded applications. It is also possible  to build ‘ufw’ using many toolchains,
 build-tools, build configurations and the  like. To automate the required cmake
-incantations, you can use the library' companion too ‘mmh’:
+incantations, you can use the library's companion too ‘mmh’:
 
     % mmh
 
