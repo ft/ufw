@@ -1,0 +1,42 @@
+---------------------------------------------------------
+  Microframework → μfw → ufw — Embedded Support Library
+---------------------------------------------------------
+
+‘ufw’ is a support library for embedded  development. It started out as a sand-
+box for trying implementions or various  kinds. It then quickly became a reser-
+voir for  various utilities that come  in handy when building  modular embedded
+applications: Version  control integration;  CMake build system  extensions and
+embedded toolchain files; zephyr impedance mismatch management; a very portable
+implementation of a  TAP emitting testing API; startup code  and a cortex-m3 to
+run test-suites for  this architecture via qemu; toolchain  feature testing and
+portable enabling, and more.
+
+Commonly, ‘ufw’ is part of a larger  source-tree that leverages it to build em-
+bedded applications. It is also possible  to build ‘ufw’ using many toolchains,
+build-tools, build configurations and the  like. To automate the required cmake
+incantations, you can use the library' companion too ‘mmh’:
+
+    % mmh
+
+…builds as many  combinations of ‘ufw’ as  it can and reports  the results. All
+build results will be cleaned up afterwards.
+
+    % mmh -d ci
+
+…will do the same, but perform all builds inside the ’ci’ subdirectory and will
+keep it around after all work is done.  You can also select parts of all combi-
+nations of builds:
+
+    % mmh -d ci -T clang,gnu -A native -B ninja -C debug
+
+…only builds ‘ufw’ using the ‘clang’ and ‘gnu’ toolchains in ‘debug’ configura-
+tion using the ‘ninja’ build tool. While this:
+
+    % mmh -d ci -T gnu-arm-none-eabi -A cortex-m3 -B ninja -C debug
+
+…builds the library  for the ‘cortex-m3’ architecture  in ‘debug’ configuration
+using ‘ninja’. If a ‘system-arm’ qemu  implementation is found on the host sys-
+tem, ufw's cortex-m3  startup code is used to run  the library's test-suite via
+qemu.
+
+The ‘mmh’ tool can be found here:   https://github.com/ft/makemehappy
