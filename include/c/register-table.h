@@ -369,6 +369,12 @@ RegisterAccess register_foreach_in(RegisterTable*,
                                    RegisterAddress, RegisterOffset,
                                    registerCallback, void*);
 
+static inline RegisterAddress
+register_address(RegisterTable *t, RegisterHandle reg)
+{
+    return t->entry[reg].address;
+}
+
 static inline RegisterArea*
 register_area(RegisterTable *t, RegisterHandle reg)
 {

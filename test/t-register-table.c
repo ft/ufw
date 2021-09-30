@@ -321,7 +321,7 @@ test_register_value(RegisterTable *t, RegisterHandle reg,
 
 static void
 test_register(RegisterTable *t, RegisterHandle reg, RegisterAddress area,
-              RegisterOffset offset,
+              RegisterOffset offset, RegisterAddress address,
               RegisterType type, RegisterValueU def)
 {
     test_register_value(t, reg, type, def);          /* 3 */
@@ -330,6 +330,9 @@ test_register(RegisterTable *t, RegisterHandle reg, RegisterAddress area,
              register_name(t, reg));
     cmp_code(register_offset(t, reg), ==, offset,    /* 1 */
              "%s: Offset in area is correct",
+             register_name(t, reg));
+    cmp_code(register_address(t, reg), ==, address,  /* 1 */
+             "%s: Global address is correct ",
              register_name(t, reg));
 }
 
@@ -384,20 +387,20 @@ t_bfg2000(void)
     cmp_code(bfg2000.area[2].entry.last, ==, 6u,
              "  ...as is last.");
 
-    /* Check default values and register meta-data: 7 * 5 = 35 */
-    test_register(&bfg2000, SENSOR_DEVICE_ID, 0, 0,
+    /* Check default values and register meta-data: 7 * 6 = 42 */
+    test_register(&bfg2000, SENSOR_DEVICE_ID, 0, 0, 0,
                   REG_TYPE_UINT16, (RegisterValueU){ .u16 = 0x2342 });
-    test_register(&bfg2000, SENSOR_RAMP_DURATION, 0, 0x10,
+    test_register(&bfg2000, SENSOR_RAMP_DURATION, 0, 0x10, 0x10,
                   REG_TYPE_UINT32, (RegisterValueU){ .u32 = 0x12345678ul });
-    test_register(&bfg2000, SENSOR_AGE_OF_UNIVERSE, 0, 0x20,
+    test_register(&bfg2000, SENSOR_AGE_OF_UNIVERSE, 0, 0x20, 0x20,
                   REG_TYPE_UINT64, (RegisterValueU){ .u64 = 0x8765432112345678ull });
-    test_register(&bfg2000, SENSOR_PHASE_DELAY_A, 0x1000, 0,
+    test_register(&bfg2000, SENSOR_PHASE_DELAY_A, 0x1000, 0, 0x1000,
                   REG_TYPE_SINT16, (RegisterValueU){ .s16 = -23 });
-    test_register(&bfg2000, SENSOR_PHASE_DELAY_B, 0x1000, 0x10,
+    test_register(&bfg2000, SENSOR_PHASE_DELAY_B, 0x1000, 0x10, 0x1010,
                   REG_TYPE_SINT32, (RegisterValueU){ .s32 = -123456l });
-    test_register(&bfg2000, SENSOR_PHASE_DELAY_C, 0x1000, 0x20,
+    test_register(&bfg2000, SENSOR_PHASE_DELAY_C, 0x1000, 0x20, 0x1020,
                   REG_TYPE_SINT64, (RegisterValueU){ .s64 = -112233445566778899ll });
-    test_register(&bfg2000, SENSOR_TRIGGER_PERIOD, 0x1040, 0x00,
+    test_register(&bfg2000, SENSOR_TRIGGER_PERIOD, 0x1040, 0x00, 0x1040,
                   REG_TYPE_FLOAT32, (RegisterValueU){ .f32 = 42e-6 });
 }
 
@@ -963,7 +966,7 @@ t_iterate_miss(void)
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(3+1+1+4+16+47+(7*18)+15+26+3+3+2+11+6);
+    plan(3+1+1+4+16+54+(7*18)+15+26+3+3+2+11+6);
     t_invalid_tables();    /*  3 */
     t_trivial_success();   /*  1 */
     t_trivial_fail();      /*  1 */
