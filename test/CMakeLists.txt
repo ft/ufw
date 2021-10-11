@@ -15,7 +15,8 @@ list(APPEND test_names
   t-convolution-low-pass
   t-persistent-storage
   t-register-table
-  t-ring-buffer)
+  t-ring-buffer
+  t-register-table-persistent-storage)
 
 set(test_prgs)
 foreach (tst ${test_names})
