@@ -92,14 +92,14 @@ typedef RegisterAccess(*registerWrite)(
     RegisterArea*, const RegisterAtom*, RegisterOffset, RegisterOffset);
 
 typedef enum RegisterType {
-    REG_TYPE_INVALID = 0u,
     REG_TYPE_UINT16,
     REG_TYPE_UINT32,
     REG_TYPE_UINT64,
     REG_TYPE_SINT16,
     REG_TYPE_SINT32,
     REG_TYPE_SINT64,
-    REG_TYPE_FLOAT32
+    REG_TYPE_FLOAT32,
+    REG_TYPE_INVALID
 } RegisterType;
 
 typedef union RegisterValueU {
