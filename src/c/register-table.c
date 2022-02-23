@@ -1467,3 +1467,13 @@ register_foreach_in(RegisterTable *t,
 
     return reg_iterate(t, startreg.handle, addr + off - 1u, f, arg);
 }
+
+RegisterEntry *
+register_get_entry(RegisterTable *t, RegisterHandle r)
+{
+    if (r >= t->entries) {
+        return NULL;
+    }
+
+    return t->entry + r;
+}
