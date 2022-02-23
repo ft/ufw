@@ -12,6 +12,9 @@ extern "C" {
 void register_table_print(void*, const char*, const RegisterTable*);
 void register_area_print(void*, const char*, const RegisterArea*);
 void register_entry_print(void*, const char*, const RegisterEntry*);
+void register_entry_print_value(void *fh, const RegisterEntry *e);
+void register_value_print(void*, RegisterValue*);
+void register_validator_print(void*, RegisterType, const RegisterValidator*);
 void register_init_print(void*, const char*, RegisterInit);
 char *register_accesscode_to_string(RegisterAccessCode);
 char *register_initcode_to_string(RegisterInitCode);

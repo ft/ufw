@@ -87,6 +87,89 @@ register_entry_print(void *fh, const char *prefix, const RegisterEntry *e)
     r_fprintf(fh, "%s    Register Flags  : 0x%08" PRIx32 "\n", prefix,
               (uint32_t)e->flags);
     r_fprintf(fh, "%s    Register Address: 0x%08" PRIx32 "\n", prefix, e->address);
+    r_fprintf(fh, "%s    Default Value   : ", prefix);
+    register_entry_print_value(fh, e);
+    r_fprintf(fh, "\n%s    Validation Type : ", prefix);
+    register_validator_print(fh, e->type, &e->check);
+    r_fprintf(fh, "\n");
+}
+
+void
+register_entry_print_value(void *fh, const RegisterEntry *e)
+{
+    RegisterValue def = { .type = e->type, .value = e->default_value };
+    register_value_print(fh, &def);
+}
+
+void
+register_validator_print(void *h, RegisterType type, const RegisterValidator *v)
+{
+    RegisterValue value;
+    value.type = type;
+
+    switch (v->type) {
+    case REGV_TYPE_TRIVIAL:
+        r_fprintf(h, "<trivial>");
+        break;
+    case REGV_TYPE_MIN:
+        r_fprintf(h, "<min: ");
+        value.value = v->arg.min;
+        register_value_print(h, &value);
+        r_fprintf(h, ">");
+        break;
+    case REGV_TYPE_MAX:
+        r_fprintf(h, "<max: ");
+        value.value = v->arg.max;
+        register_value_print(h, &value);
+        r_fprintf(h, ">");
+        break;
+    case REGV_TYPE_RANGE:
+        r_fprintf(h, "<range: ");
+        value.value = v->arg.range.min;
+        register_value_print(h, &value);
+        r_fprintf(h, ", ");
+        value.value = v->arg.range.max;
+        register_value_print(h, &value);
+        r_fprintf(h, ">");
+        break;
+    case REGV_TYPE_CALLBACK:
+        r_fprintf(h, "<callback>");
+        break;
+    default:
+        r_fprintf(h, "<unknown-type>");
+        break;
+    }
+}
+
+void
+register_value_print(void *fh, RegisterValue *v)
+{
+    switch (v->type) {
+    case REG_TYPE_UINT16:
+        r_fprintf(fh, "%" PRIu16, v->value.u16);
+        break;
+    case REG_TYPE_SINT16:
+        r_fprintf(fh, "%" PRId16, v->value.s16);
+        break;
+    case REG_TYPE_UINT32:
+        r_fprintf(fh, "%" PRIu32, v->value.u32);
+        break;
+    case REG_TYPE_SINT32:
+        r_fprintf(fh, "%" PRId32, v->value.s32);
+        break;
+    case REG_TYPE_UINT64:
+        r_fprintf(fh, "%" PRIu64, v->value.u64);
+        break;
+    case REG_TYPE_SINT64:
+        r_fprintf(fh, "%" PRId64, v->value.s64);
+        break;
+    case REG_TYPE_FLOAT32:
+        r_fprintf(fh, "%e", v->value.f32);
+        break;
+    case REG_TYPE_INVALID:
+        r_fprintf(fh, "<value-invalid>");
+        break;
+    }
 }
 
 void
