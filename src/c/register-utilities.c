@@ -146,19 +146,22 @@ register_value_print(void *fh, RegisterValue *v)
 {
     switch (v->type) {
     case REG_TYPE_UINT16:
-        r_fprintf(fh, "%" PRIu16, v->value.u16);
+        r_fprintf(fh, "[%" PRIu16 "; 0x%04" PRIx16 "]",
+                  v->value.u16, v->value.u16);
         break;
     case REG_TYPE_SINT16:
         r_fprintf(fh, "%" PRId16, v->value.s16);
         break;
     case REG_TYPE_UINT32:
-        r_fprintf(fh, "%" PRIu32, v->value.u32);
+        r_fprintf(fh, "[%" PRIu32 "; 0x%08" PRIx32 "]",
+                  v->value.u32, v->value.u32);
         break;
     case REG_TYPE_SINT32:
         r_fprintf(fh, "%" PRId32, v->value.s32);
         break;
     case REG_TYPE_UINT64:
-        r_fprintf(fh, "%" PRIu64, v->value.u64);
+        r_fprintf(fh, "[%" PRIu64 "; 0x%016" PRIx64 "]",
+                  v->value.u64, v->value.u64);
         break;
     case REG_TYPE_SINT64:
         r_fprintf(fh, "%" PRId64, v->value.s64);
