@@ -4,10 +4,15 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
-#include <inttypes.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
+
+/* With fairly recent newlib (3.3.0), this header has a couple of dependencies
+ * that breaks the availability of macros like PRIu64 (the 64-bit ones). Lea-
+ * ding to compilation errors in ‘register_value_print()’. Including this after
+ * stdio.h fixes the issue. */
+#include <inttypes.h>
 
 #include <c/register-internal.h>
 #include <c/register-table.h>
