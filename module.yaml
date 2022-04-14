@@ -18,6 +18,8 @@ cmake-extensions:
   libtap:
     include: add_libtap(${moduleroot})
     module: Libtap
+  lwgps:
+    include: add_subdirectory(${moduleroot}/lwgps)
   st-cmsis:
     include: add_st_cmsis(${moduleroot})
     module: STCmsis
