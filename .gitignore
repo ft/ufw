@@ -10,6 +10,7 @@
 *.a
 *.pro
 *.tar.*
+ci/
 gmon.out
 tags
 TAGS
