@@ -61,7 +61,7 @@ if git_got_info; then
     if git_exact_version; then
         DESTINATION="${DESTINATION}_v${__GIT_VERSION__}"
     else
-        if test "x${__GIT_BRANCH__}${GITINT_IGNORE_DETACHED_HEAD}" = "xDetachedHead1"; then
+        if test "x${__GIT_BRANCH__}" = "xDetachedHead"; then
             DESTINATION="${DESTINATION}_v${__GIT_VERSION__}"
         else
             DESTINATION="${DESTINATION}_${__GIT_BRANCH__}_v${__GIT_VERSION__}"
