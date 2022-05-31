@@ -113,11 +113,5 @@ set_property(TARGET ufw-tap PROPERTY C_STANDARD 99)
 set_target_cpu(ufw-tap)
 MakeStrictCompilerC(ufw-tap)
 
-if (UFW_RECURSIVE_RUN)
-  install(
-    TARGETS ufw
-    DESTINATION lib)
-endif()
-
 add_subdirectory(test)
 add_subdirectory(doc)
