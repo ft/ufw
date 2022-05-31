@@ -61,10 +61,15 @@ if git_got_info; then
     if git_exact_version; then
         DESTINATION="${DESTINATION}_v${__GIT_VERSION__}"
     else
+        version="$__GIT_VERSION__"
+        case "$version" in
+        NoVersion-*) version="${version#NoVersion-}" ;;
+        *)           version="v$version" ;;
+        esac
         if test "x${__GIT_BRANCH__}" = "xDetachedHead"; then
-            DESTINATION="${DESTINATION}_v${__GIT_VERSION__}"
+            DESTINATION="${DESTINATION}_${version}"
         else
-            DESTINATION="${DESTINATION}_${__GIT_BRANCH__}_v${__GIT_VERSION__}"
+            DESTINATION="${DESTINATION}_${__GIT_BRANCH__}_${version}"
         fi
     fi
 else
