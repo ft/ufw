@@ -2,6 +2,57 @@
   User-visible changes in ufw
 -------------------------------
 
+* v1.0.0 → v2.0.0 (released 2022-06-03):
+
+** Breaking compatibility
+
+- Remove support for recursive cmake building schemes. This is the big one. See
+  the commit message for 8796e9a9d for a rationale. Similar build schemes can
+  be achieved using mmh v0.11 and newer.
+- artefacts: Do not include DetachedHead in versioned file names.
+- artefacts: Drop _vNoVersion if no version tag was found.
+
+** New Features
+
+- Experimental support for selecting from multiple clang toolchain versions.
+- register-table: Add ‘register_address()’ API.
+- register-table: Add ‘register_get_entry()’ API.
+- register-table: Allow swapping out printing routines.
+- register-table: Add support for printing register values and validators.
+- modules: Add inclusion rule for lwgps module.
+
+** Bugfixes
+
+- xilinx-ise: Disable async_to_sync. This was set by mistake.
+- Fix compilation with newer newlib versions (3.3.0 in particular).
+
+** Miscellaneous
+
+- Added integration tests for register-table and persistent-storage.
+- Improve register-table initialisation error detection capabilities.
+
+** Diffstat:
+
+    .gitignore                                    |   1 +
+    AUTHORS                                       |   1 +
+    CMakeLists.txt                                |   9 +-
+    bin/generate-artifacts                        |  11 +-
+    cmake/modules/BuildInTargetDir.cmake          |  33 --
+    cmake/modules/BuildInZephyrDir.cmake          | 289 -----------------
+    cmake/modules/SetupUFW.cmake                  | 178 +----------
+    cmake/toolchains/clang.cmake                  |  45 ++-
+    .../xilinx-ise/xst/synthesis_script.xst.in    |   2 +-
+    include/c/register-table.h                    |  12 +-
+    include/c/register-utilities.h                |  14 +-
+    module.yaml                                   |   2 +
+    src/c/register-table.c                        |  10 +
+    src/c/register-utilities.c                    | 227 +++++++++----
+    test/CMakeLists.txt                           |   3 +-
+    test/t-register-table-persistent-storage.c    | 297 ++++++++++++++++++
+    test/t-register-table.c                       |  23 +-
+    17 files changed, 584 insertions(+), 573 deletions(-)
+
+
 * scratch → v1.0.0 (released 2021-08-14):
 
 ** Miscellaneous
