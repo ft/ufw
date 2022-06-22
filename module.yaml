@@ -26,6 +26,8 @@ cmake-extensions:
   stm32-hal:
     include: add_stm32_hal(${moduleroot})
     module: STM32HAL
+  ufwz:
+    include: "# zephyr-module/kernel: ${moduleroot}"
   zephyr-modules:
     include: "# zephyr-module/kernel: ${moduleroot}"
 
