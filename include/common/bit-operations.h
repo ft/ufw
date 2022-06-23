@@ -94,7 +94,7 @@
  * @return The string of bits moved to offset zero
  * @sideeffects None
  */
-#define BIT_GET(container, n, o) ((container & BIT_ONES(n,o)) >> (o))
+#define BIT_GET(container, n, o) (((container) & BIT_ONES((n),(o))) >> (o))
 
 #ifdef BIT_MASK
 /* Zephyr compatibility. */
@@ -171,7 +171,7 @@
  * @return The string of bits moved to offset zero
  * @sideeffects None
  */
-#define BITL_GET(container, n, o) ((container & BITL_ONES(n,o)) >> (o))
+#define BITL_GET(container, n, o) (((container) & BITL_ONES((n),(o))) >> (o))
 
 /**
  * Set a bit in a block of unsigned long int words
@@ -245,7 +245,7 @@
  * @return The string of bits moved to offset zero
  * @sideeffects None
  */
-#define BITLL_GET(container, n, o) ((container & BITLL_ONES(n,o)) >> (o))
+#define BITLL_GET(container, n, o) (((container) & BITLL_ONES((n),(o))) >> (o))
 
 /**
  * Set a bit in a block of unsigned long long int words
