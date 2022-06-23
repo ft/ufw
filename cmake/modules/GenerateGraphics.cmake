@@ -119,7 +119,19 @@ function(GenerateGraphics_uxf target source output type)
                   -output=${CMAKE_CURRENT_BINARY_DIR}/${output})
 endfunction(GenerateGraphics_uxf)
 
-set(GenerateGraphics_supported_sources .svg .tex .puml .uxf)
+function(GenerateGraphics_drawio target source output type)
+  add_custom_target(gen_${output} DEPENDS ${output})
+  add_dependencies(${target} gen_${output})
+  add_custom_command(
+    OUTPUT ${output}
+    DEPENDS ${source}
+    COMMENT "Building graphic file: ${output}"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND drawio -x -f ${type} --crop -o ${CMAKE_CURRENT_BINARY_DIR}/${output}
+                   ${CMAKE_CURRENT_SOURCE_DIR}/${source})
+endfunction(GenerateGraphics_drawio)
+
+set(GenerateGraphics_supported_sources .svg .tex .puml .uxf .drawio)
 
 function(generate_graphic)
   cmake_parse_arguments(PA "" "SOURCE;TARGET" "FORMATS" ${ARGN})
@@ -140,6 +152,8 @@ function(generate_graphic)
         GenerateGraphics_puml(${PA_TARGET} ${PA_SOURCE} ${output} ${variant})
       elseif (${extension} STREQUAL .uxf)
         GenerateGraphics_uxf(${PA_TARGET} ${PA_SOURCE} ${output} ${variant})
+      elseif (${extension} STREQUAL .drawio)
+        GenerateGraphics_drawio(${PA_TARGET} ${PA_SOURCE} ${output} ${variant})
       endif()
     elseif (${variant} STREQUAL "png")
       if (${extension} STREQUAL .tex)
@@ -153,6 +167,8 @@ function(generate_graphic)
         GenerateGraphics_puml(${PA_TARGET} ${PA_SOURCE} ${output} ${variant})
       elseif (${extension} STREQUAL .uxf)
         GenerateGraphics_uxf(${PA_TARGET} ${PA_SOURCE} ${output} ${variant})
+      elseif (${extension} STREQUAL .drawio)
+        GenerateGraphics_drawio(${PA_TARGET} ${PA_SOURCE} ${output} ${variant})
       endif()
     else()
       message(FATAL_ERROR "Unsupport target-format: ${variant}")
