@@ -2,6 +2,20 @@
   User-visible changes in ufw
 -------------------------------
 
+* v2.0.0 → v2.0.1 (released 2022-06-24):
+
+** Bugfixes
+
+- Handle ufwz inclusion like any other zephyr module.
+- Parenthesise macro arguments more pedantically in BIT*_GET().
+
+** Diffstat:
+
+    include/common/bit-operations.h | 6 +++---
+    module.yaml                     | 2 ++
+    2 files changed, 5 insertions(+), 3 deletions(-)
+
+
 * v1.0.0 → v2.0.0 (released 2022-06-03):
 
 ** Breaking compatibility
