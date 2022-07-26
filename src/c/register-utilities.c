@@ -23,10 +23,10 @@
 static void
 rimpl_fprintf(void *dst, const char *fmt, ...)
 {
-	va_list args;
-	va_start(args, fmt);
-	vfprintf(dst, fmt, args);
-	va_end(args);
+    va_list args;
+    va_start(args, fmt);
+    vfprintf(dst, fmt, args);
+    va_end(args);
 }
 
 static fprintf_like r_fprintf = rimpl_fprintf;
@@ -34,7 +34,7 @@ static fprintf_like r_fprintf = rimpl_fprintf;
 void
 register_set_printer(fprintf_like p)
 {
-	r_fprintf = p;
+    r_fprintf = p;
 }
 
 void
