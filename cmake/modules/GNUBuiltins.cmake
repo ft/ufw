@@ -6,7 +6,22 @@ set(__UFW_GNUBuiltins 1)
 include(CheckCSourceCompiles)
 include(CheckCXXSourceCompiles)
 
-set(__UFW_GNUBuiltin_expect
+function(__ufw_gnu_builtin_test var builtin fallback)
+  set(${var}
+  "#if defined __has_builtin
+   #if __has_builtin(${builtin})
+   int main(void) { return 0; }
+   #else
+   #error \"${builtin} not available\"
+   #endif
+   #else
+   ${fallback}
+   #endif"
+  PARENT_SCOPE)
+endfunction()
+
+__ufw_gnu_builtin_test(
+  __UFW_GNUBuiltin_expect __builtin_expect
   "int main(void) {
      int i;
      if (__builtin_expect(1,1))
@@ -25,15 +40,15 @@ macro(CheckGNUBuiltin_CXX_expect)
 endmacro()
 
 function(CheckGNUBuiltin_bswap_n compiler width)
-  set(__code
+  __ufw_gnu_builtin_test(
+    __code "__builtin_bswap${width}"
     "int main(void) {
        __builtin_bswap${width}(0);
        return 0;
      }")
   set(_result "UFW_${compiler}_HAS_BUILTIN_BSWAP${width}")
-  set(result ${_result})
   check_c_source_compiles("${__code}" ${_result})
-  set(${result} ${_result} PARENT_SCOPE)
+  set(${_result} ${${_result}} PARENT_SCOPE)
 endfunction()
 
 macro(CheckGNUBuiltin_C_bswap)
