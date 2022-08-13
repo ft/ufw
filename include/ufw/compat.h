@@ -7,12 +7,12 @@
  * actually need.
  */
 
-#ifndef INC_UFW_COMPAT_H
-#define INC_UFW_COMPAT_H
+#ifndef INC_UFW_UFW_COMPAT_H
+#define INC_UFW_UFW_COMPAT_H
 
 #include <ufw/toolchain.h>
 #include <ufw/compat/math-constants.h>
 #include <ufw/compat/ssize-t.h>
 #include <ufw/compat/strings.h>
 
-#endif /* INC_UFW_COMPAT_H */
+#endif /* INC_UFW_UFW_COMPAT_H */

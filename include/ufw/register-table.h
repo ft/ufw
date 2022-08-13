@@ -4,8 +4,8 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
-#ifndef INC_REGISTER_TABLE_H
-#define INC_REGISTER_TABLE_H
+#ifndef INC_UFW_REGISTER_TABLE_H
+#define INC_UFW_REGISTER_TABLE_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -417,4 +417,4 @@ register_was_touched(RegisterTable *t, RegisterHandle reg)
 }
 #endif /* __cplusplus */
 
-#endif /* INC_REGISTER_TABLE_H */
+#endif /* INC_UFW_REGISTER_TABLE_H */

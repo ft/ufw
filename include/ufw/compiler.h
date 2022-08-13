@@ -9,8 +9,8 @@
  * @brief Short-hand macros for compiler features
  */
 
-#ifndef INC_COMPILER_H
-#define INC_COMPILER_H
+#ifndef INC_UFW_COMPILER_H
+#define INC_UFW_COMPILER_H
 
 #include <ufw/toolchain.h>
 
@@ -249,4 +249,4 @@
  * @}
  */
 
-#endif /* INC_COMPILER_H */
+#endif /* INC_UFW_COMPILER_H */

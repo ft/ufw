@@ -14,8 +14,8 @@
  * not the contents of a field of data is valid.
  */
 
-#ifndef INC_PERSISTENT_STORE_H
-#define INC_PERSISTENT_STORE_H
+#ifndef INC_UFW_PERSISTENT_STORE_H
+#define INC_UFW_PERSISTENT_STORE_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -166,4 +166,4 @@ PersistentAccess persistent_reset(PersistentStorage*, unsigned char);
 }
 #endif /* __cplusplus */
 
-#endif /* INC_PERSISTENT_STORE_H */
+#endif /* INC_UFW_PERSISTENT_STORE_H */

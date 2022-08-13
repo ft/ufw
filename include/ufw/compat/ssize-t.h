@@ -6,8 +6,8 @@
  * implementing <sys/types.h>.
  */
 
-#ifndef INC_UFW_COMPAT_SSIZE_T_H
-#define INC_UFW_COMPAT_SSIZE_T_H
+#ifndef INC_UFW_UFW_COMPAT_SSIZE_T_H
+#define INC_UFW_UFW_COMPAT_SSIZE_T_H
 
 #include <ufw/toolchain.h>
 
@@ -49,4 +49,4 @@ typedef long int ssize_t;
 }
 #endif /* __cplusplus */
 
-#endif /* INC_UFW_COMPAT_SSIZE_T_H */
+#endif /* INC_UFW_UFW_COMPAT_SSIZE_T_H */

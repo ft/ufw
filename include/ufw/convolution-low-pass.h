@@ -4,8 +4,8 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
-#ifndef INC_CONVOLUTION_LOW_PASS_H
-#define INC_CONVOLUTION_LOW_PASS_H
+#ifndef INC_UFW_CONVOLUTION_LOW_PASS_H
+#define INC_UFW_CONVOLUTION_LOW_PASS_H
 
 /**
  * @addtogroup ufw
@@ -136,4 +136,4 @@
  * @}
  */
 
-#endif /* INC_CONVOLUTION_LOW_PASS_H */
+#endif /* INC_UFW_CONVOLUTION_LOW_PASS_H */

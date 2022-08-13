@@ -9,8 +9,8 @@
  * @brief API for a minimal TAP emitting testing module
  */
 
-#ifndef INC_UFW_TEST_TAP_H
-#define INC_UFW_TEST_TAP_H
+#ifndef INC_UFW_UFW_TEST_TAP_H
+#define INC_UFW_UFW_TEST_TAP_H
 
 #include <stdarg.h>
 #include <stdbool.h>
@@ -88,4 +88,4 @@ declare_printer(s64,  int64_t);
 }
 #endif
 
-#endif /* INC_UFW_TEST_TAP_H */
+#endif /* INC_UFW_UFW_TEST_TAP_H */

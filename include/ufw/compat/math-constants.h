@@ -14,8 +14,8 @@
  * If that is desired, first include math.h then ufw/compat/math-constants.h.
  */
 
-#ifndef INC_UFW_MATH_CONSTANTS_H
-#define INC_UFW_MATH_CONSTANTS_H
+#ifndef INC_UFW_UFW_MATH_CONSTANTS_H
+#define INC_UFW_UFW_MATH_CONSTANTS_H
 
 #ifndef M_E
 /** Euler's number (e) */
@@ -82,4 +82,4 @@
 #define M_SQRT1_2 0.70710678118654752440
 #endif
 
-#endif /* INC_UFW_MATH_CONSTANTS_H */
+#endif /* INC_UFW_UFW_MATH_CONSTANTS_H */

@@ -4,8 +4,8 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
-#ifndef INC_REGISTER_INTERNAL_H
-#define INC_REGISTER_INTERNAL_H
+#ifndef INC_UFW_REGISTER_INTERNAL_H
+#define INC_UFW_REGISTER_INTERNAL_H
 
 #include <ufw/register-table.h>
 
@@ -43,4 +43,4 @@ is_end_of_entries(RegisterEntry *e)
 }
 #endif /* __cplusplus */
 
-#endif /* INC_REGISTER_INTERNAL_H */
+#endif /* INC_UFW_REGISTER_INTERNAL_H */

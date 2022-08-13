@@ -38,8 +38,8 @@
  * @endcode
  */
 
-#ifndef INC_BINARY_FORMAT_H
-#define INC_BINARY_FORMAT_H
+#ifndef INC_UFW_BINARY_FORMAT_H
+#define INC_UFW_BINARY_FORMAT_H
 
 #include <stdint.h>
 
@@ -530,4 +530,4 @@ bf_set_f64l(bf_type *buf, double value)
 /* Remove temporary macro to not pollute namespace */
 #undef bf_type
 
-#endif /* INC_BINARY_FORMAT_H */
+#endif /* INC_UFW_BINARY_FORMAT_H */

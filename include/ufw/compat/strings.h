@@ -6,8 +6,8 @@
  * in the system's std-c lib.
  */
 
-#ifndef INC_UFW_COMPAT_STRINGS_H
-#define INC_UFW_COMPAT_STRINGS_H
+#ifndef INC_UFW_UFW_COMPAT_STRINGS_H
+#define INC_UFW_UFW_COMPAT_STRINGS_H
 
 #include <stddef.h>
 #include <ufw/toolchain.h>
@@ -28,4 +28,4 @@ size_t strnlen(const char *, size_t);
 }
 #endif /* __cplusplus */
 
-#endif /* INC_UFW_COMPAT_STRINGS_H */
+#endif /* INC_UFW_UFW_COMPAT_STRINGS_H */

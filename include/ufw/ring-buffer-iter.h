@@ -4,8 +4,8 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
-#ifndef INC_RING_BUFFER_ITER_H
-#define INC_RING_BUFFER_ITER_H
+#ifndef INC_UFW_RING_BUFFER_ITER_H
+#define INC_UFW_RING_BUFFER_ITER_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -96,4 +96,4 @@ size_t rb_iter_advance(rb_iter *);
 }
 #endif /* __cplusplus */
 
-#endif /* INC_RING_BUFFER_ITER_H */
+#endif /* INC_UFW_RING_BUFFER_ITER_H */

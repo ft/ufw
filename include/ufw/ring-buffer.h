@@ -4,8 +4,8 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
-#ifndef INC_RING_BUFFER_H
-#define INC_RING_BUFFER_H
+#ifndef INC_UFW_RING_BUFFER_H
+#define INC_UFW_RING_BUFFER_H
 
 /**
  * @addtogroup ufw
@@ -189,4 +189,4 @@
  * @}
  */
 
-#endif /* INC_RING_BUFFER_H */
+#endif /* INC_UFW_RING_BUFFER_H */

@@ -1,5 +1,5 @@
-#ifndef INC_REGISTER_UTILITIES_H
-#define INC_REGISTER_UTILITIES_H
+#ifndef INC_UFW_REGISTER_UTILITIES_H
+#define INC_UFW_REGISTER_UTILITIES_H
 
 #include <stdio.h>
 
@@ -28,4 +28,4 @@ void register_set_printer(fprintf_like);
 }
 #endif /* __cplusplus */
 
-#endif /* INC_REGISTER_UTILITIES_H */
+#endif /* INC_UFW_REGISTER_UTILITIES_H */

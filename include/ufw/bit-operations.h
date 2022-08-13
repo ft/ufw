@@ -9,8 +9,8 @@
  * @brief Macros implementing bit operations and related constants
  */
 
-#ifndef INC_BITOPS_H
-#define INC_BITOPS_H
+#ifndef INC_UFW_BITOPS_H
+#define INC_UFW_BITOPS_H
 
 #include <limits.h>
 
@@ -351,4 +351,4 @@
  * @}
  */
 
-#endif /* INC_BITOPS_H */
+#endif /* INC_UFW_BITOPS_H */
