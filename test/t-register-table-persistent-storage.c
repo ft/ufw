@@ -10,10 +10,11 @@
 #define REGISTER_TABLE_WITH_NAMES
 
 #include <ufw/binary-format.h>
-#include <ufw/register-internal.h>
 #include <ufw/register-table.h>
 #include <ufw/register-utilities.h>
 #include <ufw/persistent-storage.h>
+
+#include "../src/register-internal.h"
 
 /* Register table macros */
 #define VOLATILE_START            0x2000ul

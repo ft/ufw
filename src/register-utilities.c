@@ -14,9 +14,10 @@
  * stdio.h fixes the issue. */
 #include <inttypes.h>
 
-#include <ufw/register-internal.h>
 #include <ufw/register-table.h>
 #include <ufw/register-utilities.h>
+
+#include "register-internal.h"
 
 #define IDX2STR(x) [x] = #x
 
