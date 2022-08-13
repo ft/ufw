@@ -10,9 +10,9 @@
 #ifndef INC_UFW_COMPAT_H
 #define INC_UFW_COMPAT_H
 
-#include <common/toolchain.h>
-#include <c/compat/math-constants.h>
-#include <c/compat/ssize-t.h>
-#include <c/compat/strings.h>
+#include <ufw/toolchain.h>
+#include <ufw/compat/math-constants.h>
+#include <ufw/compat/ssize-t.h>
+#include <ufw/compat/strings.h>
 
 #endif /* INC_UFW_COMPAT_H */

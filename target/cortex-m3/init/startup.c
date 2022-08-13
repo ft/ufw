@@ -13,7 +13,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <common/compiler.h>
+#include <ufw/compiler.h>
 
 /* Prototype for user-supplied code; definition is *not* part of this file. */
 int main(void);

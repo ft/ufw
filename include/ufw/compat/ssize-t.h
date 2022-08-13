@@ -9,7 +9,7 @@
 #ifndef INC_UFW_COMPAT_SSIZE_T_H
 #define INC_UFW_COMPAT_SSIZE_T_H
 
-#include <common/toolchain.h>
+#include <ufw/toolchain.h>
 
 #ifdef WITH_SYS_TYPES_H
 #include <sys/types.h>

@@ -12,7 +12,7 @@
 #ifndef INC_COMPILER_H
 #define INC_COMPILER_H
 
-#include <common/toolchain.h>
+#include <ufw/toolchain.h>
 
 /**
  * @addtogroup ufw

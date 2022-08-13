@@ -4,16 +4,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <common/compiler.h>
-#include <test/tap.h>
+#include <ufw/compiler.h>
+#include <ufw/test/tap.h>
 
 #define REGISTER_TABLE_WITH_NAMES
 
-#include <c/binary-format.h>
-#include <c/register-internal.h>
-#include <c/register-table.h>
-#include <c/register-utilities.h>
-#include <c/persistent-storage.h>
+#include <ufw/binary-format.h>
+#include <ufw/register-internal.h>
+#include <ufw/register-table.h>
+#include <ufw/register-utilities.h>
+#include <ufw/persistent-storage.h>
 
 /* Register table macros */
 #define VOLATILE_START            0x2000ul

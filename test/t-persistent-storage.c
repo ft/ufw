@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <common/compiler.h>
-#include <test/tap.h>
+#include <ufw/compiler.h>
+#include <ufw/test/tap.h>
 
-#include <c/persistent-storage.h>
+#include <ufw/persistent-storage.h>
 
 #define BUFFER_SIZE 128u
 unsigned char buffer[BUFFER_SIZE];

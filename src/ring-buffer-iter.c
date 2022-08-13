@@ -7,7 +7,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "c/ring-buffer-iter.h"
+#include "ufw/ring-buffer-iter.h"
 
 /**
  * @addtogroup ufw

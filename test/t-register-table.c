@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <common/compiler.h>
-#include <test/tap.h>
+#include <ufw/compiler.h>
+#include <ufw/test/tap.h>
 
 #define REGISTER_TABLE_WITH_NAMES
-#include <c/register-table.h>
+#include <ufw/register-table.h>
 
 #define cmp_code(a, op, b, ...)                 \
     unless (ok(a op b, __VA_ARGS__)) {          \

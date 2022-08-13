@@ -15,9 +15,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <common/compiler.h>
-#include <common/toolchain.h>
-#include <test/tap.h>
+#include <ufw/compiler.h>
+#include <ufw/toolchain.h>
+#include <ufw/test/tap.h>
 
 static long unsigned int test_count = 0u;
 

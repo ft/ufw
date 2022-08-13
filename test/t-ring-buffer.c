@@ -9,11 +9,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <common/compiler.h>
-#include <test/tap.h>
+#include <ufw/compiler.h>
+#include <ufw/test/tap.h>
 
-#include <c/ring-buffer.h>
-#include <c/ring-buffer-iter.h>
+#include <ufw/ring-buffer.h>
+#include <ufw/ring-buffer-iter.h>
 
 RING_BUFFER_API(byte_buffer, uint16_t)
 RING_BUFFER_ITER_API(byte_buffer, uint16_t)

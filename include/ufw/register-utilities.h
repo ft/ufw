@@ -7,7 +7,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#include <c/register-table.h>
+#include <ufw/register-table.h>
 
 void register_table_print(void*, const char*, const RegisterTable*);
 void register_area_print(void*, const char*, const RegisterArea*);

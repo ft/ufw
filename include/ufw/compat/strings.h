@@ -10,7 +10,7 @@
 #define INC_UFW_COMPAT_STRINGS_H
 
 #include <stddef.h>
-#include <common/toolchain.h>
+#include <ufw/toolchain.h>
 
 #ifndef UFW_COMPAT_HAVE_STRLCAT
 size_t strlcat(char *, const char *, size_t);

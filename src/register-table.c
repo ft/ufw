@@ -11,10 +11,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <common/compiler.h>
-#include <c/binary-format.h>
-#include <c/register-internal.h>
-#include <c/register-table.h>
+#include <ufw/compiler.h>
+#include <ufw/binary-format.h>
+#include <ufw/register-internal.h>
+#include <ufw/register-table.h>
 
 /*
  * Internal API prototypes

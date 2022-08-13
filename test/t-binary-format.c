@@ -2,10 +2,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <common/compiler.h>
-#include <test/tap.h>
+#include <ufw/compiler.h>
+#include <ufw/test/tap.h>
 
-#include <c/binary-format.h>
+#include <ufw/binary-format.h>
 
 /*
  * Octet swapping

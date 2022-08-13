@@ -33,10 +33,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <common/bit-operations.h>
-#include <common/compiler.h>
-#include <common/toolchain.h>
-#include <test/tap.h>
+#include <ufw/bit-operations.h>
+#include <ufw/compiler.h>
+#include <ufw/toolchain.h>
+#include <ufw/test/tap.h>
 
 struct diffstate {
     const void *a;

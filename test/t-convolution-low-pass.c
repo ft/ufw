@@ -10,10 +10,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <common/compiler.h>
-#include <test/tap.h>
+#include <ufw/compiler.h>
+#include <ufw/test/tap.h>
 
-#include <c/convolution-low-pass.h>
+#include <ufw/convolution-low-pass.h>
 
 CONV_LOW_PASS_API(clp, int)
 CONV_LOW_PASS(clp, int)

@@ -53,7 +53,7 @@
 
 /* Use toolchain information to decide whether or not __builtin_bswapXX() are
  * available. If not, use the usual mask-shift-or routine. */
-#include <common/toolchain.h>
+#include <ufw/toolchain.h>
 
 #if !(defined(WITH_UINT8_T))
 #if !(defined(SYSTEM_ENDIANNESS_BIG)) && !(defined(SYSTEM_ENDIANNESS_LITTLE))

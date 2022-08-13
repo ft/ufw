@@ -10,7 +10,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "c/ring-buffer.h"
+#include "ufw/ring-buffer.h"
 
 #ifdef __cplusplus
 extern "C" {

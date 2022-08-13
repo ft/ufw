@@ -1,3 +1,5 @@
+cmake_minimum_required (VERSION 3.13.4)
+
 option(GENERATE_API_DOCUMENTATION "Generate API Documentation" OFF)
 find_package(Doxygen)
 

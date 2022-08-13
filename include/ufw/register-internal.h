@@ -7,7 +7,7 @@
 #ifndef INC_REGISTER_INTERNAL_H
 #define INC_REGISTER_INTERNAL_H
 
-#include <c/register-table.h>
+#include <ufw/register-table.h>
 
 #ifdef __cplusplus
 extern "C" {

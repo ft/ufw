@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <common/bit-operations.h>
+#include <ufw/bit-operations.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -12,7 +12,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <c/logger.h>
+#include <ufw/deprecated/logger.h>
 
 /**
  * @addtogroup ufw

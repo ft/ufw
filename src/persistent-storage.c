@@ -11,7 +11,7 @@
 
 #include <string.h>
 
-#include <c/persistent-storage.h>
+#include <ufw/persistent-storage.h>
 
 struct maybe_sum {
     PersistentAccess access;

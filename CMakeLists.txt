@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.8.2)
+cmake_minimum_required (VERSION 3.13.4)
 project(ufw C CXX)
 
 include(CTest)
@@ -52,66 +52,73 @@ else()
   set(UFW_COMPAT_HAVE_STRNLEN 0)
 endif()
 
-configure_file("${PROJECT_SOURCE_DIR}/include/common/toolchain.h.in"
-               "${PROJECT_BINARY_DIR}/include/common/toolchain.h" )
+configure_file("${PROJECT_SOURCE_DIR}/include/ufw/toolchain.h.in"
+               "${PROJECT_BINARY_DIR}/include/ufw/toolchain.h" )
 
-set(__ufw_sources src/c/logger.c
-                  src/c/persistent-storage.c
-                  src/c/ring-buffer-iter.c
-                  src/c/register-table.c
-                  src/c/register-utilities.c)
+set(__ufw_sources src/deprecated/logger.c
+                  src/persistent-storage.c
+                  src/ring-buffer-iter.c
+                  src/register-table.c
+                  src/register-utilities.c)
+
+set(__ufw_include ${CMAKE_CURRENT_SOURCE_DIR}/include
+                  ${CMAKE_CURRENT_BINARY_DIR}/include)
+
+set(__ufw_tap_sources src/test/memdiff.c
+                      src/test/output-utils.c
+                      src/test/tap.c)
+
+function(__ufw_setup lib)
+  set_property(TARGET ${lib} PROPERTY C_STANDARD 99)
+  set_target_cpu(${lib})
+  MakeStrictCompilerC(${lib})
+endfunction()
+
+function(__ufw_sanitise lib)
+  ufw_toolchain(${lib} FEATURES sanitize-address
+                                sanitize-integer
+                                sanitize-undefined-behaviour)
+endfunction()
 
 if (NOT UFW_COMPAT_HAVE_STRLCAT)
-  list(APPEND __ufw_sources src/c/strlcat.c)
+  list(APPEND __ufw_sources src/compat/strlcat.c)
 endif()
 
 if (NOT UFW_COMPAT_HAVE_STRLCPY)
-  list(APPEND __ufw_sources src/c/strlcpy.c)
+  list(APPEND __ufw_sources src/compat/strlcpy.c)
 endif()
 
 if (NOT UFW_COMPAT_HAVE_STRNLEN)
-  list(APPEND __ufw_sources src/c/strnlen.c)
+  list(APPEND __ufw_sources src/compat/strnlen.c)
 endif()
 
 add_library(ufw STATIC ${__ufw_sources})
-set_property(TARGET ufw PROPERTY C_STANDARD 99)
-MakeStrictCompilerC(ufw)
-set_target_cpu(ufw)
+__ufw_setup(ufw)
+__ufw_sanitise(ufw)
+target_include_directories(ufw PUBLIC ${__ufw_include})
 
-ufw_toolchain(ufw FEATURES sanitize-address
-                           sanitize-integer
-                           sanitize-undefined-behaviour)
-
-if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "native")
-  add_library(ufw-nosan STATIC ${__ufw_sources})
-  set_property(TARGET ufw-nosan PROPERTY C_STANDARD 99)
-  MakeStrictCompilerC(ufw-nosan)
-  set_target_cpu(ufw-nosan)
-  target_link_libraries(ufw-nosan PUBLIC ufw-common)
-endif()
-
-add_library(ufw++ INTERFACE)
-target_include_directories(ufw++
-  INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
-            ${CMAKE_CURRENT_BINARY_DIR}/include)
-add_library(ufw-common INTERFACE)
-target_include_directories(ufw-common
-  INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
-            ${CMAKE_CURRENT_BINARY_DIR}/include)
-
-target_link_libraries(ufw PUBLIC ufw-common)
 if (NOT ("${TOOLCHAIN_ID}" MATCHES "^ti-"))
   target_link_libraries(ufw PUBLIC m)
 endif()
 
-add_library(ufw-tap STATIC
-  src/test/memdiff.c
-  src/test/output-utils.c
-  src/test/tap.c)
-target_link_libraries(ufw-tap PUBLIC ufw-common)
-set_property(TARGET ufw-tap PROPERTY C_STANDARD 99)
-set_target_cpu(ufw-tap)
-MakeStrictCompilerC(ufw-tap)
+add_library(ufw-tap STATIC ${__ufw_tap_sources})
+__ufw_setup(ufw-tap)
+__ufw_sanitise(ufw-tap)
+target_link_libraries(ufw-tap PUBLIC ufw)
+
+if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "native")
+  add_library(ufw-nosan STATIC ${__ufw_sources})
+  __ufw_setup(ufw-nosan)
+  target_include_directories(ufw-nosan PUBLIC ${__ufw_include})
+
+  if (NOT ("${TOOLCHAIN_ID}" MATCHES "^ti-"))
+    target_link_libraries(ufw-nosan PUBLIC m)
+  endif()
+
+  add_library(ufw-tap-nosan STATIC ${__ufw_tap_sources})
+  __ufw_setup(ufw-tap-nosan)
+  target_link_libraries(ufw-tap-nosan PUBLIC ufw-nosan)
+endif()
 
 add_subdirectory(test)
 add_subdirectory(doc)
