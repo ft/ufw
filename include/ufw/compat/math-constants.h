@@ -11,7 +11,7 @@
  * manual. It works with POSIX math.h implementations by first checking if a
  * constant is present already.
  *
- * If that is desired, first include math.h then c/compat/math-constants.h.
+ * If that is desired, first include math.h then ufw/compat/math-constants.h.
  */
 
 #ifndef INC_UFW_MATH_CONSTANTS_H
