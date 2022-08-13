@@ -9,6 +9,7 @@
  * @brief Persistent storage implementation
  */
 
+#include <stdint.h>
 #include <string.h>
 
 #include <ufw/persistent-storage.h>
@@ -40,7 +41,23 @@ static uint16_t
 trivialsum(const unsigned char *data, size_t n, uint16_t init)
 {
     for (size_t i = 0u; i < n; ++i) {
-        init += data[i];
+        /*
+         * Clang14's undefined behaviour sanitiser complains about this:
+         *
+         *   persistent-storage.c:47:14: runtime error: implicit conversion from
+         *     type 'int' of value 65536 (32-bit, signed) to type 'uint16_t'
+         *     (aka 'unsigned short') changed the value to 0 (16-bit, unsigned)
+         *
+         * ...when this was: init += data[i];
+         *
+         * I am not sure why that is, since neither "init" nor "data[*]" are
+         * signed values (nor is "i" for that matter). Forcibly limiting the
+         * result of the addition to 16 bits removes the error. I am a bit
+         * puzzled about this, but nobody should be using "trivialsum()" for
+         * anything in production anyway. It's main job is to never leave a
+         * PersistentStorage object in an invalid state.
+         */
+        init = (init + data[i]) & 0xffffu;
     }
 
     return init;
