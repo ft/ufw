@@ -963,10 +963,42 @@ t_iterate_miss(void)
     }
 }
 
+struct t_ep0 {
+    unsigned int a;
+    unsigned int b;
+};
+
+#define UP(I) (&(struct t_ep0) { .a = I, .b = 666u })
+
+static void
+t_reg_entry_pointer(void)
+{
+    RegisterTable t = {
+        .area = (RegisterArea[]) {
+            MEMORY_AREA(0x0000ul, 0x40ul),
+            REGISTER_AREA_END
+        },
+        .entry = (RegisterEntry[]) {
+            REGx_U16(0, 0x0000ul, 0u, UP(23u)),
+            REGx_U16(1, 0x0001ul, 1u, UP(42u)),
+            REGISTER_ENTRY_END
+        }
+    };
+
+    RegisterInit success = register_init(&t);
+    cmp_code(success.code, ==, REG_INIT_SUCCESS, "reg-entry-pointer: t initialises");
+    struct t_ep0 *p = t.entry[0].user;
+    ok(p->a == 23u,  "reg[0].user->a is initialised correctly");
+    ok(p->b == 666u, "reg[0].user->b is initialised correctly");
+    p = t.entry[1].user;
+    ok(p->a == 42u,  "reg[1].user->a is initialised correctly");
+    ok(p->b == 666u, "reg[1].user->b is initialised correctly");
+}
+
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(3+1+1+4+16+54+(7*18)+15+26+3+3+2+11+6);
+    plan(3+1+1+4+16+54+(7*18)+15+26+3+3+2+11+6+5);
     t_invalid_tables();    /*  3 */
     t_trivial_success();   /*  1 */
     t_trivial_fail();      /*  1 */
@@ -987,5 +1019,6 @@ main(UNUSED int argc, UNUSED char *argv[])
     t_iterate_empty();     /*  2 */
     t_iterate_single();    /* 11 */
     t_iterate_miss();      /*  6 */
+    t_reg_entry_pointer(); /*  5 */
     return EXIT_SUCCESS;
 }
