@@ -901,7 +901,8 @@ register_init(RegisterTable *t)
  * parameter set to the final iteration's register address.
  *
  * If the provided register table is not initialised by ‘register_init()’, the
- * function immediately returns setting the return code to REG_ACCESS_INVALID.
+ * function immediately returns setting the return code to
+ * REG_ACCESS_UNINITIALISED.
  *
  * The iteration does not test for the user-pointer being non-NULL before
  * calling the function, as this may be one of the things users may want to
@@ -910,7 +911,7 @@ register_init(RegisterTable *t)
  * @param  t   Pointer to the register table to work on
  * @param  f   Function to call for each register entry.
  *
- * @return REG_ACCESS_INVALID if the table isn't initialised;
+ * @return REG_ACCESS_UNINITIALISED if the table isn't initialised;
  *         REG_ACCESS_FAILURE if a callback returns a negative value.
  *         REG_ACCESS_SUCCESS otherwise.
  *
@@ -923,7 +924,7 @@ register_user_init(RegisterTable *t, registerCallback f)
     RegisterAccess rv = REG_ACCESS_RESULT_INIT;
 
     if (BIT_ISSET(t->flags, REG_TF_INITIALISED) == false) {
-        rv.code = REG_ACCESS_INVALID;
+        rv.code = REG_ACCESS_UNINITIALISED;
         return rv;
     }
 
@@ -1474,7 +1475,7 @@ reg_iterate(RegisterTable *t,
  * @param  f       Callback function to call on registers
  * @param  arg     Additional argument to pass to f
  *
- * @return REG_ACCESS_INVALID if the table isn't initialised;
+ * @return REG_ACCESS_UNINITIALISED if the table isn't initialised;
  *         REG_ACCESS_FAILURE if a callback returns a negative value; the
  *         address field of the return value is set to the address of the entry
  *         at this point; REG_ACCESS_SUCCESS otherwise.
@@ -1491,7 +1492,7 @@ register_foreach_in(RegisterTable *t,
 
     if (BIT_ISSET(t->flags, REG_TF_INITIALISED) == false) {
         /* Can't do anything with a table that's not initialised. */
-        rv.code = REG_ACCESS_INVALID;
+        rv.code = REG_ACCESS_UNINITIALISED;
         return rv;
     } else if (off == 0u || t->entries == 0u) {
         /* If the table has no entries, we're done with no work. */
