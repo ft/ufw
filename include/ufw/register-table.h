@@ -389,6 +389,7 @@ typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
  */
 
 RegisterInit register_init(RegisterTable*);
+RegisterAccess register_user_init(RegisterTable*, registerCallback);
 
 RegisterAccess reg_mem_read(const RegisterArea*, RegisterAtom*,
                             RegisterOffset, RegisterOffset);

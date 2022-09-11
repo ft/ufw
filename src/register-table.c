@@ -886,6 +886,59 @@ register_init(RegisterTable *t)
     return rv;
 }
 
+/**
+ * Run a function for each register entry for user initilisation
+ *
+ * Users may want to run their own initialisation on the contents of the user
+ * pointers provided by the REGx_...() specifiers.
+ *
+ * This runs a registerCallback function with its table argument set to ‘t’,
+ * the handle argument set to the iteration's handle and the custom void
+ * pointer argument set to the iteration's registers's user pointer.
+ *
+ * When an iteration's function's return value is less than zero, iteration
+ * stops and the return code is set to REG_ACCESS_FAILURE with the address
+ * parameter set to the final iteration's register address.
+ *
+ * If the provided register table is not initialised by ‘register_init()’, the
+ * function immediately returns setting the return code to REG_ACCESS_INVALID.
+ *
+ * The iteration does not test for the user-pointer being non-NULL before
+ * calling the function, as this may be one of the things users may want to
+ * signal an error for.
+ *
+ * @param  t   Pointer to the register table to work on
+ * @param  f   Function to call for each register entry.
+ *
+ * @return REG_ACCESS_INVALID if the table isn't initialised;
+ *         REG_ACCESS_FAILURE if a callback returns a negative value.
+ *         REG_ACCESS_SUCCESS otherwise.
+ *
+ * @sideeffects The iteration process itself is pure, but a callback function
+ *              may introduce sideeffects.
+ */
+RegisterAccess
+register_user_init(RegisterTable *t, registerCallback f)
+{
+    RegisterAccess rv = REG_ACCESS_RESULT_INIT;
+
+    if (BIT_ISSET(t->flags, REG_TF_INITIALISED) == false) {
+        rv.code = REG_ACCESS_INVALID;
+        return rv;
+    }
+
+    for (RegisterHandle i = 0ul; i < t->entries; ++i) {
+        const int code = f(t, i, t->entry[i].user);
+        if (code < 0) {
+            rv.code = REG_ACCESS_FAILURE;
+            rv.address = t->entry[i].address;
+            break;
+        }
+    }
+
+    return rv;
+}
+
 RegisterAccess
 register_set(RegisterTable *t, RegisterHandle idx, const RegisterValue v)
 {
