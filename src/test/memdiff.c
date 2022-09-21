@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 ufw workers, All rights reserved.
+ * Copyright (c) 2020-2022 ufw workers, All rights reserved.
  *
  * Terms for redistribution and use can be found in LICENCE.
  */
