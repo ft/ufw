@@ -2,6 +2,100 @@
   User-visible changes in ufw
 -------------------------------
 
+* v2.1.0 → v3.0.0 (released 2022-09-21):
+
+** Breaking compatibility
+
+- Reorganise code-base:
+  - cmake: ufw++ target removed.
+  - cmake: ufw-common target removed.
+  - code: Separation of c and c/c++ code removed.
+  - code: All header files now have a consistent ‘ufw’ prefix.
+    Examples:
+
+    |--------------------+----------------------|
+    | Old (pre-3.0)      | New (3.0 and newer)  |
+    |--------------------+----------------------|
+    | common/compiler.h  | ufw/compiler.h       |
+    | c/compat/strings.h | ufw/compat/strings.h |
+    | test/tap.h         | ufw/test/tap.h       |
+    |--------------------+----------------------|
+
+- The logger API was removed.
+
+
+** New Features
+
+- cmake: ufw-tap-nosan target added.
+- register-table: Allow adding per-register user-specified data.
+- register-table: Add user-specified initialisation API.
+
+
+** Bugfixes
+
+- Fix TI toolchain feature detection.
+- Remove internal register API from public header path.
+- register-table: Fix return code of functions encountering uninitialised
+  register tables.
+
+
+** Miscellaneous
+
+- CMake minimum version increased to ‘3.13.4’.
+- register-table: REG_* and REGx_* macros can now be generated.
+- Some code was re-indented for consistency.
+
+
+** Diffstat:
+
+    CMakeLists.txt                             |  90 +++--
+    LICENCE                                    |   2 +-
+    cmake/modules/GNUBuiltins.cmake            |  23 +-
+    doc/CMakeLists.txt                         |   2 +
+    include/c/logger.h                         |  87 -----
+    include/{c => ufw}/binary-format.h         |  10 +-
+    include/{common => ufw}/bit-operations.h   |   8 +-
+    include/{c => ufw}/compat.h                |  14 +-
+    include/{c => ufw}/compat/math-constants.h |   8 +-
+    include/{c => ufw}/compat/ssize-t.h        |   8 +-
+    include/{c => ufw}/compat/strings.h        |   8 +-
+    include/{common => ufw}/compiler.h         |  10 +-
+    include/{c => ufw}/convolution-low-pass.h  |   8 +-
+    include/{c => ufw}/persistent-storage.h    |   8 +-
+    include/{c => ufw}/register-table.h        | 215 +++++++----
+    include/{c => ufw}/register-utilities.h    |   8 +-
+    include/{c => ufw}/ring-buffer-iter.h      |  10 +-
+    include/{c => ufw}/ring-buffer.h           |   8 +-
+    include/{ => ufw}/test/tap.h               |   9 +-
+    include/{common => ufw}/toolchain.h.in     |   0
+    scheme/ufw/register-table.scm              |  91 +++++
+    scheme/ufw/utilities.scm                   |  23 ++
+    src/c/logger.c                             | 175 ---------
+    src/{c => compat}/strlcat.c                |   4 +-
+    src/{c => compat}/strlcpy.c                |   4 +-
+    src/{c => compat}/strnlen.c                |   5 +-
+    src/{c => }/persistent-storage.c           |  23 +-
+    {include/c => src}/register-internal.h     |  10 +-
+    src/{c => }/register-table.c               |  69 +++-
+    src/{c => }/register-utilities.c           |  19 +-
+    src/{c => }/ring-buffer-iter.c             |   4 +-
+    src/test/memdiff.c                         |  10 +-
+    src/test/output-utils.c                    |   6 +-
+    src/test/tap.c                             |   8 +-
+    target/cortex-m3/init/startup.c            |   4 +-
+    target/cortex-m3/ld/arm-cortex-qemu.ld     |   2 +-
+    test/CMakeLists.txt                        |   2 +-
+    test/t-binary-format.c                     |   6 +-
+    test/t-convolution-low-pass.c              |   8 +-
+    test/t-persistent-storage.c                |   6 +-
+    test/t-register-table-persistent-storage.c | 423 +++++++++++----------
+    test/t-register-table.c                    |  41 +-
+    test/t-ring-buffer.c                       |  10 +-
+    tools/make-register-macros                 |  15 +
+    tools/make-register-macros.scm             |  72 ++++
+    45 files changed, 853 insertions(+), 723 deletions(-)
+
+
 * v2.0.1 → v2.1.0 (released 2022-06-25):
 
 ** New Features
