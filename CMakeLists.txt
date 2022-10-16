@@ -60,7 +60,8 @@ configure_file("${PROJECT_SOURCE_DIR}/include/ufw/toolchain.h.in"
 set(__ufw_sources src/persistent-storage.c
                   src/ring-buffer-iter.c
                   src/register-table.c
-                  src/register-utilities.c)
+                  src/register-utilities.c
+                  src/source-sink.c)
 
 set(__ufw_include ${CMAKE_CURRENT_SOURCE_DIR}/include
                   ${CMAKE_CURRENT_BINARY_DIR}/include)
