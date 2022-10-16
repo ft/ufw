@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022 ufw workers, All rights reserved.
+ *
+ * Terms for redistribution and use can be found in LICENCE.
+ */
+
 /**
  * @file strings.h
  * @brief Compatibility header for bsd-ish extensions to string library

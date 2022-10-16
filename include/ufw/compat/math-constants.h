@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022 ufw workers, All rights reserved.
+ *
+ * Terms for redistribution and use can be found in LICENCE.
+ */
+
 /**
  * @file math-constants.h
  * @brief Compatibility layer for math constants

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2019-2022 ufw workers, All rights reserved.
+ *
+ * Terms for redistribution and use can be found in LICENCE.
+ */
+
 #ifndef INC_UFW_REGISTER_UTILITIES_H
 #define INC_UFW_REGISTER_UTILITIES_H
 

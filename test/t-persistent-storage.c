@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022 ufw workers, All rights reserved.
+ *
+ * Terms for redistribution and use can be found in LICENCE.
+ */
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>

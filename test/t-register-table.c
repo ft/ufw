@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022 ufw workers, All rights reserved.
+ *
+ * Terms for redistribution and use can be found in LICENCE.
+ */
+
 #include <inttypes.h>
 #include <math.h>
 #include <stdlib.h>
