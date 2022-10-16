@@ -54,10 +54,12 @@ struct difference {
     size_t lineoffset;
 };
 
-typedef size_t(*hexdigitprinter)(const void*, const void*, size_t, char, size_t);
-typedef size_t(*printableprinter)(const void*, const void*, size_t, char);
+typedef size_t(*hexdigitprinter)(const void*, const void*, size_t,
+                                 unsigned char, size_t);
+typedef size_t(*printableprinter)(const void*, const void*, size_t,
+                                  unsigned char);
 
-static const char digits[] = {
+static const unsigned char digits[] = {
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
     'a', 'b', 'c', 'd', 'e', 'f' };
 
@@ -80,14 +82,14 @@ static void diffoverline(const void*, const void*, size_t, size_t, size_t);
 static size_t wprint_word_hex(const void*, const void*, size_t, size_t, size_t,
                               hexdigitprinter, printableprinter);
 
-static size_t pp(const void*, const void*, size_t, char);
-static size_t px(const void*, const void*, size_t, char, size_t);
+static size_t pp(const void*, const void*, size_t, unsigned char);
+static size_t px(const void*, const void*, size_t, unsigned char, size_t);
 
-static size_t pp_above(const void*, const void*, size_t, char);
-static size_t px_above(const void*, const void*, size_t, char, size_t);
+static size_t pp_above(const void*, const void*, size_t, unsigned char);
+static size_t px_above(const void*, const void*, size_t, unsigned char, size_t);
 
-static size_t pp_below(const void*, const void*, size_t, char);
-static size_t px_below(const void*, const void*, size_t, char, size_t);
+static size_t pp_below(const void*, const void*, size_t, unsigned char);
+static size_t px_below(const void*, const void*, size_t, unsigned char, size_t);
 
 static size_t
 lineoffset(size_t byte, size_t columns)
@@ -104,8 +106,8 @@ nextline(size_t position, size_t columns)
 static struct difference
 finddiff(struct diffstate *diff)
 {
-    const char *aptr = diff->a;
-    const char *bptr = diff->b;
+    const unsigned char *aptr = diff->a;
+    const unsigned char *bptr = diff->b;
     struct difference rv;
 
     rv.valid = false;
@@ -173,7 +175,8 @@ diffprecontext(struct diffstate *diff, struct difference *A)
         printlines(diff, 0u, A->lineoffset/diff->columns);
     } else {
         printskip();
-        printlines(diff, A->lineoffset - diff->context*diff->columns, diff->context);
+        printlines(diff, A->lineoffset - diff->context*diff->columns,
+                   diff->context);
     }
 }
 
@@ -188,7 +191,8 @@ diffpostcontext(struct diffstate *diff, struct difference *A)
         - nextline(A->lineoffset, diff->columns);
     const size_t limit = (diff->context+1)*diff->columns;
     if (distance <= limit) {
-        printlines(diff, A->lineoffset+diff->columns, (diff->size - A->lineoffset - 1)/diff->columns);
+        printlines(diff, A->lineoffset+diff->columns,
+                   (diff->size - A->lineoffset - 1)/diff->columns);
     } else {
         printlines(diff, A->lineoffset+diff->columns, diff->context);
         printskip();
@@ -231,7 +235,7 @@ rundiff(struct diffstate *diff, struct difference *A, struct difference *B)
 
 static size_t
 px(UNUSED const void *a, UNUSED const void *b, UNUSED size_t offset,
-   const char ch, const size_t idx)
+   const unsigned char ch, const size_t idx)
 {
     const size_t bits_per_digit = 4u;
     const size_t bitoffset = (idx-1) * bits_per_digit;
@@ -241,10 +245,11 @@ px(UNUSED const void *a, UNUSED const void *b, UNUSED size_t offset,
 }
 
 static size_t
-pr_if_diff(const void *a, const void *b, const size_t offset, const char ch)
+pr_if_diff(const void *a, const void *b, const size_t offset,
+           const unsigned char ch)
 {
-    const char *aptr = a;
-    const char *bptr = b;
+    const unsigned char *aptr = a;
+    const unsigned char *bptr = b;
     if (aptr[offset] == bptr[offset]) {
         putchar(' ');
         return 0u;
@@ -256,7 +261,7 @@ pr_if_diff(const void *a, const void *b, const size_t offset, const char ch)
 
 static size_t
 px_above(const void *a, const void *b, const size_t offset,
-         UNUSED const char ch, UNUSED const size_t idx)
+         UNUSED const unsigned char ch, UNUSED const size_t idx)
 {
     (void)pr_if_diff(a, b, offset, 'v');
     return 0u;
@@ -264,14 +269,15 @@ px_above(const void *a, const void *b, const size_t offset,
 
 static size_t
 px_below(const void *a, const void *b, size_t offset,
-         UNUSED const char ch, UNUSED const size_t idx)
+         UNUSED const unsigned char ch, UNUSED const size_t idx)
 {
     (void)pr_if_diff(a, b, offset, '^');
     return 0u;
 }
 
 static size_t
-pp(UNUSED const void *a, UNUSED const void *b, UNUSED size_t offset, char ch)
+pp(UNUSED const void *a, UNUSED const void *b, UNUSED size_t offset,
+   unsigned char ch)
 {
     if (isprint(ch) && (isspace(ch) == false))
         putchar(ch);
@@ -281,26 +287,30 @@ pp(UNUSED const void *a, UNUSED const void *b, UNUSED size_t offset, char ch)
 }
 
 static size_t
-pp_above(const void *a, const void *b, size_t offset, UNUSED const char ch)
+pp_above(const void *a, const void *b, size_t offset,
+         UNUSED const unsigned char ch)
 {
     (void)pr_if_diff(a, b, offset, 'v');
     return 0u;
 }
 
 static size_t
-pp_below(const void *a, const void *b, size_t offset, UNUSED const char ch)
+pp_below(const void *a, const void *b, size_t offset,
+         UNUSED const unsigned char ch)
 {
     return pr_if_diff(a, b, offset, '^');
 }
 
 static size_t
-diffunderline(const void *a, const void *b, size_t offset, size_t n, size_t columns)
+diffunderline(const void *a, const void *b, size_t offset, size_t n,
+              size_t columns)
 {
     return wprint_word_hex(a, b, offset, n, columns, px_below, pp_below);
 }
 
 static void
-diffoverline(const void *a, const void *b, size_t offset, size_t n, size_t columns)
+diffoverline(const void *a, const void *b, size_t offset, size_t n,
+             size_t columns)
 {
     (void)wprint_word_hex(a, b, offset, n, columns, px_above, pp_above);
 }
