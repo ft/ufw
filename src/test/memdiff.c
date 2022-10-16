@@ -183,7 +183,7 @@ diffprecontext(struct diffstate *diff, struct difference *A)
 static void
 diffpostcontext(struct diffstate *diff, struct difference *A)
 {
-    if (diff->size < diff->columns)
+    if (diff->size < diff->columns || diff->size < diff->position)
         return;
 
     const size_t distance =
