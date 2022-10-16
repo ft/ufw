@@ -57,7 +57,8 @@ set(UFW_PRIVATE_ERRNO_OFFSET 16384 CACHE STRING "Offset for errno-extensions")
 configure_file("${PROJECT_SOURCE_DIR}/include/ufw/toolchain.h.in"
                "${PROJECT_BINARY_DIR}/include/ufw/toolchain.h" )
 
-set(__ufw_sources src/persistent-storage.c
+set(__ufw_sources src/octet-buffer.c
+                  src/persistent-storage.c
                   src/ring-buffer-iter.c
                   src/register-table.c
                   src/register-utilities.c
