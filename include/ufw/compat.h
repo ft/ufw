@@ -17,6 +17,7 @@
 #define INC_UFW_UFW_COMPAT_H
 
 #include <ufw/toolchain.h>
+#include <ufw/compat/errno.h>
 #include <ufw/compat/math-constants.h>
 #include <ufw/compat/ssize-t.h>
 #include <ufw/compat/strings.h>

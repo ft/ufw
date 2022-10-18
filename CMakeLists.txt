@@ -52,6 +52,8 @@ else()
   set(UFW_COMPAT_HAVE_STRNLEN 0)
 endif()
 
+set(UFW_PRIVATE_ERRNO_OFFSET 16384 CACHE STRING "Offset for errno-extensions")
+
 configure_file("${PROJECT_SOURCE_DIR}/include/ufw/toolchain.h.in"
                "${PROJECT_BINARY_DIR}/include/ufw/toolchain.h" )
 

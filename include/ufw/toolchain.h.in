@@ -334,4 +334,14 @@
 #undef UFW_COMPAT_HAVE_STRNLEN
 #endif /* UFW_COMPAT_HAVE_STRNLEN */
 
+/**
+ * UFW errno compatibility offset
+ *
+ * In order to implement error numbers missing from some toolchains, this is
+ * the offset used at which the library defines its additions. Usually errnos
+ * are a hundred or so values. The default is at 2^14 which should be plenty or
+ * space. This is still configurable at compile time, if needed.
+ */
+#cmakedefine UFW_PRIVATE_ERRNO_OFFSET @UFW_PRIVATE_ERRNO_OFFSET@
+
 #endif /* INC_UFW_TOOLCHAIN_H */
