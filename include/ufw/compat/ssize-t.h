@@ -17,16 +17,26 @@
 
 #include <ufw/toolchain.h>
 
-#ifdef WITH_SYS_TYPES_H
-#include <sys/types.h>
-
-#else
-
-#ifndef _SSIZE_T_DECLARED
-
 #include <stdint.h>
 #include <stddef.h>
 #include <limits.h>
+
+/* Outer #if */
+#ifdef WITH_SYS_TYPES_H
+#include <sys/types.h>
+
+#ifndef SSIZE_MAX
+#ifdef SIZE_MAX
+#define SSIZE_MAX ((SIZE_MAX) >> 1u)
+#else
+#error "How big is ssize_t?"
+#endif /* SIZE_MAX */
+#endif /* SSIZE_MAX */
+
+/* Belongs to outer #if */
+#else
+
+#ifndef _SSIZE_T_DECLARED
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,10 +48,12 @@ extern "C" {
 
 #if SIZE_MAX == UINT_MAX
 typedef int ssize_t;
+#define SSIZE_MAX INT_MAX
 #define _SSIZE_T_DECLARED
 
 #elif SIZE_MAX == ULONG_MAX
 typedef long int ssize_t;
+#define SSIZE_MAX LONG_MAX
 #define _SSIZE_T_DECLARED
 
 #else
