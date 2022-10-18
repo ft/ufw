@@ -9,8 +9,8 @@
 *.o
 *.a
 *.pro
+*.log
 *.tar.*
-ci/
 gmon.out
 tags
 TAGS
@@ -20,6 +20,7 @@ core.*
 *.mp3
 *.ogg
 *.flac
+compile_commands.json
 GPATH
 GRTAGS
 GSYMS
@@ -28,3 +29,5 @@ config/*.mk
 config/*.h
 build-*/
 build/
+ci-*/
+ci/
