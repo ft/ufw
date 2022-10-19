@@ -118,7 +118,4 @@ void octet_buffer_repeat(OctetBuffer*);
 
 size_t octet_buffer_avail(OctetBuffer*);
 
-void source_from_buffer(Source*, OctetBuffer*);
-void sink_to_buffer(Sink*, OctetBuffer*);
-
 #endif /* INC_UFW_TYPES_H */
