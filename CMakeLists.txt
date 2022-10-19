@@ -1,6 +1,10 @@
 cmake_minimum_required (VERSION 3.13.4)
 project(ufw C CXX)
 
+include(CheckIncludeFile)
+include(CheckSymbolExists)
+include(CheckTypeSize)
+
 include(CTest)
 enable_testing()
 
@@ -29,10 +33,14 @@ else()
 endif()
 
 include(SetupTargetCPU)
-include(CheckIncludeFile)
 check_include_file("sys/types.h" WITH_SYS_TYPES_H)
 
-include(CheckTypeSize)
+check_include_file("unistd.h" WITH_UNISTD_H)
+if (WITH_UNISTD_H)
+  check_symbol_exists(read  "unistd.h" UFW_HAVE_POSIX_READ)
+  check_symbol_exists(write "unistd.h" UFW_HAVE_POSIX_WRITE)
+endif()
+
 check_type_size("uint8_t" UFW_UINT8_T_SIZE)
 if (UFW_UINT8_T_SIZE)
     set(UINT8_T_SIZE ${UFW_UINT8_T_SIZE})
@@ -41,7 +49,6 @@ endif()
 
 ufw_force_compat(force_compat)
 if (${force_compat} EQUAL 0)
-  include(CheckSymbolExists)
   check_symbol_exists(strlcat "string.h" UFW_COMPAT_HAVE_STRLCAT)
   check_symbol_exists(strlcpy "string.h" UFW_COMPAT_HAVE_STRLCPY)
   check_symbol_exists(strnlen "string.h" UFW_COMPAT_HAVE_STRNLEN)

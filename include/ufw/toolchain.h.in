@@ -304,6 +304,12 @@
 #undef WITH_SYS_TYPES_H
 #endif /* WITH_SYS_TYPES_H */
 
+/** Reflect the availability of unistd.h */
+#cmakedefine01 WITH_UNISTD_H
+#if (WITH_UNISTD_H == 0)
+#undef WITH_UNISTD_H
+#endif /* WITH_UNISTD_H */
+
 /** Reflect the availability of uint8_t */
 #cmakedefine01 WITH_UINT8_T
 
@@ -315,6 +321,18 @@
 #if (WITH_UINT8_T == 0)
 #undef WITH_UINT8_T
 #endif /* WITH_UINT8_T */
+
+/** Reflect the availability of POSIX style read() */
+#cmakedefine01 UFW_HAVE_POSIX_READ
+#if (UFW_HAVE_POSIX_READ == 0)
+#undef UFW_HAVE_POSIX_READ
+#endif /* UFW_HAVE_POSIX_READ */
+
+/** Reflect the availability of POSIX style write() */
+#cmakedefine01 UFW_HAVE_POSIX_WRITE
+#if (UFW_HAVE_POSIX_WRITE == 0)
+#undef UFW_HAVE_POSIX_WRITE
+#endif /* UFW_HAVE_POSIX_WRITE */
 
 /** Reflect the availability of strlcat() */
 #cmakedefine01 UFW_COMPAT_HAVE_STRLCAT
