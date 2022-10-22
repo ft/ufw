@@ -4,12 +4,19 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
-#ifndef INC_UFW_TYPES_H
-#define INC_UFW_TYPES_H
+#ifndef INC_UFW_SOURCES_AND_SINKS_H
+#define INC_UFW_SOURCES_AND_SINKS_H
 
 #include <stddef.h>
 
 #include <ufw/compat/ssize-t.h>
+#include <ufw/toolchain.h>
+
+#include <ufw/octet-buffer.h>
+
+/*
+ * Core Data Types
+ */
 
 /**
  * Function type that accepts an octet
@@ -90,32 +97,32 @@ int sink_put_octet(Sink*, unsigned char);
 ssize_t source_get_chunk(Source*, void*, size_t);
 ssize_t sink_put_chunk(Sink*, const void*, size_t);
 
-typedef struct ufw_octet_buffer {
-    unsigned char *data;
-    size_t size;
-    size_t used;
-    size_t offset;
-} OctetBuffer;
+/*
+ * Generic Sources and Sinks
+ */
 
-#define OCTET_BUFFER_INIT(DATA, SIZE, LENGTH, OFFSET) { \
-        .data = DATA,                                   \
-        .size = SIZE,                                   \
-        .used = LENGTH,                                 \
-        .offset = OFFSET }
+extern Source source_zero;
+extern Sink sink_null;
 
-int octet_buffer_set(OctetBuffer*, void*, size_t, size_t, size_t);
-void octet_buffer_null(OctetBuffer*);
+/*
+ * File descriptor based Sources and Sinks
+ */
 
-int octet_buffer_use(OctetBuffer*, void*, size_t);
-int octet_buffer_space(OctetBuffer*, void*, size_t);
+#ifdef UFW_HAVE_POSIX_READ
+ssize_t run_read(void*, void*, size_t);
+void source_from_filedesc(Source*, int*);
+#endif /* UFW_HAVE_POSIX_READ */
 
-int octet_buffer_add(OctetBuffer*, const void*, size_t);
-int octet_buffer_consume(OctetBuffer*, void*, size_t);
+#ifdef UFW_HAVE_POSIX_WRITE
+ssize_t run_write(void*, const void*, size_t);
+void sink_to_filedesc(Sink*, int*);
+#endif /* UFW_HAVE_POSIX_WRITE */
 
-int octet_buffer_rewind(OctetBuffer*);
-void octet_buffer_clear(OctetBuffer*);
-void octet_buffer_repeat(OctetBuffer*);
+/*
+ * Buffer based Sources and Sinks
+ */
 
-size_t octet_buffer_avail(OctetBuffer*);
+void source_from_buffer(Source*, OctetBuffer*);
+void sink_to_buffer(Sink*, OctetBuffer*);
 
-#endif /* INC_UFW_TYPES_H */
+#endif /* INC_UFW_SOURCES_AND_SINKS_H */

@@ -5,7 +5,7 @@
  */
 
 /**
- * @file source-sink.c
+ * @file endpoints/core.c
  * @brief Implementation of a Sink and Source abstraction
  *
  * This implements a generic sink and source data type. The main idea here is
@@ -46,8 +46,7 @@
 #include <ufw/compat/errno.h>
 #include <ufw/compat/ssize-t.h>
 
-#include <ufw/sources-and-sinks.h>
-#include <ufw/types.h>
+#include <ufw/endpoints.h>
 
 void
 octet_source_init(Source *instance, OctetSource source, void *driver)

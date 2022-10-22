@@ -5,7 +5,7 @@
  */
 
 /**
- * @file trivial-source-sink.c
+ * @file endpoints/trivial.c
  * @brief Sources and sinks that are very simple to implement
  *
  * This implements a source like /dev/zero and a sink like /dev/null.
@@ -14,8 +14,7 @@
 #include <string.h>
 
 #include <ufw/compiler.h>
-#include <ufw/sources-and-sinks.h>
-#include <ufw/types.h>
+#include <ufw/endpoints.h>
 
 static ssize_t
 run_source_zero(UNUSED void *driver, void *data, size_t n)

@@ -5,7 +5,7 @@
  */
 
 /**
- * @file posix-source-sink.c
+ * @file endpoints/posix.c
  * @brief Sources and sinks implementable on POSIX systems
  */
 
@@ -18,8 +18,7 @@
 #include <ufw/compat/errno.h>
 #include <ufw/compat/ssize-t.h>
 
-#include <ufw/types.h>
-#include <ufw/sources-and-sinks.h>
+#include <ufw/endpoints.h>
 
 #ifdef UFW_HAVE_POSIX_READ
 ssize_t

@@ -64,15 +64,15 @@ set(UFW_PRIVATE_ERRNO_OFFSET 16384 CACHE STRING "Offset for errno-extensions")
 configure_file("${PROJECT_SOURCE_DIR}/include/ufw/toolchain.h.in"
                "${PROJECT_BINARY_DIR}/include/ufw/toolchain.h" )
 
-set(__ufw_sources src/octet-buffer.c
+set(__ufw_sources src/endpoints/buffer.c
+                  src/endpoints/core.c
+                  src/endpoints/posix.c
+                  src/endpoints/trivial.c
+                  src/octet-buffer.c
                   src/persistent-storage.c
                   src/registers/core.c
                   src/registers/utilities.c
-                  src/ring-buffer-iter.c
-                  src/sources-and-sinks/core.c
-                  src/sources-and-sinks/buffer.c
-                  src/sources-and-sinks/posix.c
-                  src/sources-and-sinks/trivial.c)
+                  src/ring-buffer-iter.c)
 
 set(__ufw_include ${CMAKE_CURRENT_SOURCE_DIR}/include
                   ${CMAKE_CURRENT_BINARY_DIR}/include)

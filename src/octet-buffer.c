@@ -10,7 +10,7 @@
 #include <ufw/compat/errno.h>
 #include <ufw/compat/ssize-t.h>
 
-#include <ufw/types.h>
+#include <ufw/octet-buffer.h>
 
 void
 octet_buffer_null(OctetBuffer *b)

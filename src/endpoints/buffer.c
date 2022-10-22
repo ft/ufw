@@ -5,7 +5,7 @@
  */
 
 /**
- * @file buffer-source-sink.c
+ * @file endpoints/buffer.c
  * @brief Sources and sinks interfacing octet buffer.
  */
 
@@ -14,8 +14,7 @@
 #include <ufw/compat/errno.h>
 #include <ufw/compat/ssize-t.h>
 
-#include <ufw/sources-and-sinks.h>
-#include <ufw/types.h>
+#include <ufw/endpoints.h>
 
 static ssize_t
 read_from_buffer(void *driver, void *data, size_t n)
