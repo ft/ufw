@@ -66,9 +66,9 @@ configure_file("${PROJECT_SOURCE_DIR}/include/ufw/toolchain.h.in"
 
 set(__ufw_sources src/octet-buffer.c
                   src/persistent-storage.c
+                  src/registers/core.c
+                  src/registers/utilities.c
                   src/ring-buffer-iter.c
-                  src/register-table.c
-                  src/register-utilities.c
                   src/sources-and-sinks/core.c
                   src/sources-and-sinks/buffer.c
                   src/sources-and-sinks/posix.c

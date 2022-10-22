@@ -17,7 +17,7 @@
 #include <ufw/register-table.h>
 #include <ufw/register-utilities.h>
 
-#include "register-internal.h"
+#include "internal.h"
 
 #define IDX2STR(x) [x] = #x
 

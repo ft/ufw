@@ -15,7 +15,7 @@
 #include <ufw/binary-format.h>
 #include <ufw/register-table.h>
 
-#include "register-internal.h"
+#include "internal.h"
 
 /*
  * Internal API prototypes
