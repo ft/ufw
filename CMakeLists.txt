@@ -73,6 +73,7 @@ set(__ufw_sources src/endpoints/buffer.c
                   src/persistent-storage.c
                   src/registers/core.c
                   src/registers/utilities.c
+                  src/rfc1055.c
                   src/ring-buffer-iter.c)
 
 set(__ufw_include ${CMAKE_CURRENT_SOURCE_DIR}/include
