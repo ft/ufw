@@ -66,6 +66,7 @@ configure_file("${PROJECT_SOURCE_DIR}/include/ufw/toolchain.h.in"
 
 set(__ufw_sources src/endpoints/buffer.c
                   src/endpoints/core.c
+                  src/endpoints/instrumentable.c
                   src/endpoints/posix.c
                   src/endpoints/trivial.c
                   src/octet-buffer.c
