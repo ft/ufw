@@ -17,7 +17,8 @@ list(APPEND test_names
   t-register-table
   t-rfc1055
   t-ring-buffer
-  t-register-table-persistent-storage)
+  t-register-table-persistent-storage
+  t-varint)
 
 set(test_prgs)
 foreach (tst ${test_names})

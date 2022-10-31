@@ -74,7 +74,8 @@ set(__ufw_sources src/endpoints/buffer.c
                   src/registers/core.c
                   src/registers/utilities.c
                   src/rfc1055.c
-                  src/ring-buffer-iter.c)
+                  src/ring-buffer-iter.c
+                  src/variable-length-integer.c)
 
 set(__ufw_include ${CMAKE_CURRENT_SOURCE_DIR}/include
                   ${CMAKE_CURRENT_BINARY_DIR}/include)
