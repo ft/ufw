@@ -137,7 +137,7 @@ main(UNUSED int argc, UNUSED char **argv)
         OctetBuffer b;
         unsigned char buf[VARINT_64BIT_MAX_OCTETS];
         octet_buffer_space(&b, buf, VARINT_64BIT_MAX_OCTETS);
-        int rc = varint_encode_u64(t->value, &b);
+        int rc = varint_encode_u64(&b, t->value);
         ok(rc == 0, "u64: Encoding %"PRIu64" signals success", t->value);
         pe(rc);
         ok(b.used == t->octets,
@@ -171,7 +171,7 @@ main(UNUSED int argc, UNUSED char **argv)
         OctetBuffer b;
         unsigned char buf[VARINT_32BIT_MAX_OCTETS];
         octet_buffer_space(&b, buf, VARINT_32BIT_MAX_OCTETS);
-        int rc = varint_encode_u32(t->value, &b);
+        int rc = varint_encode_u32(&b, t->value);
         ok(rc == 0, "u32: Encoding %"PRIu32" signals success", t->value);
         pe(rc);
         ok(b.used == t->octets,
@@ -205,7 +205,7 @@ main(UNUSED int argc, UNUSED char **argv)
         OctetBuffer b;
         signed char buf[VARINT_64BIT_MAX_OCTETS];
         octet_buffer_space(&b, buf, VARINT_64BIT_MAX_OCTETS);
-        int rc = varint_encode_s64(t->value, &b);
+        int rc = varint_encode_s64(&b, t->value);
         ok(rc == 0, "s64: Encoding %"PRId64" signals success", t->value);
         pe(rc);
         ok(b.used == t->octets,
@@ -239,7 +239,7 @@ main(UNUSED int argc, UNUSED char **argv)
         OctetBuffer b;
         signed char buf[VARINT_32BIT_MAX_OCTETS];
         octet_buffer_space(&b, buf, VARINT_32BIT_MAX_OCTETS);
-        int rc = varint_encode_s32(t->value, &b);
+        int rc = varint_encode_s32(&b, t->value);
         ok(rc == 0, "s32: Encoding %"PRId32" signals success", t->value);
         pe(rc);
         ok(b.used == t->octets,
