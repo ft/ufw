@@ -15,9 +15,9 @@ list(APPEND test_names
   t-convolution-low-pass
   t-persistent-storage
   t-register-table
+  t-register-table-persistent-storage
   t-rfc1055
   t-ring-buffer
-  t-register-table-persistent-storage
   t-varint)
 
 set(test_prgs)
