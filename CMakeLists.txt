@@ -69,6 +69,7 @@ set(__ufw_sources src/endpoints/buffer.c
                   src/endpoints/instrumentable.c
                   src/endpoints/posix.c
                   src/endpoints/trivial.c
+                  src/length-prefix.c
                   src/octet-buffer.c
                   src/persistent-storage.c
                   src/registers/core.c

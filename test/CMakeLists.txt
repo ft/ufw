@@ -13,6 +13,7 @@ if (WITH_UINT8_T)
 endif()
 list(APPEND test_names
   t-convolution-low-pass
+  t-length-prefix
   t-persistent-storage
   t-register-table
   t-register-table-persistent-storage
