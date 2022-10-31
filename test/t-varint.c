@@ -123,11 +123,12 @@ size_t tests_vsi32_n = sizeof(tests_vsi32) / sizeof(*tests_vsi32);
 int
 main(UNUSED int argc, UNUSED char **argv)
 {
-    /* Three specification per table. Two times decoding, one time encoding. */
-    plan(3 * 3 * tests_vui64_n
-       + 3 * 3 * tests_vsi64_n
-       + 3 * 3 * tests_vui32_n
-       + 3 * 3 * tests_vsi32_n);
+    /* Three specification per table. Two times decoding, one time encoding.
+     * In addition, one test for encoding length per table. */
+    plan((3 * 3 + 1) * tests_vui64_n
+       + (3 * 3 + 1) * tests_vsi64_n
+       + (3 * 3 + 1) * tests_vui32_n
+       + (3 * 3 + 1) * tests_vsi32_n);
 
     /* 64 bit unsigned varint - encode */
 
@@ -347,6 +348,27 @@ main(UNUSED int argc, UNUSED char **argv)
            b.offset, t->octets);
         cmp_mem(&value, &t->value, sizeof(uint32_t),
                 "(source) s32: %"PRId32" decodes correctly", t->value);
+    }
+
+    for (size_t i = 0u; i < tests_vui64_n; ++i) {
+        struct test_vui64 *t = tests_vui64 + i;
+        ok(t->octets == varint_u64_length(t->value),
+           "%"PRIu64" takes %zu octets to encode", t->value, t->octets);
+    }
+    for (size_t i = 0u; i < tests_vsi64_n; ++i) {
+        struct test_vsi64 *t = tests_vsi64 + i;
+        ok(t->octets == varint_s64_length(t->value),
+           "%"PRId64" takes %zu octets to encode", t->value, t->octets);
+    }
+    for (size_t i = 0u; i < tests_vui32_n; ++i) {
+        struct test_vui32 *t = tests_vui32 + i;
+        ok(t->octets == varint_u32_length(t->value),
+           "%"PRIu32" takes %zu octets to encode", t->value, t->octets);
+    }
+    for (size_t i = 0u; i < tests_vsi32_n; ++i) {
+        struct test_vsi32 *t = tests_vsi32 + i;
+        ok(t->octets == varint_s32_length(t->value),
+           "%"PRId32" takes %zu octets to encode", t->value, t->octets);
     }
 
     return EXIT_SUCCESS;

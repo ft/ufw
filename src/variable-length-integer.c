@@ -1,6 +1,5 @@
 #include <stdbool.h>
 #include <stdint.h>
-#include <inttypes.h>
 
 #include <ufw/compat/errno.h>
 #include <ufw/endpoints.h>
@@ -257,3 +256,35 @@ varint_s64_to_sink(const int64_t n,  Sink *sink)
     return sink_put_chunk(sink, buf.data, buf.used);
 }
 
+size_t
+varint_u64_length(uint64_t n)
+{
+    for (size_t octets = 1u; /*forever*/; ++octets) {
+        n >>= VARINT_DATA_BITS;
+        if (n == 0) {
+            return octets;
+        }
+    }
+}
+
+size_t
+varint_s64_length(int64_t n)
+{
+    union varint64 data;
+    data.s = n;
+    return varint_u64_length(data.u);
+}
+
+size_t
+varint_u32_length(uint32_t n)
+{
+    return varint_u64_length((uint64_t)n);
+}
+
+size_t
+varint_s32_length(int32_t n)
+{
+    union varint32 data;
+    data.s = n;
+    return varint_u64_length((uint64_t)data.u);
+}
