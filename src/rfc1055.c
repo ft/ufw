@@ -129,6 +129,12 @@ rfc1055_decode_octet(Source *source, unsigned char *data)
 {
     int rv = 1;
     unsigned char first;
+    /* Guarantee that the data return value is initialised, no matter the
+     * behaviour of the source implementation. This is important with the
+     * EBADMSG return code, which this SLIP decoder uses. While unlikely that
+     * the source returns that particular error code, it is not impossible.
+     * Modern compilers even warn about this. */
+    *data = 0u;
     MAYBE_RETURN(source_get_octet(source, &first));
     switch (first) {
     case RAW_ESC:
@@ -181,7 +187,7 @@ transition(Source *source)
 int
 rfc1055_decode(RFC1055Context *ctx, Source *source, Sink *sink)
 {
-    unsigned char data;
+    unsigned char data = 0u;
 
     for (;;) {
         switch (ctx->state) {
