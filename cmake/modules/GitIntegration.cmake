@@ -175,7 +175,8 @@ foreach (srcfile ${PARSED_ARGS_FILES})
   message(\"-- Installing to \${_OFILE_}\")
   execute_process(COMMAND cmake -E copy_if_different \${_REALPATH_} \${_OFILE_})
 endforeach()
-")
+"
+  COMPONENT ufw-git-install)
   endif()
 
   install(CODE "
@@ -205,6 +206,7 @@ foreach (srcfile ${PARSED_ARGS_FILES})
                   \${_REALPATH_}
                   \${GITINTNAME}\${EXTENSION})
 endforeach()
-")
+"
+  COMPONENT ufw-git-install)
 
 endmacro(gitint_install)
