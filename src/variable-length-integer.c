@@ -22,16 +22,16 @@ varint_done(const unsigned char octet)
     return ((octet & VARINT_CONTINUATION_MASK) == 0u);
 }
 
-static void
+static int
 varint_encode(uint64_t n, OctetBuffer *b)
 {
     unsigned char *buf = b->data + b->offset;
-    for (;;) {
+    for (int i = 1;; ++i) {
         *buf = n & VARINT_DATA_MASK;
         n >>= VARINT_DATA_BITS;
         if (n == 0) {
             b->used = buf - b->data + 1u;
-            return;
+            return i;
         }
         *buf |= VARINT_CONTINUATION_MASK;
         buf++;
@@ -48,8 +48,9 @@ varint_decode(OctetBuffer *b, const size_t maxoctets, union varint64 *n)
         const unsigned char datum = buf[i];
         n->u |= (uint64_t)(datum & VARINT_DATA_MASK) << (i * VARINT_DATA_BITS);
         if (varint_done(datum)) {
-            b->offset += i + 1u;
-            return 0;
+            const size_t rc = i + 1u;
+            b->offset += rc;
+            return (int)rc;
         }
     }
 
@@ -69,7 +70,7 @@ varint_from_source(Source *source, const size_t maxoctets, union varint64 *n)
         if (rc < 0) {
             return rc;
         } else if (varint_done(data)) {
-            return 0;
+            return (int)(i + 1);
         }
     }
 
@@ -120,8 +121,7 @@ varint_encode_u32(OctetBuffer *b, const uint32_t n)
     if (octet_buffer_avail(b) < VARINT_32BIT_MAX_OCTETS) {
         return -EINVAL;
     }
-    varint_encode(n & UINT32_MAX, b);
-    return 0;
+    return varint_encode(n & UINT32_MAX, b);
 }
 
 int
@@ -132,8 +132,7 @@ varint_encode_s32(OctetBuffer *b, const int32_t n)
     }
     union varint64 data;
     data.s = n;
-    varint_encode(data.u & UINT32_MAX, b);
-    return 0;
+    return varint_encode(data.u & UINT32_MAX, b);
 }
 
 int
@@ -142,8 +141,7 @@ varint_encode_u64(OctetBuffer *b, const uint64_t n)
     if (octet_buffer_avail(b) < VARINT_64BIT_MAX_OCTETS) {
         return -EINVAL;
     }
-    varint_encode(n, b);
-    return 0;
+    return varint_encode(n, b);
 }
 
 int
@@ -154,8 +152,7 @@ varint_encode_s64(OctetBuffer *b, const int64_t n)
     }
     union varint64 data;
     data.s = n;
-    varint_encode(data.u, b);
-    return 0;
+    return varint_encode(data.u, b);
 }
 
 int
@@ -164,11 +161,10 @@ varint_u32_from_source(Source *source, uint32_t *n)
     union varint64 data;
     const int rc =
         varint_from_source(source, VARINT_32BIT_MAX_OCTETS, &data);
-    if (rc < 0) {
-        return rc;
+    if (rc >= 0) {
+        *n = data.u & UINT32_MAX;
     }
-    *n = data.u & UINT32_MAX;
-    return 0;
+    return rc;
 }
 
 int
@@ -178,12 +174,11 @@ varint_s32_from_source(Source *source, int32_t *n)
     union varint32 data32;
     const int rc =
         varint_from_source(source, VARINT_32BIT_MAX_OCTETS, &data64);
-    if (rc < 0) {
-        return rc;
+    if (rc >= 0) {
+        data32.u = data64.u & UINT32_MAX;
+        *n = data32.s;
     }
-    data32.u = data64.u & UINT32_MAX;
-    *n = data32.s;
-    return 0;
+    return rc;
 }
 
 int
@@ -192,11 +187,10 @@ varint_u64_from_source(Source *source, uint64_t *n)
     union varint64 data;
     const int rc =
         varint_from_source(source, VARINT_64BIT_MAX_OCTETS, &data);
-    if (rc < 0) {
-        return rc;
+    if (rc >= 0) {
+        *n = data.u;
     }
-    *n = data.u;
-    return 0;
+    return rc;
 }
 
 int
@@ -205,11 +199,10 @@ varint_s64_from_source(Source *source, int64_t *n)
     union varint64 data;
     const int rc =
         varint_from_source(source, VARINT_64BIT_MAX_OCTETS, &data);
-    if (rc < 0) {
-        return rc;
+    if (rc >= 0) {
+        *n = data.s;
     }
-    *n = data.s;
-    return 0;
+    return rc;
 }
 
 int

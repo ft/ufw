@@ -67,7 +67,7 @@ main(UNUSED int argc, UNUSED char *argv[])
     octet_buffer_repeat(&sinkb);
     uint64_t value_u64;
     rc = varint_decode_u64(&sinkb, &value_u64);
-    ok(rc == 0, "lenp: Decoding size value succeeded");
+    ok(rc == 2, "lenp: Decoding size value succeeded");
     ok(MEM_SIZE == value_u64,
        "lenp: Encoded size is MEM_SIZE (%"PRId64")", MEM_SIZE);
     cmp_mem(wire + m, mema, MEM_SIZE, "lenp: Encoded memory is correct");

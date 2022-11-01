@@ -138,7 +138,8 @@ main(UNUSED int argc, UNUSED char **argv)
         unsigned char buf[VARINT_64BIT_MAX_OCTETS];
         octet_buffer_space(&b, buf, VARINT_64BIT_MAX_OCTETS);
         int rc = varint_encode_u64(&b, t->value);
-        ok(rc == 0, "u64: Encoding %"PRIu64" signals success", t->value);
+        ok(rc == (int)t->octets, "u64: Encoding %"PRIu64" signals success",
+           t->value);
         pe(rc);
         ok(b.used == t->octets,
            "u64: Buffer signals correct occupation %zu ?= %zu",
@@ -155,7 +156,8 @@ main(UNUSED int argc, UNUSED char **argv)
         octet_buffer_space(&b, t->expect, VARINT_64BIT_MAX_OCTETS);
         uint64_t value;
         int rc = varint_decode_u64(&b, &value);
-        ok(rc == 0, "u64: Decoding %"PRIu64" signals success", t->value);
+        ok(rc == (int)t->octets, "u64: Decoding %"PRIu64" signals success",
+           t->value);
         pe(rc);
         ok(b.offset == t->octets,
            "u64: Buffer signals correct offset %zu ?= %zu",
@@ -172,7 +174,8 @@ main(UNUSED int argc, UNUSED char **argv)
         unsigned char buf[VARINT_32BIT_MAX_OCTETS];
         octet_buffer_space(&b, buf, VARINT_32BIT_MAX_OCTETS);
         int rc = varint_encode_u32(&b, t->value);
-        ok(rc == 0, "u32: Encoding %"PRIu32" signals success", t->value);
+        ok(rc == (int)t->octets, "u32: Encoding %"PRIu32" signals success",
+           t->value);
         pe(rc);
         ok(b.used == t->octets,
            "u32: Buffer signals correct occupation %zu ?= %zu",
@@ -189,7 +192,8 @@ main(UNUSED int argc, UNUSED char **argv)
         octet_buffer_space(&b, t->expect, VARINT_32BIT_MAX_OCTETS);
         uint32_t value;
         int rc = varint_decode_u32(&b, &value);
-        ok(rc == 0, "u32: Decoding %"PRIu32" signals success", t->value);
+        ok(rc == (int)t->octets, "u32: Decoding %"PRIu32" signals success",
+           t->value);
         pe(rc);
         ok(b.offset == t->octets,
            "u32: Buffer signals correct offset %zu ?= %zu",
@@ -206,7 +210,8 @@ main(UNUSED int argc, UNUSED char **argv)
         signed char buf[VARINT_64BIT_MAX_OCTETS];
         octet_buffer_space(&b, buf, VARINT_64BIT_MAX_OCTETS);
         int rc = varint_encode_s64(&b, t->value);
-        ok(rc == 0, "s64: Encoding %"PRId64" signals success", t->value);
+        ok(rc == (int)t->octets, "s64: Encoding %"PRId64" signals success",
+           t->value);
         pe(rc);
         ok(b.used == t->octets,
            "s64: Buffer signals correct occupation %zu ?= %zu",
@@ -223,7 +228,8 @@ main(UNUSED int argc, UNUSED char **argv)
         octet_buffer_space(&b, t->expect, VARINT_64BIT_MAX_OCTETS);
         int64_t value;
         int rc = varint_decode_s64(&b, &value);
-        ok(rc == 0, "s64: Decoding %"PRId64" signals success", t->value);
+        ok(rc == (int)t->octets, "s64: Decoding %"PRId64" signals success",
+           t->value);
         pe(rc);
         ok(b.offset == t->octets,
            "s64: Buffer signals correct offset %zu ?= %zu",
@@ -240,7 +246,8 @@ main(UNUSED int argc, UNUSED char **argv)
         signed char buf[VARINT_32BIT_MAX_OCTETS];
         octet_buffer_space(&b, buf, VARINT_32BIT_MAX_OCTETS);
         int rc = varint_encode_s32(&b, t->value);
-        ok(rc == 0, "s32: Encoding %"PRId32" signals success", t->value);
+        ok(rc == (int)t->octets, "s32: Encoding %"PRId32" signals success",
+           t->value);
         pe(rc);
         ok(b.used == t->octets,
            "s32: Buffer signals correct occupation %zu ?= %zu",
@@ -257,7 +264,8 @@ main(UNUSED int argc, UNUSED char **argv)
         octet_buffer_space(&b, t->expect, VARINT_32BIT_MAX_OCTETS);
         int32_t value;
         int rc = varint_decode_s32(&b, &value);
-        ok(rc == 0, "s32: Decoding %"PRId32" signals success", t->value);
+        ok(rc == (int)t->octets, "s32: Decoding %"PRId32" signals success",
+           t->value);
         pe(rc);
         ok(b.offset == t->octets,
            "s32: Buffer signals correct offset %zu ?= %zu",
@@ -284,7 +292,8 @@ main(UNUSED int argc, UNUSED char **argv)
         source_from_buffer(&source, &b);
         uint64_t value;
         int rc = varint_u64_from_source(&source, &value);
-        ok(rc == 0, "(source) u64: Decoding %"PRIu64" signals success", t->value);
+        ok(rc == (int)t->octets, "(source) u64: Decoding %"PRIu64" signals success",
+           t->value);
         pe(rc);
         ok(b.offset == t->octets,
            "(source) u64: Buffer signals correct offset %zu ?= %zu",
@@ -303,7 +312,8 @@ main(UNUSED int argc, UNUSED char **argv)
         source_from_buffer(&source, &b);
         uint32_t value;
         int rc = varint_u32_from_source(&source, &value);
-        ok(rc == 0, "(source) u32: Decoding %"PRIu32" signals success", t->value);
+        ok(rc == (int)t->octets, "(source) u32: Decoding %"PRIu32" signals success",
+           t->value);
         pe(rc);
         ok(b.offset == t->octets,
            "(source) u32: Buffer signals correct offset %zu ?= %zu",
@@ -322,7 +332,8 @@ main(UNUSED int argc, UNUSED char **argv)
         source_from_buffer(&source, &b);
         int64_t value;
         int rc = varint_s64_from_source(&source, &value);
-        ok(rc == 0, "(source) s64: Decoding %"PRId64" signals success", t->value);
+        ok(rc == (int)t->octets, "(source) s64: Decoding %"PRId64" signals success",
+           t->value);
         pe(rc);
         ok(b.offset == t->octets,
            "(source) s64: Buffer signals correct offset %zu ?= %zu",
@@ -341,7 +352,7 @@ main(UNUSED int argc, UNUSED char **argv)
         source_from_buffer(&source, &b);
         int32_t value;
         int rc = varint_s32_from_source(&source, &value);
-        ok(rc == 0, "(source) s32: Decoding %"PRId32" signals success", t->value);
+        ok(rc == (int)t->octets, "(source) s32: Decoding %"PRId32" signals success", t->value);
         pe(rc);
         ok(b.offset == t->octets,
            "(source) s32: Buffer signals correct offset %zu ?= %zu",
