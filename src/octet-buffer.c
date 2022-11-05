@@ -57,7 +57,7 @@ int
 octet_buffer_add(OctetBuffer *b, const void *data, size_t size)
 {
     if (b->size < (b->used + size)) {
-        return -EOVERFLOW;
+        return -ENOMEM;
     }
 
     memcpy(b->data + b->used, data, size);
@@ -69,7 +69,7 @@ int
 octet_buffer_consume(OctetBuffer *b, void *data, size_t size)
 {
     if (size > (b->used - b->offset)) {
-        return -EOVERFLOW;
+        return -ENODATA;
     }
 
     memcpy(data, b->data + b->offset, size);

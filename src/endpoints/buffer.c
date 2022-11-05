@@ -23,9 +23,7 @@ read_from_buffer(void *driver, void *data, size_t n)
     ssize_t value = n;
 
     const ssize_t rc = octet_buffer_consume(b, data, n);
-    if (rc == -EOVERFLOW) {
-        value = 0;
-    } else if (rc < 0) {
+    if (rc < 0) {
         value = rc;
     }
 
@@ -39,9 +37,7 @@ write_to_buffer(void *driver, const void *data, size_t n)
     ssize_t value = n;
 
     const ssize_t rc = octet_buffer_add(b, data, n);
-    if (rc == -EOVERFLOW) {
-        value = 0;
-    } else if (rc < 0) {
+    if (rc < 0) {
         value = rc;
     }
 

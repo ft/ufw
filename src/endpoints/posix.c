@@ -26,7 +26,8 @@ run_read(void *driver, void *data, size_t n)
 {
     int *fd = driver;
     const int rc = read(*fd, data, n);
-    return (rc < 0) ? -errno : rc;
+    return (rc == 0) ? -ENODATA
+        : ((rc < 0) ? -errno : rc);
 }
 
 void

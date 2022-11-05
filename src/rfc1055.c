@@ -116,11 +116,6 @@ rfc1055_encode_octet(Sink *sink, unsigned char data)
     default:      rc = sink_put_octet(sink, data);                     break;
     }
 
-    if (rc == 0) {
-        /* Sink could not accept data */
-        return -EOVERFLOW;
-    }
-
     return rc;
 }
 
@@ -145,7 +140,7 @@ rfc1055_decode_octet(Source *source, unsigned char *data)
         switch (second) {
         case ESC_EOF: *data = RAW_EOF; break;
         case ESC_ESC: *data = RAW_ESC; break;
-        default:      *data = second;  return -EBADMSG;
+        default:      *data = second;  return -EILSEQ;
         }
     }
         break;
@@ -215,7 +210,7 @@ rfc1055_decode(RFC1055Context *ctx, Source *source, Sink *sink)
         case RFC1055_NORMAL: /* FALLTHROUGH */
         default: {
             const int rc = rfc1055_decode_octet(source, &data);
-            if (rc == -EBADMSG) {
+            if (rc == -EILSEQ) {
                 if (BIT_ISSET(ctx->flags, RFC1055_WITH_SOF)) {
                     ctx->state = (data == RAW_EOF)
                         ? RFC1055_SEARCH_FOR_START

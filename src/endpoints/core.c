@@ -16,26 +16,14 @@
  * sources/sinks. The underlying driver can be either of those access paradigms
  * and the abstraction implements the other on top of it.
  *
- * Sources and sinks make sure the expected amount of data is transmitted,
- * unlike the POSIX read() and write() functions, for instance.
- *
- * The OctetSource/OctetSink and ChunkSource/ChunkSource function types need to
- * therefore behave similar to those functions, while returning negative errno
- * instead of actually setting errno. They do need to return the number of
- * octets transmitted. Returning zero indicates end-of-file. If some condition
- * would cause the function to return zero even though EOF was not reached yet,
- * an appropriate errno has to be used. -EINTR in case the function was
- * interrupted by a signal before an octet could be read/written.
- *
- * If a driver returns zero (indicating end-of-file) while getting/putting a
- * buffer of octets, the API returns zero as well, regardless of any previously
- * transmitted data.
- *
- * The API for sources and sinks return negative errno values to signal errors.
- *
- * For sources, returning zero indicates end of file.
- *
- * Positive return values indicate the number of octets that were transmitted.
+ * Functions implementing endpoints must return the number of octet transmitted
+ * (i.e. read or written). In case of an error, the functions must return
+ * -ERRNO. Additionally, when sources run out of data permanently, they need to
+ * return -ENODATA. When sinks run out of space to store date, they need to
+ * return -ENOMEM. Returning zero is allowed, strictly, but will cause the
+ * system to retry. If that is not meaningful with your endpoint, return a
+ * meaningful error code instead. Drivers returning -EINTR will cause the
+ * system to assume the operation was interrupted and it will thus retry.
  *
  * Using a data count of zero, or one bigger than SSIZE_MAX causes the API to
  * return -EINVAL.
@@ -97,14 +85,18 @@ sink_put_octet(Sink *sink, const unsigned char data)
 }
 
 static inline ssize_t
-source_adapt(OctetSource source, void *driver, void *buf, size_t n)
+source_adapt(OctetSource source, void *driver, void *buf, const size_t n)
 {
     unsigned char *data = buf;
-    for (size_t i = 0u; i < n; ++i) {
-        const int rc = source(driver, data + i);
-        if (rc < 0) {
+    size_t rest = n;
+    while (rest > 0) {
+        const int rc = source(driver, data + n - rest);
+        if (rc == -EINTR) {
+            continue;
+        } else if (rc < 0) {
             return (ssize_t)rc;
         }
+        rest -= rc;
     }
 
     return 0;
@@ -113,10 +105,6 @@ source_adapt(OctetSource source, void *driver, void *buf, size_t n)
 static inline ssize_t
 once_source_get_chunk(Source *source, void *buf, size_t n)
 {
-    if (n == 0 || n > SSIZE_MAX) {
-        return -EINVAL;
-    }
-
     return source->kind == DATA_KIND_OCTET
         ? source_adapt(source->source.octet, source->driver, buf, n)
         : source->source.chunk(source->driver, buf, n);
@@ -132,10 +120,10 @@ source_get_chunk(Source *source, void *buf, size_t n)
     size_t rest = n;
     while (rest > 0) {
         const ssize_t get = once_source_get_chunk(source, buf, rest);
-        if (get < 0) {
+        if (get == -EINTR) {
+            continue;
+        } else if (get < 0) {
             return get;
-        } else if (get == 0) {
-            return 0;
         }
         rest -= get;
     }
@@ -144,14 +132,18 @@ source_get_chunk(Source *source, void *buf, size_t n)
 }
 
 static inline ssize_t
-sink_adapt(OctetSink sink, void *driver, const void *buf, size_t n)
+sink_adapt(OctetSink sink, void *driver, const void *buf, const size_t n)
 {
     const unsigned char *data = buf;
-    for (size_t i = 0u; i < n; ++i) {
-        const int rc = sink(driver, data[i]);
-        if (rc < 0) {
+    size_t rest = n;
+    while (rest > 0) {
+        const int rc = sink(driver, data[n - rest]);
+        if (rc == -EINTR) {
+            continue;
+        } else if (rc < 0) {
             return (ssize_t)rc;
         }
+        rest -= rc;
     }
 
     return n;
@@ -175,10 +167,10 @@ sink_put_chunk(Sink *sink, const void *buf, size_t n)
     size_t rest = n;
     while (rest > 0) {
         const ssize_t put = once_sink_put_chunk(sink, buf, rest);
-        if (put < 0) {
+        if (put == -EINTR) {
+            continue;
+        } else if (put < 0) {
             return put;
-        } else if (put == 0) {
-            return 0;
         }
         rest -= put;
     }

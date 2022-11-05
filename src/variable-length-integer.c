@@ -54,7 +54,7 @@ varint_decode(OctetBuffer *b, const size_t maxoctets, union varint64 *n)
         }
     }
 
-    return -EBADMSG;
+    return -EILSEQ;
 }
 
 static int
@@ -74,7 +74,7 @@ varint_from_source(Source *source, const size_t maxoctets, union varint64 *n)
         }
     }
 
-    return -EBADMSG;
+    return -EILSEQ;
 }
 
 int

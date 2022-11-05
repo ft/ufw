@@ -30,12 +30,24 @@
 #define EINVAL      (UFW_PRIVATE_ERRNO_OFFSET + 0)
 #endif /* EINVAL */
 
+#ifndef ENOMEM
+#define ENOMEM      (UFW_PRIVATE_ERRNO_OFFSET + 1)
+#endif /* ENOMEM */
+
+#ifndef ENODATA
+#define ENODATA     (UFW_PRIVATE_ERRNO_OFFSET + 2)
+#endif /* ENODATA */
+
 #ifndef EBADMSG
-#define EBADMSG     (UFW_PRIVATE_ERRNO_OFFSET + 1)
+#define EBADMSG     (UFW_PRIVATE_ERRNO_OFFSET + 3)
 #endif /* EBADMSG */
 
 #ifndef EOVERFLOW
-#define EOVERFLOW   (UFW_PRIVATE_ERRNO_OFFSET + 2)
+#define EOVERFLOW   (UFW_PRIVATE_ERRNO_OFFSET + 4)
 #endif /* EOVERFLOW */
+
+#ifndef EILSEQ
+#define EILSEQ      (UFW_PRIVATE_ERRNO_OFFSET + 5)
+#endif /* EILSEQ */
 
 #endif /* INC_UFW_UFW_MATH_CONSTANTS_H */

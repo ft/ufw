@@ -213,13 +213,13 @@ main(UNUSED int argc, UNUSED char **argv)
     octet_buffer_add(&source_buffer.buffer, with_error, sizeof(with_error));
 
     rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);
-    unless (ok(rc == -EBADMSG, "RFC1055 decode signals BADMSG")) {
+    unless (ok(rc == -EILSEQ, "RFC1055 decode signals ILSEQ")) {
         printf("# errno: %s\n", strerror(-rc));
     }
 
     octet_buffer_clear(&sink_buffer.buffer);
     rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);
-    unless (ok(rc == -EBADMSG, "RFC1055 decode signals BADMSG")) {
+    unless (ok(rc == -EILSEQ, "RFC1055 decode signals ILSEQ")) {
         printf("# errno: %s\n", strerror(-rc));
     }
 

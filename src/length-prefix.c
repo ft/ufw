@@ -154,7 +154,7 @@ lenp_memory_from_source(Source *source, void *mem, size_t size)
         }
     }
     if (len > size) {
-        return -EOVERFLOW;
+        return -ENOMEM;
     }
     return source_get_chunk(source, mem, len);
 }
