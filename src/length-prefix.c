@@ -63,8 +63,7 @@ lenp_memory_encode(LengthPrefixBuffer *lpb, void *buf, size_t n)
     octet_buffer_space(&lpb->prefix, lpb->prefix_, VARINT_64BIT_MAX_OCTETS);
     /* The type definition ensures, this will not return an error. */
     (void)varint_encode_u64(&lpb->prefix, n);
-    octet_buffer_use(&lpb->payload, buf, n);
-    return 0;
+    return octet_buffer_use(&lpb->payload, buf, n);
 }
 
 int
