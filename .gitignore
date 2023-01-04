@@ -1,6 +1,7 @@
 .*
 !.gitignore
 !.clang-format
+!.dir-locals.el
 *~
 \#*\#
 \#*
