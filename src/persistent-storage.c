@@ -14,11 +14,27 @@
 
 #include <ufw/persistent-storage.h>
 
+/**
+ * Utility type to maybe represent a checksum value
+ *
+ * This type either encodes success and a checksum value, or an error code an
+ * no checksum value.
+ */
 struct maybe_sum {
+    /** Success or error code */
     PersistentAccess access;
+    /** Checksum value in case ‘access’ datum shows success */
     PersistentChecksum value;
 };
 
+/**
+ * Return configured checksum size in bytes
+ *
+ * @param  store  Pointer to the instance to query
+ *
+ * @return Checksum size in bytes
+ * @sideeffects None
+ */
 static inline size_t
 checksum_size(const PersistentStorage *store)
 {
@@ -31,12 +47,40 @@ checksum_size(const PersistentStorage *store)
     }
 }
 
+/**
+ * Set up data address in storage instance
+ *
+ * In a PersistentStorage store, the data resides behind the checksum. There is
+ * no padding for different checksum implementations, so the offset depends on
+ * the checksum that is configured. This function sets that offset accordingly.
+ *
+ * @param  store  Pointer to the instance to configure
+ *
+ * @return void
+ * @sideeffects Modifies the storage instance as described.
+ */
 static inline void
 set_data_address(PersistentStorage *store)
 {
     store->data.address = store->checksum.address + store->checksum.size;
 }
 
+/**
+ * Trivial 16 bit checksum implementation
+ *
+ * This just sums up all bytes in the buffer into a uint16_t return value.
+ *
+ * Nobody should use this algorithm in production code! Use
+ * persistent_checksum_16bit() or persistent_checksum_32bit() to specify a
+ * proper checksumming algorithm.
+ *
+ * @param  data  Pointer to buffer to sum up
+ * @param  n     Length of data buffer
+ * @param  init  Offset for sum calculation
+ *
+ * @return uint16_t sum as described
+ * @sideeffects None
+ */
 static uint16_t
 trivialsum(const unsigned char *data, size_t n, uint16_t init)
 {
@@ -140,6 +184,28 @@ persistent_init(PersistentStorage *store,
     store->buffer.data = NULL;
 }
 
+/**
+ * Run checksum algorithm if a storage instance for a memory block
+ *
+ * This takes a memory block, provided as ‘src’ and runs the checksum
+ * algorithm, configured in the storage instance (type, data-size,
+ * initial-value) for that piece of memory.
+ *
+ * The memory block must be fit for this kind of access (i.e. be readable to
+ * the configured size).
+ *
+ * This is a simplified variant of persistent_calculate_checksum(), that relies
+ * on the fact that the whole data to be checksummed can be accessed
+ * consecutively. The caller has to make sure that is the case. If this cannot
+ * be guaranteed, the more complex, but also more general function needs to be
+ * used instead.
+ *
+ * @param  store  Pointer to the storage instance
+ * @param  src    Pointer to the memory block to process
+ *
+ * @return Checksum for the memory block according to the storage instance
+ * @sideeffects None
+ */
 static PersistentChecksum
 persistent_checksum(const PersistentStorage *store, const void *src)
 {
@@ -206,6 +272,23 @@ persistent_buffer(PersistentStorage *store, unsigned char *buffer, size_t n)
     store->buffer.size = n;
 }
 
+/**
+ * Calculate checksum for a persistent storage instance
+ *
+ * This function reads data from its designated source and runs the configured
+ * checksum algorithm for it, returning the final result of that process,
+ * unless an error occurs, in which case the ‘struct maybe_sum’ return type is
+ * set up accordingly.
+ *
+ * If the storage instance was supplied with an auxiliary buffer, the function
+ * uses it in order reduce the number of reading calls to the configured
+ * medium. Otherwise, the medium is read byte-by-byte.
+ *
+ * @param  store  Pointer to the storage instance to process
+ *
+ * @return Success code and data store checksum; or an error code.
+ * @sideeffects Accesses configured media as described.
+ */
 static struct maybe_sum
 persistent_calculate_checksum(PersistentStorage *store)
 {
@@ -256,6 +339,18 @@ persistent_calculate_checksum(PersistentStorage *store)
     return rv;
 }
 
+/**
+ * Store given checksum in persistent storage medium
+ *
+ * This takes a checksum datum and stores it in the medium configured in a
+ * persistent storage instance.
+ *
+ * @param  store  Pointer to the storage instance to modify
+ * @param  sum    Checksum to store in persistent medium
+ *
+ * @return PERSISTENT_ACCESS_SUCCESS or PERSISTENT_ACCESS_IO_ERROR.
+ * @sideeffects Writes to the configured data storage medium.
+ */
 static PersistentAccess
 persistent_store_checksum(PersistentStorage *store, PersistentChecksum sum)
 {
@@ -276,6 +371,17 @@ persistent_store_checksum(PersistentStorage *store, PersistentChecksum sum)
     return PERSISTENT_ACCESS_SUCCESS;
 }
 
+/**
+ * Retrieve checksum from persistent data medium
+ *
+ * This function does not calculate a checksum, but returns a previously stored
+ * checksum from a medium configured in a persistent storage instance.
+ *
+ * @param  store  Pointer to the persistent instance to read from
+ *
+ * @return Success code and data store checksum; or an error code.
+ * @sideeffects Data is read from persistent data medium.
+ */
 static struct maybe_sum
 persistent_fetch_checksum(PersistentStorage *store)
 {
@@ -298,6 +404,19 @@ persistent_fetch_checksum(PersistentStorage *store)
     return rv;
 }
 
+/**
+ * Check if two given checksum values match
+ *
+ * Given two PersistentChecksum values, return true if and only if both values
+ * are exactly the same.
+ *
+ * @param  store  Pointer to the instance to query configuration from
+ * @param  a      First checksum value
+ * @param  b      Second checksum value
+ *
+ * @return True if both checksum values match; false otherwise.
+ * @sideeffects None
+ */
 static bool
 persistent_match(const PersistentStorage *store,
                  PersistentChecksum a, PersistentChecksum b)
@@ -430,6 +549,23 @@ persistent_store(PersistentStorage *store, const void *src)
     return persistent_store_part(store, src, 0, store->data.size);
 }
 
+/**
+ * Set part of the memory in a persistent medium to one value
+ *
+ * This function takes a persistent storage instance and sets ‘k’ bytes
+ * starting at offset ‘address’ to a given value ‘item’.
+ *
+ * This function is used to reset a persistent storage instance to a known
+ * state in persistent_reset().
+ *
+ * @param  store    Pointer to the instance to write to
+ * @param  address  Address at which to start writing
+ * @param  item     Datum to write at each address
+ * @param  k        Number of bytes to to write
+ *
+ * @return PERSISTENT_ACCESS_SUCCESS or PERSISTENT_ACCESS_IO_ERROR.
+ * @sideeffects Data storage medium is written to as described.
+ */
 static PersistentAccess
 persistent_writen(PersistentStorage *store,
                   uint32_t address, unsigned char item, size_t k)
