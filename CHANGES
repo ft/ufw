@@ -2,6 +2,80 @@
   User-visible changes in ufw
 -------------------------------
 
+* v3.0.0 → v3.1.0 (released 2022-01-12):
+
+** New Features
+
+- Add an errno compatibility layer. Instead of including ‘errno.h’, portable
+  code should include ‘ufw/compat/errno.h’.
+- Add octet-buffer data type.
+- Add generic source and sink data types (collectively called endpoints).
+- Add RFC1055 compliant SLIP codec, with optional start-of-frame delimiter
+  support.
+- Add variable-length integer encoding. This follows the specification for
+  Google's protobuf; it implements 32/64 bit unsigned/signed integers.
+- Add length-prefix framing, using 64 bit unsigned variable-length integer
+  length specifiers.
+- cmake, GitIntegration: Install via ‘ufw-git-install’ CMake component. This
+  allows user to only install these artefacts if they so choose.
+
+** Bugfixes
+
+- Fix memdiff issue when there are differences in the last line of hexadecimal
+  data.
+- Implement ssize_t limit macros for toolchains (Texas Instruments), that do
+  not implement this data type. This is an oversight at the time the typedef
+  and the basic compatibility layer for the data type was introduced.
+
+** Miscellaneous
+
+- Documentation improvements.
+- Slight restructuring of ‘src/’ directory without impact onto users.
+
+** Diffstat:
+
+    .dir-locals.el                                |   6 +
+    .gitignore                                    |   6 +-
+    CMakeLists.txt                                |  30 +-
+    cmake/modules/GitIntegration.cmake            |   6 +-
+    include/ufw/compat.h                          |   7 +
+    include/ufw/compat/errno.h                    |  53 +++
+    include/ufw/compat/math-constants.h           |   6 +
+    include/ufw/compat/ssize-t.h                  |  26 +-
+    include/ufw/compat/strings.h                  |   6 +
+    include/ufw/endpoints.h                       | 149 +++++++
+    include/ufw/length-prefix.h                   |  38 ++
+    include/ufw/octet-buffer.h                    |  40 ++
+    include/ufw/register-utilities.h              |   6 +
+    include/ufw/rfc1055.h                         |  42 ++
+    include/ufw/toolchain.h.in                    |  28 ++
+    include/ufw/variable-length-integer.h         |  40 ++
+    src/endpoints/buffer.c                        |  57 +++
+    src/endpoints/core.c                          | 179 ++++++++
+    src/endpoints/instrumentable.c                |  95 +++++
+    src/endpoints/posix.c                         |  54 +++
+    src/endpoints/trivial.c                       |  33 ++
+    src/length-prefix.c                           | 173 ++++++++
+    src/octet-buffer.c                            | 111 +++++
+    src/persistent-storage.c                      | 136 ++++++
+    src/{register-table.c => registers/core.c}    |   2 +-
+    .../internal.h}                               |   0
+    .../utilities.c}                              |   2 +-
+    src/rfc1055.c                                 | 241 +++++++++++
+    src/test/memdiff.c                            |  60 +--
+    src/test/output-utils.c                       |   6 +
+    src/variable-length-integer.c                 | 283 +++++++++++++
+    test/CMakeLists.txt                           |   5 +-
+    test/t-binary-format.c                        |   6 +
+    test/t-length-prefix.c                        |  89 ++++
+    test/t-persistent-storage.c                   |   6 +
+    test/t-register-table-persistent-storage.c    |   8 +-
+    test/t-register-table.c                       |   6 +
+    test/t-rfc1055.c                              | 254 ++++++++++++
+    test/t-varint.c                               | 386 ++++++++++++++++++
+    39 files changed, 2639 insertions(+), 42 deletions(-)
+
+
 * v2.1.0 → v3.0.0 (released 2022-09-21):
 
 ** Breaking compatibility
