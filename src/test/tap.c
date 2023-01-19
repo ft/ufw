@@ -22,11 +22,12 @@
 static long unsigned int test_count = 0u;
 
 static void tap_result(
-    const bool, const char*, unsigned long, const char*, va_list);
+    const bool, const char*, unsigned long, const char*, const char*, va_list);
 
 static void
 tap_result(const bool result,
            const char *file, unsigned long line,
+           const char *expr,
            const char *fmt, va_list ap)
 {
     test_count++;
@@ -35,7 +36,13 @@ tap_result(const bool result,
     }
 
     printf("ok %lu - ", test_count);
-    vprintf(fmt, ap);
+    if (fmt == NULL && expr == NULL) {
+        printf("Missing Test Description");
+    } else if (fmt == NULL) {
+        printf("%s", expr);
+    } else {
+        vprintf(fmt, ap);
+    }
     putchar('\n');
 
     if (result == false) {
@@ -60,7 +67,7 @@ ufw_test_ok(const char *file, long unsigned int line,
     va_list ap;
 
     va_start(ap, format);
-    tap_result(result, file, line, format, ap);
+    tap_result(result, file, line, expr, format, ap);
     va_end(ap);
 
     if (result == false) {
@@ -82,7 +89,7 @@ ufw_test_cmp_mem(const char *file, long unsigned int line,
     va_list ap;
 
     va_start(ap, format);
-    tap_result(result, file, line, format, ap);
+    tap_result(result, file, line, NULL, format, ap);
     va_end(ap);
 
     if (result == false) {
