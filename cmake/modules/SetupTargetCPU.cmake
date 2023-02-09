@@ -96,7 +96,11 @@ endfunction()
 function(set_target_cpu target)
   if (ZEPHYR_TOOLCHAIN_VARIANT)
     target_compile_options(${target} PUBLIC ${TOOLCHAIN_C_FLAGS})
-    target_link_libraries(${target} PUBLIC ${TOOLCHAIN_LD_FLAGS})
+    # Strip NO_SPLIT from LD_FLAGS. This works for now, but at some point, we
+    # may need to use zephyr's cmake extensions to keep this going.
+    set(__list ${TOOLCHAIN_LD_FLAGS})
+    list(REMOVE_ITEM __list NO_SPLIT)
+    target_link_libraries(${target} PUBLIC ${__list})
     return()
   endif()
   if (NOT PROJECT_TARGET_CPU)
