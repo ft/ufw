@@ -2,7 +2,22 @@
   User-visible changes in ufw
 -------------------------------
 
-* v3.0.0 → v3.1.0 (released 2022-01-12):
+* v3.1.0 → v3.2.0 (released 2023-02-10):
+
+** New Features
+
+- test/tap: Add okx() variant of ok().
+- Improve zephyr toolchain compatibility for zephyr 3.3.
+
+** Diffstat:
+
+    cmake/modules/SetupTargetCPU.cmake |  6 +++++-
+    include/ufw/test/tap.h             |  2 ++
+    src/test/tap.c                     | 15 +++++++++++----
+    3 files changed, 18 insertions(+), 5 deletions(-)
+
+
+* v3.0.0 → v3.1.0 (released 2023-01-12):
 
 ** New Features
 
