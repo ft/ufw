@@ -20,6 +20,9 @@ cmake-extensions:
     module: Libtap
   lwgps:
     include: add_subdirectory(${moduleroot}/lwgps)
+  nanopb:
+    include: add_nanopb(${moduleroot})
+    module: AddNanoPB
   st-cmsis:
     include: add_st_cmsis(${moduleroot})
     module: STCmsis
