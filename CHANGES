@@ -2,6 +2,19 @@
   User-visible changes in ufw
 -------------------------------
 
+* v3.2.0 → v3.3.0 (released 2023-02-16):
+
+** New Features
+
+- Add support for nanopb.
+
+** Diffstat:
+
+    cmake/modules/AddNanoPB.cmake | 18 ++++++++++++++++++
+    module.yaml                   |  3 +++
+    2 files changed, 21 insertions(+)
+
+
 * v3.1.0 → v3.2.0 (released 2023-02-10):
 
 ** New Features
