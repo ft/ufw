@@ -102,7 +102,7 @@
 /**
  * Implement moving median resolution based on convolution buffer.
  *
- * Provide a source for standard qsort for this (#include <stdlib.h>).
+ * Provide a source for standard qsort for this (as found in stdlib.h).
  * TYPE must be directly comparable with <, >, ==.
  */
 #define CONV_LOW_PASS_MEDIAN(NAME, TYPE)                                      \
