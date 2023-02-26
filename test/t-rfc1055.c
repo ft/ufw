@@ -151,8 +151,8 @@ main(UNUSED int argc, UNUSED char **argv)
                      sizeof(expect_with_sof) - 1);
 
     rc = rfc1055_decode(&rfc1055_classic, &source, &sink);
-    ok(rc == 0, "RFC1055 classic decode signals success");
-    if (rc != 0) {
+    ok(rc == 1, "RFC1055 classic decode signals success");
+    if (rc < 0) {
         printf("# errno: %s\n", strerror(-rc));
     }
     ok(sink_buffer.buffer.used == sizeof(payload),
@@ -168,8 +168,8 @@ main(UNUSED int argc, UNUSED char **argv)
     octet_buffer_clear(&sink_buffer.buffer);
 
     rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);
-    ok(rc == 0, "RFC1055 classic decode signals success");
-    if (rc != 0) {
+    ok(rc == 1, "RFC1055 classic decode signals success");
+    if (rc < 0) {
         printf("# errno: %s\n", strerror(-rc));
     }
     ok(sink_buffer.buffer.used == sizeof(payload),
@@ -225,7 +225,8 @@ main(UNUSED int argc, UNUSED char **argv)
 
     octet_buffer_clear(&sink_buffer.buffer);
     rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);
-    unless (ok(rc == 0, "RFC1055 decode signals success")) {
+    ok(rc == 1, "RFC1055 decode signals success");
+    if (rc < 0) {
         printf("# errno: %s\n", strerror(-rc));
     }
     unless(ok(sink_buffer.buffer.used == 3,

@@ -229,7 +229,7 @@ rfc1055_decode(RFC1055Context *ctx, Source *source, Sink *sink)
                 if (BIT_ISSET(ctx->flags, RFC1055_WITH_SOF)) {
                     ctx->state = RFC1055_SEARCH_FOR_START;
                 }
-                return 0;
+                return 1;
             }
 
             MAYBE_RETURN(sink_put_octet(sink, data));
