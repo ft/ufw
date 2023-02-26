@@ -2,6 +2,40 @@
   User-visible changes in ufw
 -------------------------------
 
+* v3.3.0 → v3.4.0 (released 2023-02-26):
+
+** New Features
+
+- hexdump: Add Generic, portable hexdump(1) like utility.
+- rfc1055: Signal successful end-of-frame to caller.
+- bitops: Extend zephyr compatibility to cover BITS_PER_LONG_LONG.
+- toolchain.h: Add detection for ctype.h and isprint().
+
+** Bugfixes
+
+- rfc1055: Fix frame delimiter octet.
+- rfc1055: Forward Source/Sink error codes more consistently.
+
+** Miscellaneous
+
+- Small doxygen improvements.
+- Improve internal code documentation.
+
+** Diffstat:
+
+    CMakeLists.txt                     |   6 ++
+    include/ufw/bit-operations.h       |  15 ++-
+    include/ufw/convolution-low-pass.h |   2 +-
+    include/ufw/hexdump.h              |  31 ++++++
+    include/ufw/toolchain.h.in         |   6 ++
+    src/hexdump.c                      | 159 +++++++++++++++++++++++++++
+    src/rfc1055.c                      |  10 +-
+    test/CMakeLists.txt                |   4 +
+    test/t-hexdump.c                   | 165 +++++++++++++++++++++++++++++
+    test/t-rfc1055.c                   |  13 +--
+    10 files changed, 397 insertions(+), 14 deletions(-)
+
+
 * v3.2.0 → v3.3.0 (released 2023-02-16):
 
 ** New Features
