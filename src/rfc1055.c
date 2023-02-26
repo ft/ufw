@@ -189,7 +189,7 @@ rfc1055_decode(RFC1055Context *ctx, Source *source, Sink *sink)
         case RFC1055_SEARCH_FOR_START: {
             const int rc = transition(source);
             if (rc < 0) {
-                return 0;
+                return rc;
             } else if (rc == 1) {
                 ctx->state = RFC1055_NORMAL;
             }
@@ -198,7 +198,7 @@ rfc1055_decode(RFC1055Context *ctx, Source *source, Sink *sink)
         case RFC1055_SEARCH_FOR_END: {
             const int rc = transition(source);
             if (rc < 0) {
-                return 0;
+                return rc;
             } else if (rc == 1) {
                 ctx->state =
                     BIT_ISSET(ctx->flags, RFC1055_WITH_SOF)
