@@ -41,11 +41,13 @@ hexdump_ascii(const struct hexdump_cfg *cfg, const unsigned char *data,
 /**
  * Memory dumper in the style of the hexdump(1) utility
  *
+ * @verbatim
  * 00010000  20 43 6f 70 79 72 69 67  68 74 20 c2 a9 20 32 30  | Copyright .. 20|
  * 00010010  31 37 2d 32 30 32 32 20  6d 69 63 72 6f 20 66 72  |17-2022 micro fr|
  * 00010020  61 6d 65 77 6f 72 6b 20  77 6f 72 6b 65 72 73 2c  |amework workers,|
  * 00010030  20 41 6c 6c 20 72 69 67  68 74 73 20 72 65 73 65  | All rights rese|
  * 00010040  72 76 65 64 2e 0a 0a 20  52 65 64 69 73 74 72 69  |rved... Redistri|
+ * @endverbatim
  *
  * @param  cfg      Hexdump configuration data
  * @param  mem      Pointer to memory to dump
@@ -112,6 +114,16 @@ hd_printf(void *driver, const char *fmt, ...)
     return rc;
 }
 
+/**
+ * Variant of hexdump() that uses stdio's stdout
+ *
+ * @param  mem      Pointer to memory to dump
+ * @param  n        Number of octets of dump from ‘mem’.
+ * @param  doffset  Offset to use for display purposes only.
+ *
+ * @return Zero on success; negative errno on error.
+ * @sideeffects Prints to a output backend handed in by ‘cfg’.
+ */
 int
 hexdump_stdout(const void *mem, const size_t n, const size_t doffset)
 {
@@ -124,6 +136,16 @@ hexdump_stdout(const void *mem, const size_t n, const size_t doffset)
     return hexdump(&hd, mem, n, doffset);
 }
 
+/**
+ * Variant of hexdump() that uses stdio's stderr
+ *
+ * @param  mem      Pointer to memory to dump
+ * @param  n        Number of octets of dump from ‘mem’.
+ * @param  doffset  Offset to use for display purposes only.
+ *
+ * @return Zero on success; negative errno on error.
+ * @sideeffects Prints to a output backend handed in by ‘cfg’.
+ */
 int
 hexdump_stderr(const void *mem, const size_t n, const size_t doffset)
 {
