@@ -14,6 +14,7 @@ endif()
 list(APPEND test_names
   t-convolution-low-pass
   t-length-prefix
+  t-hexdump
   t-persistent-storage
   t-register-table
   t-register-table-persistent-storage
@@ -28,6 +29,9 @@ foreach (tst ${test_names})
                                 sanitize-integer
                                 sanitize-undefined-behaviour)
   target_link_libraries(${tst} PRIVATE ufw ufw-tap)
+  if (DEFINED PROJECT_TARGET_CPU AND ${PROJECT_TARGET_CPU} STREQUAL native)
+    target_compile_definitions(${tst} PRIVATE UFW_NATIVE_BUILD)
+  endif()
   MakeStrictCompilerC(${tst})
   list(APPEND test_prgs $<TARGET_FILE:${tst}>)
 endforeach()
