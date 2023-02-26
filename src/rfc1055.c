@@ -35,7 +35,7 @@
  * This is what the RFC suggests as an extension, because it does not increase
  * the overhead cause by the octet-stuffing technique.
  */
-#define RAW_EOF 0xcu
+#define RAW_EOF 0xc0u
 
 /**
  * Indicate Control Character in Payload

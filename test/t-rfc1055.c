@@ -15,7 +15,7 @@
 static unsigned char source_memory[MEMORY_SIZE];
 static unsigned char sink_memory[MEMORY_SIZE];
 
-#define RAW_EOF 0xcu
+#define RAW_EOF 0xc0u
 #define RAW_ESC 0xdbu
 #define ESC_EOF 0xdcu
 #define ESC_ESC 0xddu
