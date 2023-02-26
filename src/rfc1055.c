@@ -126,7 +126,7 @@ rfc1055_decode_octet(Source *source, unsigned char *data)
     unsigned char first;
     /* Guarantee that the data return value is initialised, no matter the
      * behaviour of the source implementation. This is important with the
-     * EBADMSG return code, which this SLIP decoder uses. While unlikely that
+     * EILSEQ return code, which this SLIP decoder uses. While unlikely that
      * the source returns that particular error code, it is not impossible.
      * Modern compilers even warn about this. */
     *data = 0u;
