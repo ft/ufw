@@ -37,11 +37,29 @@
 #endif /* BITS_PER_BYTE */
 
 /** Number of bits in an unsigned integer */
-#define UFW_BITS_PER_UNSIGNED (sizeof(unsigned int) * BITS_PER_BYTE)
+#define BITS_PER_UNSIGNED (sizeof(unsigned int) * BITS_PER_BYTE)
+
+/*
+ * Zephyr defines these too, so in order to be able to use this without being
+ * warned, undefine beforehand.
+ *
+ * Use ufw headers after zephyr headers, so these workarounds can help remove
+ * compiler warnings. I am pretty certain, the definitions a compatible for any
+ * of the supported zephyr architectures.
+ */
+#ifdef BITS_PER_LONG
+#undef BITS_PER_LONG
+#endif /* BITS_PER_LONG */
+
+#ifdef BITS_PER_LONG_LONG
+#undef BITS_PER_LONG_LONG
+#endif /* BITS_PER_LONG_LONG */
+
 /** Number of bits in an unsigned long integer */
-#define UFW_BITS_PER_LONG (sizeof(unsigned long int) * BITS_PER_BYTE)
+#define BITS_PER_LONG (sizeof(unsigned long int) * BITS_PER_BYTE)
+
 /** Number of bits in an unsigned long long integer */
-#define UFW_BITS_PER_LONG_LONG (sizeof(unsigned long long int) * BITS_PER_BYTE)
+#define BITS_PER_LONG_LONG (sizeof(unsigned long long int) * BITS_PER_BYTE)
 
 /*
  * Unsigned int generators
@@ -75,7 +93,7 @@
  * @return Unsigned integer as described.
  * @sideeffects None
  */
-#define BIT_ONES(n, o) ((~0u) >> (UFW_BITS_PER_UNSIGNED - (n)) << (o))
+#define BIT_ONES(n, o) ((~0u) >> (BITS_PER_UNSIGNED - (n)) << (o))
 
 /**
  * Extract a string of bits from an unsigned integer container
@@ -110,7 +128,7 @@
  * @return Unsigned integer as described.
  * @sideeffects None
  */
-#define BIT_MASK(n) (BIT((n) % UFW_BITS_PER_UNSIGNED))
+#define BIT_MASK(n) (BIT((n) % BITS_PER_UNSIGNED))
 
 /**
  * Return the word index of a bit within a block of unsigned ints
@@ -122,7 +140,7 @@
  * @return Unsigned integer as described.
  * @sideeffects None
  */
-#define BIT_WORD(n) ((n) / UFW_BITS_PER_LONG)
+#define BIT_WORD(n) ((n) / BITS_PER_LONG)
 
 /*
  * Unsigned long int generators
@@ -152,7 +170,7 @@
  * @return Unsigned long integer as described.
  * @sideeffects None
  */
-#define BITL_ONES(n, o) ((~0ul) >> (UFW_BITS_PER_LONG - (n)) << (o))
+#define BITL_ONES(n, o) ((~0ul) >> (BITS_PER_LONG - (n)) << (o))
 
 /**
  * Extract a string of bits from an long unsigned integer container
@@ -183,7 +201,7 @@
  * @return Unsigned long integer as described.
  * @sideeffects None
  */
-#define BITL_MASK(n) (BITL((n) % UFW_BITS_PER_LONG))
+#define BITL_MASK(n) (BITL((n) % BITS_PER_LONG))
 
 /**
  * Return the word index of a bit within a block of unsigned long ints
@@ -195,7 +213,7 @@
  * @return Unsigned long integer as described.
  * @sideeffects None
  */
-#define BITL_WORD(n) ((n) / UFW_BITS_PER_LONG)
+#define BITL_WORD(n) ((n) / BITS_PER_LONG)
 
 /*
  * Unsigned long long int generators
@@ -226,7 +244,7 @@
  * @return Unsigned long integer as described.
  * @sideeffects None
  */
-#define BITLL_ONES(n, o) ((~0ull) >> (UFW_BITS_PER_LONG_LONG - (n)) << (o))
+#define BITLL_ONES(n, o) ((~0ull) >> (BITS_PER_LONG_LONG - (n)) << (o))
 
 /**
  * Extract a string of bits from an long long unsigned integer container
@@ -257,7 +275,7 @@
  * @return Unsigned long long integer as described.
  * @sideeffects None
  */
-#define BITLL_MASK(n) (BITLL((n) % UFW_BITS_PER_LONG_LONG))
+#define BITLL_MASK(n) (BITLL((n) % BITS_PER_LONG_LONG))
 
 /**
  * Return the word index of a bit within a block of unsigned long long ints
@@ -269,7 +287,7 @@
  * @return Unsigned long long integer as described.
  * @sideeffects None
  */
-#define BITLL_WORD(n) ((n) / UFW_BITS_PER_LONG_LONG)
+#define BITLL_WORD(n) ((n) / BITS_PER_LONG_LONG)
 
 /*
  * Generic predicates and mutators
