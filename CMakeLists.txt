@@ -35,6 +35,11 @@ endif()
 include(SetupTargetCPU)
 check_include_file("sys/types.h" WITH_SYS_TYPES_H)
 
+check_include_file("ctype.h" WITH_CTYPE_H)
+if (WITH_CTYPE_H)
+  check_symbol_exists(isprint "ctype.h" UFW_HAVE_CTYPE_ISPRINT)
+endif()
+
 check_include_file("unistd.h" WITH_UNISTD_H)
 if (WITH_UNISTD_H)
   check_symbol_exists(read  "unistd.h" UFW_HAVE_POSIX_READ)

@@ -322,6 +322,12 @@
 #undef WITH_UINT8_T
 #endif /* WITH_UINT8_T */
 
+/** Reflect the availability of ctype's isprint() */
+#cmakedefine01 UFW_HAVE_CTYPE_ISPRINT
+#if (UFW_HAVE_CTYPE_ISPRINT == 0)
+#undef UFW_HAVE_CTYPE_ISPRINT
+#endif /* UFW_HAVE_CTYPE_ISPRINT */
+
 /** Reflect the availability of POSIX style read() */
 #cmakedefine01 UFW_HAVE_POSIX_READ
 #if (UFW_HAVE_POSIX_READ == 0)
