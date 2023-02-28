@@ -161,10 +161,10 @@ rfc1055_encode(const RFC1055Context *ctx, Source *source, Sink *sink)
     for (;;) {
         unsigned char data;
         const int get = source_get_octet(source, &data);
-        if (get < 0) {
-            return get;
-        } else if (get == 0) {
+        if (get == -ENODATA || get == 0) {
             break;
+        } else if (get < 0) {
+            return get;
         }
         MAYBE_RETURN(rfc1055_encode_octet(sink, data));
     }
