@@ -48,7 +48,7 @@ run_instrumentable_source(void *driver, void *data)
     }
 
     if (b->buffer.offset >= b->buffer.used) {
-        return 0;
+        return -ENODATA;
     }
 
     unsigned char *dest = data;
@@ -71,7 +71,7 @@ run_instrumentable_sink(void *driver, unsigned char data)
     }
 
     if (b->buffer.used == b->buffer.size) {
-        return 0;
+        return -ENOMEM;
     }
 
     b->buffer.data[b->buffer.used] = data;
