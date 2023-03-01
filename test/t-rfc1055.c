@@ -58,6 +58,54 @@ static unsigned char expect_with_sof[] = {
     ESC_EOF, 'e', 'n', 'd',
     RAW_EOF };
 
+/*
+ * This one deals with the situation, where a silly client sometimes stops
+ * transmission in the middle of a frame. This deals with other situations as
+ * well, like the case where a delimiter character is lost. This is expecially
+ * true with framing using a start-of-frame character.
+ *
+ * With just the end-of-frame delimiter, things resynchronise pretty naturally,
+ * with a frame just becoming larger than it should have been.
+ */
+static unsigned char sync_to_start[] = {
+    RAW_EOF,
+    'a', 'b', 'c',
+    RAW_EOF,
+    RAW_EOF,
+    'd', 'e', 'f',
+    /*
+     * Missing end, or missing start. You can't really tell. From the parser's
+     * point of view, this is the end-of-frame delimiter. With sof, now we'll
+     * be looking for RAW_EOF again after this one. That means, the "ghi" will
+     * be dropped. Now the next RAW_EOF really is an EOF, not the SOF we're
+     * looking for. That one has dropped, supposedly. The only way we can de-
+     * tect this, is to see if there's two EOF characters right next to each
+     * other. That is our new synchronisation point. If you don't do this, you
+     * will now hang on empty frames from now on, which is not useful. That is
+     * harder to implement and less robust than using a different SOF charac-
+     * ter, but is saves a 1/256 (or so) average encoding overhead…
+     *
+     * Oh well.
+     */
+    RAW_EOF,
+    'g', 'h', 'i',
+    RAW_EOF,
+    RAW_EOF,
+    'j', 'k', 'l',
+    RAW_EOF,
+    RAW_EOF,
+    'm', 'n', 'o',
+    RAW_EOF,
+};
+
+static char *sync_with_sof[] = {
+    "abc", "def", "jkl", "mno"
+};
+
+static char *sync_without_sof[] = {
+    "", "abc", "", "def", "ghi", "", "jkl", "", "mno"
+};
+
 int
 main(UNUSED int argc, UNUSED char **argv)
 {
@@ -67,7 +115,10 @@ main(UNUSED int argc, UNUSED char **argv)
     Sink sink;
     int rc;
 
-    plan(19);
+    const size_t swos_n = sizeof(sync_without_sof)/sizeof(*sync_without_sof);
+    const size_t sws_n = sizeof(sync_with_sof)/sizeof(*sync_with_sof);
+
+    plan(21 + (swos_n + sws_n) * 3);
 
     /*
      * General encoding tests
@@ -180,6 +231,69 @@ main(UNUSED int argc, UNUSED char **argv)
             "RFC1055 classic decode(...) works");
 
     /*
+     * Missing delimiter tests
+     */
+
+    /* Re-initialise buffers for decoding tests */
+    octet_buffer_space(&source_buffer.buffer, source_memory, MEMORY_SIZE);
+    octet_buffer_space(&sink_buffer.buffer, sink_memory, MEMORY_SIZE);
+
+    /* Load valid, classic RFC1055 encoded buffer into source */
+    octet_buffer_add(&source_buffer.buffer, sync_to_start,
+                     sizeof(expect_with_sof));
+
+    rfc1055_context_init(&rfc1055_classic, RFC1055_DEFAULT);
+    for (size_t i = 0u; i < swos_n; ++i) {
+        rc = rfc1055_decode(&rfc1055_classic, &source, &sink);
+        unless (ok(rc == 1, "sync_to_start, without_sof: %zu - success!", i)) {
+            printf("# errno: %s\n", strerror(-rc));
+            break;
+        }
+        const char *s = sync_without_sof[i];
+        const size_t u = sink_buffer.buffer.used;
+        const size_t l = strlen(s);
+        const size_t m = u < l ? u : l;
+
+        if (ok(u == l,
+               "sync_to_start, without_sof: %zu - length correct (%zu/%zu)",
+               i, l, u))
+        {
+            cmp_mem(s, sink_buffer.buffer.data, m,
+                    "sync_to_start, without_sof: %zu - data correct (%s)",
+                    i, s);
+        }
+
+        octet_buffer_clear(&sink_buffer.buffer);
+    }
+
+    rfc1055_context_init(&rfc1055_with_sof, RFC1055_WITH_SOF);
+    octet_buffer_clear(&source_buffer.buffer);
+    octet_buffer_add(&source_buffer.buffer, sync_to_start,
+                     sizeof(expect_with_sof));
+    for (size_t i = 0u; i < sws_n; ++i) {
+        rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);
+        unless (ok(rc == 1, "sync_to_start, with_sof: %zu - success!", i)) {
+            printf("# Error: %s\n", strerror(-rc));
+            break;
+        }
+        const char *s = sync_with_sof[i];
+        const size_t u = sink_buffer.buffer.used;
+        const size_t l = strlen(s);
+        const size_t m = u < l ? u : l;
+
+        if (ok(u == l,
+               "sync_to_start, with_sof: %zu - length correct (%zu/%zu)",
+               i, l, u))
+        {
+            cmp_mem(s, sink_buffer.buffer.data, m,
+                    "sync_to_start, with_sof: %zu - data correct (%s)",
+                    i, s);
+        }
+
+        octet_buffer_clear(&sink_buffer.buffer);
+    }
+
+    /*
      * Decoding error tests
      *
      * As with the encoder, the sources and sinks could signal errors, which
@@ -203,7 +317,7 @@ main(UNUSED int argc, UNUSED char **argv)
          * decoder may thus not just ignore the character after the RAW_ESC as
          * part of an invalid sequence. When restarted, the decoder finally
          * runs into a frame, containing "foo". */
-        RAW_EOF, 'f', RAW_ESC, 'o', 'o', RAW_EOF,
+        RAW_EOF, RAW_EOF, 'f', RAW_ESC, 'o', 'o', RAW_EOF,
         RAW_EOF, 'f', RAW_ESC, RAW_EOF,
         RAW_EOF, 'f', 'o', 'o', RAW_EOF
     };
@@ -216,11 +330,23 @@ main(UNUSED int argc, UNUSED char **argv)
     unless (ok(rc == -EILSEQ, "RFC1055 decode signals ILSEQ")) {
         printf("# errno: %s\n", strerror(-rc));
     }
+    unless (ok(source_buffer.buffer.offset - 1 == 10u,
+               "    error at 'ESC o'"))
+    {
+        printf("# Actual buffer offset: %zu (wanted: %u)\n",
+               source_buffer.buffer.offset - 1, 10u);
+    }
 
     octet_buffer_clear(&sink_buffer.buffer);
     rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);
-    unless (ok(rc == -EILSEQ, "RFC1055 decode signals ILSEQ")) {
+    unless (ok(rc == -EILSEQ, "RFC1055 decode signals ILSEQ again")) {
         printf("# errno: %s\n", strerror(-rc));
+    }
+    unless (ok(source_buffer.buffer.offset - 1 == 16u,
+               "    error at 'ESC EOF'"))
+    {
+        printf("# Actual buffer offset: %zu (wanted: %u)\n",
+               source_buffer.buffer.offset - 1, 16u);
     }
 
     octet_buffer_clear(&sink_buffer.buffer);
