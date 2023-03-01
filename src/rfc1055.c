@@ -194,6 +194,7 @@ rfc1055_decode(RFC1055Context *ctx, Source *source, Sink *sink)
                 ctx->state = RFC1055_NORMAL;
             } else {
                 ctx->state = RFC1055_SEARCH_FOR_END;
+                return -EILSEQ;
             }
             break;
         }

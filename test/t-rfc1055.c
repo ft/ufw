@@ -99,7 +99,7 @@ static unsigned char sync_to_start[] = {
 };
 
 static char *sync_with_sof[] = {
-    "abc", "def", "jkl", "mno"
+    "abc", "def", NULL, "jkl", "mno"
 };
 
 static char *sync_without_sof[] = {
@@ -118,7 +118,7 @@ main(UNUSED int argc, UNUSED char **argv)
     const size_t swos_n = sizeof(sync_without_sof)/sizeof(*sync_without_sof);
     const size_t sws_n = sizeof(sync_with_sof)/sizeof(*sync_with_sof);
 
-    plan(21 + (swos_n + sws_n) * 3);
+    plan(23 + (swos_n + (sws_n - 1)) * 3 + 1);
 
     /*
      * General encoding tests
@@ -272,9 +272,16 @@ main(UNUSED int argc, UNUSED char **argv)
                      sizeof(expect_with_sof));
     for (size_t i = 0u; i < sws_n; ++i) {
         rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);
-        unless (ok(rc == 1, "sync_to_start, with_sof: %zu - success!", i)) {
-            printf("# Error: %s\n", strerror(-rc));
-            break;
+        if (sync_with_sof[i] == NULL) {
+            ok(rc == -EILSEQ, "Found an expected illegal sequence");
+            octet_buffer_clear(&sink_buffer.buffer);
+            continue;
+        } else {
+            unless (ok(rc == 1, "sync_to_start, with_sof: %zu - success!", i))
+            {
+                printf("# Error: %s\n", strerror(-rc));
+                break;
+            }
         }
         const char *s = sync_with_sof[i];
         const size_t u = sink_buffer.buffer.used;
@@ -330,6 +337,17 @@ main(UNUSED int argc, UNUSED char **argv)
     unless (ok(rc == -EILSEQ, "RFC1055 decode signals ILSEQ")) {
         printf("# errno: %s\n", strerror(-rc));
     }
+    unless (ok(source_buffer.buffer.offset - 1 == 0u,
+               "    error at the beginning"))
+    {
+        printf("# Actual buffer offset: %zu (wanted: %u)\n",
+               source_buffer.buffer.offset - 1, 0u);
+    }
+
+    rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);
+    unless (ok(rc == -EILSEQ, "RFC1055 decode signals ILSEQ again")) {
+        printf("# errno: %s\n", strerror(-rc));
+    }
     unless (ok(source_buffer.buffer.offset - 1 == 10u,
                "    error at 'ESC o'"))
     {
@@ -339,7 +357,8 @@ main(UNUSED int argc, UNUSED char **argv)
 
     octet_buffer_clear(&sink_buffer.buffer);
     rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);
-    unless (ok(rc == -EILSEQ, "RFC1055 decode signals ILSEQ again")) {
+    unless (ok(rc == -EILSEQ, "RFC1055 decode signals ILSEQ again and again"))
+    {
         printf("# errno: %s\n", strerror(-rc));
     }
     unless (ok(source_buffer.buffer.offset - 1 == 16u,
