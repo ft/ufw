@@ -240,7 +240,7 @@ main(UNUSED int argc, UNUSED char **argv)
 
     /* Load valid, classic RFC1055 encoded buffer into source */
     octet_buffer_add(&source_buffer.buffer, sync_to_start,
-                     sizeof(expect_with_sof));
+                     sizeof(sync_to_start));
 
     rfc1055_context_init(&rfc1055_classic, RFC1055_DEFAULT);
     for (size_t i = 0u; i < swos_n; ++i) {
@@ -269,7 +269,7 @@ main(UNUSED int argc, UNUSED char **argv)
     rfc1055_context_init(&rfc1055_with_sof, RFC1055_WITH_SOF);
     octet_buffer_clear(&source_buffer.buffer);
     octet_buffer_add(&source_buffer.buffer, sync_to_start,
-                     sizeof(expect_with_sof));
+                     sizeof(sync_to_start));
     for (size_t i = 0u; i < sws_n; ++i) {
         rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);
         if (sync_with_sof[i] == NULL) {
