@@ -332,6 +332,20 @@
 #define BIT_SET(container, mask) ((container) |= (mask))
 
 /**
+ * Set a number of bits in a container at an offset
+ *
+ * This sets all the bits from mask in container.
+ *
+ * @param container    Unsigned integer storage to modify
+ * @param mask         Unsigned integer mask of target bits
+ * @param offset       Unsigned integer offset for mask
+ *
+ * @return The modified value of container
+ * @sideeffects Modifies container as described.
+ */
+#define BIT_SETo(container, mask, offset) ((container) |= ((mask) << (offset)))
+
+/**
  * Clear a number of bits in a container
  *
  * This clears all the bits from mask in container.
