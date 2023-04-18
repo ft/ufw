@@ -3,6 +3,10 @@ if(__UFW_AddNanoPB)
 endif()
 set(__UFW_AddNanoPB 1)
 
+macro(define_nanopb_protoc nanopb_root)
+  set(NANOPB_PROTOC ${CMAKE_SOURCE_DIR}/${nanopb_root}/generator/protoc)
+endmacro(define_nanopb_protoc)
+
 macro(add_nanopb nanopb_root)
   option(nanopb_BUILD_RUNTIME
     "Build the headers and libraries needed at runtime"
@@ -13,6 +17,6 @@ macro(add_nanopb nanopb_root)
   option(nanopb_MSVC_STATIC_RUNTIME
     "Link static runtime libraries"
     OFF)
-  set(NANOPB_PROTOC ${CMAKE_SOURCE_DIR}/${nanopb_root}/generator/protoc)
+  define_nanopb_protoc(${nanopb_root})
   add_subdirectory(${nanopb_root})
 endmacro()
