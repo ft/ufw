@@ -2,6 +2,33 @@
   User-visible changes in ufw
 -------------------------------
 
+* v3.4.0 → v3.5.0 (released 2023-05-15):
+
+** New Features
+
+- nanopb: Allow defining NANOPB_PROTOC independent of add_subdirectory
+- bitops: Add BIT_SETo() macro to bit-operations
+
+** Bugfixes
+
+- rfc1055: encode: Handle -ENODATA from sources correctly
+- rfc1055: Make w/SOF decoder signal ILSEQ on missing delimiters
+- endpoints: Make instrumentable source/sinks send the right error codes
+
+** Miscellaneous
+
+- test,rfc1055: Fix buffer overflow in test suite
+
+** Diffstat:
+
+    cmake/modules/AddNanoPB.cmake  |   6 +-
+    include/ufw/bit-operations.h   |  14 +++
+    src/endpoints/instrumentable.c |   4 +-
+    src/rfc1055.c                  |   9 +-
+    test/t-rfc1055.c               | 151 ++++++++++++++++++++++++++++++++-
+    5 files changed, 175 insertions(+), 9 deletions(-)
+
+
 * v3.3.0 → v3.4.0 (released 2023-02-26):
 
 ** New Features
