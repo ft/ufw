@@ -84,7 +84,7 @@
 static inline uint16_t
 bf_swap16(uint16_t value)
 {
-#ifdef HAVE_COMPILER_BUILTIN_BSWAP16
+#if defined(HAVE_COMPILER_BUILTIN_BSWAP16) && defined(UFW_USE_BUILTIN_SWAP)
     return __builtin_bswap16(value);
 #else
     return (((value >> 8u) & 0xffu) | ((value & 0xffu) << 8u));
@@ -104,7 +104,7 @@ bf_swap16(uint16_t value)
 static inline uint32_t
 bf_swap32(uint32_t value)
 {
-#ifdef HAVE_COMPILER_BUILTIN_BSWAP32
+#if defined(HAVE_COMPILER_BUILTIN_BSWAP32) && defined(UFW_USE_BUILTIN_SWAP)
     return __builtin_bswap32(value);
 #else
     return ( ((value & 0xff000000ul) >> 24u)
@@ -127,7 +127,7 @@ bf_swap32(uint32_t value)
 static inline uint64_t
 bf_swap64(uint64_t value)
 {
-#ifdef HAVE_COMPILER_BUILTIN_BSWAP64
+#if defined(HAVE_COMPILER_BUILTIN_BSWAP64) && defined(UFW_USE_BUILTIN_SWAP)
     return __builtin_bswap64(value);
 #else
     return ( ((value & 0xff00000000000000ull) >> 56u)
