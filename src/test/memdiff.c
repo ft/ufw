@@ -321,7 +321,7 @@ wprint_word_hex(const void *memory, const void *aux, const size_t offset,
                 hexdigitprinter hexdigit, printableprinter printable)
 {
     const size_t bits_per_digit = 4u;
-    const size_t bits_per_byte = (size_t)BITS_PER_BYTE;
+    const size_t bits_per_byte = (size_t)UFW_BITS_PER_BYTE;
     const size_t bits_per_word = bits_per_byte * bytes;
     const size_t digitsteps = bits_per_byte / bits_per_digit;
     const size_t steps = bits_per_word / bits_per_byte;
