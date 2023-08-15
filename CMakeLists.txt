@@ -3,7 +3,8 @@ project(ufw C CXX)
 
 include(CheckIncludeFile)
 include(CheckSymbolExists)
-include(CheckTypeSize)
+
+include(UFWCompiler)
 
 include(CTest)
 enable_testing()
@@ -48,11 +49,7 @@ if (WITH_UNISTD_H)
   check_symbol_exists(write "unistd.h" UFW_HAVE_POSIX_WRITE)
 endif()
 
-check_type_size("uint8_t" UFW_UINT8_T_SIZE)
-if (UFW_UINT8_T_SIZE)
-    set(UINT8_T_SIZE ${UFW_UINT8_T_SIZE})
-    set(WITH_UINT8_T 1)
-endif()
+ufw_compiler_has_type(uint8_t WITH_UINT8_T)
 
 ufw_force_compat(force_compat)
 if (${force_compat} EQUAL 0)
