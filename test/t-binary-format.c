@@ -131,7 +131,7 @@ t_native_set_u16(void)
 
     p16 = bf_set_u16n((uint8_t*)m16, u16);
     ok(u16 == *m16, "Setting uint16_t memory in native order works");
-    ok(p16 == m16, "Setting uint16_t memory returns correct memory");
+    ok(p16 == m16 + 1, "Setting uint16_t memory returns correct memory");
 }
 
 static void
@@ -143,7 +143,7 @@ t_native_set_u32(void)
 
     p32 = bf_set_u32n((uint8_t*)m32, u32);
     ok(u32 == *m32, "Setting uint32_t memory in native order works");
-    ok(p32 == m32, "Setting uint32_t memory returns correct memory");
+    ok(p32 == m32 + 1, "Setting uint32_t memory returns correct memory");
 }
 
 static void
@@ -155,7 +155,7 @@ t_native_set_u64(void)
 
     p64 = bf_set_u64n((uint8_t*)m64, u64);
     ok(u64 == *m64, "Setting uint64_t memory in native order works");
-    ok(p64 == m64, "Setting uint64_t memory returns correct memory");
+    ok(p64 == m64 + 1, "Setting uint64_t memory returns correct memory");
 }
 
 static void
@@ -175,7 +175,7 @@ t_native_set_s16(void)
 
     p16 = bf_set_s16n((uint8_t*)m16, s16);
     ok(s16 == *m16, "Setting int16_t memory in native order works");
-    ok(p16 == m16, "Setting int16_t memory returns correct memory");
+    ok(p16 == m16 + 1, "Setting int16_t memory returns correct memory");
 }
 
 static void
@@ -187,7 +187,7 @@ t_native_set_s32(void)
 
     p32 = bf_set_s32n((uint8_t*)m32, s32);
     ok(s32 == *m32, "Setting int32_t memory in native order works");
-    ok(p32 == m32, "Setting int32_t memory returns correct memory");
+    ok(p32 == m32 + 1, "Setting int32_t memory returns correct memory");
 }
 
 static void
@@ -199,7 +199,7 @@ t_native_set_s64(void)
 
     p64 = bf_set_s64n((uint8_t*)m64, s64);
     ok(s64 == *m64, "Setting int64_t memory in native order works");
-    ok(p64 == m64, "Setting int64_t memory returns correct memory");
+    ok(p64 == m64 + 1, "Setting int64_t memory returns correct memory");
 }
 
 static void
@@ -219,7 +219,7 @@ t_native_set_f32(void)
 
     p32 = bf_set_f32n((uint8_t*)m32, f32);
     ok(f32 == *m32, "Setting float memory in native order works");
-    ok(p32 == m32, "Setting float memory returns correct memory");
+    ok(p32 == m32 + 1, "Setting float memory returns correct memory");
 }
 
 static void
@@ -231,7 +231,7 @@ t_native_set_f64(void)
 
     p64 = bf_set_f64n((uint8_t*)m64, f64);
     ok(f64 == *m64, "Setting double memory in native order works");
-    ok(p64 == m64, "Setting double memory returns correct memory");
+    ok(p64 == m64 + 1, "Setting double memory returns correct memory");
 }
 
 static void
@@ -321,7 +321,7 @@ t_big_set_u16(void)
     p16 = bf_set_u16b((uint8_t*)m16, u16);
     cmp_mem(m16, expect, sizeof(expect),
             "Setting uint16_t memory in big endian order works");
-    ok(p16 == m16, "Setting uint16_t memory returns correct memory");
+    ok(p16 == m16 + 1, "Setting uint16_t memory returns correct memory");
 }
 
 static void
@@ -335,7 +335,7 @@ t_big_set_u32(void)
     p32 = bf_set_u32b((uint8_t*)m32, u32);
     cmp_mem(m32, expect, sizeof(expect),
             "Setting uint32_t memory in big endian order works");
-    ok(p32 == m32, "Setting uint32_t memory returns correct memory");
+    ok(p32 == m32 + 1, "Setting uint32_t memory returns correct memory");
 }
 
 static void
@@ -350,7 +350,7 @@ t_big_set_u64(void)
     p64 = bf_set_u64b((uint8_t*)m64, u64);
     cmp_mem(m64, expect, sizeof(expect),
             "Setting uint64_t memory in big endian order works");
-    ok(p64 == m64, "Setting uint64_t memory returns correct memory");
+    ok(p64 == m64 + 1, "Setting uint64_t memory returns correct memory");
 }
 
 static void
@@ -372,7 +372,7 @@ t_big_set_s16(void)
     p16 = bf_set_s16b((uint8_t*)m16, s16);
     cmp_mem(m16, expect, sizeof(expect),
             "Setting int16_t memory in big endian order works");
-    ok(p16 == m16, "Setting int16_t memory returns correct memory");
+    ok(p16 == m16 + 1, "Setting int16_t memory returns correct memory");
 }
 
 static void
@@ -386,7 +386,7 @@ t_big_set_s32(void)
     p32 = bf_set_s32b((uint8_t*)m32, s32);
     cmp_mem(m32, expect, sizeof(expect),
             "Setting int32_t memory in big endian order works");
-    ok(p32 == m32, "Setting int32_t memory returns correct memory");
+    ok(p32 == m32 + 1, "Setting int32_t memory returns correct memory");
 }
 
 static void
@@ -401,7 +401,7 @@ t_big_set_s64(void)
     p64 = bf_set_s64b((uint8_t*)m64, s64);
     cmp_mem(m64, expect, sizeof(expect),
             "Setting int64_t memory in big endian order works");
-    ok(p64 == m64, "Setting int64_t memory returns correct memory");
+    ok(p64 == m64 + 1, "Setting int64_t memory returns correct memory");
 }
 
 static void
@@ -423,7 +423,7 @@ t_big_set_f32(void)
     p32 = bf_set_f32b((uint8_t*)m32, f32.f);
     cmp_mem(m32, expect, sizeof(expect),
             "Setting float memory in big endian order works");
-    ok(p32 == m32, "Setting float memory returns correct memory");
+    ok(p32 == m32 + 1, "Setting float memory returns correct memory");
 }
 
 static void
@@ -438,7 +438,7 @@ t_big_set_f64(void)
     p64 = bf_set_f64b((uint8_t*)m64, f64.f);
     cmp_mem(m64, expect, sizeof(expect),
             "Setting double memory in big endian order works");
-    ok(p64 == m64, "Setting double memory returns correct memory");
+    ok(p64 == m64 + 1, "Setting double memory returns correct memory");
 }
 
 static void
@@ -528,7 +528,7 @@ t_little_set_u16(void)
     p16 = bf_set_u16l((uint8_t*)m16, u16);
     cmp_mem(m16, expect, sizeof(expect),
             "Setting uint16_t memory in big endian order works");
-    ok(p16 == m16, "Setting uint16_t memory returns correct memory");
+    ok(p16 == m16 + 1, "Setting uint16_t memory returns correct memory");
 }
 
 static void
@@ -542,7 +542,7 @@ t_little_set_u32(void)
     p32 = bf_set_u32l((uint8_t*)m32, u32);
     cmp_mem(m32, expect, sizeof(expect),
             "Setting uint32_t memory in little endian order works");
-    ok(p32 == m32, "Setting uint32_t memory returns correct memory");
+    ok(p32 == m32 + 1, "Setting uint32_t memory returns correct memory");
 }
 
 static void
@@ -557,7 +557,7 @@ t_little_set_u64(void)
     p64 = bf_set_u64l((uint8_t*)m64, u64);
     cmp_mem(m64, expect, sizeof(expect),
             "Setting uint64_t memory in little endian order works");
-    ok(p64 == m64, "Setting uint64_t memory returns correct memory");
+    ok(p64 == m64 + 1, "Setting uint64_t memory returns correct memory");
 }
 
 static void
@@ -579,7 +579,7 @@ t_little_set_s16(void)
     p16 = bf_set_s16l((uint8_t*)m16, s16);
     cmp_mem(m16, expect, sizeof(expect),
             "Setting int16_t memory in little endian order works");
-    ok(p16 == m16, "Setting int16_t memory returns correct memory");
+    ok(p16 == m16 + 1, "Setting int16_t memory returns correct memory");
 }
 
 static void
@@ -593,7 +593,7 @@ t_little_set_s32(void)
     p32 = bf_set_s32l((uint8_t*)m32, s32);
     cmp_mem(m32, expect, sizeof(expect),
             "Setting int32_t memory in little endian order works");
-    ok(p32 == m32, "Setting int32_t memory returns correct memory");
+    ok(p32 == m32 + 1, "Setting int32_t memory returns correct memory");
 }
 
 static void
@@ -608,7 +608,7 @@ t_little_set_s64(void)
     p64 = bf_set_s64l((uint8_t*)m64, s64);
     cmp_mem(m64, expect, sizeof(expect),
             "Setting int64_t memory in little endian order works");
-    ok(p64 == m64, "Setting int64_t memory returns correct memory");
+    ok(p64 == m64 + 1, "Setting int64_t memory returns correct memory");
 }
 
 static void
@@ -630,7 +630,7 @@ t_little_set_f32(void)
     p32 = bf_set_f32l((uint8_t*)m32, f32.f);
     cmp_mem(m32, expect, sizeof(expect),
             "Setting float memory in little endian order works");
-    ok(p32 == m32, "Setting float memory returns correct memory");
+    ok(p32 == m32 + 1, "Setting float memory returns correct memory");
 }
 
 static void
@@ -645,7 +645,7 @@ t_little_set_f64(void)
     p64 = bf_set_f64l((uint8_t*)m64, f64.f);
     cmp_mem(m64, expect, sizeof(expect),
             "Setting double memory in little endian order works");
-    ok(p64 == m64, "Setting double memory returns correct memory");
+    ok(p64 == m64 + 1, "Setting double memory returns correct memory");
 }
 
 static void

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+TOPLEVEL=$(git rev-parse --show-toplevel)
+
+GUILE_BINARY="${GUILE_BINARY:-guile}"
+GUILE_LOAD_PATH="$TOPLEVEL/scheme${GUILE_LOAD_PATH:+:}$GUILE_LOAD_PATH"
+GUILE_LOAD_COMPILED_PATH="$TOPLEVEL/scheme${GUILE_COMPILED_LOAD_PATH:+:}$GUILE_COMPILED_LOAD_PATH"
+GUILE_AUTO_COMPILE=0
+
+for i in GUILE_LOAD_PATH GUILE_LOAD_COMPILED_PATH GUILE_AUTO_COMPILE; do
+    export "$i"
+done
+unset i
+
+exec "$GUILE_BINARY" "$TOPLEVEL/tools/make-binary-format.scm"
