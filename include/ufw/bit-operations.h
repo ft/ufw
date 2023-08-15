@@ -29,7 +29,7 @@
 #ifdef CHAR_BIT
 /** Number of bits in a byte. Most of the time, a byte is an octet (eight
  *  bits), but on some plattforms (notably DSPs) this is not the case. */
-#define UFW_BITS_PER_BYTE ((unsigned long int)CHAR_BIT)
+#define UFW_BITS_PER_BYTE CHAR_BIT
 #else
 #warning "Assuming UFW_BITS_PER_BYTE = 8"
 #define UFW_BITS_PER_BYTE 8ul
