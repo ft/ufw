@@ -2,6 +2,58 @@
   User-visible changes in ufw
 -------------------------------
 
+* v3.5.0 → v4.0.0 (released 2023-08-24):
+
+** Breaking compatibility
+
+- bit-operations.h: Rename BITS_PER_* macros to UFW_BITS_PER_* to avoid symbol
+  conflicts with other vendors using the same macro names.
+- bit-operations.h: Remove cast from UFW_BITS_PER_BYTE macro, to allow the use
+  of the macro in preprocessor conditions.
+- binary-format: The ‘bf_ieee754_f32’ and ‘bf_ieee754_f64’ are gone in favour
+  of ‘bf_convert32’ and ‘bf_convert64’, as well as ‘bf_convert16’.
+- binary-format: All buffer pointer arguments are now ‘void*’.
+- binary-format: All setter procedures ‘bf_set_*()’ now return ‘void*’; and
+  instead of returning the address of their buffer argument, they now return
+  the address of the piece of memory directly after the piece of memory that
+  was modified by the set operation.
+
+** New Features
+
+- Add ufw/meta.h to expose library version information.
+- Allow disabling the use of __builtin_bswapxx() even if detected, via CMake
+  option ‘UFW_USE_BUILTIN_SWAP’. The default of this option is ‘ON’.
+
+** Bugfixes
+
+- Fix possible architecture errors, due to misaligned word accesses in
+  ‘binary-format.h’.
+- Fix ‘uint8_t’ detection for ‘ti-arm’ toolchain. The detection mechanism in
+  CMake does not work for toolchains that are not LLVM or GCC. This by accident
+  yielded the correct outcome for the ‘ti-c2000’ toolchain (which does not
+  support ‘uint8_t’), but wrongly claimed the ‘ti-arm’ toolchain did not have
+  this type either.
+
+** Miscellaneous
+
+- The ‘binary-format.h’ module is now completely generated, to avoid oversights
+  due to its extremely mechanical nature of code. As a side-effect, now every
+  function has API documentation attached to it.
+
+** Diffstat:
+
+    CMakeLists.txt                  |   17 +-
+    cmake/modules/UFWCompiler.cmake |   34 +
+    include/ufw/binary-format.h     | 1162 ++++++++++++++++++++++++-------
+    include/ufw/bit-operations.h    |   50 +-
+    include/ufw/meta.h              |   24 +
+    src/test/memdiff.c              |    2 +-
+    test/t-binary-format.c          |   48 +-
+    tools/make-binary-format        |   15 +
+    tools/make-binary-format.scm    |  509 ++++++++++++++
+    9 files changed, 1558 insertions(+), 303 deletions(-)
+
+
 * v3.4.0 → v3.5.0 (released 2023-05-15):
 
 ** New Features
