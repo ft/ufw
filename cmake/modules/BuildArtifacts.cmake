@@ -162,5 +162,6 @@ function(build_artifacts source)
   endif()
   add_custom_target(${basename}-formats ALL DEPENDS ${artifacts})
   install(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${source} ${artifacts}
-          DESTINATION latest)
+    DESTINATION latest
+    COMPONENT ${UFW_INSTALL_COMPONENT})
 endfunction(build_artifacts)

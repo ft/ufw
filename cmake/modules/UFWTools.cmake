@@ -33,6 +33,15 @@ define_property(
   BRIEF_DOCS "Linkerscript used for defined board."
   FULL_DOCS "Linkerscript used for defined board.")
 
+# The default value of this is for backward compatibility. This may change to
+# "ufw-install" at another major release.
+set(UFW_INSTALL_COMPONENT ufw-git-install CACHE STRING
+  "CMake Installation Component name for ufw installation items.")
+
+function(ufw_install)
+  install(${ARGV} COMPONENT ${UFW_INSTALL_COMPONENT})
+endfunction()
+
 function(ufw_set_property target prop value)
   set_target_properties(${target} PROPERTIES UFW_${prop} ${value})
 endfunction()

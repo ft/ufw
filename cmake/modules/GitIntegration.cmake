@@ -3,6 +3,8 @@ if(__UFW_GitIntegration)
 endif()
 set(__UFW_GitIntegration 1)
 
+include(UFWTools)
+
 function(gitint_options prefix outvar)
   set(GENERATE_OPTIONS)
 
@@ -176,7 +178,7 @@ foreach (srcfile ${PARSED_ARGS_FILES})
   execute_process(COMMAND cmake -E copy_if_different \${_REALPATH_} \${_OFILE_})
 endforeach()
 "
-  COMPONENT ufw-git-install)
+  COMPONENT ${UFW_INSTALL_COMPONENT})
   endif()
 
   install(CODE "
@@ -207,6 +209,6 @@ foreach (srcfile ${PARSED_ARGS_FILES})
                   \${GITINTNAME}\${EXTENSION})
 endforeach()
 "
-  COMPONENT ufw-git-install)
+  COMPONENT ${UFW_INSTALL_COMPONENT})
 
 endmacro(gitint_install)
