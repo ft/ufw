@@ -3,6 +3,8 @@ if(__UFW_BuildArtifacts)
 endif()
 set(__UFW_BuildArtifacts 1)
 
+include(UFWTools)
+
 function(build_artifacts source)
   cmake_parse_arguments(PA "" "SDK_DIR" "VARIANTS;WITHOUT_SECTIONS" ${ARGN})
   get_filename_component(basename ${source} NAME_WE)
