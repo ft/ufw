@@ -2,6 +2,23 @@
   User-visible changes in ufw
 -------------------------------
 
+* v4.0.0 → v4.1.0 (released 2023-09-13):
+
+** New Features
+
+- cmake: Add ufw_install() function that uses the same CMake install component
+  as gitint_install().
+- zephyr,cmake: Support endianness in Zephyr toolchain support.
+
+** Diffstat:
+
+    cmake/modules/BuildArtifacts.cmake | 5 ++++-
+    cmake/modules/GitIntegration.cmake | 6 ++++--
+    cmake/modules/SetupTargetCPU.cmake | 5 +++++
+    cmake/modules/UFWTools.cmake       | 9 +++++++++
+    4 files changed, 22 insertions(+), 3 deletions(-)
+
+
 * v3.5.0 → v4.0.0 (released 2023-08-24):
 
 ** Breaking compatibility
