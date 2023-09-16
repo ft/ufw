@@ -6,6 +6,40 @@ set(__UFW_Test 1)
 include(InitialiseToolchain)
 include(Newlib)
 
+set(UFW_TEST_USE_GUILE_TAP ON CACHE BOOL
+  "Use guile-tap's tap-harness program, if available.")
+
+function(ufw_test_a_harness name pkg program)
+  find_program(found ${name})
+  if (NOT (${found} STREQUAL "found-NOTFOUND"))
+    execute_process(
+      COMMAND ${found} --version
+      OUTPUT_VARIABLE UFW_HARNESS_VERSION
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      ERROR_QUIET
+      RESULT_VARIABLE UFW_HARNESS_VERSION_RESULT)
+    if ("${UFW_HARNESS_VERSION_RESULT}" STREQUAL "0")
+      message(STATUS "TAP harness: ${found} (${UFW_HARNESS_VERSION})")
+      set(${program} ${found} PARENT_SCOPE)
+      return()
+    endif()
+  endif()
+  message(STATUS "${name} (from ${pkg}) NOT found.")
+  set(${program} NOTFOUND PARENT_SCOPE)
+endfunction()
+
+function(ufw_test_harness harness_type)
+  if (${UFW_TEST_USE_GUILE_TAP})
+    ufw_test_a_harness(tap-harness guile-tap program)
+    if (NOT ("${program}" STREQUAL "NOTFOUND"))
+      set(${harness_type} ${program} PARENT_SCOPE)
+      return()
+    endif()
+  endif()
+  ufw_test_a_harness(prove perl program)
+  set(${harness_type} ${program} PARENT_SCOPE)
+endfunction()
+
 function(ufw_test_qemu arch with_qemu)
   find_program(found_qemu qemu-system-${arch})
   if (${found_qemu} STREQUAL "found_qemu-NOTFOUND")
@@ -94,18 +128,25 @@ function(ufw_test_init)
     set(can_run_tests False)
   endif()
 
+  ufw_test_harness(harness)
+
   set(__UFW_TEST_CAN_RUN_TESTS ${can_run_tests} PARENT_SCOPE)
   set(__UFW_TEST_CAN_LINK_TESTS ${can_link_tests} PARENT_SCOPE)
   set(__UFW_TEST_BUILD ${test_build} PARENT_SCOPE)
+  set(__UFW_TEST_TAP_HARNESS ${harness} PARENT_SCOPE)
 endfunction()
 
 function(ufw_add_test_runner)
   if (NOT ${__UFW_TEST_CAN_RUN_TESTS})
     return()
   endif()
+  if (${__UFW_TEST_TAP_HARNESS} STREQUAL NOTFOUND)
+    message(STATUS "No TAP harness detected, cannot execute test-suite.")
+    return()
+  endif()
   cmake_parse_arguments(PA "" "NAME" "TESTS" ${ARGN})
   ufw_get_test_runner(runner)
   add_test(
     NAME ${PA_NAME}
-    COMMAND prove --verbose --merge --color --exec "${runner}" ${PA_TESTS})
+    COMMAND ${__UFW_TEST_TAP_HARNESS} --verbose --exec "${runner}" ${PA_TESTS})
 endfunction()
