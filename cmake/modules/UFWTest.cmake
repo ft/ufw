@@ -12,6 +12,17 @@ set(UFW_TEST_USE_GUILE_TAP ON CACHE BOOL
 set(UFW_TEST_HARNESS_PROGRAM "" CACHE STRING
   "TAP test harness program name.")
 
+# Feature set of UFW_TEST_HARNESS_PROGRAM. We assume, that your harness is
+# either a drop in replacement for Perl's prove programe or guile-tap's
+# tap-harness program. The default is perl-prove, which gets overridden when
+# the _PROGRAM parameter is empty and the automatic detection runs.
+set(UFW_TEST_HARNESS_TYPE "perl-prove" CACHE STRING
+  "TAP test harness type; either perl-prove or guile-tap-harness.")
+
+# This works when guile-tap's tap-harness program is available and in use.
+set(UFW_TEST_OUTPUT_PREFIX "${CMAKE_INSTALL_PREFIX}/tests" CACHE PATH
+  "Directory to place test TAP output.")
+
 function(ufw_test_a_harness name pkg program)
   set(found found-NOTFOUND)
   find_program(found ${name})
@@ -32,16 +43,20 @@ function(ufw_test_a_harness name pkg program)
   set(${program} "" PARENT_SCOPE)
 endfunction()
 
-function(ufw_test_harness harness_type)
+function(ufw_test_harness _program _type)
   if (${UFW_TEST_USE_GUILE_TAP})
     ufw_test_a_harness(tap-harness guile-tap program)
     if (NOT ("${program}" STREQUAL ""))
-      set(${harness_type} ${program} PARENT_SCOPE)
+      set(${_program} ${program} PARENT_SCOPE)
+      set(${_type} guile-tap-harness PARENT_SCOPE)
       return()
     endif()
   endif()
   ufw_test_a_harness(prove perl program)
-  set(${harness_type} ${program} PARENT_SCOPE)
+  if (NOT ("${program}" STREQUAL ""))
+    set(${_type} perl-prove PARENT_SCOPE)
+  endif()
+  set(${_program} ${program} PARENT_SCOPE)
 endfunction()
 
 function(ufw_test_qemu arch with_qemu)
@@ -133,10 +148,12 @@ function(ufw_test_init)
   endif()
 
   if ("${UFW_TEST_HARNESS_PROGRAM}" STREQUAL "")
-    ufw_test_harness(harness)
+    ufw_test_harness(harness type)
     set(UFW_TEST_HARNESS_PROGRAM ${harness} PARENT_SCOPE)
+    set(UFW_TEST_HARNESS_TYPE ${type} PARENT_SCOPE)
   else()
-    message(STATUS "TAP harness: ${UFW_TEST_HARNESS_PROGRAM}")
+    message(STATUS
+      "TAP harness: ${UFW_TEST_HARNESS_PROGRAM} (${UFW_TEST_HARNESS_TYPE})")
   endif()
 
   set(__UFW_TEST_CAN_RUN_TESTS ${can_run_tests} PARENT_SCOPE)
@@ -152,9 +169,21 @@ function(ufw_add_test_runner)
     message(STATUS "No TAP harness detected, cannot execute test-suite.")
     return()
   endif()
+
+  set(cmd)
+  if ("${UFW_TEST_HARNESS_TYPE}" STREQUAL "guile-tap-harness")
+    list(APPEND cmd ${UFW_TEST_HARNESS_PROGRAM} --verbose)
+  elseif ("${UFW_TEST_HARNESS_TYPE}" STREQUAL "perl-prove")
+    list(APPEND cmd ${UFW_TEST_HARNESS_PROGRAM} --verbose --merge)
+  else()
+    message(FATAL_ERROR
+      "Invalid UFW_TEST_HARNESS_TYPE: ${UFW_TEST_HARNESS_TYPE}")
+  endif()
+
   cmake_parse_arguments(PA "" "NAME" "TESTS" ${ARGN})
   ufw_get_test_runner(runner)
-  add_test(
-    NAME ${PA_NAME}
-    COMMAND ${UFW_TEST_HARNESS_PROGRAM} --verbose --exec "${runner}" ${PA_TESTS})
+
+  list(APPEND cmd --exec "${runner}" ${PA_TESTS})
+
+  add_test(NAME ${PA_NAME} COMMAND ${cmd})
 endfunction()
