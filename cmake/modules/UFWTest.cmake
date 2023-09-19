@@ -10,6 +10,7 @@ set(UFW_TEST_USE_GUILE_TAP ON CACHE BOOL
   "Use guile-tap's tap-harness program, if available.")
 
 function(ufw_test_a_harness name pkg program)
+  set(found found-NOTFOUND)
   find_program(found ${name})
   if (NOT (${found} STREQUAL "found-NOTFOUND"))
     execute_process(
