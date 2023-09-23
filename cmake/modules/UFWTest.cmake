@@ -23,6 +23,10 @@ set(UFW_TEST_HARNESS_TYPE "perl-prove" CACHE STRING
 set(UFW_TEST_OUTPUT_PREFIX "${CMAKE_INSTALL_PREFIX}/tests" CACHE PATH
   "Directory to place test TAP output.")
 
+# This requires a TAP harness that supports this, like guile-tap's tap-harness.
+set(UFW_TEST_HARNESS_LOGDATA OFF CACHE BOOL
+  "Make TAP harness log test data to UFW_TEST_OUTPUT_PREFIX.")
+
 function(ufw_test_a_harness name pkg program)
   set(found found-NOTFOUND)
   find_program(found ${name})
@@ -173,6 +177,9 @@ function(ufw_add_test_runner)
   set(cmd)
   if ("${UFW_TEST_HARNESS_TYPE}" STREQUAL "guile-tap-harness")
     list(APPEND cmd ${UFW_TEST_HARNESS_PROGRAM} --verbose)
+    if (UFW_TEST_HARNESS_LOGDATA)
+      list(APPEND cmd --log-dir ${UFW_TEST_OUTPUT_PREFIX})
+    endif()
   elseif ("${UFW_TEST_HARNESS_TYPE}" STREQUAL "perl-prove")
     list(APPEND cmd ${UFW_TEST_HARNESS_PROGRAM} --verbose --merge)
   else()
