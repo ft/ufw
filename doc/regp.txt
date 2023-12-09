@@ -1,0 +1,315 @@
+                   The Register Protocol (Version 0)
+
+
+0. Abstract
+
+The ufw library includes a  fairly flexible implementation of a register
+table, that supports  primitives like block-read and  block-write to ac-
+cess the contents of the registers  contained within the table. This do-
+cument specifies a  simple protocol that can be used  to transfer blocks
+of memory in  and out of a system. The  register table implementation is
+the main target for  this protocol to be used as  a memory backend. None
+of the specification requires this, however.
+
+
+1. Overview
+
+This protocol is currently in  the development phase (version 0). There-
+fore the specification may change in unexpected ways without notice. The
+main purpose of the protocol is to read and write blocks of memory via a
+communication link. This link can  take multiple forms, with this speci-
+fication detailing usage  in serial links (USB, UART,  RS232, RS485), as
+well as TCP links.
+
+The protocol uses units  of frames, that consist of a  header and an op-
+tional payload section. Checksums are used to ensure the validity of da-
+ta in each of  these two sections. These checksums are  part of the hea-
+der. The payload checksum  will be set to all-zero bits  in case a frame
+does not contain payload. The atom of the protocol is an octet (a string
+of eight bits).  The octet-order of the protocol is  network order (big-
+endian).
+
+The primitives of this protocol are:
+
+  - Block Read
+  - Block Write
+
+The protocol is designed in a way,  so that decoding any of its messages
+and its semantic  meaning does not require information  from other parts
+of the communication.
+
+The supported address space is 32  bits. Payload atom-sizes can be eight
+and sixteen bits. The protocol is not optimised for minimal overhead but
+for ease of implementation.
+
+
+2. Message Structure
+
+The general message structure is this:
+
+
+    f  e  d  c  b  a  9  8  7  6  5  4  3  2  1  0   [Header]
+  +------------------------------------------------+
+  |   Meta    || Options  ||   Type   ||  Version  |    0   0
+  +------------------------------------------------+
+  |                Sequence Number                 |    2   1
+  +------------------------------------------------+
+  |         Target Address (Upper Word)            |    4   2
+  |         Target Address (Lower Word)            |    6   3
+  +------------------------------------------------+
+  |            Block Size (Upper Word)             |    8   4
+  |            Block Size (Lower Word)             |   10   5
+  +------------------------------------------------+
+  |               Checksum (Header)                |   12   6
+  +------------------------------------------------+
+  |               Checksum (Payload)               |   14   7
+  +------------------------------------------------+
+
+    7  6  5  4  3  2  1  0  7  6  5  4  3  2  1  0   [Optional Payload]
+  +------------------------------------------------+
+  |  Payload Octet 0      || Payload Octet 1       |
+  +------------------------------------------------+
+  |  Payload Octet 2      || Payload Octet 3       |
+  +------------------------------------------------+
+  |                      ....                      |
+  +------------------------------------------------+
+  |  Payload Octet n-1    |
+  +-----------------------+
+
+
+The version field always carries the  version of this specification as a
+four bit integer.  The type field encodes one of  the protocol's message
+types:
+
+   |------------------+----------------|
+   |  Mnemonic        |  Numeric Code  |
+   |------------------+----------------|
+   |  READ-REQUEST    |          0000  |
+   |  READ-RESPONSE   |          0001  |
+   |  WRITE-REQUEST   |          0010  |
+   |  WRITE-RESPONSE  |          0011  |
+   |  META            |          1111  |
+   |------------------+----------------|
+
+
+The header contains four option Bits:
+
+   |------------------+----------------|
+   |  Mnemonic        |  Numeric Code  |
+   |------------------+----------------|
+   |  WORD-SIZE-16    |          0001  |
+   |------------------+----------------|
+
+All unused numeric type codes  are reserved. The unspecified option bits
+are reserved. The four bits of the meta field are unused in request mes-
+sages (and reserved), and used as a response code (see below) in respon-
+se frames. All reserved bits shall be set to zero.
+
+
+2.1 Message Types
+
+2.1.1 READ-REQUEST (0000)
+
+A read-request asks  the communication partner to return a  block of its
+memory, specified by a start address and a block-size. This request car-
+ries no payload.
+
+2.1.2 READ-RESPONSE (0001)
+
+This is the  response that corresponds to a READ-REQUEST  message. If no
+error condition  was hit and an  ACKNOWLEDGE response code is  used, the
+payload carries  exactly the  block of memory  requested in  the corres-
+ponding READ-REQUEST message.
+
+2.1.3 WRITE-REQUEST (0010)
+
+A read-request asks  the communication partner to store a  block of data
+in its memory,  specified by a start address, a  block-size, and the raw
+data to store. The payload of this  message type carries the raw data to
+be stored in the remote memory.
+
+See the "Response  Codes" section below for how other  outcoms are enco-
+ded.
+
+2.1.4 WRITE-RESPONSE (0011)
+
+If the data from a corresponding WRITE-REQUEST was stored in the remote
+memory, this message is returned with the ACKNOWLEDGE response code.
+
+See the "Response  Codes" section below for how other  outcoms are enco-
+ded.
+
+2.1.5 META Message (1111)
+
+In META messages, only the meta field is used. The semantics are as fol-
+lows:
+
+   |---------------+----------------|
+   |  Mnemonic     |  Numeric Code  |
+   |---------------+----------------|
+   |  Reserved     |          0000  |
+   |  EHEADERENC   |          0001  |  Header failed to parse.
+   |  EHEADERCRC   |          0010  |  Header failed to verify crc.
+   |---------------+----------------|
+
+The rationale  here is, that if  parsing the header field  fails (either
+invalid  header encoding,  or failure  to verify  the header  checksum),
+there is no sensible way to respond within the rest of the protocol.
+
+This type of message is used as a  best effort do try and let the commu-
+nication partner know  that something basic went wrong  with an incoming
+message.
+
+The use of this message type may be extended in the future.
+
+
+2.2 Option Bits
+
+2.2.1 WORD-SIZE-16 (0001)
+
+This option indicates that the word  width for the remote memory is six-
+teen  bits instead  of the  default eight  bits (octet)  semantics. This
+means that every  memory address stores sixteen bits, and  has an impact
+on the blocksize parameter, which  also encodes sixteen words instead of
+octets.
+
+
+3. Response Codes
+
+   |------------------+----------------|
+   |  Mnemonic        |  Numeric Code  |
+   |------------------+----------------|
+   |  ACKNOWLEDGE     |          0000  |
+   |  EWORDSIZE       |          0001  |
+   |  EPAYLOADCRC     |          0010  |
+   |  EPAYLOADSIZE    |          0011  |
+   |  ERXOVERFLOW     |          0100  |
+   |  ETXOVERFLOW     |          0101  |
+   |  EBUSY           |          0110  |
+   |  EUNMAPPED       |          0111  |
+   |  EACCESS         |          1000  |
+   |  ERANGE          |          1001  |
+   |  EINVALID        |          1010  |
+   |  EIO             |          1011  |
+   |------------------+----------------|
+
+
+3.1 Responses in Detail
+
+All responses shall mirror all parts  of the requests header, except the
+type field (which needs  to be set to the correct  response for the ini-
+tiating request),  checksum fields (for  obvious reasons), and  the meta
+field (that  carries the response  code). Some responses  carry payload.
+This section details the behaviour of all response codes.
+
+3.1.1 ACKNOWLEDGE (0000)
+
+The ACKNOWLEDGE  response indicates positive  outcome of a  request. The
+response carries payload if the message type demands it (write responses
+do not, read responses obviously do not).
+
+3.1.2 EWORDSIZE (0001)
+
+This is  emitted by a  communication partner if  the value of  the WORD-
+SIZE-16 option bit is incompatible by the partner's exposed memory. This
+response carries no payload.
+
+3.1.3 EPAYLOADCRC (0010)
+
+If a request's  payload CRC check fails, this response  is emitted. This
+response carries no payload.
+
+3.1.4 EPAYLOADSIZE (0011)
+
+If plausibility  checks with  regards to a  frame's payload  size fails,
+this response is emitted. This response carries no payload.
+
+3.1.5 ERXOVERFLOW (0100)
+
+This response  is caused by frames  that are too large  for the communi-
+cation partner to receive. The payload  of this response shall contain a
+32 bit  unsigned integer,  reflecting the  largest supported  message in
+octets.
+
+3.1.6 ETXOVERFLOW (0101)
+
+This response  is caused by frames  that are too large  for the communi-
+cation partner to prepare for transmission. The payload of this response
+shall contain  a 32  bit unsigned integer,  reflecting the  largest sup-
+ported message in octets.
+
+3.1.7 EBUSY (0110)
+
+If a communication partner is out of resources, preventing it to process
+an incoming  request, it is  allowed to emit  this response kind.  It is
+possible to retry the same request  in the future. This response carries
+no payload.
+
+3.1.8 EUNMAPPED (0111)
+
+If a  request touches memory that  is not mapped to  actual storage, the
+request cannot be fulfilled and  this response is generated. The payload
+of this  response, shall be  a 32  bit unsigned integer,  indicating the
+first address in the request's range that touches unmapped memory.
+
+3.1.9 EACCESS (1000)
+
+If a request attempts to write to read-only memory, this response is ge-
+nerated. The payload of this response,  shall be a 32 bit unsigned inte-
+ger, indicating  the first address  in the  request's range that  is not
+readable.
+
+3.1.10 ERANGE (1001)
+
+The communication partner is allowed to  put limitations in the range of
+values it allows clients to put into its memory. The payload of this re-
+sponse, shall  be a 32 bit  unsigned integer, indicating the  address of
+the first piece  of memory in the request's range  that failed these ru-
+les.
+
+3.1.11 EINVALID (1010)
+
+This response code is similar to ERANGE, but it whereas ERANGE indicates
+that the datum is of the  correct type generally, this response kind in-
+dicates that the bit  sequence is not just out of  range but invalid for
+this piece of memory. One possible use of this response, for example, is
+to disallow users to store a  not-a-number value in an address that sto-
+res a floating point value. The payload  of this response, shall be a 32
+bit unsigned integer, indicating the address of the first piece of memo-
+ry in the request's range that failed these rules.
+
+3.1.11 EIO (1011)
+
+This code indicates  an input output error on the  remote end, resulting
+in some  of the addressed block  to be inaccessible. This  response does
+not carry any payload.
+
+
+4. Checksum Variant
+
+The checksum used in the header of the protocol's frames, is the CRC-16
+variant known as CRC-16-ARC (also known as CRC-16-IBM, CRC-16-ANSI). It
+is also used in protocols like Modbus and USB. It used the polynomial:
+
+    x¹⁶ + x¹⁵ + x² + 1     (0x8005)
+
+The initial value for the calculation is zero.
+
+
+5. Supported Transports
+
+This section specifies required channel adaptations for supported trans-
+ports. This is mainly concerned with framing in serial octet streams.
+
+
+5.1 Classic Serial Communication (USB, UART, RS232, RS485)
+
+In classic serial communication channels, the mandated framing format is
+SLIP as  specified in RFC1055,  in its classical form  without start-of-
+frame octets.
+
+
+5.2 Transmission Control Protocol (TCP)
+
+In TCP channels, the mandated framing format is length prefixing with
+variable-length integers as specified in Google's protobuf format.
