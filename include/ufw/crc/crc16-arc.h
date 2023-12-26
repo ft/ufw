@@ -1,0 +1,21 @@
+/*
+ * Copyright (c) 2023 micro framework workers, All rights reserved.
+ *
+ * Terms for redistribution and use can be found in LICENCE.
+ */
+
+#ifndef INC_UFW_CRC_CRC16_ARC_H_19c5e461
+#define INC_UFW_CRC_CRC16_ARC_H_19c5e461
+
+#include <stddef.h>
+#include <stdint.h>
+
+#define CRC16_ARC_INITIAL 0x0000u
+
+uint16_t ufw_crc16_arc(uint16_t, const void*, size_t);
+uint16_t ufw_buffer_crc16_arc(const void*, size_t);
+
+uint16_t ufw_crc16_arc_u16(uint16_t, const uint16_t*, size_t);
+uint16_t ufw_buffer_crc16_arc_u16(const uint16_t*, size_t);
+
+#endif /* INC_UFW_CRC_CRC16_ARC_H_19c5e461 */
