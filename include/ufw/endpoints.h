@@ -102,6 +102,7 @@ ssize_t sink_put_chunk(Sink*, const void*, size_t);
  * Generic Sources and Sinks
  */
 
+extern Source source_empty;
 extern Source source_zero;
 extern Sink sink_null;
 

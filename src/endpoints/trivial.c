@@ -13,6 +13,8 @@
 
 #include <string.h>
 
+#include <ufw/compat/errno.h>
+
 #include <ufw/compiler.h>
 #include <ufw/endpoints.h>
 
@@ -29,5 +31,12 @@ run_sink_null(UNUSED void *driver, UNUSED const void *data, size_t n)
     return n;
 }
 
-Source source_zero = CHUNK_SOURCE_INIT(run_source_zero, NULL);
-Sink   sink_null   = CHUNK_SINK_INIT(  run_sink_null,   NULL);
+static ssize_t
+run_source_empty(UNUSED void *driver, UNUSED void *data, UNUSED size_t n)
+{
+    return -ENODATA;
+}
+
+Source source_empty = CHUNK_SOURCE_INIT(run_source_empty, NULL);
+Source source_zero  = CHUNK_SOURCE_INIT(run_source_zero,  NULL);
+Sink   sink_null    = CHUNK_SINK_INIT(  run_sink_null,    NULL);
