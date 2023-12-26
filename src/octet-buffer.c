@@ -84,6 +84,21 @@ octet_buffer_consume(OctetBuffer *b, void *data, size_t size)
     return 0;
 }
 
+ssize_t
+octet_buffer_consume_at_most(OctetBuffer *b, void *data, size_t size)
+{
+    const size_t rest = b->used - b->offset;
+    if (rest == 0u) {
+        return -ENODATA;
+    }
+
+    const size_t n = size > rest ? rest : size;
+    memcpy(data, b->data + b->offset, n);
+    b->offset += n;
+
+    return (ssize_t)n;
+}
+
 int
 octet_buffer_rewind(OctetBuffer *b)
 {

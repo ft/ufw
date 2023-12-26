@@ -9,6 +9,8 @@
 
 #include <stddef.h>
 
+#include <ufw/compat/ssize-t.h>
+
 typedef struct ufw_octet_buffer {
     unsigned char *data;
     size_t size;
@@ -30,6 +32,7 @@ int octet_buffer_space(OctetBuffer*, void*, size_t);
 
 int octet_buffer_add(OctetBuffer*, const void*, size_t);
 int octet_buffer_consume(OctetBuffer*, void*, size_t);
+ssize_t octet_buffer_consume_at_most(OctetBuffer*, void*, size_t);
 
 int octet_buffer_rewind(OctetBuffer*);
 void octet_buffer_clear(OctetBuffer*);
