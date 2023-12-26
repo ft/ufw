@@ -31,6 +31,27 @@ read_from_buffer(void *driver, void *data, size_t n)
 }
 
 static ssize_t
+read_from_chunks(void *driver, void *data, size_t n)
+{
+    OctetChunks *source = driver;
+
+next:
+    if (source->active >= source->chunks) {
+        return -ENODATA;
+    }
+
+    const ssize_t rc = octet_buffer_consume_at_most(
+        source->chunk + source->active, data, n);
+
+    if (rc == -ENODATA) {
+        source->active += 1u;
+        goto next;
+    }
+
+    return rc;
+}
+
+static ssize_t
 write_to_buffer(void *driver, const void *data, size_t n)
 {
     OctetBuffer *b = driver;
@@ -48,6 +69,12 @@ void
 source_from_buffer(Source *instance, OctetBuffer *buffer)
 {
     chunk_source_init(instance, read_from_buffer, buffer);
+}
+
+void
+source_from_chunks(Source *instance, OctetChunks *chunks)
+{
+    chunk_source_init(instance, read_from_chunks, chunks);
 }
 
 void

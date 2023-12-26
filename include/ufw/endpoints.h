@@ -125,6 +125,7 @@ void sink_to_filedesc(Sink*, int*);
  */
 
 void source_from_buffer(Source*, OctetBuffer*);
+void source_from_chunks(Source*, OctetChunks*);
 void sink_to_buffer(Sink*, OctetBuffer*);
 
 /*
