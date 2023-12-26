@@ -20,14 +20,7 @@ static ssize_t
 read_from_buffer(void *driver, void *data, size_t n)
 {
     OctetBuffer *b = driver;
-    ssize_t value = n;
-
-    const ssize_t rc = octet_buffer_consume(b, data, n);
-    if (rc < 0) {
-        value = rc;
-    }
-
-    return value;
+    return octet_buffer_consume_at_most(b, data, n);
 }
 
 static ssize_t
