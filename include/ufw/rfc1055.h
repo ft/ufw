@@ -14,7 +14,9 @@
 #include <ufw/bit-operations.h>
 #include <ufw/endpoints.h>
 
-#define RFC1055_WORST_CASE(n) (((n) * 2u) + 2u)
+#define RFC1055_WORST_CASE(n,with_sof) (((n) * 2u) + ((with_sof) ? 2u : 1u))
+#define RFC1055_WORST_CLASSIC(n) RFC1055_WORST_CASE(n, false)
+#define RFC1055_WORST_WITHSOF(n) RFC1055_WORST_CASE(n, true)
 
 #define RFC1055_WITH_SOF BITL(0)
 #define RFC1055_DEFAULT  0u
