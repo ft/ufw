@@ -16,6 +16,7 @@ list(APPEND test_names
   t-length-prefix
   t-hexdump
   t-persistent-storage
+  t-register-protocol
   t-register-table
   t-register-table-persistent-storage
   t-rfc1055

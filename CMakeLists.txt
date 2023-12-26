@@ -82,6 +82,7 @@ set(__ufw_sources src/allocator.c
                   src/persistent-storage.c
                   src/registers/core.c
                   src/registers/utilities.c
+                  src/register-protocol.c
                   src/rfc1055.c
                   src/ring-buffer-iter.c
                   src/variable-length-integer.c)
