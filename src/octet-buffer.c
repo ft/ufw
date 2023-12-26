@@ -41,6 +41,12 @@ octet_buffer_avail(OctetBuffer *b)
     return (b->size - b->used);
 }
 
+size_t
+octet_buffer_rest(OctetBuffer *b)
+{
+    return (b->used - b->offset);
+}
+
 int
 octet_buffer_use(OctetBuffer *b, void *data, size_t size)
 {

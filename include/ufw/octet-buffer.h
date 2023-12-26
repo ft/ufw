@@ -36,5 +36,6 @@ void octet_buffer_clear(OctetBuffer*);
 void octet_buffer_repeat(OctetBuffer*);
 
 size_t octet_buffer_avail(OctetBuffer*);
+size_t octet_buffer_rest(OctetBuffer*);
 
 #endif /* INC_UFW_OCTET_BUFFER_H */
