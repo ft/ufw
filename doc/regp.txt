@@ -60,6 +60,7 @@ The general message structure is this:
   |            Block Size (Upper Word)             |    8   4
   |            Block Size (Lower Word)             |   10   5
   +------------------------------------------------+
+  +------------------------------------------------+
   |               Checksum (Header)                |   12   6
   +------------------------------------------------+
   |               Checksum (Payload)               |   14   7
@@ -94,16 +95,22 @@ types:
 
 The header contains four option Bits:
 
-   |------------------+----------------|
-   |  Mnemonic        |  Numeric Code  |
-   |------------------+----------------|
-   |  WORD-SIZE-16    |          0001  |
-   |------------------+----------------|
+   |--------------------+----------------|
+   |  Mnemonic          |  Numeric Code  |
+   |--------------------+----------------|
+   |  WORD-SIZE-16      |          0001  |
+   |  WITH-HEADER-CRC   |          0010  |
+   |  WITH-PAYLOAD-CRC  |          0100  |
+   |--------------------+----------------|
 
 All unused numeric type codes  are reserved. The unspecified option bits
 are reserved. The four bits of the meta field are unused in request mes-
 sages (and reserved), and used as a response code (see below) in respon-
 se frames. All reserved bits shall be set to zero.
+
+Note that the existence of the  Checksum fields is governed by the value
+of option  bits. See the  "Option Bits" and "Supported  Transports" sec-
+tions below for details.
 
 
 2.1 Message Types
@@ -172,6 +179,21 @@ teen  bits instead  of the  default eight  bits (octet)  semantics. This
 means that every  memory address stores sixteen bits, and  has an impact
 on the blocksize parameter, which  also encodes sixteen words instead of
 octets.
+
+2.2.2 WITH-HEADER-CRC (0010)
+
+This indicates that the message carries  a header checksum. This must be
+the case, unless the underlying channel can make similar guarantees.
+
+The value of  this option bit is mandated by  the "Supported Transports"
+section below.
+
+2.2.3 WITH-PAYLOAD-CRC (0100)
+
+This indicates that the message carries  a payload checksum. If there is
+no payload to a message, this  option bit shall be unset. Otherwise, the
+value  of this  bit is  mandated by  the "Supported  Transports" section
+below.
 
 
 3. Response Codes
@@ -308,8 +330,16 @@ In classic serial communication channels, the mandated framing format is
 SLIP as  specified in RFC1055,  in its classical form  without start-of-
 frame octets.
 
+The WITH-HEADER-CRC option bit shall be enabled in these channels.
+
+The WITH-PAYLOAD-CRC option bit shall be enabled with messages that car-
+ry payload.
+
 
 5.2 Transmission Control Protocol (TCP)
 
-In TCP channels, the mandated framing format is length prefixing with
+In TCP  channels, the mandated  framing format is length  prefixing with
 variable-length integers as specified in Google's protobuf format.
+
+Furthermore, the WITH-HEADER-CRC and  WITH-PAYLOAD-CRC option bits shall
+be disabled for all messages in TCP channels.
