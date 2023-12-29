@@ -17,6 +17,7 @@
 
 #include <ufw/compiler.h>
 #include <ufw/toolchain.h>
+
 #include <ufw/test/tap.h>
 
 static long unsigned int test_count = 0u;
@@ -32,7 +33,7 @@ tap_result(const bool result,
 {
     test_count++;
     if (result == false) {
-        fputs("not ", stdout);
+        (void)fputs("not ", stdout);
     }
 
     printf("ok %lu - ", test_count);
@@ -96,7 +97,7 @@ ufw_test_cmp_mem(const char *file, long unsigned int line,
         printf("#   expr: (memcmp(%s, %s, %lu) == 0) => false\n#\n",
                an, bn, (unsigned long int)n);
         printf("# Expressions: a: (%s) b: (%s)\n#\n", an, bn);
-        fputs("# memdiff:\n#\n", stdout);
+        (void)fputs("# memdiff:\n#\n", stdout);
         size_t differences = memdiff(a, b, n);
         printf("#\n# Found differences in %lu of %lu byte(s).\n#\n",
                (unsigned long int)differences, (unsigned long int)n);

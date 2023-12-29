@@ -24,12 +24,15 @@ extern "C" {
 static inline bool
 is_end_of_areas(RegisterArea *a)
 {
-    if (a->read != NULL || a->write != NULL)
+    if (a->read != NULL || a->write != NULL) {
         return false;
-    if (a->size != 0 || a->base != 0)
+    }
+    if (a->size != 0 || a->base != 0) {
         return false;
-    if (a->mem != NULL)
+    }
+    if (a->mem != NULL) {
         return false;
+    }
     return true;
 }
 

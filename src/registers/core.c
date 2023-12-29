@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <ufw/compiler.h>
 #include <ufw/binary-format.h>
+#include <ufw/compiler.h>
 #include <ufw/register-table.h>
 
 #include "internal.h"
@@ -22,31 +22,31 @@
  */
 
 /* Ser/Des */
-static bool rds_invalid_ser(const RegisterValue, RegisterAtom*);
+static bool rds_invalid_ser(RegisterValue, RegisterAtom*);
 static bool rds_invalid_des(const RegisterAtom*, RegisterValue*);
-static bool rds_u16_ser(const RegisterValue, RegisterAtom*);
+static bool rds_u16_ser(RegisterValue, RegisterAtom*);
 static bool rds_u16_des(const RegisterAtom*, RegisterValue*);
-static bool rds_u32_ser(const RegisterValue, RegisterAtom*);
+static bool rds_u32_ser(RegisterValue, RegisterAtom*);
 static bool rds_u32_des(const RegisterAtom*, RegisterValue*);
-static bool rds_u64_ser(const RegisterValue, RegisterAtom*);
+static bool rds_u64_ser(RegisterValue, RegisterAtom*);
 static bool rds_u64_des(const RegisterAtom*, RegisterValue*);
-static bool rds_s16_ser(const RegisterValue, RegisterAtom*);
+static bool rds_s16_ser(RegisterValue, RegisterAtom*);
 static bool rds_s16_des(const RegisterAtom*, RegisterValue*);
-static bool rds_s32_ser(const RegisterValue, RegisterAtom*);
+static bool rds_s32_ser(RegisterValue, RegisterAtom*);
 static bool rds_s32_des(const RegisterAtom*, RegisterValue*);
-static bool rds_s64_ser(const RegisterValue, RegisterAtom*);
+static bool rds_s64_ser(RegisterValue, RegisterAtom*);
 static bool rds_s64_des(const RegisterAtom*, RegisterValue*);
-static bool rds_f32_ser(const RegisterValue, RegisterAtom*);
+static bool rds_f32_ser(RegisterValue, RegisterAtom*);
 static bool rds_f32_des(const RegisterAtom*, RegisterValue*);
 
 /* Validators */
-static inline bool rv_check_max_value(const RegisterValueU, const RegisterValue);
-static inline bool rv_check_min_value(const RegisterValueU, const RegisterValue);
-static inline bool rv_check_min(RegisterEntry*, const RegisterValue);
-static inline bool rv_check_max(RegisterEntry*, const RegisterValue);
-static inline bool rv_check_range(RegisterEntry*, const RegisterValue);
-static inline bool rv_check_cb(RegisterEntry*, const RegisterValue);
-static bool rv_validate(RegisterEntry*, const RegisterValue);
+static inline bool rv_check_max_value(RegisterValueU, RegisterValue);
+static inline bool rv_check_min_value(RegisterValueU, RegisterValue);
+static inline bool rv_check_min(RegisterEntry*, RegisterValue);
+static inline bool rv_check_max(RegisterEntry*, RegisterValue);
+static inline bool rv_check_range(RegisterEntry*, RegisterValue);
+static inline bool rv_check_cb(RegisterEntry*, RegisterValue);
+static bool rv_validate(RegisterEntry*, RegisterValue);
 
 /* Initialisation utilities */
 static AreaHandle reg_count_areas(RegisterArea*);
@@ -125,7 +125,7 @@ reg_min(size_t a, size_t b)
 }
 
 static bool
-rds_invalid_ser(const RegisterValue v, RegisterAtom *r)
+rds_invalid_ser(const RegisterValue v, RegisterAtom *r) /* NOLINT */
 {
     (void)v;
     (void)r;
@@ -242,8 +242,9 @@ static bool
 rds_f32_ser(const RegisterValue v, RegisterAtom *r)
 {
     assert(v.type == REG_TYPE_FLOAT32);
-    if ((v.value.f32 != 0.) && (isnormal(v.value.f32) == false))
+    if ((v.value.f32 != 0.) && (isnormal(v.value.f32) == false)) {
         return false;
+    }
     bf_set_f32l((uint_least8_t*)r, v.value.f32);
     return true;
 }
@@ -260,7 +261,7 @@ rds_f32_des(const RegisterAtom *r, RegisterValue *v)
 
 const RegisterSerDes rds_serdes[] = {
     [REG_TYPE_INVALID] = { rds_invalid_ser, rds_invalid_des, 0 },
-    [REG_TYPE_UINT16] = { rds_u16_ser, rds_u16_des, rs(uint16_t) },
+    [REG_TYPE_UINT16] = { rds_u16_ser, rds_u16_des, rs(uint16_t) }, /* NOLINT */
     [REG_TYPE_UINT32] = { rds_u32_ser, rds_u32_des, rs(uint32_t) },
     [REG_TYPE_UINT64] = { rds_u64_ser, rds_u64_des, rs(uint64_t) },
     [REG_TYPE_SINT16] = { rds_s16_ser, rds_s16_des, rs(int16_t) },
@@ -347,8 +348,9 @@ rv_check_cb(RegisterEntry *e, const RegisterValue v)
 static bool
 rv_validate(RegisterEntry *e, const RegisterValue v)
 {
-    if (e->type != v.type)
+    if (e->type != v.type) {
         return false;
+    }
 
     switch (e->check.type) {
     case REGV_TYPE_TRIVIAL:
@@ -373,11 +375,13 @@ reg_range_touches(RegisterEntry *e, RegisterAddress addr, RegisterOffset n)
      * it is above the range */
     const RegisterOffset size = rds_serdes[e->type].size;
 
-    if ((e->address + size) <= addr)
+    if ((e->address + size) <= addr) {
         return -1;
+    }
 
-    if ((addr + n) <= e->address)
+    if ((addr + n) <= e->address) {
         return 1;
+    }
 
     return 0;
 }
@@ -419,10 +423,12 @@ reg_taint_in_range(RegisterTable *t, RegisterAddress addr, RegisterOffset n)
 {
     for (RegisterOffset i = 0ul; i < t->entries; ++i) {
         int touch = reg_range_touches(&t->entry[i], addr, n);
-        if (touch > 0)
+        if (touch > 0) {
             return;
-        if (touch < 0)
+        }
+        if (touch < 0) {
             continue;
+        }
         register_touch(t, i);
     }
 }
@@ -470,12 +476,12 @@ register_area_is_readable(const RegisterArea *a)
 static bool
 ra_addr_is_part_of(RegisterArea *a, RegisterAddress addr)
 {
-    if (a->base > addr)
+    if (a->base > addr) {
         return false;
-
-    if ((a->base + a->size) <= addr)
+    }
+    if ((a->base + a->size) <= addr) {
         return false;
-
+    }
     return true;
 }
 
@@ -512,8 +518,9 @@ reg_entry_is_in_memory(RegisterTable *t, RegisterEntry *e)
     for (AreaHandle an = 0ul; an < t->areas; ++an) {
         RegisterArea *area = &t->area[an];
         if (ra_reg_is_part_of(area, e)) {
-            if (ra_reg_fits_into(area, e) == false)
+            if (ra_reg_fits_into(area, e) == false) {
                 return false;
+            }
 
             e->area = area;
             e->offset = e->address - area->base;
@@ -534,20 +541,21 @@ ra_range_touches(RegisterArea *a, RegisterAddress addr, RegisterOffset n)
 {
     /* Return -1 if area is below range; 0 if it is within the range and 1 if
      * it is above the range */
-    if ((a->base + a->size) <= addr)
+    if ((a->base + a->size) <= addr) {
         return -1;
-
-    if ((addr + n) <= a->base)
+    }
+    if ((addr + n) <= a->base) {
         return 1;
-
+    }
     return 0;
 }
 static RegisterHandle
 ra_first_entry_of_next(RegisterTable *t, RegisterArea *a, RegisterHandle start)
 {
     for (RegisterHandle i = start; i < t->entries; ++i) {
-        if (ra_addr_is_part_of(a, t->entry[i].address) == false)
+        if (ra_addr_is_part_of(a, t->entry[i].address) == false) {
             return i;
+        }
     }
     return t->entries;
 }
@@ -569,10 +577,12 @@ ra_writeable(RegisterTable *t, RegisterAddress addr, RegisterOffset n)
      */
     for (AreaHandle i = 0ul; i < t->areas; ++i) {
         int touch = ra_range_touches(&t->area[i], addr, n);
-        if (touch < 0)
+        if (touch < 0) {
             continue;
-        if (touch > 0)
+        }
+        if (touch > 0) {
             break;
+        }
         if (register_area_is_writeable(&t->area[i]) == false) {
             rv.code = REG_ACCESS_READONLY;
             rv.address = addr;
@@ -600,12 +610,14 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr,
         RegisterOffset rlen;
 
         /* Skip entries before block start */
-        if (addr > end)
+        if (addr > end) {
             continue;
+        }
 
         /* Terminate for entries after last */
-        if (e->address > last)
+        if (e->address > last) {
             break;
+        }
 
         /*
          * What we now need to do is this: Which parts of the entry does the
@@ -687,8 +699,9 @@ static bool
 reg_is_hexstr(const char *s, const size_t n)
 {
     for (size_t idx = 0u; idx < n; ++idx) {
-        if (isxdigit((int)s[idx]) == false)
+        if (isxdigit((int)s[idx]) == false) {
             return false;
+        }
     }
 
     return true;
@@ -734,11 +747,13 @@ reg_atom_from_hexstr(const char *s, const size_t n)
 static bool
 need_to_load_default(const RegisterEntry *e)
 {
-    if (e->area->write == NULL)
+    if (e->area->write == NULL) {
         return false;
+    }
 
-    if (BIT_ISSET(e->area->flags, REG_AF_SKIP_DEFAULTS))
+    if (BIT_ISSET(e->area->flags, REG_AF_SKIP_DEFAULTS)) {
         return false;
+    }
 
     return true;
 }
@@ -746,7 +761,7 @@ need_to_load_default(const RegisterEntry *e)
 /* Public API */
 
 RegisterInit
-register_init(RegisterTable *t)
+register_init(RegisterTable *t) /* NOLINT */
 {
     RegisterInit rv = REG_INIT_RESULT_INIT;
     RegisterAddress previous;
@@ -1125,12 +1140,14 @@ register_block_read(RegisterTable *t, RegisterAddress addr,
         return rv;
     }
 
-    if (n == 0ull)
+    if (n == 0ull) {
         return rv;
+    }
 
     rv = register_block_touches_hole(t, addr, n);
-    if (rv.code != REG_ACCESS_SUCCESS)
+    if (rv.code != REG_ACCESS_SUCCESS) {
         return rv;
+    }
 
     return register_block_read_unsafe(t, addr, n, buf);
 }
@@ -1148,23 +1165,27 @@ register_block_write(RegisterTable *t, RegisterAddress addr,
     }
 
     /* Zero-length writes finish trivially. */
-    if (n == 0ull)
+    if (n == 0ull) {
         return rv;
+    }
 
     rv = ra_writeable(t, addr, n);
-    if (rv.code != REG_ACCESS_SUCCESS)
+    if (rv.code != REG_ACCESS_SUCCESS) {
         return rv;
+    }
 
     /* Make sure the block write instruction does not want to write into
      * an address that does not map to an area in the register table. */
 
     rv = register_block_touches_hole(t, addr, n);
-    if (rv.code != REG_ACCESS_SUCCESS)
+    if (rv.code != REG_ACCESS_SUCCESS) {
         return rv;
+    }
 
     rv = ra_malformed_write(t, addr, n, buf);
-    if (rv.code != REG_ACCESS_SUCCESS)
+    if (rv.code != REG_ACCESS_SUCCESS) {
         return rv;
+    }
 
     /* If the previous validation steps succeeded, it is safe to push this
      * chunk of memory into the referenced register table. Since we checked for
@@ -1310,8 +1331,9 @@ register_mcopy(RegisterTable *t, AreaHandle dst, AreaHandle src)
 bool
 register_value_compare(const RegisterValue *a, const RegisterValue *b)
 {
-    if (a->type != b->type)
+    if (a->type != b->type) {
         return false;
+    }
 
     switch (a->type) {
     case REG_TYPE_UINT16:
@@ -1517,8 +1539,9 @@ register_foreach_in(RegisterTable *t,
         startreg = find_reg(t, 0, t->entries - 1u, addr);
     }
 
-    if (startreg.valid == false)
+    if (startreg.valid == false) {
         return rv;
+    }
 
     return reg_iterate(t, startreg.handle, addr + off - 1u, f, arg);
 }

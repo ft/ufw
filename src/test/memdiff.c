@@ -33,9 +33,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <ufw/bit-operations.h>
 #include <ufw/compiler.h>
 #include <ufw/toolchain.h>
+
+#include <ufw/bit-operations.h>
+
 #include <ufw/test/tap.h>
 
 struct diffstate {
@@ -183,8 +185,9 @@ diffprecontext(struct diffstate *diff, struct difference *A)
 static void
 diffpostcontext(struct diffstate *diff, struct difference *A)
 {
-    if (diff->size < diff->columns || diff->size < diff->position)
+    if (diff->size < diff->columns || diff->size < diff->position) {
         return;
+    }
 
     const size_t distance =
         nextline(diff->size - diff->columns, diff->columns)
@@ -279,10 +282,11 @@ static size_t
 pp(UNUSED const void *a, UNUSED const void *b, UNUSED size_t offset,
    unsigned char ch)
 {
-    if (isprint(ch) && (isspace(ch) == false))
+    if (isprint(ch) && (isspace(ch) == false)) {
         putchar(ch);
-    else
+    } else {
         putchar('.');
+    }
     return 0u;
 }
 
@@ -316,7 +320,7 @@ diffoverline(const void *a, const void *b, size_t offset, size_t n,
 }
 
 static size_t
-wprint_word_hex(const void *memory, const void *aux, const size_t offset,
+wprint_word_hex(const void *memory, const void *aux, const size_t offset, /* NOLINT */
                 const size_t bytes, size_t columns,
                 hexdigitprinter hexdigit, printableprinter printable)
 {
@@ -328,15 +332,17 @@ wprint_word_hex(const void *memory, const void *aux, const size_t offset,
     size_t count = 0u;
     size_t step, pad;
 
-    if (bytes > columns)
+    if (bytes > columns) {
         columns = bytes;
+    }
 
     const unsigned char *ptr = memory;
     ptr += offset;
     /* Print hexadecimal data dump */
     for (step = 0u; step < steps; ++step) {
-        if (step > 0 && (step % 8) == 0)
+        if (step > 0 && (step % 8) == 0) {
             putchar(' ');
+        }
         for (size_t j = digitsteps; j > 0; --j) {
             count += hexdigit(memory, aux, offset + step, *ptr, j);
         }
@@ -348,8 +354,9 @@ wprint_word_hex(const void *memory, const void *aux, const size_t offset,
         size_t rest = columns - bytes;
         size_t spaces = step + rest;
         for (pad = step; pad < spaces; ++pad) {
-            if (pad > 0 && (pad % 8) == 0)
+            if (pad > 0 && (pad % 8) == 0) {
                 putchar(' ');
+            }
             for (size_t j = digitsteps; j > 0; --j) {
                 putchar(' ');
             }
@@ -358,12 +365,13 @@ wprint_word_hex(const void *memory, const void *aux, const size_t offset,
         }
     }
     /* Print printable-characters after data dump, similar to hexdump */
-    fputs(" | ", stdout);
+    (void)fputs(" | ", stdout);
     ptr = memory;
     ptr += offset;
     for (step = 0u; step < bytes; ++step) {
-        if (step > 0 && (step % 8) == 0)
+        if (step > 0 && (step % 8) == 0) {
             putchar(' ');
+        }
         count += printable(memory, aux, offset + step, *ptr);
         ptr++;
     }
@@ -371,12 +379,13 @@ wprint_word_hex(const void *memory, const void *aux, const size_t offset,
     if (bytes < columns) {
         size_t rest = step + columns - bytes;
         for (pad = step; pad < rest; ++pad) {
-            if (pad > 0 && (pad % 8) == 0)
+            if (pad > 0 && (pad % 8) == 0) {
                 putchar(' ');
+            }
             putchar(' ');
         }
     }
-    fputs(" |\n", stdout);
+    (void)fputs(" |\n", stdout);
     return count;
 }
 

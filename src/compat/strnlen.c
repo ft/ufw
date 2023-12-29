@@ -20,13 +20,15 @@
 #include <stddef.h>
 #include <ufw/compat/strings.h>
 
+#ifndef UFW_COMPAT_HAVE_STRNLEN
 size_t
 strnlen(const char *str, size_t maxlen)
 {
 	const char *cp;
 
-	for (cp = str; maxlen != 0 && *cp != '\0'; cp++, maxlen--)
-		;
+	for (cp = str; maxlen != 0 && *cp != '\0'; cp++, maxlen--) {
+        }
 
 	return (size_t)(cp - str);
 }
+#endif /* !UFW_COMPAT_HAVE_STRNLEN */

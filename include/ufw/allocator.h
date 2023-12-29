@@ -38,21 +38,21 @@ void block_free(BlockAllocator*, void*);
 
 #define MAKE_GENERIC_BLOCKALLOC(_driver, _alloc, _free, _blocksize) \
     { .type = UFW_ALLOC_GENERIC,                                    \
-      .blocksize = _blocksize,                                      \
-      .driver = _driver,                                            \
-      .alloc.generic = _alloc,                                      \
-      .free = _free }
+      .blocksize = (_blocksize),                                    \
+      .driver = (_driver),                                          \
+      .alloc.generic = (_alloc),                                    \
+      .free = (_free) }
 
 #define MAKE_SLAB_BLOCKALLOC(_driver, _alloc, _free, _blocksize) \
     { .type = UFW_ALLOC_SLAB,                                    \
-      .blocksize = _blocksize,                                   \
-      .driver = _driver,                                         \
-      .alloc.slab = _alloc,                                      \
-      .free = _free }
+      .blocksize = (_blocksize),                                 \
+      .driver = (_driver),                                       \
+      .alloc.slab = (_alloc),                                    \
+      .free = (_free) }
 
 #define MAKE_STDHEAD_BLOCKALLOC(_blocksize) \
     { .type = UFW_ALLOC_GENERIC,            \
-      .blocksize = _blocksize,              \
+      .blocksize = (_blocksize),            \
       .driver = NULL,                       \
       .alloc.generic = ufw_malloc,          \
       .free = ufw_mfree }

@@ -26,7 +26,7 @@ rimpl_fprintf(void *dst, const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    vfprintf(dst, fmt, args);
+    (void)vfprintf(dst, fmt, args);
     va_end(args);
 }
 
@@ -245,8 +245,9 @@ register_init_print(void *fh, const char *prefix, const RegisterInit result)
 char *
 register_accesscode_to_string(RegisterAccessCode code)
 {
-    if (code > REG_ACCESS_CODE_MAXIDX)
+    if (code > REG_ACCESS_CODE_MAXIDX) {
         return "<INVALID-REGISTER-ACCESS-CODE>";
+    }
 
     static char *map[] = {
         IDX2STR(REG_ACCESS_SUCCESS),
@@ -265,8 +266,9 @@ register_accesscode_to_string(RegisterAccessCode code)
 char *
 register_initcode_to_string(RegisterInitCode code)
 {
-    if (code > REG_INIT_CODE_MAXIDX)
+    if (code > REG_INIT_CODE_MAXIDX) {
         return "<INVALID-REGISTER-INIT-CODE>";
+    }
 
     static char *map[] = {
         IDX2STR(REG_INIT_SUCCESS),
@@ -288,8 +290,9 @@ register_initcode_to_string(RegisterInitCode code)
 char *
 register_registertype_to_string(RegisterType type)
 {
-    if (type > REG_TYPE_MAXIDX)
+    if (type > REG_TYPE_MAXIDX) {
         return "<INVALID-REGISTER-TYPE>";
+    }
 
     static char *map[] = {
         IDX2STR(REG_TYPE_INVALID),
@@ -308,8 +311,9 @@ register_registertype_to_string(RegisterType type)
 char *
 register_validatortype_to_string(RegisterValidatorType type)
 {
-    if (type > REGV_TYPE_MAXIDX)
+    if (type > REGV_TYPE_MAXIDX) {
         return "<INVALID-VALIDATOR-TYPE>";
+    }
 
     static char *map[] = {
         IDX2STR(REGV_TYPE_TRIVIAL),

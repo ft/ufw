@@ -17,9 +17,9 @@
 
 #include <ufw/toolchain.h>
 
-#include <stdint.h>
-#include <stddef.h>
 #include <limits.h>
+#include <stddef.h>
+#include <stdint.h>
 
 /* Outer #if */
 #ifdef WITH_SYS_TYPES_H

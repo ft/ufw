@@ -219,24 +219,24 @@ typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
 /* Area Macros */
 
 #define MAKE_CUSTOM_AREA(READ,WRITE,ADDR,SIZE,FLAGS)  \
-    { .read = READ,                                   \
-      .write = WRITE,                                 \
-      .flags = FLAGS,                                 \
-      .base = ADDR,                                   \
-      .size = SIZE,                                   \
-      .mem = NULL }
+    { .read  = (READ),                                \
+      .write = (WRITE),                               \
+      .flags = (FLAGS),                               \
+      .base  = (ADDR),                                \
+      .size  = (SIZE),                                \
+      .mem   = NULL }
 
 #define CUSTOM_AREA(R,W,A,S) MAKE_CUSTOM_AREA(R,W,A,S,REG_AF_RW)
 #define CUSTOM_AREA_RO(R,A,S) MAKE_CUSTOM_AREA(R,NULL,A,S,REG_AF_READABLE)
 #define CUSTOM_AREA_WO(W,A,S) MAKE_CUSTOM_AREA(NULL,W,S,REG_AF_WRITEABLE)
 
 #define MAKE_MEMORY_AREA(ADDR,SIZE,FLAGS)   \
-    { .read = reg_mem_read,                 \
+    { .read  = reg_mem_read,                \
       .write = reg_mem_write,               \
-      .flags = FLAGS,                       \
-      .base = ADDR,                         \
-      .size = SIZE,                         \
-      .mem = (RegisterAtom[SIZE]) { 0 } }
+      .flags = (FLAGS),                     \
+      .base  = (ADDR),                      \
+      .size  = (SIZE),                      \
+      .mem   = (RegisterAtom[SIZE]) { 0 } }
 
 #define MEMORY_AREA(A,S) MAKE_MEMORY_AREA(A,S,REG_AF_RW)
 #define MEMORY_AREA_RO(A,S) MAKE_MEMORY_AREA(A,S,REG_AF_READABLE)
@@ -252,41 +252,41 @@ typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
     .name = #IDX
 #else
 #define REGCOMMON(IDX,ADDR,TYPE,MEMBER,DEFAULT) \
-    .type = TYPE,                               \
-    .default_value.MEMBER = DEFAULT,            \
-    .address = ADDR,                            \
+    .type = (TYPE),                             \
+    .default_value.MEMBER = (DEFAULT),          \
+    .address = (ADDR),                          \
     .name = NULL
 #endif
 
 #define MAKE_REGISTERx(IDX,ADDR,TYPE,MEMBER,DEFAULT,USR)        \
     [IDX] = { REGCOMMON(IDX,ADDR,TYPE,MEMBER,DEFAULT),          \
               .check.type = REGV_TYPE_TRIVIAL,                  \
-              .user = USR }
+              .user = (USR) }
 
 #define MAKE_MIN_REGISTERx(IDX,ADDR,TYPE,MEMBER,DEFAULT,MIN,USR)        \
     [IDX] = { REGCOMMON(IDX,ADDR,TYPE,MEMBER,DEFAULT),                  \
               .check.type = REGV_TYPE_MIN,                              \
-              .check.arg.min.MEMBER = MIN,                              \
-              .user = USR }
+              .check.arg.min.MEMBER = (MIN),                            \
+              .user = (USR) }
 
 #define MAKE_MAX_REGISTERx(IDX,ADDR,TYPE,MEMBER,DEFAULT,MAX, USR)   \
     [IDX] = { REGCOMMON(IDX,ADDR,TYPE,MEMBER,DEFAULT),              \
               .check.type = REGV_TYPE_MAX,                          \
-              .check.arg.max.MEMBER = MAX,                          \
-              .user = USR }
+              .check.arg.max.MEMBER = (MAX),                        \
+              .user = (USR) }
 
 #define MAKE_RANGE_REGISTERx(IDX,ADDR,TYPE,MEMBER,DEFAULT,MIN,MAX,USR)  \
     [IDX] = { REGCOMMON(IDX,ADDR,TYPE,MEMBER,DEFAULT),                  \
               .check.type = REGV_TYPE_RANGE,                            \
-              .check.arg.range.min.MEMBER = MIN,                        \
-              .check.arg.range.max.MEMBER = MAX,                        \
-              .user = USR }
+              .check.arg.range.min.MEMBER = (MIN),                      \
+              .check.arg.range.max.MEMBER = (MAX),                      \
+              .user = (USR) }
 
 #define MAKE_VALIDATOR_REGISTERx(IDX,ADDR,TYPE,MEMBER,DEFAULT,FNC,USR)  \
     [IDX] = { REGCOMMON(IDX,ADDR,TYPE,MEMBER,DEFAULT),                  \
               .check.type = REGV_TYPE_CALLBACK,                         \
-              .check.arg.cb = FNC,                                      \
-              .user = USR }
+              .check.arg.cb = (FNC),                                    \
+              .user = (USR) }
 
 #define MAKE_REGISTER(IDX,ADDR,TYPE,MEMBER,DEFAULT)     \
     MAKE_REGISTERx(IDX,ADDR,TYPE,MEMBER,DEFAULT,NULL)
@@ -397,7 +397,7 @@ RegisterAccess reg_mem_write(RegisterArea*, const RegisterAtom*,
                              RegisterOffset, RegisterOffset);
 
 RegisterAccess register_set(RegisterTable*, RegisterHandle,
-                            const RegisterValue);
+                            RegisterValue);
 RegisterAccess register_get(RegisterTable*, RegisterHandle,
                             RegisterValue*);
 RegisterAccess register_default(RegisterTable*, RegisterHandle,

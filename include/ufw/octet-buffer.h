@@ -25,21 +25,27 @@ typedef struct ufw_octet_chunks {
 } OctetChunks;
 
 #define OCTET_BUFFER_INIT(DATA, SIZE, LENGTH, OFFSET) { \
-        .data = DATA,                                   \
-        .size = SIZE,                                   \
-        .used = LENGTH,                                 \
-        .offset = OFFSET }
+        .data = (DATA),                                 \
+        .size = (SIZE),                                 \
+        .used = (LENGTH),                               \
+        .offset = (OFFSET) }
 
 #define OCTET_BUFFER(DATA, SIZE) { \
-        .data = DATA,              \
-        .size = SIZE,              \
-        .used = SIZE,              \
+        .data = (DATA),            \
+        .size = (SIZE),            \
+        .used = (SIZE),            \
+        .offset = 0u }
+
+#define OCTET_BUFFER_EMPTY(DATA, SIZE) { \
+        .data = (DATA),                  \
+        .size = (SIZE),                  \
+        .used = 0u,                      \
         .offset = 0u }
 
 #define OCTET_CHUNKS(VAR) {                     \
-        .chunks = sizeof(VAR)/sizeof(*VAR),     \
+        .chunks = sizeof(VAR)/sizeof(*(VAR)),   \
         .active = 0u,                           \
-        .chunk = VAR                            }
+        .chunk = (VAR)                          }
 
 int octet_buffer_set(OctetBuffer*, void*, size_t, size_t, size_t);
 void octet_buffer_null(OctetBuffer*);
