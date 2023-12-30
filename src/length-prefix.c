@@ -249,3 +249,17 @@ lenp_buffer_from_source(Source *source, OctetBuffer *b)
 
     return rc;
 }
+
+ssize_t
+lenp_decode_source_to_sink(Source *source, Sink *sink)
+{
+    uint64_t len = 0u;
+    {
+        const int rc = varint_u64_from_source(source, &len);
+        if (rc < 0) {
+            return (ssize_t)rc;
+        }
+    }
+
+    return sts_n(source, sink, len);
+}

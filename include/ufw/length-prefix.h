@@ -44,4 +44,6 @@ ssize_t lenp_chunks_to_sink(Sink*, OctetChunks*);
 ssize_t lenp_memory_from_source(Source*, void*, size_t);
 ssize_t lenp_buffer_from_source(Source*, OctetBuffer*);
 
+ssize_t lenp_decode_source_to_sink(Source*, Sink*);
+
 #endif /* INC_UFW_LENGTH_PREFIX_H */
