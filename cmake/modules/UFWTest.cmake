@@ -190,7 +190,11 @@ function(ufw_add_test_runner)
   cmake_parse_arguments(PA "" "NAME" "TESTS" ${ARGN})
   ufw_get_test_runner(runner)
 
-  list(APPEND cmd --exec "${runner}" ${PA_TESTS})
+  if ("${runner}" STREQUAL "")
+    list(APPEND cmd ${PA_TESTS})
+  else()
+    list(APPEND cmd --exec "${runner}" ${PA_TESTS})
+  endif()
 
   add_test(NAME ${PA_NAME} COMMAND ${cmd})
 endfunction()
