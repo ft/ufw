@@ -224,6 +224,10 @@ tiating request),  checksum fields (for  obvious reasons), and  the meta
 field (that  carries the response  code). Some responses  carry payload.
 This section details the behaviour of all response codes.
 
+Response codes  other than ACKNOWLEDGE,  that do carry a  payload, shall
+unset the WORD-SIZE-16 option bit and  specify the size of their payload
+in terms of octet semantics.
+
 3.1.1 ACKNOWLEDGE (0000)
 
 The ACKNOWLEDGE  response indicates positive  outcome of a  request. The
