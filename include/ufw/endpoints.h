@@ -7,6 +7,7 @@
 #ifndef INC_UFW_SOURCES_AND_SINKS_H
 #define INC_UFW_SOURCES_AND_SINKS_H
 
+#include <stdbool.h>
 #include <stddef.h>
 
 #include <ufw/compat/ssize-t.h>
@@ -174,9 +175,14 @@ void sink_to_buffer(Sink*, OctetBuffer*);
  */
 
 #define INSTRUMENTABLE_ERROR_AT_COUNT BITLL(0)
+#define INSTRUMENTABLE_ENABLE_TRACE   BITLL(1)
 
 typedef struct ufw_instrumentable_buffer {
     uint64_t flags;
+    struct {
+        size_t read;
+        size_t write;
+    } count;
     struct {
         int number;
         size_t at;
@@ -184,6 +190,7 @@ typedef struct ufw_instrumentable_buffer {
     OctetBuffer buffer;
 } InstrumentableBuffer;
 
+void instrumentable_set_trace(InstrumentableBuffer*, bool);
 void instrumentable_no_error(InstrumentableBuffer*);
 void instrumentable_error_at(InstrumentableBuffer*, size_t, int);
 void instrumentable_source(Source*, InstrumentableBuffer*);
