@@ -29,7 +29,9 @@
  * return -EINVAL.
  */
 
+#include <stdbool.h>
 #include <stddef.h>
+#include <string.h>
 
 #include <ufw/compat/errno.h>
 #include <ufw/compat/ssize-t.h>
@@ -42,6 +44,7 @@ octet_source_init(Source *instance, OctetSource source, void *driver)
     instance->kind = DATA_KIND_OCTET;
     instance->source.octet = source;
     instance->driver = driver;
+    instance->ext.getbuffer = NULL;
 }
 
 void
@@ -50,6 +53,7 @@ chunk_source_init(Source *instance, ChunkSource source, void *driver)
     instance->kind = DATA_KIND_CHUNK;
     instance->source.chunk = source;
     instance->driver = driver;
+    instance->ext.getbuffer = NULL;
 }
 
 void
@@ -58,6 +62,7 @@ octet_sink_init(Sink *instance, OctetSink sink, void *driver)
     instance->kind = DATA_KIND_OCTET;
     instance->sink.octet = sink;
     instance->driver = driver;
+    instance->ext.getbuffer = NULL;
 }
 
 void
@@ -66,6 +71,7 @@ chunk_sink_init(Sink *instance, ChunkSink sink, void *driver)
     instance->kind = DATA_KIND_CHUNK;
     instance->sink.chunk = sink;
     instance->driver = driver;
+    instance->ext.getbuffer = NULL;
 }
 
 int

@@ -19,6 +19,9 @@
  * Core Data Types
  */
 
+typedef struct ufw_sink Sink;
+typedef struct ufw_source Source;
+
 /**
  * Function type that accepts an octet
  *
@@ -44,48 +47,61 @@ typedef ssize_t (*ChunkSink)(void*, const void*, size_t);
 /** Function type that produces a buffer of octets */
 typedef ssize_t (*ChunkSource)(void*, void*, size_t);
 
+typedef OctetBuffer (*SinkGetBuffer)(Sink*);
+typedef OctetBuffer (*SourceGetBuffer)(Source*);
+
 typedef enum ufw_data_kind {
     DATA_KIND_OCTET,
     DATA_KIND_CHUNK
 } DataKind;
 
-typedef struct ufw_source {
+struct ufw_source {
     DataKind kind;
     void *driver;
     union {
         OctetSource octet;
         ChunkSource chunk;
     } source;
-} Source;
+    struct {
+        SourceGetBuffer getbuffer;
+    } ext;
+};
 
-typedef struct ufw_sink {
+struct ufw_sink {
     DataKind kind;
     void *driver;
     union {
         OctetSink octet;
         ChunkSink chunk;
     } sink;
-} Sink;
+    struct {
+        SinkGetBuffer getbuffer;
+    } ext;
+};
 
 #define OCTET_SOURCE_INIT(CB, DRIVER) { \
         .kind = DATA_KIND_OCTET,        \
-        .driver = DRIVER,               \
-        .source.octet = CB }
+        .driver = (DRIVER),             \
+        .source.octet = (CB),           \
+        .ext.getbuffer = NULL }
 
 #define CHUNK_SOURCE_INIT(CB, DRIVER) { \
         .kind = DATA_KIND_CHUNK,        \
-        .driver = DRIVER,               \
-        .source.chunk = CB }
+        .driver = (DRIVER),             \
+        .source.chunk = (CB),           \
+        .ext.getbuffer = NULL }
 
 #define OCTET_SINK_INIT(CB, DRIVER) {   \
         .kind = DATA_KIND_OCTET,        \
-        .driver = DRIVER,               \
-        .sink.octet = CB }
+        .driver = (DRIVER),             \
+        .sink.octet = (CB),             \
+        .ext.getbuffer = NULL }
 
 #define CHUNK_SINK_INIT(CB, DRIVER) {   \
         .kind = DATA_KIND_CHUNK,        \
-        .driver = DRIVER,               \
-        .sink.chunk = CB }
+        .driver = (DRIVER),             \
+        .sink.chunk = (CB),             \
+        .ext.getbuffer = NULL }
 
 void octet_source_init(Source*, OctetSource, void*);
 void chunk_source_init(Source*, ChunkSource, void*);
