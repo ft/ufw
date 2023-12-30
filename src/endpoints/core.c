@@ -137,6 +137,12 @@ source_get_chunk(Source *source, void *buf, size_t n)
     return (ssize_t)n;
 }
 
+ssize_t
+source_get_chunk_atmost(Source *source, void *buf, const size_t n)
+{
+    return once_source_get_chunk(source, buf, n);
+}
+
 static inline ssize_t
 sink_adapt(OctetSink sink, void *driver, const void *buf, const size_t n)
 {
@@ -182,4 +188,10 @@ sink_put_chunk(Sink *sink, const void *buf, size_t n)
     }
 
     return (ssize_t)n;
+}
+
+ssize_t
+sink_put_chunk_atmost(Sink *sink, const void *buf, const size_t n)
+{
+    return once_sink_put_chunk(sink, buf, n);
 }

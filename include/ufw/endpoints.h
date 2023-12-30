@@ -112,7 +112,9 @@ int source_get_octet(Source*, void*);
 int sink_put_octet(Sink*, unsigned char);
 
 ssize_t source_get_chunk(Source*, void*, size_t);
+ssize_t source_get_chunk_atmost(Source*, void*, size_t);
 ssize_t sink_put_chunk(Sink*, const void*, size_t);
+ssize_t sink_put_chunk_atmost(Sink*, const void*, size_t);
 
 /*
  * Generic Sources and Sinks
