@@ -71,6 +71,7 @@ configure_file("${PROJECT_SOURCE_DIR}/include/ufw/toolchain.h.in"
 set(__ufw_sources src/allocator.c
                   src/crc-16-arc.c
                   src/endpoints/buffer.c
+                  src/endpoints/continuable-sink.c
                   src/endpoints/core.c
                   src/endpoints/instrumentable.c
                   src/endpoints/posix.c
