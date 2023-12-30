@@ -117,6 +117,29 @@ ssize_t sink_put_chunk(Sink*, const void*, size_t);
 ssize_t sink_put_chunk_atmost(Sink*, const void*, size_t);
 
 /*
+ * Source to Sink Plumbing
+ */
+
+/* These makes sense in cases where either the source or the sink implements
+ * the getbuffer extension. */
+ssize_t sts_some(Source*, Sink*);
+ssize_t sts_atmost(Source*, Sink*, size_t);
+ssize_t sts_n(Source*, Sink*, size_t);
+ssize_t sts_drain(Source*, Sink*);
+
+/* These work for arbitrary sources and sinks, but requires extra copying to
+ * and from the auxiliary buffer. */
+ssize_t sts_some_aux(Source*, Sink*, OctetBuffer*);
+ssize_t sts_atmost_aux(Source*, Sink*, OctetBuffer*, size_t);
+ssize_t sts_n_aux(Source*, Sink*, OctetBuffer*, size_t);
+ssize_t sts_drain_aux(Source*, Sink*, OctetBuffer*);
+
+/* Character-by-Character Plumbing */
+ssize_t sts_cbc(Source*, Sink*);
+ssize_t sts_n_cbc(Source*, Sink*, size_t);
+ssize_t sts_drain_cbc(Source*, Sink*);
+
+/*
  * Generic Sources and Sinks
  */
 

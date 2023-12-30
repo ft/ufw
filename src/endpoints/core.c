@@ -195,3 +195,211 @@ sink_put_chunk_atmost(Sink *sink, const void *buf, const size_t n)
 {
     return once_sink_put_chunk(sink, buf, n);
 }
+
+static inline bool
+channel_has_buffer_ext(Source *source, Sink *sink)
+{
+    return (source->ext.getbuffer != NULL || sink->ext.getbuffer != NULL);
+}
+
+static ssize_t
+sts_atmost_via_sink(Source *source, Sink *sink, const size_t n)
+{
+    if (sink->ext.getbuffer == NULL) {
+        return -ENOMEM;
+    }
+
+    OctetBuffer b = sink->ext.getbuffer(sink);
+    void *buf = b.data + b.offset;
+    const size_t rest = octet_buffer_rest(&b);
+    if (rest == 0) {
+        return -ENOMEM;
+    }
+    const size_t m = (n == 0 || rest < n) ? rest : n;
+    return (source->kind == DATA_KIND_CHUNK)
+        ? source->source.chunk(source->driver, buf, m)
+        : source_get_chunk(source, buf, m);
+}
+
+static ssize_t
+sts_atmost_via_source(Source *source, Sink *sink, const size_t n)
+{
+    if (source->ext.getbuffer == NULL) {
+        return -EPIPE;
+    }
+
+    OctetBuffer b = source->ext.getbuffer(source);
+    void *buf = b.data + b.offset;
+    const size_t rest = octet_buffer_rest(&b);
+    if (rest == 0) {
+        /* A source shouldn't offer an empty buffer. */
+        return -ENODATA;
+    }
+    const size_t m = (n == 0 || rest < n) ? rest : n;
+    const ssize_t rc = (source->kind == DATA_KIND_CHUNK)
+        ? source->source.chunk(source->driver, buf, m)
+        : source_get_chunk(source, buf, m);
+    return (rc < 0) ? rc : sink_put_chunk(sink, buf, rc);
+}
+
+ssize_t
+sts_atmost(Source *source, Sink *sink, size_t n)
+{
+    if (channel_has_buffer_ext(source, sink) == false) {
+        /* This works, but has a pretty heavy runtime overhead. Using sinks
+         * with exposable buffers is preferable. */
+        return sts_cbc(source, sink);
+    }
+    const ssize_t sinkrc = sts_atmost_via_sink(source, sink, n);
+    return (sinkrc >= 0) ? sinkrc : sts_atmost_via_source(source, sink, n);
+}
+
+ssize_t
+sts_some(Source *source, Sink *sink)
+{
+    return sts_atmost(source, sink, 0u);
+}
+
+ssize_t
+sts_n(Source *source, Sink *sink, const size_t n)
+{
+    size_t rest = n;
+    bool shortcut = false;
+    while (rest > 0) {
+        const ssize_t rc = shortcut
+            ? sts_atmost_via_source(source, sink, rest)
+            : sts_atmost(source, sink, rest);
+        if (rc == -ENOMEM) {
+            /* This means that the sink buffer is out of memory. If the source
+             * can provide a buffer in the next iteration, we can go on,
+             * otherwise we cannot. */
+            shortcut = channel_has_buffer_ext(source, sink);
+            continue;
+        } else if (rc < 0) {
+            return rc;
+        }
+        rest -= rc;
+    }
+
+    return n;
+}
+
+ssize_t
+sts_drain(Source *source, Sink *sink)
+{
+    ssize_t rc = 0;
+    bool shortcut = false;
+
+    for (;;) {
+        rc = shortcut
+            ? sts_atmost_via_source(source, sink, 0u)
+            : sts_atmost(source, sink, 0u);
+        if (rc == -ENOMEM) {
+            /* This means that the sink buffer is out of memory. If the source
+             * can provide a buffer in the next iteration, we can go on,
+             * otherwise we cannot. */
+            shortcut = true;
+            continue;
+        } else if (rc < 0) {
+            break;
+        }
+    }
+
+    return rc;
+}
+
+ssize_t
+sts_some_aux(Source *source, Sink *sink, OctetBuffer *b)
+{
+    void *buf = b->data + b->offset;
+    const size_t n = octet_buffer_rest(b);
+    const ssize_t rc = source_get_chunk_atmost(source, buf, n);
+    return (rc < 0) ? rc : sink_put_chunk(sink, buf, n);
+}
+
+ssize_t
+sts_atmost_aux(Source *source, Sink *sink, OctetBuffer *b, const size_t n)
+{
+    OctetBuffer buffer;
+    memcpy(&buffer, b, sizeof(*b));
+    if (buffer.size > n) {
+        buffer.size = n;
+    }
+    return sts_some_aux(source, sink, &buffer);
+}
+
+ssize_t
+sts_n_aux(Source *source, Sink *sink, OctetBuffer *b, const size_t n)
+{
+    size_t rest = n;
+
+    while (rest > 0) {
+        octet_buffer_rewind(b);
+        const ssize_t rc = sts_atmost_aux(source, sink, b, rest);
+        if (rc < 0) {
+            return rc;
+        }
+        rest -= rc;
+    }
+
+    return n;
+}
+
+ssize_t
+sts_drain_aux(Source *source, Sink *sink, OctetBuffer *b)
+{
+    const size_t n = b->size;
+    ssize_t rc = 0;
+
+    for (;;) {
+        octet_buffer_rewind(b);
+        rc = sts_atmost_aux(source, sink, b, n);
+        if (rc < 0) {
+            break;
+        }
+
+    }
+
+    return rc;
+}
+
+ssize_t
+sts_cbc(Source *source, Sink *sink)
+{
+    unsigned char buf;
+
+    const int rc = source_get_octet(source, &buf);
+    if (rc < 0) {
+        return (ssize_t)rc;
+    }
+
+    return sink_put_octet(sink, buf);
+}
+
+ssize_t
+sts_n_cbc(Source *source, Sink *sink, const size_t n)
+{
+    for (size_t i = 0u; i < n; ++i) {
+        const ssize_t rc = sts_cbc(source, sink);
+        if (rc < 0) {
+            return rc;
+        }
+    }
+
+    return n;
+}
+
+ssize_t
+sts_drain_cbc(Source *source, Sink *sink)
+{
+    ssize_t rc = 0;
+
+    for (;;) {
+        rc = sts_cbc(source, sink);
+        if (rc < 0) {
+            break;
+        }
+    }
+
+    return rc;
+}
