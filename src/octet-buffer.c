@@ -36,13 +36,13 @@ octet_buffer_set(OctetBuffer *b, void *data,
 }
 
 size_t
-octet_buffer_avail(OctetBuffer *b)
+octet_buffer_avail(const OctetBuffer *b)
 {
     return (b->size - b->used);
 }
 
 size_t
-octet_buffer_rest(OctetBuffer *b)
+octet_buffer_rest(const OctetBuffer *b)
 {
     return (b->used - b->offset);
 }
