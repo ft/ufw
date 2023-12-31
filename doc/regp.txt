@@ -108,6 +108,11 @@ are reserved. The four bits of the meta field are unused in request mes-
 sages (and reserved), and used as a response code (see below) in respon-
 se frames. All reserved bits shall be set to zero.
 
+The Block Size parameter specifies the  size of a message's payload, ex-
+cept for READ-REQUEST messages, for which it specifies the length of the
+desired block of memory to  be returned. See "READ-REQUEST (0000)" below
+for details.
+
 Note that the existence of the  Checksum fields is governed by the value
 of option  bits. See the  "Option Bits" and "Supported  Transports" sec-
 tions below for details.
@@ -119,7 +124,8 @@ tions below for details.
 
 A read-request asks  the communication partner to return a  block of its
 memory, specified by a start address and a block-size. This request car-
-ries no payload.
+ries no payload.  Read Request frames that carry data  beyond its header
+are invalid.
 
 2.1.2 READ-RESPONSE (0001)
 
