@@ -26,6 +26,10 @@ GPATH
 GRTAGS
 GSYMS
 GTAGS
+fuzz/build-afl
+fuzz/afl-compiler
+fuzz/afl-runner
+fuzz/ex-*/out
 config/*.mk
 config/*.h
 build-*/
