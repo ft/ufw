@@ -4,8 +4,6 @@ project(ufw C CXX)
 include(CheckIncludeFile)
 include(CheckSymbolExists)
 
-include(UFWCompiler)
-
 include(CTest)
 enable_testing()
 
@@ -28,6 +26,8 @@ if (NOT WITH_INITIALISE_TOOLCHAIN)
   message(STATUS "InitialiseToolchain missing; trying local cmake-modules")
   include(InitialiseToolchain OPTIONAL RESULT_VARIABLE WITH_INITIALISE_TOOLCHAIN)
 endif()
+
+include(UFWCompiler)
 
 if (WITH_INITIALISE_TOOLCHAIN)
   initialise_toolchain()
@@ -135,7 +135,7 @@ __ufw_setup(ufw-tap)
 __ufw_sanitise(ufw-tap)
 target_link_libraries(ufw-tap PUBLIC ufw)
 
-if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "native")
+if ("${PROJECT_TARGET_CPU}" STREQUAL "native")
   add_library(ufw-nosan STATIC ${__ufw_sources})
   __ufw_setup(ufw-nosan)
   target_include_directories(ufw-nosan PUBLIC ${__ufw_include})
@@ -152,5 +152,6 @@ if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "native")
   target_link_libraries(ufw-tap-nosan PUBLIC ufw-nosan)
 endif()
 
+add_subdirectory(examples)
 add_subdirectory(test)
 add_subdirectory(doc)
