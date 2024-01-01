@@ -50,4 +50,8 @@
 #define EILSEQ      (UFW_PRIVATE_ERRNO_OFFSET + 5)
 #endif /* EILSEQ */
 
+#ifndef EPROTO
+#define EPROTO      (UFW_PRIVATE_ERRNO_OFFSET + 6)
+#endif /* EPROTO */
+
 #endif /* INC_UFW_UFW_MATH_CONSTANTS_H */
