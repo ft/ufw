@@ -120,6 +120,16 @@ tions below for details.
 
 2.1 Message Types
 
+The protocol  consists of requests,  responses, and meta  messages. Meta
+messages are used for signaling very  low level issues in the system. In
+normal operation  requests messages  are replied  to by  single response
+messages.
+
+Reponse or  meta messages that exhibit  a problem shall not  be met with
+another reponse to signal this in automatic fashion. It is up to the re-
+questing party to resolve the issue.
+
+
 2.1.1 READ-REQUEST (0000)
 
 A read-request asks  the communication partner to return a  block of its
