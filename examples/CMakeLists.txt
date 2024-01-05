@@ -5,7 +5,9 @@ if ((NOT "${PROJECT_TARGET_CPU}" STREQUAL "native")
   return()
 endif()
 
-set(examples ex-regp-parse-frame)
+set(examples
+  ex-regp-parse-frame
+  ex-rfc1055-parse-frame)
 
 foreach (example ${examples})
   add_executable(${example} ${example}.c)
