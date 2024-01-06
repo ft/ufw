@@ -286,7 +286,6 @@ parse_frame(ByteBuffer *framebuf)
 static int
 send_memory(RegP *p, void *hdr, size_t hs, void *pl, size_t ps)
 {
-    /* TODO: Make a const byte buffer variant. */
     ByteBuffer chunks[] = {
         BYTE_BUFFER(hdr, hs),
         BYTE_BUFFER(pl, ps)
@@ -841,8 +840,9 @@ regp_recv(RegP *p, RPMaybeFrame *mf)
         /* Send EBUSY reply, based on fallback buffer */
         return early_ebusy(p, &fb);
     case ENOMEM:
-        /* TODO: We need to copy the header into fb here. */
         /* Send ERXOVERFLOW reply, based on fallback buffer */
+        byte_buffer_rewind(&fb);
+        byte_buffer_add(&fb, mf->frame->raw.memory, RP_HEADER_SIZE);
         return early_erxoverflow(p, &fb);
     default:
         /* Unexpected error. Really shouldn't happen. */
@@ -950,9 +950,6 @@ regp_process(RegP *p, const RPMaybeFrame *mf)
          * from the memory implementation. This removes the requirement of
          * allocating again, and eliminates some block memory waste. */
         if (p->memory.type == RP_MEMTYPE_16) {
-            /* TODO: We need to check the code for all these things that depend
-             * on CHAR_BITS. We should minimise the dependency, of course.
-             * Supporting TI DSPs is a pain. */
             const size_t maxsize = (p->alloc->blocksize - sizeof(RPFrame)) / 2;
             if (maxsize < blocksize) {
                 ba.status = RP_RESP_ETXOVERFLOW;
@@ -989,7 +986,7 @@ regp_process(RegP *p, const RPMaybeFrame *mf)
 
     switch (ba.status) {
     case RP_RESP_ACK:
-        return regp_resp_ack(p, mf->frame, buf, buf == NULL ? 0u :blocksize);
+        return regp_resp_ack(p, mf->frame, buf, buf == NULL ? 0u : blocksize);
     case RP_RESP_EWORDSIZE:
         return regp_resp_ewordsize(p, mf->frame);
     case RP_RESP_EPAYLOADCRC:
