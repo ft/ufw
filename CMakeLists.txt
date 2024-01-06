@@ -78,7 +78,7 @@ set(__ufw_sources src/allocator.c
                   src/endpoints/trivial.c
                   src/length-prefix.c
                   src/hexdump.c
-                  src/octet-buffer.c
+                  src/byte-buffer.c
                   src/persistent-storage.c
                   src/registers/core.c
                   src/registers/utilities.c

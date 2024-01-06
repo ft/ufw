@@ -39,7 +39,7 @@
 #include <ufw/endpoints.h>
 
 void
-octet_source_init(Source *instance, OctetSource source, void *driver)
+octet_source_init(Source *instance, ByteSource source, void *driver)
 {
     instance->kind = DATA_KIND_OCTET;
     instance->source.octet = source;
@@ -57,7 +57,7 @@ chunk_source_init(Source *instance, ChunkSource source, void *driver)
 }
 
 void
-octet_sink_init(Sink *instance, OctetSink sink, void *driver)
+octet_sink_init(Sink *instance, ByteSink sink, void *driver)
 {
     instance->kind = DATA_KIND_OCTET;
     instance->sink.octet = sink;
@@ -91,7 +91,7 @@ sink_put_octet(Sink *sink, const unsigned char data)
 }
 
 static inline ssize_t
-source_adapt(OctetSource source, void *driver, void *buf, const size_t n)
+source_adapt(ByteSource source, void *driver, void *buf, const size_t n)
 {
     unsigned char *data = buf;
     size_t rest = n;
@@ -144,7 +144,7 @@ source_get_chunk_atmost(Source *source, void *buf, const size_t n)
 }
 
 static inline ssize_t
-sink_adapt(OctetSink sink, void *driver, const void *buf, const size_t n)
+sink_adapt(ByteSink sink, void *driver, const void *buf, const size_t n)
 {
     const unsigned char *data = buf;
     size_t rest = n;
@@ -209,9 +209,9 @@ sts_atmost_via_sink(Source *source, Sink *sink, const size_t n)
         return -ENOMEM;
     }
 
-    OctetBuffer b = sink->ext.getbuffer(sink);
+    ByteBuffer b = sink->ext.getbuffer(sink);
     void *buf = b.data + b.offset;
-    const size_t rest = octet_buffer_rest(&b);
+    const size_t rest = byte_buffer_rest(&b);
     if (rest == 0) {
         return -ENOMEM;
     }
@@ -228,9 +228,9 @@ sts_atmost_via_source(Source *source, Sink *sink, const size_t n)
         return -EPIPE;
     }
 
-    OctetBuffer b = source->ext.getbuffer(source);
+    ByteBuffer b = source->ext.getbuffer(source);
     void *buf = b.data + b.offset;
-    const size_t rest = octet_buffer_rest(&b);
+    const size_t rest = byte_buffer_rest(&b);
     if (rest == 0) {
         /* A source shouldn't offer an empty buffer. */
         return -ENODATA;
@@ -309,18 +309,18 @@ sts_drain(Source *source, Sink *sink)
 }
 
 ssize_t
-sts_some_aux(Source *source, Sink *sink, OctetBuffer *b)
+sts_some_aux(Source *source, Sink *sink, ByteBuffer *b)
 {
     void *buf = b->data + b->offset;
-    const size_t n = octet_buffer_rest(b);
+    const size_t n = byte_buffer_rest(b);
     const ssize_t rc = source_get_chunk_atmost(source, buf, n);
     return (rc < 0) ? rc : sink_put_chunk(sink, buf, n);
 }
 
 ssize_t
-sts_atmost_aux(Source *source, Sink *sink, OctetBuffer *b, const size_t n)
+sts_atmost_aux(Source *source, Sink *sink, ByteBuffer *b, const size_t n)
 {
-    OctetBuffer buffer;
+    ByteBuffer buffer;
     memcpy(&buffer, b, sizeof(*b));
     if (buffer.size > n) {
         buffer.size = n;
@@ -329,12 +329,12 @@ sts_atmost_aux(Source *source, Sink *sink, OctetBuffer *b, const size_t n)
 }
 
 ssize_t
-sts_n_aux(Source *source, Sink *sink, OctetBuffer *b, const size_t n)
+sts_n_aux(Source *source, Sink *sink, ByteBuffer *b, const size_t n)
 {
     size_t rest = n;
 
     while (rest > 0) {
-        octet_buffer_rewind(b);
+        byte_buffer_rewind(b);
         const ssize_t rc = sts_atmost_aux(source, sink, b, rest);
         if (rc < 0) {
             return rc;
@@ -346,13 +346,13 @@ sts_n_aux(Source *source, Sink *sink, OctetBuffer *b, const size_t n)
 }
 
 ssize_t
-sts_drain_aux(Source *source, Sink *sink, OctetBuffer *b)
+sts_drain_aux(Source *source, Sink *sink, ByteBuffer *b)
 {
     const size_t n = b->size;
     ssize_t rc = 0;
 
     for (;;) {
-        octet_buffer_rewind(b);
+        byte_buffer_rewind(b);
         rc = sts_atmost_aux(source, sink, b, n);
         if (rc < 0) {
             break;

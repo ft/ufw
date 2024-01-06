@@ -114,7 +114,7 @@ t_check_wire(const InstrumentableBuffer *wire,
              const size_t offset)
 {
     const size_t required = n + offset;
-    const size_t m = octet_buffer_rest(&wire->buffer);
+    const size_t m = byte_buffer_rest(&wire->buffer);
     if (ok(required <= m,
            "channel: Expected bytes are available in wire (%zu <= %zu)",
            required, m))
@@ -159,8 +159,8 @@ t_setup(const bool trace, const RPMemoryType mtype,
 
     memset(wire_remote_to_local, 0xff, WIRE_SIZE);
     memset(wire_local_to_remote, 0xff, WIRE_SIZE);
-    octet_buffer_rewind(&r2l_buffer.buffer);
-    octet_buffer_rewind(&l2r_buffer.buffer);
+    byte_buffer_rewind(&r2l_buffer.buffer);
+    byte_buffer_rewind(&l2r_buffer.buffer);
     instrumentable_set_trace(&r2l_buffer, trace);
     instrumentable_set_trace(&l2r_buffer, trace);
 
@@ -187,10 +187,10 @@ main(UNUSED int argc, UNUSED char *argv[])
     regp_init(remote);
 
     /* Initialise wire buffers */
-    octet_buffer_space(&r2l_buffer.buffer,
+    byte_buffer_space(&r2l_buffer.buffer,
                        wire_remote_to_local,
                        WIRE_SIZE);
-    octet_buffer_space(&l2r_buffer.buffer,
+    byte_buffer_space(&l2r_buffer.buffer,
                        wire_local_to_remote,
                        WIRE_SIZE);
 
@@ -431,9 +431,9 @@ main(UNUSED int argc, UNUSED char *argv[])
         }
         regp_free(remote, mf.frame);
 
-        ok(octet_buffer_rest(&l2r_buffer.buffer) == 0u,
+        ok(byte_buffer_rest(&l2r_buffer.buffer) == 0u,
            "channel: local-to-remote is empty");
-        ok(octet_buffer_rest(&r2l_buffer.buffer) == 0u,
+        ok(byte_buffer_rest(&r2l_buffer.buffer) == 0u,
            "channel: remote-to-local is empty");
 
     }
@@ -501,9 +501,9 @@ main(UNUSED int argc, UNUSED char *argv[])
 
         regp_free(remote, mf.frame);
 
-        ok(octet_buffer_rest(&l2r_buffer.buffer) == 0u,
+        ok(byte_buffer_rest(&l2r_buffer.buffer) == 0u,
            "channel: local-to-remote is empty");
-        ok(octet_buffer_rest(&r2l_buffer.buffer) == 0u,
+        ok(byte_buffer_rest(&r2l_buffer.buffer) == 0u,
            "channel: remote-to-local is empty");
     }
 #endif /* WITH_UINT8_T */
@@ -558,9 +558,9 @@ main(UNUSED int argc, UNUSED char *argv[])
 
         regp_free(remote, mf.frame);
 
-        ok(octet_buffer_rest(&l2r_buffer.buffer) == 0u,
+        ok(byte_buffer_rest(&l2r_buffer.buffer) == 0u,
            "channel: local-to-remote is empty");
-        ok(octet_buffer_rest(&r2l_buffer.buffer) == 0u,
+        ok(byte_buffer_rest(&r2l_buffer.buffer) == 0u,
            "channel: remote-to-local is empty");
     }
     /* NOLINTEND(concurrency-mt-unsafe) */

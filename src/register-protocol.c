@@ -251,7 +251,7 @@ payload_plausible(RPFrame *f)
 }
 
 static int
-parse_frame(OctetBuffer *framebuf)
+parse_frame(ByteBuffer *framebuf)
 {
     int rc;
 
@@ -286,12 +286,12 @@ parse_frame(OctetBuffer *framebuf)
 static int
 send_memory(RegP *p, void *hdr, size_t hs, void *pl, size_t ps)
 {
-    /* TODO: Make a const octet buffer variant. */
-    OctetBuffer chunks[] = {
-        OCTET_BUFFER(hdr, hs),
-        OCTET_BUFFER(pl, ps)
+    /* TODO: Make a const byte buffer variant. */
+    ByteBuffer chunks[] = {
+        BYTE_BUFFER(hdr, hs),
+        BYTE_BUFFER(pl, ps)
     };
-    OctetChunks data = OCTET_CHUNKS(chunks);
+    ByteChunks data = BYTE_CHUNKS(chunks);
     if (pl == NULL) {
         data.chunks = 1u;
     }
@@ -367,7 +367,7 @@ send_resp_32(RegP *p, const RPFrame *frame, RPResponse code, const uint32_t pl,
  * regp_resp_ebusy() and regp_resp_erxoverflow() instead. */
 
 static int
-send_early_response(RegP *p, OctetBuffer *hdrbuf, RPResponse code)
+send_early_response(RegP *p, ByteBuffer *hdrbuf, RPResponse code)
 {
     RPFrame frame;
     const int rc = parse_header(&frame, hdrbuf->data, hdrbuf->used);
@@ -388,13 +388,13 @@ send_early_response(RegP *p, OctetBuffer *hdrbuf, RPResponse code)
 }
 
 static int
-early_ebusy(RegP *p, OctetBuffer *hdrbuf)
+early_ebusy(RegP *p, ByteBuffer *hdrbuf)
 {
     return send_early_response(p, hdrbuf, RP_RESP_EBUSY);
 }
 
 static int
-early_erxoverflow(RegP *p, OctetBuffer *hdrbuf)
+early_erxoverflow(RegP *p, ByteBuffer *hdrbuf)
 {
     return send_early_response(p, hdrbuf, RP_RESP_ERXOVERFLOW);
 }
@@ -408,7 +408,7 @@ memtype_valid(const RegP *p, const RPFrame *f)
 }
 
 static void
-setup_buffer(OctetBuffer *b)
+setup_buffer(ByteBuffer *b)
 {
     assert(sizeof(RPFrame) < b->size);
     b->used = sizeof(RPFrame);
@@ -803,7 +803,7 @@ regp_recv(RegP *p, RPMaybeFrame *mf)
     mf->error.id = 0;
     mf->error.framesize = 0u;
     uint16_t fallback[RP_HEADER_SIZE_16];
-    OctetBuffer fb = OCTET_BUFFER_EMPTY((void*)fallback, sizeof(fallback));
+    ByteBuffer fb = BYTE_BUFFER_EMPTY((void*)fallback, sizeof(fallback));
     Sink recv;
     ContinuableSink cs = CONTINUABLE_SINK(p->alloc, &fb, setup_buffer);
     continuable_sink_init(&recv, &cs);

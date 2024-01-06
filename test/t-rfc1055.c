@@ -125,8 +125,8 @@ main(UNUSED int argc, UNUSED char **argv)
      */
 
     /* Connect buffer abstraction to allocated memory */
-    octet_buffer_space(&source_buffer.buffer, source_memory, MEMORY_SIZE);
-    octet_buffer_space(&sink_buffer.buffer, sink_memory, MEMORY_SIZE);
+    byte_buffer_space(&source_buffer.buffer, source_memory, MEMORY_SIZE);
+    byte_buffer_space(&sink_buffer.buffer, sink_memory, MEMORY_SIZE);
 
     /* Make buffer abstractions accessible via sink/source interface */
     instrumentable_source(&source, &source_buffer);
@@ -138,7 +138,7 @@ main(UNUSED int argc, UNUSED char **argv)
     rfc1055_context_init(&rfc1055_classic, RFC1055_DEFAULT);
 
     /* Load payload buffer into source */
-    octet_buffer_add(&source_buffer.buffer, payload, sizeof(payload));
+    byte_buffer_add(&source_buffer.buffer, payload, sizeof(payload));
 
     /* Run RFC1055 encoder without SOF delimiter */
     rc = rfc1055_encode(&rfc1055_classic, &source, &sink);
@@ -153,9 +153,9 @@ main(UNUSED int argc, UNUSED char **argv)
 
     /* Move read point back to begining of source to be able to repeat the
      * encoding process with the other RFC1055 context. */
-    octet_buffer_repeat(&source_buffer.buffer);
+    byte_buffer_repeat(&source_buffer.buffer);
     /* Discard and information in sink memory. */
-    octet_buffer_clear(&sink_buffer.buffer);
+    byte_buffer_clear(&sink_buffer.buffer);
 
     /* Setup another RFC1055 context that uses start-of-frame. */
     RFC1055Context rfc1055_with_sof;
@@ -181,8 +181,8 @@ main(UNUSED int argc, UNUSED char **argv)
      */
 
     instrumentable_error_at(&sink_buffer, 10, -EIO);
-    octet_buffer_repeat(&source_buffer.buffer);
-    octet_buffer_clear(&sink_buffer.buffer);
+    byte_buffer_repeat(&source_buffer.buffer);
+    byte_buffer_clear(&sink_buffer.buffer);
     rfc1055_context_init(&rfc1055_with_sof, RFC1055_WITH_SOF);
     rc = rfc1055_encode(&rfc1055_with_sof, &source, &sink);
     ok(rc == -EIO, "RFC1055 encoder passes error code correctly, %d", rc);
@@ -193,11 +193,11 @@ main(UNUSED int argc, UNUSED char **argv)
      */
 
     /* Re-initialise buffers for decoding tests */
-    octet_buffer_space(&source_buffer.buffer, source_memory, MEMORY_SIZE);
-    octet_buffer_space(&sink_buffer.buffer, sink_memory, MEMORY_SIZE);
+    byte_buffer_space(&source_buffer.buffer, source_memory, MEMORY_SIZE);
+    byte_buffer_space(&sink_buffer.buffer, sink_memory, MEMORY_SIZE);
 
     /* Load valid, classic RFC1055 encoded buffer into source */
-    octet_buffer_add(&source_buffer.buffer,
+    byte_buffer_add(&source_buffer.buffer,
                      expect_with_sof + 1,
                      sizeof(expect_with_sof) - 1);
 
@@ -214,9 +214,9 @@ main(UNUSED int argc, UNUSED char **argv)
             "RFC1055 classic decode(...) works");
 
     /* Back to the start again, with-start-of-frame this time */
-    octet_buffer_clear(&source_buffer.buffer);
-    octet_buffer_add(&source_buffer.buffer, expect_with_sof, sizeof(expect_with_sof));
-    octet_buffer_clear(&sink_buffer.buffer);
+    byte_buffer_clear(&source_buffer.buffer);
+    byte_buffer_add(&source_buffer.buffer, expect_with_sof, sizeof(expect_with_sof));
+    byte_buffer_clear(&sink_buffer.buffer);
 
     rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);
     ok(rc == 1, "RFC1055 classic decode signals success");
@@ -235,11 +235,11 @@ main(UNUSED int argc, UNUSED char **argv)
      */
 
     /* Re-initialise buffers for decoding tests */
-    octet_buffer_space(&source_buffer.buffer, source_memory, MEMORY_SIZE);
-    octet_buffer_space(&sink_buffer.buffer, sink_memory, MEMORY_SIZE);
+    byte_buffer_space(&source_buffer.buffer, source_memory, MEMORY_SIZE);
+    byte_buffer_space(&sink_buffer.buffer, sink_memory, MEMORY_SIZE);
 
     /* Load valid, classic RFC1055 encoded buffer into source */
-    octet_buffer_add(&source_buffer.buffer, sync_to_start,
+    byte_buffer_add(&source_buffer.buffer, sync_to_start,
                      sizeof(sync_to_start));
 
     rfc1055_context_init(&rfc1055_classic, RFC1055_DEFAULT);
@@ -263,18 +263,18 @@ main(UNUSED int argc, UNUSED char **argv)
                     i, s);
         }
 
-        octet_buffer_clear(&sink_buffer.buffer);
+        byte_buffer_clear(&sink_buffer.buffer);
     }
 
     rfc1055_context_init(&rfc1055_with_sof, RFC1055_WITH_SOF);
-    octet_buffer_clear(&source_buffer.buffer);
-    octet_buffer_add(&source_buffer.buffer, sync_to_start,
+    byte_buffer_clear(&source_buffer.buffer);
+    byte_buffer_add(&source_buffer.buffer, sync_to_start,
                      sizeof(sync_to_start));
     for (size_t i = 0u; i < sws_n; ++i) {
         rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);
         if (sync_with_sof[i] == NULL) {
             ok(rc == -EILSEQ, "Found an expected illegal sequence");
-            octet_buffer_clear(&sink_buffer.buffer);
+            byte_buffer_clear(&sink_buffer.buffer);
             continue;
         } else {
             unless (ok(rc == 1, "sync_to_start, with_sof: %zu - success!", i))
@@ -297,7 +297,7 @@ main(UNUSED int argc, UNUSED char **argv)
                     i, s);
         }
 
-        octet_buffer_clear(&sink_buffer.buffer);
+        byte_buffer_clear(&sink_buffer.buffer);
     }
 
     /*
@@ -329,9 +329,9 @@ main(UNUSED int argc, UNUSED char **argv)
         RAW_EOF, 'f', 'o', 'o', RAW_EOF
     };
 
-    octet_buffer_space(&sink_buffer.buffer, sink_memory, MEMORY_SIZE);
-    octet_buffer_space(&source_buffer.buffer, source_memory, MEMORY_SIZE);
-    octet_buffer_add(&source_buffer.buffer, with_error, sizeof(with_error));
+    byte_buffer_space(&sink_buffer.buffer, sink_memory, MEMORY_SIZE);
+    byte_buffer_space(&source_buffer.buffer, source_memory, MEMORY_SIZE);
+    byte_buffer_add(&source_buffer.buffer, with_error, sizeof(with_error));
 
     rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);
     unless (ok(rc == -EILSEQ, "RFC1055 decode signals ILSEQ")) {
@@ -355,7 +355,7 @@ main(UNUSED int argc, UNUSED char **argv)
                source_buffer.buffer.offset - 1, 10u);
     }
 
-    octet_buffer_clear(&sink_buffer.buffer);
+    byte_buffer_clear(&sink_buffer.buffer);
     rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);
     unless (ok(rc == -EILSEQ, "RFC1055 decode signals ILSEQ again and again"))
     {
@@ -368,7 +368,7 @@ main(UNUSED int argc, UNUSED char **argv)
                source_buffer.buffer.offset - 1, 16u);
     }
 
-    octet_buffer_clear(&sink_buffer.buffer);
+    byte_buffer_clear(&sink_buffer.buffer);
     rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);
     ok(rc == 1, "RFC1055 decode signals success");
     if (rc < 0) {
@@ -384,11 +384,11 @@ main(UNUSED int argc, UNUSED char **argv)
     /* Finally check that errors are passed properly */
     instrumentable_error_at(&sink_buffer, 10, -EIO);
 
-    octet_buffer_space(&sink_buffer.buffer, sink_memory, MEMORY_SIZE);
-    octet_buffer_space(&source_buffer.buffer, source_memory, MEMORY_SIZE);
-    octet_buffer_add(&source_buffer.buffer,
-                     expect_with_sof,
-                     sizeof(expect_with_sof));
+    byte_buffer_space(&sink_buffer.buffer, sink_memory, MEMORY_SIZE);
+    byte_buffer_space(&source_buffer.buffer, source_memory, MEMORY_SIZE);
+    byte_buffer_add(&source_buffer.buffer,
+                    expect_with_sof,
+                    sizeof(expect_with_sof));
 
     rfc1055_context_init(&rfc1055_with_sof, RFC1055_WITH_SOF);
     rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);

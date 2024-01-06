@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #include <ufw/endpoints.h>
-#include <ufw/octet-buffer.h>
+#include <ufw/byte-buffer.h>
 
 #define VARINT_CONTINUATION_MASK 0x80u
 #define VARINT_DATA_MASK         0x7fu
@@ -12,15 +12,15 @@
 #define VARINT_32BIT_MAX_OCTETS     5u
 #define VARINT_64BIT_MAX_OCTETS    10u
 
-int varint_decode_u32(OctetBuffer*, uint32_t*);
-int varint_decode_s32(OctetBuffer*,  int32_t*);
-int varint_decode_u64(OctetBuffer*, uint64_t*);
-int varint_decode_s64(OctetBuffer*,  int64_t*);
+int varint_decode_u32(ByteBuffer*, uint32_t*);
+int varint_decode_s32(ByteBuffer*,  int32_t*);
+int varint_decode_u64(ByteBuffer*, uint64_t*);
+int varint_decode_s64(ByteBuffer*,  int64_t*);
 
-int varint_encode_u32(OctetBuffer*, uint32_t);
-int varint_encode_s32(OctetBuffer*,  int32_t);
-int varint_encode_u64(OctetBuffer*, uint64_t);
-int varint_encode_s64(OctetBuffer*,  int64_t);
+int varint_encode_u32(ByteBuffer*, uint32_t);
+int varint_encode_s32(ByteBuffer*,  int32_t);
+int varint_encode_u64(ByteBuffer*, uint64_t);
+int varint_encode_s64(ByteBuffer*,  int64_t);
 
 int varint_u32_from_source(Source*, uint32_t*);
 int varint_s32_from_source(Source*,  int32_t*);

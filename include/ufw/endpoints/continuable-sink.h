@@ -27,7 +27,7 @@
  *
  * Allocation only happens once and that is the first time data arrives for
  * the sink to store. When allocation succeeds, a user specifiable callback
- * is called that allows further setup of the OctetBuffer before the sink
+ * is called that allows further setup of the ByteBuffer before the sink
  * takes up its normal operation.
  *
  * If no allocator is provided, the sink will only operate on the fallback
@@ -43,7 +43,7 @@
 
 #include <ufw/allocator.h>
 #include <ufw/endpoints.h>
-#include <ufw/octet-buffer.h>
+#include <ufw/byte-buffer.h>
 
 typedef struct ContinuableIssue {
     /*
@@ -70,24 +70,24 @@ typedef struct ContinuableSink {
     /* This is the allocator that will be used to allocate a fresh receive
      * buffer, for this sink to store data into. This may be NULL, in which
      * case it is obviously not used. In that case, some other memory has to
-     * be linked to the frame octet buffer below. */
+     * be linked to the frame byte buffer below. */
     BlockAllocator *alloc;
-    /* An octet buffer to navigate the dynamically allocated buffer. */
-    OctetBuffer buffer;
-    /* This OctetBuffer will be linked to the static header store below. */
-    OctetBuffer *fallback;
+    /* An byte buffer to navigate the dynamically allocated buffer. */
+    ByteBuffer buffer;
+    /* This ByteBuffer will be linked to the static header store below. */
+    ByteBuffer *fallback;
     /* A callback to run after allocation. This can be used to do any desired
-     * setup of the OctetBuffer instance. This is called after the allocated
-     * buffer is linked into the OctetBuffer. In our case, this will move the
+     * setup of the ByteBuffer instance. This is called after the allocated
+     * buffer is linked into the ByteBuffer. In our case, this will move the
      * buffer offset so we can store a RPFrame instance at the beginning of the
      * block. */
-    void (*postalloc)(OctetBuffer*);
+    void (*postalloc)(ByteBuffer*);
     ContinuableIssue error;
 } ContinuableSink;
 
 #define CONTINUABLE_SINK(ALLOC,FB,CB) {     \
         .alloc = (ALLOC),                   \
-        .buffer = OCTET_BUFFER(NULL, 0u),   \
+        .buffer = BYTE_BUFFER(NULL, 0u),    \
         .fallback = (FB),                   \
         .postalloc = (CB),                  \
         .error.id = 0,                      \

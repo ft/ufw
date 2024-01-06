@@ -76,7 +76,7 @@ main(UNUSED int argc, UNUSED char *argv[])
         return EXIT_FAILURE;
     }
 
-    OctetBuffer raw = OCTET_BUFFER_INIT(input, BUFFER_SIZE,
+    ByteBuffer raw = BYTE_BUFFER_INIT(input, BUFFER_SIZE,
                                         sizeof(RPFrame) + offset,
                                         sizeof(RPFrame));
     RPFrame *frame = (void*)input;

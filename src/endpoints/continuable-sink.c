@@ -12,13 +12,13 @@
 static int
 cs_add(ContinuableSink *cs, const void *data, const size_t n)
 {
-    OctetBuffer *b = cs->buffer.data != NULL ? &cs->buffer : cs->fallback;
+    ByteBuffer *b = cs->buffer.data != NULL ? &cs->buffer : cs->fallback;
     if (b == NULL) {
         return -ENOMEM;
     }
-    const size_t rest = octet_buffer_rest(b);
+    const size_t rest = byte_buffer_rest(b);
     const size_t tosave = n < rest ? n : rest;
-    octet_buffer_add(b, data, tosave);
+    byte_buffer_add(b, data, tosave);
     return tosave < n ? -ENOMEM : 0;
 }
 

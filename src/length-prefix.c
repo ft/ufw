@@ -44,13 +44,13 @@
 
 #include <ufw/compat/errno.h>
 #include <ufw/compat/ssize-t.h>
-#include <ufw/octet-buffer.h>
+#include <ufw/byte-buffer.h>
 #include <ufw/endpoints.h>
 #include <ufw/length-prefix.h>
 #include <ufw/variable-length-integer.h>
 
 static int
-encode_prefix(OctetBuffer *b, unsigned char *mem, size_t n)
+encode_prefix(ByteBuffer *b, unsigned char *mem, size_t n)
 {
     if (n > SSIZE_MAX) {
         return -EINVAL;
@@ -60,7 +60,7 @@ encode_prefix(OctetBuffer *b, unsigned char *mem, size_t n)
         return -EINVAL;
     }
 #endif
-    octet_buffer_space(b, mem, VARINT_64BIT_MAX_OCTETS);
+    byte_buffer_space(b, mem, VARINT_64BIT_MAX_OCTETS);
     /* The type definition ensures, this will not return an error. */
     (void)varint_encode_u64(b, n);
     return 0;
@@ -75,20 +75,20 @@ lenp_memory_encode(LengthPrefixBuffer *lpb, void *buf, size_t n)
         return rc;
     }
 
-    return octet_buffer_use(&lpb->payload, buf, n);
+    return byte_buffer_use(&lpb->payload, buf, n);
 }
 
 int
-lenp_buffer_encode(LengthPrefixBuffer *lpb, OctetBuffer *b)
+lenp_buffer_encode(LengthPrefixBuffer *lpb, ByteBuffer *b)
 {
-    const size_t rest = octet_buffer_rest(b);
+    const size_t rest = byte_buffer_rest(b);
     return lenp_memory_encode(lpb, b->data + b->offset, rest);
 }
 
 int
-lenp_buffer_encode_n(LengthPrefixBuffer *lpb, OctetBuffer *b, size_t n)
+lenp_buffer_encode_n(LengthPrefixBuffer *lpb, ByteBuffer *b, size_t n)
 {
-    const size_t rest = octet_buffer_rest(b);
+    const size_t rest = byte_buffer_rest(b);
     if (n > rest) {
         return -EINVAL;
     }
@@ -102,7 +102,7 @@ lenp_chunks_use(LengthPrefixChunks *lpc)
 {
     size_t size = 0u;
     for (size_t i = lpc->payload.active; i < lpc->payload.chunks; ++i) {
-        size += octet_buffer_rest(lpc->payload.chunk + i);
+        size += byte_buffer_rest(lpc->payload.chunk + i);
     }
 
     const int rc = encode_prefix(&lpc->prefix, lpc->prefix_, size);
@@ -155,15 +155,15 @@ lenp_memory_to_sink(Sink *sink, void *buf, size_t n)
 }
 
 ssize_t
-lenp_buffer_to_sink(Sink *sink, OctetBuffer *b)
+lenp_buffer_to_sink(Sink *sink, ByteBuffer *b)
 {
-    return lenp_memory_to_sink(sink, b->data + b->offset, octet_buffer_avail(b));
+    return lenp_memory_to_sink(sink, b->data + b->offset, byte_buffer_avail(b));
 }
 
 ssize_t
-lenp_buffer_to_sink_n(Sink *sink, OctetBuffer *b, size_t n)
+lenp_buffer_to_sink_n(Sink *sink, ByteBuffer *b, size_t n)
 {
-    const size_t rest = octet_buffer_avail(b);
+    const size_t rest = byte_buffer_avail(b);
     if (n > rest) {
         return -EINVAL;
     }
@@ -173,11 +173,11 @@ lenp_buffer_to_sink_n(Sink *sink, OctetBuffer *b, size_t n)
 }
 
 ssize_t
-lenp_chunks_to_sink(Sink *sink, OctetChunks *oc)
+lenp_chunks_to_sink(Sink *sink, ByteChunks *oc)
 {
     size_t size = 0u;
     for (size_t i = oc->active; i < oc->chunks; ++i) {
-        size += octet_buffer_rest(oc->chunk + i);
+        size += byte_buffer_rest(oc->chunk + i);
     }
 
     if (size > SSIZE_MAX) {
@@ -207,7 +207,7 @@ lenp_chunks_to_sink(Sink *sink, OctetChunks *oc)
     }
 
     for (size_t i = oc->active; i < oc->chunks; ++i) {
-        const size_t n = octet_buffer_rest(oc->chunk + i);
+        const size_t n = byte_buffer_rest(oc->chunk + i);
         const ssize_t rc = sink_put_chunk(
             sink, oc->chunk[i].data + oc->chunk[i].offset, n);
         if (rc < 0) {
@@ -237,11 +237,11 @@ lenp_memory_from_source(Source *source, void *mem, size_t size)
 }
 
 ssize_t
-lenp_buffer_from_source(Source *source, OctetBuffer *b)
+lenp_buffer_from_source(Source *source, ByteBuffer *b)
 {
     const ssize_t rc =
         lenp_memory_from_source(source, b->data + b->offset,
-                                octet_buffer_avail(b));
+                                byte_buffer_avail(b));
 
     if (rc >= 0) {
         b->offset += rc;

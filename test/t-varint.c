@@ -21,7 +21,7 @@
 #include <ufw/compat/errno.h>
 #include <ufw/compiler.h>
 #include <ufw/endpoints.h>
-#include <ufw/octet-buffer.h>
+#include <ufw/byte-buffer.h>
 #include <ufw/test/tap.h>
 #include <ufw/variable-length-integer.h>
 
@@ -134,9 +134,9 @@ main(UNUSED int argc, UNUSED char **argv)
 
     for (size_t i = 0u; i < tests_vui64_n; ++i) {
         struct test_vui64 *t = tests_vui64 + i;
-        OctetBuffer b;
+        ByteBuffer b;
         unsigned char buf[VARINT_64BIT_MAX_OCTETS];
-        octet_buffer_space(&b, buf, VARINT_64BIT_MAX_OCTETS);
+        byte_buffer_space(&b, buf, VARINT_64BIT_MAX_OCTETS);
         int rc = varint_encode_u64(&b, t->value);
         ok(rc == (int)t->octets, "u64: Encoding %"PRIu64" signals success",
            t->value);
@@ -152,8 +152,8 @@ main(UNUSED int argc, UNUSED char **argv)
 
     for (size_t i = 0u; i < tests_vui64_n; ++i) {
         struct test_vui64 *t = tests_vui64 + i;
-        OctetBuffer b;
-        octet_buffer_space(&b, t->expect, VARINT_64BIT_MAX_OCTETS);
+        ByteBuffer b;
+        byte_buffer_space(&b, t->expect, VARINT_64BIT_MAX_OCTETS);
         uint64_t value;
         int rc = varint_decode_u64(&b, &value);
         ok(rc == (int)t->octets, "u64: Decoding %"PRIu64" signals success",
@@ -170,9 +170,9 @@ main(UNUSED int argc, UNUSED char **argv)
 
     for (size_t i = 0u; i < tests_vui32_n; ++i) {
         struct test_vui32 *t = tests_vui32 + i;
-        OctetBuffer b;
+        ByteBuffer b;
         unsigned char buf[VARINT_32BIT_MAX_OCTETS];
-        octet_buffer_space(&b, buf, VARINT_32BIT_MAX_OCTETS);
+        byte_buffer_space(&b, buf, VARINT_32BIT_MAX_OCTETS);
         int rc = varint_encode_u32(&b, t->value);
         ok(rc == (int)t->octets, "u32: Encoding %"PRIu32" signals success",
            t->value);
@@ -188,8 +188,8 @@ main(UNUSED int argc, UNUSED char **argv)
 
     for (size_t i = 0u; i < tests_vui32_n; ++i) {
         struct test_vui32 *t = tests_vui32 + i;
-        OctetBuffer b;
-        octet_buffer_space(&b, t->expect, VARINT_32BIT_MAX_OCTETS);
+        ByteBuffer b;
+        byte_buffer_space(&b, t->expect, VARINT_32BIT_MAX_OCTETS);
         uint32_t value;
         int rc = varint_decode_u32(&b, &value);
         ok(rc == (int)t->octets, "u32: Decoding %"PRIu32" signals success",
@@ -206,9 +206,9 @@ main(UNUSED int argc, UNUSED char **argv)
 
     for (size_t i = 0u; i < tests_vsi64_n; ++i) {
         struct test_vsi64 *t = tests_vsi64 + i;
-        OctetBuffer b;
+        ByteBuffer b;
         signed char buf[VARINT_64BIT_MAX_OCTETS];
-        octet_buffer_space(&b, buf, VARINT_64BIT_MAX_OCTETS);
+        byte_buffer_space(&b, buf, VARINT_64BIT_MAX_OCTETS);
         int rc = varint_encode_s64(&b, t->value);
         ok(rc == (int)t->octets, "s64: Encoding %"PRId64" signals success",
            t->value);
@@ -224,8 +224,8 @@ main(UNUSED int argc, UNUSED char **argv)
 
     for (size_t i = 0u; i < tests_vsi64_n; ++i) {
         struct test_vsi64 *t = tests_vsi64 + i;
-        OctetBuffer b;
-        octet_buffer_space(&b, t->expect, VARINT_64BIT_MAX_OCTETS);
+        ByteBuffer b;
+        byte_buffer_space(&b, t->expect, VARINT_64BIT_MAX_OCTETS);
         int64_t value;
         int rc = varint_decode_s64(&b, &value);
         ok(rc == (int)t->octets, "s64: Decoding %"PRId64" signals success",
@@ -242,9 +242,9 @@ main(UNUSED int argc, UNUSED char **argv)
 
     for (size_t i = 0u; i < tests_vsi32_n; ++i) {
         struct test_vsi32 *t = tests_vsi32 + i;
-        OctetBuffer b;
+        ByteBuffer b;
         signed char buf[VARINT_32BIT_MAX_OCTETS];
-        octet_buffer_space(&b, buf, VARINT_32BIT_MAX_OCTETS);
+        byte_buffer_space(&b, buf, VARINT_32BIT_MAX_OCTETS);
         int rc = varint_encode_s32(&b, t->value);
         ok(rc == (int)t->octets, "s32: Encoding %"PRId32" signals success",
            t->value);
@@ -260,8 +260,8 @@ main(UNUSED int argc, UNUSED char **argv)
 
     for (size_t i = 0u; i < tests_vsi32_n; ++i) {
         struct test_vsi32 *t = tests_vsi32 + i;
-        OctetBuffer b;
-        octet_buffer_space(&b, t->expect, VARINT_32BIT_MAX_OCTETS);
+        ByteBuffer b;
+        byte_buffer_space(&b, t->expect, VARINT_32BIT_MAX_OCTETS);
         int32_t value;
         int rc = varint_decode_s32(&b, &value);
         ok(rc == (int)t->octets, "s32: Decoding %"PRId32" signals success",
@@ -286,9 +286,9 @@ main(UNUSED int argc, UNUSED char **argv)
 
     for (size_t i = 0u; i < tests_vui64_n; ++i) {
         struct test_vui64 *t = tests_vui64 + i;
-        OctetBuffer b;
+        ByteBuffer b;
         Source source;
-        octet_buffer_use(&b, t->expect, VARINT_64BIT_MAX_OCTETS);
+        byte_buffer_use(&b, t->expect, VARINT_64BIT_MAX_OCTETS);
         source_from_buffer(&source, &b);
         uint64_t value;
         int rc = varint_u64_from_source(&source, &value);
@@ -306,9 +306,9 @@ main(UNUSED int argc, UNUSED char **argv)
 
     for (size_t i = 0u; i < tests_vui32_n; ++i) {
         struct test_vui32 *t = tests_vui32 + i;
-        OctetBuffer b;
+        ByteBuffer b;
         Source source;
-        octet_buffer_use(&b, t->expect, VARINT_32BIT_MAX_OCTETS);
+        byte_buffer_use(&b, t->expect, VARINT_32BIT_MAX_OCTETS);
         source_from_buffer(&source, &b);
         uint32_t value;
         int rc = varint_u32_from_source(&source, &value);
@@ -326,9 +326,9 @@ main(UNUSED int argc, UNUSED char **argv)
 
     for (size_t i = 0u; i < tests_vsi64_n; ++i) {
         struct test_vsi64 *t = tests_vsi64 + i;
-        OctetBuffer b;
+        ByteBuffer b;
         Source source;
-        octet_buffer_use(&b, t->expect, VARINT_64BIT_MAX_OCTETS);
+        byte_buffer_use(&b, t->expect, VARINT_64BIT_MAX_OCTETS);
         source_from_buffer(&source, &b);
         int64_t value;
         int rc = varint_s64_from_source(&source, &value);
@@ -346,9 +346,9 @@ main(UNUSED int argc, UNUSED char **argv)
 
     for (size_t i = 0u; i < tests_vsi32_n; ++i) {
         struct test_vsi32 *t = tests_vsi32 + i;
-        OctetBuffer b;
+        ByteBuffer b;
         Source source;
-        octet_buffer_use(&b, t->expect, VARINT_32BIT_MAX_OCTETS);
+        byte_buffer_use(&b, t->expect, VARINT_32BIT_MAX_OCTETS);
         source_from_buffer(&source, &b);
         int32_t value;
         int rc = varint_s32_from_source(&source, &value);

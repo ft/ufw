@@ -3,7 +3,7 @@
 
 #include <ufw/compat/errno.h>
 #include <ufw/endpoints.h>
-#include <ufw/octet-buffer.h>
+#include <ufw/byte-buffer.h>
 #include <ufw/variable-length-integer.h>
 
 union varint32 {
@@ -23,7 +23,7 @@ varint_done(const unsigned char octet)
 }
 
 static int
-varint_encode(uint64_t n, OctetBuffer *b)
+varint_encode(uint64_t n, ByteBuffer *b)
 {
     unsigned char *buf = b->data + b->offset;
     for (int i = 1;; ++i) {
@@ -39,7 +39,7 @@ varint_encode(uint64_t n, OctetBuffer *b)
 }
 
 static int
-varint_decode(OctetBuffer *b, const size_t maxoctets, union varint64 *n)
+varint_decode(ByteBuffer *b, const size_t maxoctets, union varint64 *n)
 {
     const unsigned char *buf = b->data + b->offset;
     n->u = 0u;
@@ -78,7 +78,7 @@ varint_from_source(Source *source, const size_t maxoctets, union varint64 *n)
 }
 
 int
-varint_decode_u32(OctetBuffer *b, uint32_t *n)
+varint_decode_u32(ByteBuffer *b, uint32_t *n)
 {
     union varint64 data;
     const int rc = varint_decode(b, VARINT_32BIT_MAX_OCTETS, &data);
@@ -87,7 +87,7 @@ varint_decode_u32(OctetBuffer *b, uint32_t *n)
 }
 
 int
-varint_decode_s32(OctetBuffer *b, int32_t *n)
+varint_decode_s32(ByteBuffer *b, int32_t *n)
 {
     union varint64 data64;
     union varint32 data32;
@@ -98,7 +98,7 @@ varint_decode_s32(OctetBuffer *b, int32_t *n)
 }
 
 int
-varint_decode_u64(OctetBuffer *b, uint64_t *n)
+varint_decode_u64(ByteBuffer *b, uint64_t *n)
 {
     union varint64 data;
     const int rc = varint_decode(b, VARINT_64BIT_MAX_OCTETS, &data);
@@ -107,7 +107,7 @@ varint_decode_u64(OctetBuffer *b, uint64_t *n)
 }
 
 int
-varint_decode_s64(OctetBuffer *b, int64_t *n)
+varint_decode_s64(ByteBuffer *b, int64_t *n)
 {
     union varint64 data;
     const int rc = varint_decode(b, VARINT_64BIT_MAX_OCTETS, &data);
@@ -116,18 +116,18 @@ varint_decode_s64(OctetBuffer *b, int64_t *n)
 }
 
 int
-varint_encode_u32(OctetBuffer *b, const uint32_t n)
+varint_encode_u32(ByteBuffer *b, const uint32_t n)
 {
-    if (octet_buffer_avail(b) < VARINT_32BIT_MAX_OCTETS) {
+    if (byte_buffer_avail(b) < VARINT_32BIT_MAX_OCTETS) {
         return -EINVAL;
     }
     return varint_encode(n & UINT32_MAX, b);
 }
 
 int
-varint_encode_s32(OctetBuffer *b, const int32_t n)
+varint_encode_s32(ByteBuffer *b, const int32_t n)
 {
-    if (octet_buffer_avail(b) < VARINT_32BIT_MAX_OCTETS) {
+    if (byte_buffer_avail(b) < VARINT_32BIT_MAX_OCTETS) {
         return -EINVAL;
     }
     union varint64 data;
@@ -136,18 +136,18 @@ varint_encode_s32(OctetBuffer *b, const int32_t n)
 }
 
 int
-varint_encode_u64(OctetBuffer *b, const uint64_t n)
+varint_encode_u64(ByteBuffer *b, const uint64_t n)
 {
-    if (octet_buffer_avail(b) < VARINT_64BIT_MAX_OCTETS) {
+    if (byte_buffer_avail(b) < VARINT_64BIT_MAX_OCTETS) {
         return -EINVAL;
     }
     return varint_encode(n, b);
 }
 
 int
-varint_encode_s64(OctetBuffer *b, const int64_t n)
+varint_encode_s64(ByteBuffer *b, const int64_t n)
 {
-    if (octet_buffer_avail(b) < VARINT_64BIT_MAX_OCTETS) {
+    if (byte_buffer_avail(b) < VARINT_64BIT_MAX_OCTETS) {
         return -EINVAL;
     }
     union varint64 data;
@@ -209,9 +209,9 @@ int
 varint_u32_to_sink(Sink *sink, const uint32_t n)
 {
     unsigned char raw[VARINT_32BIT_MAX_OCTETS];
-    OctetBuffer buf;
+    ByteBuffer buf;
 
-    octet_buffer_space(&buf, raw, VARINT_32BIT_MAX_OCTETS);
+    byte_buffer_space(&buf, raw, VARINT_32BIT_MAX_OCTETS);
     varint_encode_u32(&buf, n);
     return sink_put_chunk(sink, buf.data, buf.used);
 }
@@ -220,9 +220,9 @@ int
 varint_s32_to_sink(Sink *sink, const int32_t n)
 {
     unsigned char raw[VARINT_32BIT_MAX_OCTETS];
-    OctetBuffer buf;
+    ByteBuffer buf;
 
-    octet_buffer_space(&buf, raw, VARINT_32BIT_MAX_OCTETS);
+    byte_buffer_space(&buf, raw, VARINT_32BIT_MAX_OCTETS);
     varint_encode_s32(&buf, n);
     return sink_put_chunk(sink, buf.data, buf.used);
 }
@@ -231,9 +231,9 @@ int
 varint_u64_to_sink(Sink *sink, const uint64_t n)
 {
     unsigned char raw[VARINT_64BIT_MAX_OCTETS];
-    OctetBuffer buf;
+    ByteBuffer buf;
 
-    octet_buffer_space(&buf, raw, VARINT_64BIT_MAX_OCTETS);
+    byte_buffer_space(&buf, raw, VARINT_64BIT_MAX_OCTETS);
     varint_encode_u64(&buf, n);
     return sink_put_chunk(sink, buf.data, buf.used);
 }
@@ -242,9 +242,9 @@ int
 varint_s64_to_sink(Sink *sink, const int64_t n)
 {
     unsigned char raw[VARINT_64BIT_MAX_OCTETS];
-    OctetBuffer buf;
+    ByteBuffer buf;
 
-    octet_buffer_space(&buf, raw, VARINT_64BIT_MAX_OCTETS);
+    byte_buffer_space(&buf, raw, VARINT_64BIT_MAX_OCTETS);
     varint_encode_s64(&buf, n);
     return sink_put_chunk(sink, buf.data, buf.used);
 }

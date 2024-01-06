@@ -18,7 +18,7 @@
 #include <ufw/compat/errno.h>
 #include <ufw/compiler.h>
 #include <ufw/length-prefix.h>
-#include <ufw/octet-buffer.h>
+#include <ufw/byte-buffer.h>
 #include <ufw/test/tap.h>
 
 #define BUFFER_SIZE 1024u
@@ -52,8 +52,8 @@ main(UNUSED int argc, UNUSED char *argv[])
     ok(lpb.prefix.used == 2, "lenp: 128 takes 1 octet to encode");
 
     Sink sink;
-    OctetBuffer sinkb;
-    octet_buffer_space(&sinkb, wire, WIRE_SIZE);
+    ByteBuffer sinkb;
+    byte_buffer_space(&sinkb, wire, WIRE_SIZE);
     sink_to_buffer(&sink, &sinkb);
 
     const size_t m = varint_u64_length(MEM_SIZE);
@@ -64,7 +64,7 @@ main(UNUSED int argc, UNUSED char *argv[])
         ok((size_t)n == (m + MEM_SIZE), "lenp: Prefix+payload size is correct");
     }
     cmp_mem(wire, ((unsigned char[]){0x80u, 0x08u}), m, "lenp: Prefix is correct");
-    octet_buffer_repeat(&sinkb);
+    byte_buffer_repeat(&sinkb);
     uint64_t value_u64;
     rc = varint_decode_u64(&sinkb, &value_u64);
     ok(rc == 2, "lenp: Decoding size value succeeded");
@@ -73,10 +73,10 @@ main(UNUSED int argc, UNUSED char *argv[])
     cmp_mem(wire + m, mema, MEM_SIZE, "lenp: Encoded memory is correct");
 
     Source source;
-    OctetBuffer sourceb, finalbuffer;
-    octet_buffer_use(&sourceb, wire, m + MEM_SIZE);
+    ByteBuffer sourceb, finalbuffer;
+    byte_buffer_use(&sourceb, wire, m + MEM_SIZE);
     source_from_buffer(&source, &sourceb);
-    octet_buffer_space(&finalbuffer, memb, MEM_SIZE);
+    byte_buffer_space(&finalbuffer, memb, MEM_SIZE);
 
     const ssize_t k = lenp_buffer_from_source(&source, &finalbuffer);
     if (ok((k <= 0) == false, "lenp: Decode from source succeeded")) {
