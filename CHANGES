@@ -2,6 +2,145 @@
   User-visible changes in ufw
 -------------------------------
 
+* v4.1.0 → v5.0.0 (unreleased):
+
+** Breaking compatibility
+
+- RFC1055_WORST_CASE now takes two arguments. Use RFC1055_WORST_CLASSIC or
+  RFC1055_WORST_WITHSOF instead for the previous behaviour, depending on the
+  variant in use.
+- Rename octet buffer type to byte buffer. Strictly speaking the term octet
+  buffer was wrong to use here, since there are architectures on which a byte
+  is not an octet. This renames the API prefix from octet_buffer_ to
+  byte_buffer_, the data types from OctetBuffer and OctetChunks to ByteBuffer
+  and ByteChunks, as well as the header from octet-buffer.h to byte-buffer.h.
+- bb: Make paramter to _avail() and _rest() const.
+
+** New Features
+
+- Add generic block allocator allocator data type.
+- Add CRC-16-ARC implementation based on NetBSD's libkern.
+- bb: Add byte_buffer_rest() function.
+- bb: Add byte_buffer_consume_at_most() function.
+- bb: Add ByteChunks data type.
+- endpoints: Add source_empty source that always fails to produce data.
+- endpoints: Add a way to make a source from a ByteChunks instance.
+- endpoints: Add getbuffer extension to sinks and sources.
+- endpoints: Add _atmost variants of chunk transfer functions.
+- endpoints: Add source-to-sink plumbing infrastructure.
+- endpoints: Add a continuable sink implementation.
+- endpoints: Add optional tracing output to instrumentable buffers.
+- compat,errno: Add EPROTO for platforms that do not implement it.
+- lenp: Add ByteChunks support to length prefix framing.
+- lenp: Add support for connected a lenp-source to arbitrary sinks.
+- regp: Add a specification for the proposed register protocol.
+- regp: Add an implementation of the register protocol.
+
+** Bugfixes
+
+- rfc1055: Fix RFC1055_WORST_CASE macro.
+- endpoints: Fix run-out behaviour of read_from_buffer().
+- meta: Update version reflection macros.
+
+** Miscellaneous
+
+- Add clang-tidy configuration.
+- Fix some style issues found by clang-tidy.
+- Add running AFL++ fuzzer on parts of the ufw library.
+- ex: Add examples subdirectory with a program using regp's parse_frame().
+- ex: Add an example that runs the SLIP (rfc1055) parser
+
+** Diffstat:
+
+    .clang-tidy                                   |  401 ++++++
+    .gitignore                                    |    6 +-
+    CMakeLists.txt                                |   15 +-
+    LICENCE                                       |    2 +-
+    cmake/modules/UFWTest.cmake                   |   95 +-
+    doc/fuzzing.txt                               |   85 ++
+    doc/regp.txt                                  |  365 ++++++
+    examples/CMakeLists.txt                       |   16 +
+    examples/ex-regp-parse-frame.c                |  137 ++
+    examples/ex-rfc1055-parse-frame.c             |   78 ++
+    fuzz/ex-regp-parse-frame/in/minimal.dat       |    1 +
+    fuzz/ex-regp-parse-frame/in/zero-minimal.dat  |  Bin 0 -> 12 bytes
+    fuzz/ex-regp-parse-frame/in/zero-toolarge.dat |  Bin 0 -> 16 bytes
+    .../in/simple-slip-frame-with-sof.dat         |  Bin 0 -> 17 bytes
+    .../in/simple-slip-frame.dat                  |  Bin 0 -> 16 bytes
+    fuzz/run                                      |  277 ++++
+    include/ufw/allocator.h                       |   60 +
+    include/ufw/binary-format.h                   |    2 +-
+    include/ufw/bit-operations.h                  |    2 +-
+    include/ufw/byte-buffer.h                     |   67 +
+    include/ufw/compat.h                          |    2 +-
+    include/ufw/compat/errno.h                    |    6 +-
+    include/ufw/compat/math-constants.h           |    2 +-
+    include/ufw/compat/ssize-t.h                  |    6 +-
+    include/ufw/compat/strings.h                  |    2 +-
+    include/ufw/compiler.h                        |    2 +-
+    include/ufw/convolution-low-pass.h            |    2 +-
+    include/ufw/crc/crc16-arc.h                   |   21 +
+    include/ufw/endpoints.h                       |   96 +-
+    include/ufw/endpoints/continuable-sink.h      |   98 ++
+    include/ufw/hexdump.h                         |    2 +-
+    include/ufw/length-prefix.h                   |   28 +-
+    include/ufw/meta.h                            |    2 +-
+    include/ufw/octet-buffer.h                    |   40 -
+    include/ufw/persistent-storage.h              |    2 +-
+    include/ufw/register-protocol.h               |  262 ++++
+    include/ufw/register-table.h                  |   52 +-
+    include/ufw/register-utilities.h              |    2 +-
+    include/ufw/rfc1055.h                         |    6 +-
+    include/ufw/ring-buffer-iter.h                |    2 +-
+    include/ufw/ring-buffer.h                     |    2 +-
+    include/ufw/test/tap.h                        |    2 +-
+    include/ufw/variable-length-integer.h         |   18 +-
+    scheme/ufw/register-table.scm                 |    2 +-
+    scheme/ufw/utilities.scm                      |    2 +-
+    src/allocator.c                               |   42 +
+    src/{octet-buffer.c => byte-buffer.c}         |   49 +-
+    src/compat/strlcat.c                          |    8 +-
+    src/compat/strlcpy.c                          |   14 +-
+    src/compat/strnlen.c                          |    8 +-
+    src/crc-16-arc.c                              |  159 +++
+    src/endpoints/buffer.c                        |   44 +-
+    src/endpoints/continuable-sink.c              |   96 ++
+    src/endpoints/core.c                          |  234 +++-
+    src/endpoints/instrumentable.c                |   53 +-
+    src/endpoints/posix.c                         |    2 +-
+    src/endpoints/trivial.c                       |   15 +-
+    src/hexdump.c                                 |    2 +-
+    src/length-prefix.c                           |  129 +-
+    src/persistent-storage.c                      |    5 +-
+    src/register-protocol.c                       | 1157 +++++++++++++++++
+    src/registers/core.c                          |  123 +-
+    src/registers/internal.h                      |   11 +-
+    src/registers/utilities.c                     |   16 +-
+    src/rfc1055.c                                 |    4 +-
+    src/ring-buffer-iter.c                        |    2 +-
+    src/test/memdiff.c                            |   35 +-
+    src/test/output-utils.c                       |    3 +-
+    src/test/tap.c                                |    7 +-
+    src/variable-length-integer.c                 |   47 +-
+    target/cortex-m3/init/startup.c               |    2 +-
+    target/cortex-m3/ld/arm-cortex-qemu.ld        |    2 +-
+    test/CMakeLists.txt                           |    1 +
+    test/t-binary-format.c                        |    2 +-
+    test/t-convolution-low-pass.c                 |    2 +-
+    test/t-hexdump.c                              |    2 +-
+    test/t-length-prefix.c                        |   16 +-
+    test/t-persistent-storage.c                   |    2 +-
+    test/t-register-protocol.c                    |  569 ++++++++
+    test/t-register-table-persistent-storage.c    |    2 +-
+    test/t-register-table.c                       |    2 +-
+    test/t-rfc1055.c                              |   62 +-
+    test/t-ring-buffer.c                          |    2 +-
+    test/t-varint.c                               |   52 +-
+    tools/make-binary-format.scm                  |    2 +-
+    tools/make-register-macros.scm                |    2 +-
+    86 files changed, 4869 insertions(+), 388 deletions(-)
+
+
 * v4.0.0 → v4.1.0 (released 2023-09-13):
 
 ** New Features
