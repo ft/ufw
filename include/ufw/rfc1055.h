@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 chip-remote workers, All rights reserved.
+ * Copyright (c) 2022-2024 chip-remote workers, All rights reserved.
  *
  * Terms for redistribution and use can be found in LICENCE.
  */

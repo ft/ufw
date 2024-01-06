@@ -1,4 +1,4 @@
-;; Copyright (c) 2023 ufw workers, All rights reserved.
+;; Copyright (c) 2023-2024 ufw workers, All rights reserved.
 ;;
 ;; Terms for redistribution and use can be found in LICENCE.
 
