@@ -28,7 +28,7 @@ Options:
 
   -h           Display this help text.
   -m           Only initialise afl-compiler and afl-runner.
-  -A           AFL++ source directory
+  -A DIRECTORY AFL++ source directory
   -c COMPILER  Set compiler to COMPILER instead of "afl-clang".
   -r RUNNER    Set fuzzing runner to RUNNER instead of "afl-fuzz".
 
