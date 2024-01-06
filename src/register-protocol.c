@@ -413,6 +413,15 @@ setup_buffer(ByteBuffer *b)
     b->used = sizeof(RPFrame);
 }
 
+static inline size_t
+trxbufsize(const RegP *p)
+{
+    /* Including binary-format.h ensures CHAR_BIT is either 8 or 16. */
+    const size_t bs = p->alloc->blocksize * (CHAR_BIT / 8);
+    const size_t fs = sizeof(RPFrame)     * (CHAR_BIT / 8);
+    return bs - fs;
+}
+
 static inline uint32_t
 address_min(uint32_t a, uint32_t b)
 {
@@ -994,12 +1003,9 @@ regp_process(RegP *p, const RPMaybeFrame *mf)
     case RP_RESP_EPAYLOADSIZE:
         return regp_resp_epayloadsize(p, mf->frame);
     case RP_RESP_ERXOVERFLOW:
-        /* TODO: What about 16 bit machines? */
-        return regp_resp_erxoverflow(p, mf->frame,
-                                     p->alloc->blocksize - sizeof(RPFrame));
+        return regp_resp_erxoverflow(p, mf->frame, trxbufsize(p));
     case RP_RESP_ETXOVERFLOW:
-        return regp_resp_etxoverflow(p, mf->frame,
-                                     p->alloc->blocksize - sizeof(RPFrame));
+        return regp_resp_etxoverflow(p, mf->frame, trxbufsize(p));
     case RP_RESP_EBUSY:
         return regp_resp_ebusy(p, mf->frame);
     case RP_RESP_EUNMAPPED:
