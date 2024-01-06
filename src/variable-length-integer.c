@@ -2,8 +2,9 @@
 #include <stdint.h>
 
 #include <ufw/compat/errno.h>
-#include <ufw/endpoints.h>
+
 #include <ufw/byte-buffer.h>
+#include <ufw/endpoints.h>
 #include <ufw/variable-length-integer.h>
 
 union varint32 {

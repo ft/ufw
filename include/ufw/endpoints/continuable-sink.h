@@ -42,8 +42,8 @@
 #include <stdint.h>
 
 #include <ufw/allocator.h>
-#include <ufw/endpoints.h>
 #include <ufw/byte-buffer.h>
+#include <ufw/endpoints.h>
 
 typedef struct ContinuableIssue {
     /*

@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-#include <ufw/endpoints.h>
 #include <ufw/byte-buffer.h>
+#include <ufw/endpoints.h>
 
 #define VARINT_CONTINUATION_MASK 0x80u
 #define VARINT_DATA_MASK         0x7fu

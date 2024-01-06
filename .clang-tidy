@@ -1,8 +1,10 @@
 ---
 # Stuff we may want to enable again later:
 #
+# bugprone-macro-parentheses
 # bugprone-narrowing-conversions
-# readability-else-after-return,
+# readability-else-after-return
+# readability-function-cognitive-complexity
 # readability-magic-numbers
 # readability-named-parameter
 # readability-uppercase-literal-suffix
@@ -13,6 +15,7 @@ Checks: >
   -altera-struct-pack-align,
   -altera-unroll-loops,
   -bugprone-easily-swappable-parameters,
+  -bugprone-macro-parentheses,
   -bugprone-narrowing-conversions,
   -cert-err09-cpp,
   -cert-err61-cpp,
@@ -26,6 +29,7 @@ Checks: >
   -misc-throw-by-value-catch-by-reference,
   -modernize-macro-to-enum,
   -readability-else-after-return,
+  -readability-function-cognitive-complexity,
   -readability-identifier-length,
   -readability-isolate-declaration,
   -readability-magic-numbers,

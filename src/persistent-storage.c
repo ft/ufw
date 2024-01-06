@@ -622,7 +622,8 @@ persistent_reset(PersistentStorage *store, unsigned char item)
     const PersistentAccess rv =
         persistent_writen(store, store->checksum.address,
                           item, store->checksum.size);
-    if (rv != PERSISTENT_ACCESS_SUCCESS)
+    if (rv != PERSISTENT_ACCESS_SUCCESS) {
         return rv;
+    }
     return persistent_writen(store, store->data.address, item, store->data.size);
 }

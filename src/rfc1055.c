@@ -17,8 +17,8 @@
 
 #include <ufw/bit-operations.h>
 #include <ufw/compiler.h>
-#include <ufw/rfc1055.h>
 #include <ufw/endpoints.h>
+#include <ufw/rfc1055.h>
 
 /*
  * RFC1055 Control Characters

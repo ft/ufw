@@ -16,7 +16,6 @@
 
 #include <ufw/byte-buffer.h>
 #include <ufw/endpoints.h>
-#include <ufw/byte-buffer.h>
 #include <ufw/variable-length-integer.h>
 
 typedef struct ufw_length_prefix_buffer {
