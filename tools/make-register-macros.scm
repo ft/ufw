@@ -29,7 +29,7 @@
                                      (s . sint))
                           (widths 16 32 64))
                          ((mnemonics (f . float))
-                          (widths 32))))
+                          (widths 32 64))))
 
 ;; For every type specified in ‘register-types’, this program generates a
 ;; number of macros that simplify the definition of register tables using ufw.

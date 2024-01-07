@@ -38,6 +38,8 @@ static bool rds_s64_ser(RegisterValue, RegisterAtom*, bool);
 static bool rds_s64_des(const RegisterAtom*, RegisterValue*, bool);
 static bool rds_f32_ser(RegisterValue, RegisterAtom*, bool);
 static bool rds_f32_des(const RegisterAtom*, RegisterValue*, bool);
+static bool rds_f64_ser(RegisterValue, RegisterAtom*, bool);
+static bool rds_f64_des(const RegisterAtom*, RegisterValue*, bool);
 
 /* Validators */
 static inline bool rv_check_max_value(RegisterValueU, RegisterValue);
@@ -315,6 +317,33 @@ rds_f32_des(const RegisterAtom *r, RegisterValue *v, const bool bigendian)
     return ((v->value.f32 == 0.) || (isnormal(v->value.f32) == true));
 }
 
+static bool
+rds_f64_ser(const RegisterValue v, RegisterAtom *r, const bool bigendian)
+{
+    assert(v.type == REG_TYPE_FLOAT64);
+    if ((v.value.f64 != 0.) && (isnormal(v.value.f64) == false)) {
+        return false;
+    }
+    if (bigendian) {
+        bf_set_f64b(r, v.value.f64);
+    } else {
+        bf_set_f64l(r, v.value.f64);
+    }
+    return true;
+}
+
+static bool
+rds_f64_des(const RegisterAtom *r, RegisterValue *v, const bool bigendian)
+{
+    if (bigendian) {
+        v->value.f64 = bf_ref_f64b(r);
+    } else {
+        v->value.f64 = bf_ref_f64l(r);
+    }
+    v->type = REG_TYPE_FLOAT64;
+    return ((v->value.f64 == 0.) || (isnormal(v->value.f64) == true));
+}
+
 const RegisterSerDes rds_serdes[] = {
     [REG_TYPE_INVALID] = { rds_invalid_ser, rds_invalid_des },
     [REG_TYPE_UINT16]  = { rds_u16_ser,     rds_u16_des },
@@ -323,7 +352,8 @@ const RegisterSerDes rds_serdes[] = {
     [REG_TYPE_SINT16]  = { rds_s16_ser,     rds_s16_des },
     [REG_TYPE_SINT32]  = { rds_s32_ser,     rds_s32_des },
     [REG_TYPE_SINT64]  = { rds_s64_ser,     rds_s64_des },
-    [REG_TYPE_FLOAT32] = { rds_f32_ser,     rds_f32_des }
+    [REG_TYPE_FLOAT32] = { rds_f32_ser,     rds_f32_des },
+    [REG_TYPE_FLOAT64] = { rds_f64_ser,     rds_f64_des }
 };
 
 #define rs(t) (sizeof(t) / sizeof(RegisterAtom))
@@ -336,7 +366,8 @@ const size_t rds_size[] = {
     [REG_TYPE_SINT16]  = rs(int16_t),
     [REG_TYPE_SINT32]  = rs(int32_t),
     [REG_TYPE_SINT64]  = rs(int64_t),
-    [REG_TYPE_FLOAT32] = rs(float)
+    [REG_TYPE_FLOAT32] = rs(float),
+    [REG_TYPE_FLOAT64] = rs(double),
 };
 
 static inline bool
@@ -359,6 +390,8 @@ rv_check_min_value(const RegisterValueU limit, const RegisterValue v)
         return (v.value.s64 >= limit.s64);
     case REG_TYPE_FLOAT32:
         return (v.value.f32 >= limit.f32);
+    case REG_TYPE_FLOAT64:
+        return (v.value.f64 >= limit.f64);
     default:
         return false;
     }
@@ -390,6 +423,8 @@ rv_check_max_value(const RegisterValueU limit, const RegisterValue v)
         return (v.value.s64 <= limit.s64);
     case REG_TYPE_FLOAT32:
         return (v.value.f32 <= limit.f32);
+    case REG_TYPE_FLOAT64:
+        return (v.value.f64 <= limit.f64);
     default:
         return false;
     }
@@ -1432,6 +1467,8 @@ register_value_compare(const RegisterValue *a, const RegisterValue *b)
         return (a->value.s64 == b->value.s64);
     case REG_TYPE_FLOAT32:
         return (a->value.f32 == b->value.f32);
+    case REG_TYPE_FLOAT64:
+        return (a->value.f64 == b->value.f64);
     default:
         return false;
     }

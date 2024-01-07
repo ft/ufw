@@ -99,6 +99,7 @@ typedef enum RegisterType {
     REG_TYPE_SINT32,
     REG_TYPE_SINT64,
     REG_TYPE_FLOAT32,
+    REG_TYPE_FLOAT64,
     REG_TYPE_INVALID
 } RegisterType;
 
@@ -110,6 +111,7 @@ typedef union RegisterValueU {
     int32_t s32;
     int64_t s64;
     float f32;
+    double f64;
 } RegisterValueU;
 
 struct RegisterValue {
@@ -381,6 +383,16 @@ typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
 #define REGx_F32RANGE(I,A,MIN,MAX,D,U) MAKE_RANGE_REGISTERx(I,A,REG_TYPE_FLOAT32,f32,D,MIN,MAX,U)
 #define REG_F32FNC(I,A,FNC,D)          MAKE_VALIDATOR_REGISTER(I,A,REG_TYPE_FLOAT32,f32,D,FNC)
 #define REGx_F32FNC(I,A,FNC,D,U)       MAKE_VALIDATOR_REGISTERx(I,A,REG_TYPE_FLOAT32,f32,D,FNC,U)
+#define REG_F64(I,A,D)                 MAKE_REGISTER(I,A,REG_TYPE_FLOAT64,f64,D)
+#define REGx_F64(I,A,D,U)              MAKE_REGISTERx(I,A,REG_TYPE_FLOAT64,f64,D,U)
+#define REG_F64MIN(I,A,MIN,D)          MAKE_MIN_REGISTER(I,A,REG_TYPE_FLOAT64,f64,D,MIN)
+#define REGx_F64MIN(I,A,MIN,D,U)       MAKE_MIN_REGISTERx(I,A,REG_TYPE_FLOAT64,f64,D,MIN,U)
+#define REG_F64MAX(I,A,MAX,D)          MAKE_MAX_REGISTER(I,A,REG_TYPE_FLOAT64,f64,D,MAX)
+#define REGx_F64MAX(I,A,MAX,D,U)       MAKE_MAX_REGISTERx(I,A,REG_TYPE_FLOAT64,f64,D,MAX,U)
+#define REG_F64RANGE(I,A,MIN,MAX,D)    MAKE_RANGE_REGISTER(I,A,REG_TYPE_FLOAT64,f64,D,MIN,MAX)
+#define REGx_F64RANGE(I,A,MIN,MAX,D,U) MAKE_RANGE_REGISTERx(I,A,REG_TYPE_FLOAT64,f64,D,MIN,MAX,U)
+#define REG_F64FNC(I,A,FNC,D)          MAKE_VALIDATOR_REGISTER(I,A,REG_TYPE_FLOAT64,f64,D,FNC)
+#define REGx_F64FNC(I,A,FNC,D,U)       MAKE_VALIDATOR_REGISTERx(I,A,REG_TYPE_FLOAT64,f64,D,FNC,U)
 
 /* End of Registers Specification Front-Ends */
 

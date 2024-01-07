@@ -175,6 +175,9 @@ register_value_print(void *fh, RegisterValue *v)
     case REG_TYPE_FLOAT32:
         r_fprintf(fh, "%e", v->value.f32);
         break;
+    case REG_TYPE_FLOAT64:
+        r_fprintf(fh, "%e", v->value.f64);
+        break;
     case REG_TYPE_INVALID:
         r_fprintf(fh, "<value-invalid>");
         break;
@@ -302,7 +305,8 @@ register_registertype_to_string(RegisterType type)
         IDX2STR(REG_TYPE_SINT16),
         IDX2STR(REG_TYPE_SINT32),
         IDX2STR(REG_TYPE_SINT64),
-        IDX2STR(REG_TYPE_FLOAT32)
+        IDX2STR(REG_TYPE_FLOAT32),
+        IDX2STR(REG_TYPE_FLOAT64)
     };
 
     return map[type];

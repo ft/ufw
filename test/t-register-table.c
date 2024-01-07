@@ -248,7 +248,7 @@ typedef enum SensorRegister {
 static char*
 type2string(RegisterType type)
 {
-    if (type > REG_TYPE_FLOAT32)
+    if (type > REG_TYPE_FLOAT64)
         return "<INVALID-TYPE>";
 
     char *map[] = {
@@ -259,7 +259,8 @@ type2string(RegisterType type)
         STRMAP(REG_TYPE_SINT16),
         STRMAP(REG_TYPE_SINT32),
         STRMAP(REG_TYPE_SINT64),
-        STRMAP(REG_TYPE_FLOAT32)
+        STRMAP(REG_TYPE_FLOAT32),
+        STRMAP(REG_TYPE_FLOAT64)
     };
 
     return map[type];
