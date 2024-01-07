@@ -650,7 +650,7 @@ regp_resp_erxoverflow(RegP *p, const RPFrame *f, const uint32_t size)
 int
 regp_resp_etxoverflow(RegP *p, const RPFrame *f, const uint32_t size)
 {
-    return send_resp_32(p, f, RP_RESP_ERXOVERFLOW, size, MSEM_8BIT);
+    return send_resp_32(p, f, RP_RESP_ETXOVERFLOW, size, MSEM_8BIT);
 }
 
 int
