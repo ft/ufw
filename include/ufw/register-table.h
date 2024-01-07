@@ -82,8 +82,8 @@ typedef struct RegisterInit {
 
 #define REG_INIT_RESULT_INIT { .code = REG_INIT_SUCCESS, .pos.address = 0u }
 
-typedef bool(*registerSer)(const RegisterValue, RegisterAtom*);
-typedef bool(*registerDes)(const RegisterAtom*, RegisterValue*);
+typedef bool(*registerSer)(const RegisterValue, RegisterAtom*, bool);
+typedef bool(*registerDes)(const RegisterAtom*, RegisterValue*, bool);
 typedef bool(*validatorFunction)(const RegisterEntry*, RegisterValue);
 
 typedef RegisterAccess(*registerRead)(
@@ -200,7 +200,8 @@ struct RegisterArea {
       .mem = NULL }
 
 typedef enum RegisterTableFlags {
-    REG_TF_INITIALISED = (1u << 0u)
+    REG_TF_INITIALISED = (1u << 0u),
+    REG_TF_BIG_ENDIAN  = (1u << 1u)
 } RegisterTableFlags;
 
 typedef struct RegisterTable {
@@ -387,6 +388,7 @@ typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
  * Public Functions
  */
 
+void register_make_bigendian(RegisterTable*, bool);
 RegisterInit register_init(RegisterTable*);
 RegisterAccess register_user_init(RegisterTable*, registerCallback);
 

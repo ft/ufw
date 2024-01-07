@@ -22,22 +22,22 @@
  */
 
 /* Ser/Des */
-static bool rds_invalid_ser(RegisterValue, RegisterAtom*);
-static bool rds_invalid_des(const RegisterAtom*, RegisterValue*);
-static bool rds_u16_ser(RegisterValue, RegisterAtom*);
-static bool rds_u16_des(const RegisterAtom*, RegisterValue*);
-static bool rds_u32_ser(RegisterValue, RegisterAtom*);
-static bool rds_u32_des(const RegisterAtom*, RegisterValue*);
-static bool rds_u64_ser(RegisterValue, RegisterAtom*);
-static bool rds_u64_des(const RegisterAtom*, RegisterValue*);
-static bool rds_s16_ser(RegisterValue, RegisterAtom*);
-static bool rds_s16_des(const RegisterAtom*, RegisterValue*);
-static bool rds_s32_ser(RegisterValue, RegisterAtom*);
-static bool rds_s32_des(const RegisterAtom*, RegisterValue*);
-static bool rds_s64_ser(RegisterValue, RegisterAtom*);
-static bool rds_s64_des(const RegisterAtom*, RegisterValue*);
-static bool rds_f32_ser(RegisterValue, RegisterAtom*);
-static bool rds_f32_des(const RegisterAtom*, RegisterValue*);
+static bool rds_invalid_ser(RegisterValue, RegisterAtom*, bool);
+static bool rds_invalid_des(const RegisterAtom*, RegisterValue*, bool);
+static bool rds_u16_ser(RegisterValue, RegisterAtom*, bool);
+static bool rds_u16_des(const RegisterAtom*, RegisterValue*, bool);
+static bool rds_u32_ser(RegisterValue, RegisterAtom*, bool);
+static bool rds_u32_des(const RegisterAtom*, RegisterValue*, bool);
+static bool rds_u64_ser(RegisterValue, RegisterAtom*, bool);
+static bool rds_u64_des(const RegisterAtom*, RegisterValue*, bool);
+static bool rds_s16_ser(RegisterValue, RegisterAtom*, bool);
+static bool rds_s16_des(const RegisterAtom*, RegisterValue*, bool);
+static bool rds_s32_ser(RegisterValue, RegisterAtom*, bool);
+static bool rds_s32_des(const RegisterAtom*, RegisterValue*, bool);
+static bool rds_s64_ser(RegisterValue, RegisterAtom*, bool);
+static bool rds_s64_des(const RegisterAtom*, RegisterValue*, bool);
+static bool rds_f32_ser(RegisterValue, RegisterAtom*, bool);
+static bool rds_f32_des(const RegisterAtom*, RegisterValue*, bool);
 
 /* Validators */
 static inline bool rv_check_max_value(RegisterValueU, RegisterValue);
@@ -125,134 +125,192 @@ reg_min(size_t a, size_t b)
 }
 
 static bool
-rds_invalid_ser(const RegisterValue v, RegisterAtom *r) /* NOLINT */
+rds_invalid_ser(const RegisterValue v, RegisterAtom *r, bool be) /* NOLINT */
 {
     (void)v;
     (void)r;
+    (void)be;
     assert(false);
     return false;
 }
 
 static bool
-rds_invalid_des(const RegisterAtom *r, RegisterValue *v)
+rds_invalid_des(const RegisterAtom *r, RegisterValue *v, bool be)
 {
     (void)r;
     (void)v;
+    (void)be;
     assert(false);
     return false;
 }
 
 static bool
-rds_u16_ser(const RegisterValue v, RegisterAtom *r)
+rds_u16_ser(const RegisterValue v, RegisterAtom *r, const bool bigendian)
 {
     assert(v.type == REG_TYPE_UINT16);
-    bf_set_u16l((uint_least8_t*)r, v.value.u16);
+    if (bigendian) {
+        bf_set_u16b(r, v.value.u16);
+    } else {
+        bf_set_u16l(r, v.value.u16);
+    }
     return true;
 }
 
 static bool
-rds_u16_des(const RegisterAtom *r, RegisterValue *v)
+rds_u16_des(const RegisterAtom *r, RegisterValue *v, const bool bigendian)
 {
-    v->value.u16 = bf_ref_u16l((uint_least8_t*)r);
+    if (bigendian) {
+        v->value.u16 = bf_ref_u16b(r);
+    } else {
+        v->value.u16 = bf_ref_u16l(r);
+    }
     v->type = REG_TYPE_UINT16;
     return true;
 }
 
 static bool
-rds_u32_ser(const RegisterValue v, RegisterAtom *r)
+rds_u32_ser(const RegisterValue v, RegisterAtom *r, const bool bigendian)
 {
     assert(v.type == REG_TYPE_UINT32);
-    bf_set_u32l((uint_least8_t*)r, v.value.u32);
+    if (bigendian) {
+        bf_set_u32b(r, v.value.u32);
+    } else {
+        bf_set_u32l(r, v.value.u32);
+    }
     return true;
 }
 
 static bool
-rds_u32_des(const RegisterAtom *r, RegisterValue *v)
+rds_u32_des(const RegisterAtom *r, RegisterValue *v, const bool bigendian)
 {
-    v->value.u32 = bf_ref_u32l((uint_least8_t*)r);
+    if (bigendian) {
+        v->value.u32 = bf_ref_u32b(r);
+    } else {
+        v->value.u32 = bf_ref_u32l(r);
+    }
     v->type = REG_TYPE_UINT32;
     return true;
 }
 
 static bool
-rds_u64_ser(const RegisterValue v, RegisterAtom *r)
+rds_u64_ser(const RegisterValue v, RegisterAtom *r, const bool bigendian)
 {
     assert(v.type == REG_TYPE_UINT64);
-    bf_set_u64l((uint_least8_t*)r, v.value.u64);
+    if (bigendian) {
+        bf_set_u64b(r, v.value.u64);
+    } else {
+        bf_set_u64l(r, v.value.u64);
+    }
     return true;
 }
 
 static bool
-rds_u64_des(const RegisterAtom *r, RegisterValue *v)
+rds_u64_des(const RegisterAtom *r, RegisterValue *v, const bool bigendian)
 {
-    v->value.u64 = bf_ref_u64l((uint_least8_t*)r);
+    if (bigendian) {
+        v->value.u64 = bf_ref_u64b(r);
+    } else {
+        v->value.u64 = bf_ref_u64l(r);
+    }
     v->type = REG_TYPE_UINT64;
     return true;
 }
 
 static bool
-rds_s16_ser(const RegisterValue v, RegisterAtom *r)
+rds_s16_ser(const RegisterValue v, RegisterAtom *r, const bool bigendian)
 {
     assert(v.type == REG_TYPE_SINT16);
-    bf_set_s16l((uint_least8_t*)r, v.value.s16);
+    if (bigendian) {
+        bf_set_s16b(r, v.value.s16);
+    } else {
+        bf_set_s16l(r, v.value.s16);
+    }
     return true;
 }
 
 static bool
-rds_s16_des(const RegisterAtom *r, RegisterValue *v)
+rds_s16_des(const RegisterAtom *r, RegisterValue *v, const bool bigendian)
 {
-    v->value.s16 = bf_ref_s16l((uint_least8_t*)r);
+    if (bigendian) {
+        v->value.s16 = bf_ref_s16b(r);
+    } else {
+        v->value.s16 = bf_ref_s16l(r);
+    }
     v->type = REG_TYPE_SINT16;
     return true;
 }
 
 static bool
-rds_s32_ser(const RegisterValue v, RegisterAtom *r)
+rds_s32_ser(const RegisterValue v, RegisterAtom *r, const bool bigendian)
 {
     assert(v.type == REG_TYPE_SINT32);
-    bf_set_s32l((uint_least8_t*)r, v.value.s32);
+    if (bigendian) {
+        bf_set_s32b(r, v.value.s32);
+    } else {
+        bf_set_s32l(r, v.value.s32);
+    }
     return true;
 }
 
 static bool
-rds_s32_des(const RegisterAtom *r, RegisterValue *v)
+rds_s32_des(const RegisterAtom *r, RegisterValue *v, const bool bigendian)
 {
-    v->value.s32 = bf_ref_s32l((uint_least8_t*)r);
+    if (bigendian) {
+        v->value.s32 = bf_ref_s32b(r);
+    } else {
+        v->value.s32 = bf_ref_s32l(r);
+    }
     v->type = REG_TYPE_SINT32;
     return true;
 }
 
 static bool
-rds_s64_ser(const RegisterValue v, RegisterAtom *r)
+rds_s64_ser(const RegisterValue v, RegisterAtom *r, const bool bigendian)
 {
     assert(v.type == REG_TYPE_SINT64);
-    bf_set_s64l((uint_least8_t*)r, v.value.s64);
+    if (bigendian) {
+        bf_set_s64b(r, v.value.s64);
+    } else {
+        bf_set_s64l(r, v.value.s64);
+    }
     return true;
 }
 
 static bool
-rds_s64_des(const RegisterAtom *r, RegisterValue *v)
+rds_s64_des(const RegisterAtom *r, RegisterValue *v, const bool bigendian)
 {
-    v->value.s64 = bf_ref_s64l((uint_least8_t*)r);
+    if (bigendian) {
+        v->value.s64 = bf_ref_s64b(r);
+    } else {
+        v->value.s64 = bf_ref_s64l(r);
+    }
     v->type = REG_TYPE_SINT64;
     return true;
 }
 
 static bool
-rds_f32_ser(const RegisterValue v, RegisterAtom *r)
+rds_f32_ser(const RegisterValue v, RegisterAtom *r, const bool bigendian)
 {
     assert(v.type == REG_TYPE_FLOAT32);
     if ((v.value.f32 != 0.) && (isnormal(v.value.f32) == false)) {
         return false;
     }
-    bf_set_f32l((uint_least8_t*)r, v.value.f32);
+    if (bigendian) {
+        bf_set_f32b(r, v.value.f32);
+    } else {
+        bf_set_f32l(r, v.value.f32);
+    }
     return true;
 }
 
 static bool
-rds_f32_des(const RegisterAtom *r, RegisterValue *v)
+rds_f32_des(const RegisterAtom *r, RegisterValue *v, const bool bigendian)
 {
-    v->value.f32 = bf_ref_f32l((uint_least8_t*)r);
+    if (bigendian) {
+        v->value.f32 = bf_ref_f32b(r);
+    } else {
+        v->value.f32 = bf_ref_f32l(r);
+    }
     v->type = REG_TYPE_FLOAT32;
     return ((v->value.f32 == 0.) || (isnormal(v->value.f32) == true));
 }
@@ -690,7 +748,8 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr,
         memcpy(raw + rs, buf + bs, rlen * sizeof(RegisterAtom));
 
         /* Try the deserialiser, fail if it fails */
-        if (rds_serdes[e->type].des(raw, &datum) == false) {
+        const bool bigendian = BIT_ISSET(t->flags, REG_TF_BIG_ENDIAN);
+        if (rds_serdes[e->type].des(raw, &datum, bigendian) == false) {
             rv.code = REG_ACCESS_INVALID;
             rv.address = addr + bs;
             return rv;
@@ -770,6 +829,16 @@ need_to_load_default(const RegisterEntry *e)
 }
 
 /* Public API */
+
+void
+register_make_bigendian(RegisterTable *t, const bool bigendian)
+{
+    if (bigendian) {
+        BIT_SET(t->flags, REG_TF_BIG_ENDIAN);
+    } else {
+        BIT_CLEAR(t->flags, REG_TF_BIG_ENDIAN);
+    }
+}
 
 RegisterInit
 register_init(RegisterTable *t) /* NOLINT */
@@ -1003,7 +1072,8 @@ register_set(RegisterTable *t, RegisterHandle idx, const RegisterValue v)
         return rv;
     }
 
-    success = rds_serdes[e->type].ser(v, raw);
+    const bool bigendian = BIT_ISSET(t->flags, REG_TF_BIG_ENDIAN);
+    success = rds_serdes[e->type].ser(v, raw, bigendian);
 
     if (success == false) {
         rv.code = REG_ACCESS_INVALID;
@@ -1041,7 +1111,8 @@ register_get(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
     if (rv.code != REG_ACCESS_SUCCESS) {
         return rv;
     }
-    success = rds_serdes[e->type].des(raw, v);
+    const bool bigendian = BIT_ISSET(t->flags, REG_TF_BIG_ENDIAN);
+    success = rds_serdes[e->type].des(raw, v, bigendian);
 
     if (success == false) {
         rv.code = REG_ACCESS_INVALID;

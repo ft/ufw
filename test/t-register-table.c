@@ -1001,10 +1001,46 @@ t_reg_entry_pointer(void)
     ok(p->b == 666u, "reg[1].user->b is initialised correctly");
 }
 
+static void
+t_big_endian(void)
+{
+    RegisterTable t = {
+        .area = (RegisterArea[]) {
+            MEMORY_AREA(0x0000ul, 0x40ul),
+            REGISTER_AREA_END
+        },
+        .entry = (RegisterEntry[]) {
+            REG_U16(0, 0x0000ul, 0x1234u),
+            REG_U32(1, 0x0010ul, 0x12345678ul),
+            REG_U64(2, 0x0020ul, 0x1234567890abcdefull),
+            REGISTER_ENTRY_END
+        }
+    };
+
+    register_make_bigendian(&t, true);
+    RegisterInit success = register_init(&t);
+    cmp_code(success.code, ==, REG_INIT_SUCCESS, "big-endian: t initialises");
+
+    unsigned char exu16[] = { 0x12u, 0x34u };
+    void *pos = t.area[0].mem;
+    cmp_mem(exu16, pos, sizeof(uint16_t), "big-endian: u16 value is correct");
+
+    unsigned char exu32[] = { 0x12u, 0x34u, 0x56u, 0x78u };
+    pos = t.area[0].mem + 0x10u;
+    cmp_mem(exu32, pos, sizeof(uint32_t), "big-endian: u32 value is correct");
+
+    unsigned char exu64[] = {
+        0x12u, 0x34u, 0x56u, 0x78u,
+        0x90u, 0xabu, 0xcdu, 0xefu
+    };
+    pos = t.area[0].mem + 0x20u;
+    cmp_mem(exu64, pos, sizeof(uint64_t), "big-endian: u64 value is correct");
+}
+
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(3+1+1+4+16+54+(7*18)+15+26+3+3+2+11+6+5);
+    plan(3+1+1+4+16+54+(7*18)+15+26+3+3+2+11+6+5+4);
     t_invalid_tables();    /*  3 */
     t_trivial_success();   /*  1 */
     t_trivial_fail();      /*  1 */
@@ -1026,5 +1062,6 @@ main(UNUSED int argc, UNUSED char *argv[])
     t_iterate_single();    /* 11 */
     t_iterate_miss();      /*  6 */
     t_reg_entry_pointer(); /*  5 */
+    t_big_endian();        /*  4 */
     return EXIT_SUCCESS;
 }

@@ -35,6 +35,7 @@
 - lenp: Add support for connected a lenp-source to arbitrary sinks.
 - regp: Add a specification for the proposed register protocol.
 - regp: Add an implementation of the register protocol.
+- regs: Add support for big-endian register tables.
 
 ** Bugfixes
 
