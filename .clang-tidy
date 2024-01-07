@@ -27,7 +27,7 @@ Checks: >
   -llvm-header-guard,
   -llvmlibc-restrict-system-libc-headers,
   -misc-throw-by-value-catch-by-reference,
-  -modernize-macro-to-enum,
+  -modernize-*,
   -readability-else-after-return,
   -readability-function-cognitive-complexity,
   -readability-identifier-length,
