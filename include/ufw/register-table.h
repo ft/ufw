@@ -120,7 +120,6 @@ struct RegisterValue {
 typedef struct RegisterSerDes {
     registerSer ser;
     registerDes des;
-    RegisterOffset size;
 } RegisterSerDes;
 
 typedef enum RegisterValidatorType {

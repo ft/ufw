@@ -257,17 +257,28 @@ rds_f32_des(const RegisterAtom *r, RegisterValue *v)
     return ((v->value.f32 == 0.) || (isnormal(v->value.f32) == true));
 }
 
+const RegisterSerDes rds_serdes[] = {
+    [REG_TYPE_INVALID] = { rds_invalid_ser, rds_invalid_des },
+    [REG_TYPE_UINT16]  = { rds_u16_ser,     rds_u16_des },
+    [REG_TYPE_UINT32]  = { rds_u32_ser,     rds_u32_des },
+    [REG_TYPE_UINT64]  = { rds_u64_ser,     rds_u64_des },
+    [REG_TYPE_SINT16]  = { rds_s16_ser,     rds_s16_des },
+    [REG_TYPE_SINT32]  = { rds_s32_ser,     rds_s32_des },
+    [REG_TYPE_SINT64]  = { rds_s64_ser,     rds_s64_des },
+    [REG_TYPE_FLOAT32] = { rds_f32_ser,     rds_f32_des }
+};
+
 #define rs(t) (sizeof(t) / sizeof(RegisterAtom))
 
-const RegisterSerDes rds_serdes[] = {
-    [REG_TYPE_INVALID] = { rds_invalid_ser, rds_invalid_des, 0 },
-    [REG_TYPE_UINT16] = { rds_u16_ser, rds_u16_des, rs(uint16_t) }, /* NOLINT */
-    [REG_TYPE_UINT32] = { rds_u32_ser, rds_u32_des, rs(uint32_t) },
-    [REG_TYPE_UINT64] = { rds_u64_ser, rds_u64_des, rs(uint64_t) },
-    [REG_TYPE_SINT16] = { rds_s16_ser, rds_s16_des, rs(int16_t) },
-    [REG_TYPE_SINT32] = { rds_s32_ser, rds_s32_des, rs(int32_t) },
-    [REG_TYPE_SINT64] = { rds_s64_ser, rds_s64_des, rs(int64_t) },
-    [REG_TYPE_FLOAT32] = { rds_f32_ser, rds_f32_des, rs(float) }
+const size_t rds_size[] = {
+    [REG_TYPE_INVALID] = 0,
+    [REG_TYPE_UINT16]  = rs(uint16_t), /* NOLINT */
+    [REG_TYPE_UINT32]  = rs(uint32_t),
+    [REG_TYPE_UINT64]  = rs(uint64_t),
+    [REG_TYPE_SINT16]  = rs(int16_t),
+    [REG_TYPE_SINT32]  = rs(int32_t),
+    [REG_TYPE_SINT64]  = rs(int64_t),
+    [REG_TYPE_FLOAT32] = rs(float)
 };
 
 static inline bool
@@ -373,7 +384,7 @@ reg_range_touches(RegisterEntry *e, RegisterAddress addr, RegisterOffset n)
 {
     /* Return -1 if entry is below range; 0 if it is within the range and 1 if
      * it is above the range */
-    const RegisterOffset size = rds_serdes[e->type].size;
+    const RegisterOffset size = rds_size[e->type];
 
     if ((e->address + size) <= addr) {
         return -1;
@@ -495,7 +506,7 @@ static bool
 ra_reg_fits_into(RegisterArea *a, RegisterEntry *e)
 {
     const RegisterAddress area_end = a->base + a->size;
-    const RegisterAddress entry_end = e->address + rds_serdes[e->type].size;
+    const RegisterAddress entry_end = e->address + rds_size[e->type];
     return (entry_end <= area_end);
 }
 
@@ -533,7 +544,7 @@ reg_entry_is_in_memory(RegisterTable *t, RegisterEntry *e)
 static inline RegisterAccess
 reg_read_entry(RegisterEntry *e, RegisterAtom *buf)
 {
-    return e->area->read(e->area, buf, e->offset, rds_serdes[e->type].size);
+    return e->area->read(e->area, buf, e->offset, rds_size[e->type]);
 }
 
 static inline int
@@ -604,7 +615,7 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr,
         RegisterEntry *e = &t->entry[i];
         RegisterValue datum;
         RegisterAtom raw[REG_SIZEOF_LARGEST_DATUM];
-        const RegisterOffset size = rds_serdes[e->type].size;
+        const RegisterOffset size = rds_size[e->type];
         const RegisterAddress end = e->address + size - 1;
         RegisterAddress bs, rs;
         RegisterOffset rlen;
@@ -826,7 +837,7 @@ register_init(RegisterTable *t) /* NOLINT */
             rv.pos.entry = i;
             return rv;
         }
-        if (current < (previous+rds_serdes[t->entry[i-1].type].size)) {
+        if (current < (previous+rds_size[t->entry[i-1].type])) {
             rv.code = REG_INIT_ENTRY_ADDRESS_OVERLAP;
             rv.pos.entry = i;
             return rv;
@@ -1000,7 +1011,7 @@ register_set(RegisterTable *t, RegisterHandle idx, const RegisterValue v)
         return rv;
     }
 
-    return a->write(a, raw, e->offset, rds_serdes[e->type].size);
+    return a->write(a, raw, e->offset, rds_size[e->type]);
 }
 
 RegisterAccess
@@ -1026,7 +1037,7 @@ register_get(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
 
     e = &t->entry[idx];
     a = e->area;
-    rv = a->read(a, raw, e->offset, rds_serdes[e->type].size);
+    rv = a->read(a, raw, e->offset, rds_size[e->type]);
     if (rv.code != REG_ACCESS_SUCCESS) {
         return rv;
     }
@@ -1275,7 +1286,7 @@ register_set_from_hexstr(RegisterTable *t, const RegisterAddress start,
 
         const RegisterAtom value = reg_atom_from_hexstr(cur, cn);
         const RegisterOffset o = ca - area->base;
-        const size_t size = rds_serdes[REG_TYPE_UINT16].size;
+        const size_t size = rds_size[REG_TYPE_UINT16];
         rv = area->write((RegisterArea*)area, &value, o, size);
         if (rv.code != REG_ACCESS_SUCCESS) {
             return rv;
