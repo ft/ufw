@@ -126,6 +126,7 @@ typedef struct RegisterSerDes {
 
 typedef enum RegisterValidatorType {
     REGV_TYPE_TRIVIAL = 0,
+    REGV_TYPE_FAIL,
     REGV_TYPE_MIN,
     REGV_TYPE_MAX,
     REGV_TYPE_RANGE,
@@ -203,7 +204,8 @@ struct RegisterArea {
 
 typedef enum RegisterTableFlags {
     REG_TF_INITIALISED = (1u << 0u),
-    REG_TF_BIG_ENDIAN  = (1u << 1u)
+    REG_TF_DURING_INIT = (1u << 1u),
+    REG_TF_BIG_ENDIAN  = (1u << 2u)
 } RegisterTableFlags;
 
 typedef struct RegisterTable {
@@ -265,6 +267,11 @@ typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
               .check.type = REGV_TYPE_TRIVIAL,                  \
               .user = (USR) }
 
+#define MAKE_FAIL_REGISTERx(IDX,ADDR,TYPE,MEMBER,DEFAULT,USR)   \
+    [IDX] = { REGCOMMON(IDX,ADDR,TYPE,MEMBER,DEFAULT),          \
+              .check.type = REGV_TYPE_FAIL,                     \
+              .user = (USR) }
+
 #define MAKE_MIN_REGISTERx(IDX,ADDR,TYPE,MEMBER,DEFAULT,MIN,USR)        \
     [IDX] = { REGCOMMON(IDX,ADDR,TYPE,MEMBER,DEFAULT),                  \
               .check.type = REGV_TYPE_MIN,                              \
@@ -293,6 +300,9 @@ typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
 #define MAKE_REGISTER(IDX,ADDR,TYPE,MEMBER,DEFAULT)     \
     MAKE_REGISTERx(IDX,ADDR,TYPE,MEMBER,DEFAULT,NULL)
 
+#define MAKE_FAIL_REGISTER(IDX,ADDR,TYPE,MEMBER,DEFAULT)        \
+    MAKE_FAIL_REGISTERx(IDX,ADDR,TYPE,MEMBER,DEFAULT,NULL)
+
 #define MAKE_MIN_REGISTER(IDX,ADDR,TYPE,MEMBER,DEFAULT,MIN)     \
     MAKE_MIN_REGISTERx(IDX,ADDR,TYPE,MEMBER,DEFAULT,MIN,NULL)
 
@@ -315,6 +325,8 @@ typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
 
 #define REG_U16(I,A,D)                 MAKE_REGISTER(I,A,REG_TYPE_UINT16,u16,D)
 #define REGx_U16(I,A,D,U)              MAKE_REGISTERx(I,A,REG_TYPE_UINT16,u16,D,U)
+#define REG_U16FAIL(I,A,D)             MAKE_FAIL_REGISTER(I,A,REG_TYPE_UINT16,u16,D)
+#define REGx_U16FAIL(I,A,D,U)          MAKE_FAIL_REGISTERx(I,A,REG_TYPE_UINT16,u16,D,U)
 #define REG_U16MIN(I,A,MIN,D)          MAKE_MIN_REGISTER(I,A,REG_TYPE_UINT16,u16,D,MIN)
 #define REGx_U16MIN(I,A,MIN,D,U)       MAKE_MIN_REGISTERx(I,A,REG_TYPE_UINT16,u16,D,MIN,U)
 #define REG_U16MAX(I,A,MAX,D)          MAKE_MAX_REGISTER(I,A,REG_TYPE_UINT16,u16,D,MAX)
@@ -325,6 +337,8 @@ typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
 #define REGx_U16FNC(I,A,FNC,D,U)       MAKE_VALIDATOR_REGISTERx(I,A,REG_TYPE_UINT16,u16,D,FNC,U)
 #define REG_U32(I,A,D)                 MAKE_REGISTER(I,A,REG_TYPE_UINT32,u32,D)
 #define REGx_U32(I,A,D,U)              MAKE_REGISTERx(I,A,REG_TYPE_UINT32,u32,D,U)
+#define REG_U32FAIL(I,A,D)             MAKE_FAIL_REGISTER(I,A,REG_TYPE_UINT32,u32,D)
+#define REGx_U32FAIL(I,A,D,U)          MAKE_FAIL_REGISTERx(I,A,REG_TYPE_UINT32,u32,D,U)
 #define REG_U32MIN(I,A,MIN,D)          MAKE_MIN_REGISTER(I,A,REG_TYPE_UINT32,u32,D,MIN)
 #define REGx_U32MIN(I,A,MIN,D,U)       MAKE_MIN_REGISTERx(I,A,REG_TYPE_UINT32,u32,D,MIN,U)
 #define REG_U32MAX(I,A,MAX,D)          MAKE_MAX_REGISTER(I,A,REG_TYPE_UINT32,u32,D,MAX)
@@ -335,6 +349,8 @@ typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
 #define REGx_U32FNC(I,A,FNC,D,U)       MAKE_VALIDATOR_REGISTERx(I,A,REG_TYPE_UINT32,u32,D,FNC,U)
 #define REG_U64(I,A,D)                 MAKE_REGISTER(I,A,REG_TYPE_UINT64,u64,D)
 #define REGx_U64(I,A,D,U)              MAKE_REGISTERx(I,A,REG_TYPE_UINT64,u64,D,U)
+#define REG_U64FAIL(I,A,D)             MAKE_FAIL_REGISTER(I,A,REG_TYPE_UINT64,u64,D)
+#define REGx_U64FAIL(I,A,D,U)          MAKE_FAIL_REGISTERx(I,A,REG_TYPE_UINT64,u64,D,U)
 #define REG_U64MIN(I,A,MIN,D)          MAKE_MIN_REGISTER(I,A,REG_TYPE_UINT64,u64,D,MIN)
 #define REGx_U64MIN(I,A,MIN,D,U)       MAKE_MIN_REGISTERx(I,A,REG_TYPE_UINT64,u64,D,MIN,U)
 #define REG_U64MAX(I,A,MAX,D)          MAKE_MAX_REGISTER(I,A,REG_TYPE_UINT64,u64,D,MAX)
@@ -345,6 +361,8 @@ typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
 #define REGx_U64FNC(I,A,FNC,D,U)       MAKE_VALIDATOR_REGISTERx(I,A,REG_TYPE_UINT64,u64,D,FNC,U)
 #define REG_S16(I,A,D)                 MAKE_REGISTER(I,A,REG_TYPE_SINT16,s16,D)
 #define REGx_S16(I,A,D,U)              MAKE_REGISTERx(I,A,REG_TYPE_SINT16,s16,D,U)
+#define REG_S16FAIL(I,A,D)             MAKE_FAIL_REGISTER(I,A,REG_TYPE_SINT16,s16,D)
+#define REGx_S16FAIL(I,A,D,U)          MAKE_FAIL_REGISTERx(I,A,REG_TYPE_SINT16,s16,D,U)
 #define REG_S16MIN(I,A,MIN,D)          MAKE_MIN_REGISTER(I,A,REG_TYPE_SINT16,s16,D,MIN)
 #define REGx_S16MIN(I,A,MIN,D,U)       MAKE_MIN_REGISTERx(I,A,REG_TYPE_SINT16,s16,D,MIN,U)
 #define REG_S16MAX(I,A,MAX,D)          MAKE_MAX_REGISTER(I,A,REG_TYPE_SINT16,s16,D,MAX)
@@ -355,6 +373,8 @@ typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
 #define REGx_S16FNC(I,A,FNC,D,U)       MAKE_VALIDATOR_REGISTERx(I,A,REG_TYPE_SINT16,s16,D,FNC,U)
 #define REG_S32(I,A,D)                 MAKE_REGISTER(I,A,REG_TYPE_SINT32,s32,D)
 #define REGx_S32(I,A,D,U)              MAKE_REGISTERx(I,A,REG_TYPE_SINT32,s32,D,U)
+#define REG_S32FAIL(I,A,D)             MAKE_FAIL_REGISTER(I,A,REG_TYPE_SINT32,s32,D)
+#define REGx_S32FAIL(I,A,D,U)          MAKE_FAIL_REGISTERx(I,A,REG_TYPE_SINT32,s32,D,U)
 #define REG_S32MIN(I,A,MIN,D)          MAKE_MIN_REGISTER(I,A,REG_TYPE_SINT32,s32,D,MIN)
 #define REGx_S32MIN(I,A,MIN,D,U)       MAKE_MIN_REGISTERx(I,A,REG_TYPE_SINT32,s32,D,MIN,U)
 #define REG_S32MAX(I,A,MAX,D)          MAKE_MAX_REGISTER(I,A,REG_TYPE_SINT32,s32,D,MAX)
@@ -365,6 +385,8 @@ typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
 #define REGx_S32FNC(I,A,FNC,D,U)       MAKE_VALIDATOR_REGISTERx(I,A,REG_TYPE_SINT32,s32,D,FNC,U)
 #define REG_S64(I,A,D)                 MAKE_REGISTER(I,A,REG_TYPE_SINT64,s64,D)
 #define REGx_S64(I,A,D,U)              MAKE_REGISTERx(I,A,REG_TYPE_SINT64,s64,D,U)
+#define REG_S64FAIL(I,A,D)             MAKE_FAIL_REGISTER(I,A,REG_TYPE_SINT64,s64,D)
+#define REGx_S64FAIL(I,A,D,U)          MAKE_FAIL_REGISTERx(I,A,REG_TYPE_SINT64,s64,D,U)
 #define REG_S64MIN(I,A,MIN,D)          MAKE_MIN_REGISTER(I,A,REG_TYPE_SINT64,s64,D,MIN)
 #define REGx_S64MIN(I,A,MIN,D,U)       MAKE_MIN_REGISTERx(I,A,REG_TYPE_SINT64,s64,D,MIN,U)
 #define REG_S64MAX(I,A,MAX,D)          MAKE_MAX_REGISTER(I,A,REG_TYPE_SINT64,s64,D,MAX)
@@ -375,6 +397,8 @@ typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
 #define REGx_S64FNC(I,A,FNC,D,U)       MAKE_VALIDATOR_REGISTERx(I,A,REG_TYPE_SINT64,s64,D,FNC,U)
 #define REG_F32(I,A,D)                 MAKE_REGISTER(I,A,REG_TYPE_FLOAT32,f32,D)
 #define REGx_F32(I,A,D,U)              MAKE_REGISTERx(I,A,REG_TYPE_FLOAT32,f32,D,U)
+#define REG_F32FAIL(I,A,D)             MAKE_FAIL_REGISTER(I,A,REG_TYPE_FLOAT32,f32,D)
+#define REGx_F32FAIL(I,A,D,U)          MAKE_FAIL_REGISTERx(I,A,REG_TYPE_FLOAT32,f32,D,U)
 #define REG_F32MIN(I,A,MIN,D)          MAKE_MIN_REGISTER(I,A,REG_TYPE_FLOAT32,f32,D,MIN)
 #define REGx_F32MIN(I,A,MIN,D,U)       MAKE_MIN_REGISTERx(I,A,REG_TYPE_FLOAT32,f32,D,MIN,U)
 #define REG_F32MAX(I,A,MAX,D)          MAKE_MAX_REGISTER(I,A,REG_TYPE_FLOAT32,f32,D,MAX)
@@ -385,6 +409,8 @@ typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
 #define REGx_F32FNC(I,A,FNC,D,U)       MAKE_VALIDATOR_REGISTERx(I,A,REG_TYPE_FLOAT32,f32,D,FNC,U)
 #define REG_F64(I,A,D)                 MAKE_REGISTER(I,A,REG_TYPE_FLOAT64,f64,D)
 #define REGx_F64(I,A,D,U)              MAKE_REGISTERx(I,A,REG_TYPE_FLOAT64,f64,D,U)
+#define REG_F64FAIL(I,A,D)             MAKE_FAIL_REGISTER(I,A,REG_TYPE_FLOAT64,f64,D)
+#define REGx_F64FAIL(I,A,D,U)          MAKE_FAIL_REGISTERx(I,A,REG_TYPE_FLOAT64,f64,D,U)
 #define REG_F64MIN(I,A,MIN,D)          MAKE_MIN_REGISTER(I,A,REG_TYPE_FLOAT64,f64,D,MIN)
 #define REGx_F64MIN(I,A,MIN,D,U)       MAKE_MIN_REGISTERx(I,A,REG_TYPE_FLOAT64,f64,D,MIN,U)
 #define REG_F64MAX(I,A,MAX,D)          MAKE_MAX_REGISTER(I,A,REG_TYPE_FLOAT64,f64,D,MAX)

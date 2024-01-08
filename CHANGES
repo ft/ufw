@@ -37,6 +37,7 @@
 - regp: Add an implementation of the register protocol.
 - regs: Add support for big-endian register tables.
 - regs: Add support for double (f64) registers.
+- regs: Add always-failing register value validator.
 
 ** Bugfixes
 

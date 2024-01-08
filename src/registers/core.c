@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 micro framework workers, All rights reserved.
+ * Copyright (c) 2019-2024 micro framework workers, All rights reserved.
  *
  * Terms for redistribution and use can be found in LICENCE.
  */
@@ -48,7 +48,7 @@ static inline bool rv_check_min(RegisterEntry*, RegisterValue);
 static inline bool rv_check_max(RegisterEntry*, RegisterValue);
 static inline bool rv_check_range(RegisterEntry*, RegisterValue);
 static inline bool rv_check_cb(RegisterEntry*, RegisterValue);
-static bool rv_validate(RegisterEntry*, RegisterValue);
+static bool rv_validate(RegisterTable*, RegisterEntry*, RegisterValue);
 
 /* Initialisation utilities */
 static AreaHandle reg_count_areas(RegisterArea*);
@@ -450,7 +450,7 @@ rv_check_cb(RegisterEntry *e, const RegisterValue v)
 }
 
 static bool
-rv_validate(RegisterEntry *e, const RegisterValue v)
+rv_validate(RegisterTable *t, RegisterEntry *e, const RegisterValue v)
 {
     if (e->type != v.type) {
         return false;
@@ -459,6 +459,10 @@ rv_validate(RegisterEntry *e, const RegisterValue v)
     switch (e->check.type) {
     case REGV_TYPE_TRIVIAL:
         return true;
+    case REGV_TYPE_FAIL:
+        /* This allows for the default value to be applied at initialisation
+         * time, but no further writes afterwards. */
+        return BIT_ISSET(t->flags, REG_TF_DURING_INIT);
     case REGV_TYPE_MIN:
         return rv_check_min(e, v);
     case REGV_TYPE_MAX:
@@ -503,7 +507,7 @@ reg_entry_sane(RegisterTable *t, RegisterHandle reg)
     }
 
     /* Make sure the current value is fits into table constraints */
-    if (rv_validate(t->entry + reg, current)) {
+    if (rv_validate(t, t->entry + reg, current)) {
         rv.code = REG_ACCESS_SUCCESS;
         rv.address = 0u;
     } else {
@@ -791,7 +795,7 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr,
         }
 
         /* Try the validator, fail if it fails */
-        if (rv_validate(e, datum) == false) {
+        if (rv_validate(t, e, datum) == false) {
             rv.code = REG_ACCESS_RANGE;
             rv.address = addr + bs;
             return rv;
@@ -897,23 +901,27 @@ register_init(RegisterTable *t) /* NOLINT */
     }
 
     BIT_CLEAR(t->flags, REG_TF_INITIALISED);
+    BIT_SET(t->flags, REG_TF_DURING_INIT);
     /* Determine table sizes first */
     t->areas = reg_count_areas(t->area);
     if (t->areas == AREA_HANDLE_MAX) {
         rv.code = REG_INIT_TOO_MANY_AREAS;
         rv.pos.area = AREA_HANDLE_MAX;
+        BIT_CLEAR(t->flags, REG_TF_DURING_INIT);
         return rv;
     }
     t->entries = reg_count_entries(t->entry);
     if (t->entries == REGISTER_HANDLE_MAX) {
         rv.code = REG_INIT_TOO_MANY_ENTRIES;
         rv.pos.entry = REGISTER_HANDLE_MAX;
+        BIT_CLEAR(t->flags, REG_TF_DURING_INIT);
         return rv;
     }
 
     if (t->areas == 0ul) {
         rv.code = REG_INIT_NO_AREAS;
         rv.pos.area = 0;
+        BIT_CLEAR(t->flags, REG_TF_DURING_INIT);
         return rv;
     }
 
@@ -923,11 +931,13 @@ register_init(RegisterTable *t) /* NOLINT */
         if (current < previous) {
             rv.code = REG_INIT_AREA_INVALID_ORDER;
             rv.pos.area = i;
+            BIT_CLEAR(t->flags, REG_TF_DURING_INIT);
             return rv;
         }
         if (current < (previous + t->area[i-1].size)) {
             rv.code = REG_INIT_AREA_ADDRESS_OVERLAP;
             rv.pos.area = i;
+            BIT_CLEAR(t->flags, REG_TF_DURING_INIT);
             return rv;
         }
         previous = current;
@@ -939,11 +949,13 @@ register_init(RegisterTable *t) /* NOLINT */
         if (t->entry[i].address < previous) {
             rv.code = REG_INIT_ENTRY_INVALID_ORDER;
             rv.pos.entry = i;
+            BIT_CLEAR(t->flags, REG_TF_DURING_INIT);
             return rv;
         }
         if (current < (previous+rds_size[t->entry[i-1].type])) {
             rv.code = REG_INIT_ENTRY_ADDRESS_OVERLAP;
             rv.pos.entry = i;
+            BIT_CLEAR(t->flags, REG_TF_DURING_INIT);
             return rv;
         }
         previous = current;
@@ -972,7 +984,7 @@ register_init(RegisterTable *t) /* NOLINT */
         if (success == false) {
             rv.code = REG_INIT_ENTRY_IN_MEMORY_HOLE;
             rv.pos.entry = i;
-            BIT_CLEAR(t->flags, REG_TF_INITIALISED);
+            BIT_CLEAR(t->flags, REG_TF_INITIALISED | REG_TF_DURING_INIT);
             return rv;
         }
         e->area = &t->area[ra_find_area_by_addr(t, e->address)];
@@ -988,7 +1000,7 @@ register_init(RegisterTable *t) /* NOLINT */
             if (access.code != REG_ACCESS_SUCCESS) {
                 rv.code = REG_INIT_ENTRY_INVALID_DEFAULT;
                 rv.pos.entry = i;
-                BIT_CLEAR(t->flags, REG_TF_INITIALISED);
+                BIT_CLEAR(t->flags, REG_TF_INITIALISED | REG_TF_DURING_INIT);
                 return rv;
             }
         }
@@ -1013,6 +1025,7 @@ register_init(RegisterTable *t) /* NOLINT */
         }
     }
 
+    BIT_CLEAR(t->flags, REG_TF_DURING_INIT);
     return rv;
 }
 
@@ -1092,7 +1105,7 @@ register_set(RegisterTable *t, RegisterHandle idx, const RegisterValue v)
     }
 
     e = &t->entry[idx];
-    success = rv_validate(e, v);
+    success = rv_validate(t, e, v);
     if (success == false) {
         rv.code = REG_ACCESS_RANGE;
         rv.address = e->address;

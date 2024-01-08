@@ -117,6 +117,9 @@ register_validator_print(void *h, RegisterType type, const RegisterValidator *v)
     case REGV_TYPE_TRIVIAL:
         r_fprintf(h, "<trivial>");
         break;
+    case REGV_TYPE_FAIL:
+        r_fprintf(h, "<fail>");
+        break;
     case REGV_TYPE_MIN:
         r_fprintf(h, "<min: ");
         value.value = v->arg.min;
@@ -321,6 +324,7 @@ register_validatortype_to_string(RegisterValidatorType type)
 
     static char *map[] = {
         IDX2STR(REGV_TYPE_TRIVIAL),
+        IDX2STR(REGV_TYPE_FAIL),
         IDX2STR(REGV_TYPE_MIN),
         IDX2STR(REGV_TYPE_MAX),
         IDX2STR(REGV_TYPE_RANGE),
