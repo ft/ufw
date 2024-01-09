@@ -15,6 +15,7 @@
   byte_buffer_, the data types from OctetBuffer and OctetChunks to ByteBuffer
   and ByteChunks, as well as the header from octet-buffer.h to byte-buffer.h.
 - bb: Make paramter to _avail() and _rest() const.
+- regs: Table argument to register_get_entry() is now const.
 
 ** New Features
 

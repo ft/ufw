@@ -1679,7 +1679,7 @@ register_foreach_in(RegisterTable *t,
 }
 
 RegisterEntry *
-register_get_entry(RegisterTable *t, RegisterHandle r)
+register_get_entry(const RegisterTable *t, const RegisterHandle r)
 {
     if (r >= t->entries) {
         return NULL;
