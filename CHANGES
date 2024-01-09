@@ -40,6 +40,7 @@
 - regs: Add support for double (f64) registers.
 - regs: Add always-failing register value validator.
 - regs: Add register_entry_size() function.
+- regs: Add register_set_unsafe() function.
 
 ** Bugfixes
 

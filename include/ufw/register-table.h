@@ -437,6 +437,8 @@ RegisterAccess reg_mem_write(RegisterArea*, const RegisterAtom*,
 
 RegisterAccess register_set(RegisterTable*, RegisterHandle,
                             RegisterValue);
+RegisterAccess register_set_unsafe(RegisterTable*, RegisterHandle,
+                                   RegisterValue);
 RegisterAccess register_get(RegisterTable*, RegisterHandle,
                             RegisterValue*);
 RegisterAccess register_default(RegisterTable*, RegisterHandle,

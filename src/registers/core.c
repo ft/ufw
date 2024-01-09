@@ -79,6 +79,9 @@ static inline int reg_range_touches(RegisterEntry*,
 static RegisterAccess reg_entry_sane(RegisterTable*, RegisterHandle);
 static RegisterAccess reg_entry_load_default(RegisterTable*, RegisterHandle);
 
+static RegisterAccess register_setx(RegisterTable*, RegisterHandle,
+                                    RegisterValue, bool);
+
 /* Block write utilities */
 static RegisterAccess ra_writeable(RegisterTable*,
                                    RegisterAddress,
@@ -1089,8 +1092,9 @@ register_user_init(RegisterTable *t, registerCallback f)
     return rv;
 }
 
-RegisterAccess
-register_set(RegisterTable *t, RegisterHandle idx, const RegisterValue v)
+static RegisterAccess
+register_setx(RegisterTable *t, const RegisterHandle idx,
+              const RegisterValue v, const bool withvalidator)
 {
     RegisterAtom raw[REG_SIZEOF_LARGEST_DATUM];
     RegisterAccess rv = REG_ACCESS_RESULT_INIT;
@@ -1110,12 +1114,15 @@ register_set(RegisterTable *t, RegisterHandle idx, const RegisterValue v)
         return rv;
     }
 
-    e = &t->entry[idx];
-    success = rv_validate(t, e, v);
-    if (success == false) {
-        rv.code = REG_ACCESS_RANGE;
-        rv.address = e->address;
-        return rv;
+    e = t->entry + idx;
+
+    if (withvalidator) {
+        success = rv_validate(t, e, v);
+        if (success == false) {
+            rv.code = REG_ACCESS_RANGE;
+            rv.address = e->address;
+            return rv;
+        }
     }
 
     a = e->area;
@@ -1136,6 +1143,19 @@ register_set(RegisterTable *t, RegisterHandle idx, const RegisterValue v)
     }
 
     return a->write(a, raw, e->offset, rds_size[e->type]);
+}
+
+RegisterAccess
+register_set(RegisterTable *t, const RegisterHandle idx, const RegisterValue v)
+{
+    return register_setx(t, idx, v, true);
+}
+
+RegisterAccess
+register_set_unsafe(RegisterTable *t, const RegisterHandle idx,
+                    const RegisterValue v)
+{
+    return register_setx(t, idx, v, false);
 }
 
 RegisterAccess
