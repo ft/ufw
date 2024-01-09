@@ -460,6 +460,7 @@ RegisterAccess register_set_from_hexstr(RegisterTable*,
 RegisterAccess register_sanitise(RegisterTable*);
 
 RegisterEntry* register_get_entry(const RegisterTable*, RegisterHandle);
+size_t register_entry_size(const RegisterEntry*);
 
 RegisterAccess register_mcopy(RegisterTable*, AreaHandle, AreaHandle);
 bool register_value_compare(const RegisterValue*, const RegisterValue*);

@@ -869,6 +869,12 @@ need_to_load_default(const RegisterEntry *e)
 
 /* Public API */
 
+size_t
+register_entry_size(const RegisterEntry *e)
+{
+    return rds_size[e->type];
+}
+
 void
 register_make_bigendian(RegisterTable *t, const bool bigendian)
 {
