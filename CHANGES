@@ -41,6 +41,7 @@
 - regs: Add always-failing register value validator.
 - regs: Add register_entry_size() function.
 - regs: Add register_set_unsafe() function.
+- Add octet-ring as a common uint8_t based ring-buffer.
 
 ** Bugfixes
 

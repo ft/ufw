@@ -87,6 +87,10 @@ set(__ufw_sources src/allocator.c
                   src/ring-buffer-iter.c
                   src/variable-length-integer.c)
 
+if (WITH_UINT8_T)
+  list(APPEND __ufw_sources src/octet-ring.c)
+endif()
+
 set(__ufw_include ${CMAKE_CURRENT_SOURCE_DIR}/include
                   ${CMAKE_CURRENT_BINARY_DIR}/include)
 
