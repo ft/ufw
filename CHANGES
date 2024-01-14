@@ -42,6 +42,8 @@
 - regs: Add register_entry_size() function.
 - regs: Add register_set_unsafe() function.
 - Add octet-ring as a common uint8_t based ring-buffer.
+- Add a small s-expression parser library (ufw-sx), that can be useful for
+  system testing. It lives in its own library, because it uses malloc().
 
 ** Bugfixes
 

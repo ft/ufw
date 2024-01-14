@@ -21,6 +21,7 @@ list(APPEND test_names
   t-register-table-persistent-storage
   t-rfc1055
   t-ring-buffer
+  t-sx-parser
   t-varint)
 
 set(test_prgs)
@@ -30,6 +31,9 @@ foreach (tst ${test_names})
                                 sanitize-integer
                                 sanitize-undefined-behaviour)
   target_link_libraries(${tst} PRIVATE ufw ufw-tap)
+  if (${tst} STREQUAL t-sx-parser)
+    target_link_libraries(${tst} PRIVATE ufw-sx)
+  endif()
   if (DEFINED PROJECT_TARGET_CPU AND ${PROJECT_TARGET_CPU} STREQUAL native)
     target_compile_definitions(${tst} PRIVATE UFW_NATIVE_BUILD)
   endif()

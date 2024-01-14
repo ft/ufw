@@ -98,6 +98,8 @@ set(__ufw_tap_sources src/test/memdiff.c
                       src/test/output-utils.c
                       src/test/tap.c)
 
+set(__ufw_sx_sources src/sx.c)
+
 function(__ufw_setup lib)
   set_property(TARGET ${lib} PROPERTY C_STANDARD 99)
   set_target_cpu(${lib})
@@ -135,9 +137,13 @@ if (NOT ("${TOOLCHAIN_ID}" MATCHES "^ti-"))
 endif()
 
 add_library(ufw-tap STATIC ${__ufw_tap_sources})
-__ufw_setup(ufw-tap)
-__ufw_sanitise(ufw-tap)
-target_link_libraries(ufw-tap PUBLIC ufw)
+add_library(ufw-sx STATIC ${__ufw_sx_sources})
+
+foreach (__lib ufw-tap ufw-sx)
+  __ufw_setup(${__lib})
+  __ufw_sanitise(${__lib})
+  target_link_libraries(${__lib} PUBLIC ufw)
+endforeach()
 
 if ("${PROJECT_TARGET_CPU}" STREQUAL "native")
   add_library(ufw-nosan STATIC ${__ufw_sources})
@@ -152,8 +158,11 @@ if ("${PROJECT_TARGET_CPU}" STREQUAL "native")
   endif()
 
   add_library(ufw-tap-nosan STATIC ${__ufw_tap_sources})
-  __ufw_setup(ufw-tap-nosan)
-  target_link_libraries(ufw-tap-nosan PUBLIC ufw-nosan)
+  add_library(ufw-sx-nosan STATIC ${__ufw_sx_sources})
+  foreach (__lib ufw-tap ufw-sx)
+    __ufw_setup(${__lib}-nosan)
+    target_link_libraries(${__lib}-nosan PUBLIC ufw-nosan)
+  endforeach()
 endif()
 
 add_subdirectory(examples)
