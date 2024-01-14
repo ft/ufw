@@ -2,7 +2,7 @@
   User-visible changes in ufw
 -------------------------------
 
-* v4.1.0 → v5.0.0 (unreleased):
+* v4.1.0 → v5.0.0 (released 2024-01-14):
 
 ** Breaking compatibility
 
@@ -19,6 +19,18 @@
 
 ** New Features
 
+*** Experimental
+
+The new features marked as experimental may change their API in a minor
+release, use with caution!
+
+- regp: Add a specification for a register protocol.
+- regp: Add an implementation of the proposed register protocol.
+- sx: Add a small s-expression parser library (ufw-sx), that can be useful for
+  system testing. It lives in its own library, because it uses malloc().
+
+*** Stable API
+
 - Add generic block allocator allocator data type.
 - Add CRC-16-ARC implementation based on NetBSD's libkern.
 - bb: Add byte_buffer_rest() function.
@@ -33,17 +45,14 @@
 - endpoints: Add optional tracing output to instrumentable buffers.
 - compat,errno: Add EPROTO for platforms that do not implement it.
 - lenp: Add ByteChunks support to length prefix framing.
-- lenp: Add support for connected a lenp-source to arbitrary sinks.
-- regp: Add a specification for the proposed register protocol.
-- regp: Add an implementation of the register protocol.
+- lenp: Add support for connecting a lenp-source to arbitrary sinks.
 - regs: Add support for big-endian register tables.
 - regs: Add support for double (f64) registers.
-- regs: Add always-failing register value validator.
 - regs: Add register_entry_size() function.
 - regs: Add register_set_unsafe() function.
-- Add octet-ring as a common uint8_t based ring-buffer.
-- Add a small s-expression parser library (ufw-sx), that can be useful for
-  system testing. It lives in its own library, because it uses malloc().
+- regs: Add always-failing register value validator.
+- Add octet-ring as a common uint8_t based ring-buffer, on platformes that
+  support uint8_t.
 
 ** Bugfixes
 
@@ -63,7 +72,7 @@
 
     .clang-tidy                                   |  401 ++++++
     .gitignore                                    |    6 +-
-    CMakeLists.txt                                |   15 +-
+    CMakeLists.txt                                |   38 +-
     LICENCE                                       |    2 +-
     cmake/modules/UFWTest.cmake                   |   95 +-
     doc/fuzzing.txt                               |   85 ++
@@ -95,13 +104,15 @@
     include/ufw/length-prefix.h                   |   28 +-
     include/ufw/meta.h                            |    2 +-
     include/ufw/octet-buffer.h                    |   40 -
+    include/ufw/octet-ring.h                      |   18 +
     include/ufw/persistent-storage.h              |    2 +-
     include/ufw/register-protocol.h               |  262 ++++
-    include/ufw/register-table.h                  |   52 +-
+    include/ufw/register-table.h                  |  104 +-
     include/ufw/register-utilities.h              |    2 +-
     include/ufw/rfc1055.h                         |    6 +-
     include/ufw/ring-buffer-iter.h                |    2 +-
     include/ufw/ring-buffer.h                     |    2 +-
+    include/ufw/sx.h                              |  141 ++
     include/ufw/test/tap.h                        |    2 +-
     include/ufw/variable-length-integer.h         |   18 +-
     scheme/ufw/register-table.scm                 |    2 +-
@@ -120,20 +131,22 @@
     src/endpoints/trivial.c                       |   15 +-
     src/hexdump.c                                 |    2 +-
     src/length-prefix.c                           |  129 +-
+    src/octet-ring.c                              |   12 +
     src/persistent-storage.c                      |    5 +-
     src/register-protocol.c                       | 1157 +++++++++++++++++
-    src/registers/core.c                          |  123 +-
-    src/registers/internal.h                      |   11 +-
-    src/registers/utilities.c                     |   16 +-
+    src/registers/core.c                          |  423 ++++--
+    src/registers/internal.h                      |   13 +-
+    src/registers/utilities.c                     |   26 +-
     src/rfc1055.c                                 |    4 +-
     src/ring-buffer-iter.c                        |    2 +-
+    src/sx.c                                      |  515 ++++++++
     src/test/memdiff.c                            |   35 +-
     src/test/output-utils.c                       |    3 +-
     src/test/tap.c                                |    7 +-
     src/variable-length-integer.c                 |   47 +-
     target/cortex-m3/init/startup.c               |    2 +-
     target/cortex-m3/ld/arm-cortex-qemu.ld        |    2 +-
-    test/CMakeLists.txt                           |    1 +
+    test/CMakeLists.txt                           |    5 +
     test/t-binary-format.c                        |    2 +-
     test/t-convolution-low-pass.c                 |    2 +-
     test/t-hexdump.c                              |    2 +-
@@ -141,13 +154,14 @@
     test/t-persistent-storage.c                   |    2 +-
     test/t-register-protocol.c                    |  569 ++++++++
     test/t-register-table-persistent-storage.c    |    2 +-
-    test/t-register-table.c                       |    2 +-
+    test/t-register-table.c                       |   46 +-
     test/t-rfc1055.c                              |   62 +-
     test/t-ring-buffer.c                          |    2 +-
+    test/t-sx-parser.c                            |  471 +++++++
     test/t-varint.c                               |   52 +-
     tools/make-binary-format.scm                  |    2 +-
-    tools/make-register-macros.scm                |    2 +-
-    86 files changed, 4869 insertions(+), 388 deletions(-)
+    tools/make-register-macros.scm                |    5 +-
+    91 files changed, 6377 insertions(+), 475 deletions(-)
 
 
 * v4.0.0 → v4.1.0 (released 2023-09-13):
