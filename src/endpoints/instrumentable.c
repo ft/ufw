@@ -37,7 +37,7 @@ debug_trace(const bool sinkp, const void *driver, const unsigned char data)
            label, (uintptr_t)driver, count,
            data,
 #ifdef UFW_HAVE_CTYPE_ISPRINT
-           isprint(data) ? data : '.',
+           isprint(data) ? (char)data : '.',
 #else
            '.',
 #endif /* UFW_HAVE_CTYPE_ISPRINT */
