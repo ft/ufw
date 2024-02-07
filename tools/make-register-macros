@@ -12,4 +12,4 @@ for i in GUILE_LOAD_PATH GUILE_LOAD_COMPILED_PATH GUILE_AUTO_COMPILE; do
 done
 unset i
 
-exec "$GUILE_BINARY" "$TOPLEVEL/tools/make-register-macros.scm"
+exec "$GUILE_BINARY" "$@" "$TOPLEVEL/tools/make-register-macros.scm"
