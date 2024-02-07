@@ -1,12 +1,26 @@
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR native)
 
-set(CMAKE_C_COMPILER gcc)
-set(CMAKE_CXX_COMPILER g++)
-
 set(TOOLCHAIN_ID "gcc-native")
 set(COMPILER_API "gnu")
 
+set(cc gcc)
+if (DEFINED TOOLCHAIN_CC_GNU)
+  set(cc ${TOOLCHAIN_CC_GNU})
+endif()
+set(cxx g++)
+if (DEFINED TOOLCHAIN_CXX_GNU)
+  set(cxx ${TOOLCHAIN_CXX_GNU})
+endif()
+
+find_program(COMPILER_BINARY ${cc}
+  PATH_SUFFIXES "bin"
+  HINTS ENV TOOLCHAIN_ROOT_GNU
+  REQUIRED)
+get_filename_component(TOOLCHAIN_ROOT ${COMPILER_BINARY} DIRECTORY)
+
+set(CMAKE_C_COMPILER ${TOOLCHAIN_ROOT}/${cc})
+set(CMAKE_CXX_COMPILER ${TOOLCHAIN_ROOT}/${cxx})
 
 set(TOOLCHAIN_FEATURES
   sanitize-address

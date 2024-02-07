@@ -1,0 +1,30 @@
+CMake Toolchain Files
+---------------------
+
+The cmake-toolchains-files maintained by ufw try  to follow a common usage pat-
+tern. In terms of  CMake these are used by providing the file  to the system at
+configure time:
+
+    % cmake -DCMAKE_TOOLCHAIN_FILE=/path/to/ufw/cmake/toolchains/gnu.cmake …
+
+It it possible  to customise the toolchain's installation  directory by setting
+an environment variable that matches the following pattern:
+
+    TOOLCHAIN_ROOT_<UPCASE_UNDERSCORE_TOOLCHAIN_NAME>
+
+…where <UPCASE_UNDERSCORE_TOOLCHAIN_NAME> for ti-c2000 would be TI_C2000.
+
+Example:
+
+    export TOOLCHAIN_ROOT_TI_C2000=/opt/ti/ti-cgt-c2000_20.0.0.LTS
+    cmake …
+
+Additionally, the names of the C and C++ compiler executables are modifiable by
+similarly named CMake variables (not environment variables):
+
+    TOOLCHAIN_CC_<UPCASE_UNDERSCORE_TOOLCHAIN_NAME>
+    TOOLCHAIN_CXX_<UPCASE_UNDERSCORE_TOOLCHAIN_NAME>
+
+This may  be useful with  toolchains that  allow the installation  of different
+versions of the  same toolchain in the same execution  environment, such as gcc
+and clang on debian installations.

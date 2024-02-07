@@ -1,25 +1,31 @@
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 
-find_program(BINUTILS_PATH arm-none-eabi-gcc)
+set(TOOLCHAIN_ID "gcc-arm")
+set(COMPILER_API "gnu")
 
-get_filename_component(ARM_TOOLCHAIN_DIR ${BINUTILS_PATH} DIRECTORY)
+set(cc arm-none-eabi-gcc)
+if (DEFINED TOOLCHAIN_CC_GNU_ARM_NONE_EABI)
+  set(cc ${TOOLCHAIN_CC_GNU_ARM_NONE_EABI})
+endif()
+set(cxx arm-none-eabi-g++)
+if (DEFINED TOOLCHAIN_CXX_GNU_ARM_NONE_EABI)
+  set(cxx ${TOOLCHAIN_CXX_GNU_ARM_NONE_EABI})
+endif()
 
-set(CMAKE_C_COMPILER ${ARM_TOOLCHAIN_DIR}/arm-none-eabi-gcc)
-set(CMAKE_CXX_COMPILER ${ARM_TOOLCHAIN_DIR}/arm-none-eabi-g++)
+find_program(COMPILER_BINARY ${cc}
+  PATH_SUFFIXES "bin"
+  HINTS ENV TOOLCHAIN_ROOT_GNU_ARM_NONE_EABI
+  REQUIRED)
+get_filename_component(TOOLCHAIN_ROOT ${COMPILER_BINARY} DIRECTORY)
 
-set(ARM_OBJCOPY ${ARM_TOOLCHAIN_DIR}/arm-none-eabi-objcopy)
-set(ARM_OBJDUMP ${ARM_TOOLCHAIN_DIR}/arm-none-eabi-objdump)
-set(ARM_SIZE ${ARM_TOOLCHAIN_DIR}/arm-none-eabi-size)
+set(CMAKE_C_COMPILER   ${TOOLCHAIN_ROOT}/arm-none-eabi-gcc)
+set(CMAKE_CXX_COMPILER ${TOOLCHAIN_ROOT}/arm-none-eabi-g++)
+set(OBJCOPY            ${TOOLCHAIN_ROOT}/arm-none-eabi-objcopy)
+set(OBJDUMP            ${TOOLCHAIN_ROOT}/arm-none-eabi-objdump)
+set(SIZE               ${TOOLCHAIN_ROOT}/arm-none-eabi-size)
 
 set(CMAKE_C_FLAGS_INIT
     "-fdata-sections -ffunction-sections -frecord-gcc-switches -pipe")
 
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
-
-set(OBJCOPY ${ARM_OBJCOPY})
-set(OBJDUMP ${ARM_OBJDUMP})
-set(SIZE ${ARM_SIZE})
-
-set(TOOLCHAIN_ID "gcc-arm")
-set(COMPILER_API "gnu")

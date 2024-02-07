@@ -1,38 +1,50 @@
-if (NOT CGT_TOOLCHAINS)
-  set(CGT_TOOLCHAINS "/opt/ti/")
-endif()
-
-if (NOT CGT_TOOLCHAIN_ARCH)
-  set(CGT_TOOLCHAIN_ARCH "arm")
-endif()
-
-if (NOT CGT_TOOLCHAIN_VERSION)
-  set(CGT_TOOLCHAIN_VERSION "18.12.0.LTS")
-endif()
-
-if (NOT CGT_TOOLCHAIN_ROOT)
-  set(CGT_TOOLCHAIN_ROOT
-    "${CGT_TOOLCHAINS}/ti-cgt-${CGT_TOOLCHAIN_ARCH}_${CGT_TOOLCHAIN_VERSION}")
-endif()
-
-# set target system
 set(CMAKE_SYSTEM_NAME Generic)
-set(CMAKE_SYSTEM_VERSION 1)
 set(CMAKE_SYSTEM_PROCESSOR arm)
-set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
-# toolchain paths
-find_program(TI_CC NAMES armcl PATHS ${CGT_TOOLCHAIN_ROOT}/bin NO_DEFAULT_PATH)
-find_program(TI_CXX NAMES armcl PATHS ${CGT_TOOLCHAIN_ROOT}/bin NO_DEFAULT_PATH)
-find_program(TI_AS NAMES armcl PATHS ${CGT_TOOLCHAIN_ROOT}/bin NO_DEFAULT_PATH)
-find_program(TI_AR NAMES armar PATHS ${CGT_TOOLCHAIN_ROOT}/bin NO_DEFAULT_PATH)
-find_program(TI_OBJCOPY NAMES armofd PATHS ${CGT_TOOLCHAIN_ROOT}/bin NO_DEFAULT_PATH)
-find_program(TI_OBJDUMP NAMES armhex PATHS ${CGT_TOOLCHAIN_ROOT}/bin NO_DEFAULT_PATH)
-find_program(TI_LD NAMES armcl PATHS ${CGT_TOOLCHAIN_ROOT}/bin NO_DEFAULT_PATH)
-find_program(TI_DIS NAMES armdis PATHS ${CGT_TOOLCHAIN_ROOT}/bin NO_DEFAULT_PATH)
+set(TOOLCHAIN_ID "ti-arm")
+set(COMPILER_API "ti")
 
-include_directories(SYSTEM ${CGT_TOOLCHAIN_ROOT}/include)
-link_directories(${CGT_TOOLCHAIN_ROOT}/lib)
+set(cc armcl)
+if (DEFINED TOOLCHAIN_CC_TI_ARM)
+  set(cc ${TOOLCHAIN_CC_TI_ARM})
+endif()
+set(cxx armcl)
+if (DEFINED TOOLCHAIN_CXX_TI_ARM)
+  set(cxx ${TOOLCHAIN_CXX_TI_ARM})
+endif()
+
+if (DEFINED ENV{TOOLCHAIN_ROOT_TI_ARM})
+  find_program(COMPILER_BINARY ${cc}
+    PATH_SUFFIXES "bin"
+    HINTS ENV TOOLCHAIN_ROOT_TI_ARM
+    REQUIRED)
+else()
+  # This resembles the old toolchain file's default behaviour.
+  find_program(COMPILER_BINARY ${cc}
+    PATH_SUFFIXES "bin"
+    HINTS "/opt/ti/ti-cgt-arm_18.12.0.LTS"
+    REQUIRED)
+endif()
+get_filename_component(TOOLCHAIN_BIN ${COMPILER_BINARY} DIRECTORY)
+get_filename_component(TOOLCHAIN_ROOT ${TOOLCHAIN_BIN} DIRECTORY)
+
+set(CMAKE_C_COMPILER          ${TOOLCHAIN_BIN}/${cc})
+set(CMAKE_CXX_COMPILER        ${TOOLCHAIN_BIN}/${cxx})
+set(AS                        ${TOOLCHAIN_BIN}/${cc})
+set(AR                        ${TOOLCHAIN_BIN}/armar)
+set(OBJCOPY                   ${TOOLCHAIN_BIN}/armofd)
+set(OBJDUMP                   ${TOOLCHAIN_BIN}/armhex)
+set(SIZE                      arm-none-eabi-size)
+set(LD                        ${TOOLCHAIN_BIN}/${cc})
+# Setting ranlib to touch, since TI's toolchain doesn't have this, and CMake
+# tends to pick up the one from the host's native toolchain, which in turn
+# breaks the libraries produced by the build system.
+set(CMAKE_C_COMPILER_RANLIB   "touch")
+set(CMAKE_CXX_COMPILER_RANLIB "touch")
+set(CMAKE_RANLIB              "touch")
+
+include_directories(SYSTEM ${TOOLCHAIN_ROOT}/include)
+link_directories(${TOOLCHAIN_ROOT}/lib)
 
 # Seems like CMake's compiler integration for TI's compilers lacks support for
 # adhering to the C_STANDARD property (analogous for C++). Would be better if
@@ -41,19 +53,4 @@ link_directories(${CGT_TOOLCHAIN_ROOT}/lib)
 set(CMAKE_C_FLAGS_INIT   "--c99   --diag_warning=225 --diag_warning=255 --gen_func_subsections=on --preproc_with_compile")
 set(CMAKE_CXX_FLAGS_INIT "--c++14 --diag_warning=225 --diag_warning=255 --gen_func_subsections=on --preproc_with_compile")
 
-# set executables settings
-set(CMAKE_C_COMPILER ${TI_CC})
-set(CMAKE_CXX_COMPILER ${TI_CXX})
-set(CMAKE_C_COMPILER_RANLIB "touch")
-set(CMAKE_CXX_COMPILER_RANLIB "touch")
-set(CMAKE_RANLIB "touch")
-set(AS ${TI_AS})
-set(AR ${TI_AR})
-# We can use the system's variant of the command, since ti-arm produces elf.
-set(OBJCOPY objcopy)
-set(OBJDUMP ${TI_OBJDUMP})
-set(SIZE size)
-set(LD ${TI_LD})
-
-set(TOOLCHAIN_ID "ti-arm")
-set(COMPILER_API "ti")
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
