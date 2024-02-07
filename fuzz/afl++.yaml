@@ -1,0 +1,19 @@
+# This is a makemehappy configuration, that enables exactly one toolchain for a
+# single architecture (afl++-native), one build tool (ninja) and one build con-
+# figuration (debug). Using  this, you can run larger builds,  that are managed
+# by makemehappy to  build through the AFL++  instrumented compiler implementa-
+# tion, thus allowing to efficiently run produced binaries through "afl-fuzz".
+
+remove:
+  toolchains: True
+  buildtools: True
+  buildconfigs: True
+
+toolchains:
+  - name: afl++
+    architecture: native
+    features:
+      - 8bit-byte
+
+buildtools: [ ninja ]
+buildconfigs: [ debug ]
