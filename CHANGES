@@ -2,6 +2,41 @@
   User-visible changes in ufw
 -------------------------------
 
+* v5.0.1 → v5.1.0 (released 2024-02-12):
+
+This release mainly  reworks the way toolchain-file works.  Now toolchain files
+have a unified behaviour with regards  to installation and compiler name custo-
+misation. See cmake/README.toolchains for details.
+
+** New Features
+
+- afl++ toolchain file.
+- arm-zephyr-none toolchain file.
+
+** Miscellaneous
+
+- Some improvements to code generation scripts
+
+** Diffstat:
+
+    cmake/README.toolchains                  | 30 ++++++++
+    cmake/toolchains/afl++.cmake             | 55 +++++++++++++++
+    cmake/toolchains/arm-zephyr-eabi.cmake   | 31 +++++++++
+    cmake/toolchains/clang.cmake             | 58 +++++-----------
+    cmake/toolchains/gnu-arm-none-eabi.cmake | 38 ++++++-----
+    cmake/toolchains/gnu.cmake               | 20 +++++-
+    cmake/toolchains/ti-arm.cmake            | 87 ++++++++++++------------
+    cmake/toolchains/ti-c2000.cmake          | 87 ++++++++++++------------
+    fuzz/afl++.yaml                          | 19 ++++++
+    include/ufw/meta.h                       |  4 +-
+    include/ufw/register-table.h             |  2 +-
+    src/endpoints/instrumentable.c           |  2 +-
+    tools/make-binary-format.scm             |  2 +-
+    tools/make-register-macros               | 15 ----
+    tools/{make-binary-format => run}        |  2 +-
+    15 files changed, 280 insertions(+), 172 deletions(-)
+
+
 * v5.0.0 → v5.0.1 (released 2024-01-31):
 
 ** Bugfixes
