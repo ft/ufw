@@ -158,6 +158,10 @@ union bf_convert64 {
         ((> n 16) 'ul)
         (else 'u)))
 
+(define (next-power-of-2 n)
+  (let loop ((k 16))
+    (if (>= k n) k (loop (ash k 1)))))
+
 (define (bits->digits n)
   "Calculate number of hex digits for a given number of bits.
 
@@ -180,8 +184,10 @@ A sub-expression looks like this ((value & mask) OPERATOR shift).
 
 The tabular alignment is handed in as arguments to the generator function."
   (lambda (mask op shift)
-    (format #f "((~a & 0x~v,'0x~a) ~a ~vdu)"
-            sym (bits->digits bits) mask suffix op shift-align shift)))
+    (if (zero? shift)
+        (format #f "((~a & 0x~v,'0x~a))" sym (bits->digits bits) mask suffix)
+        (format #f "((~a & 0x~v,'0x~a) ~a ~vdu)"
+                sym (bits->digits bits) mask suffix op shift-align shift))))
 
 (define (make-swap-down-shifts n)
   "Generate a list of down shifts required for a swap expression."
@@ -199,10 +205,13 @@ The tabular alignment is handed in as arguments to the generator function."
   "Generate a list of arguments for mask-and-shifter function for word width n"
   (let* ((down* (make-swap-down-shifts n))
          (down (map (lambda (x) (list '>> x)) down*))
+         (mid (if (odd? (/ n 8))
+                  '((<< 0))
+                  '()))
          (up (map (lambda (x) (list '<< x)) (reverse down*))))
     (map (lambda (mask x) (cons mask x))
          (make-swap-masks n)
-         (concatenate (list down up)))))
+         (concatenate (list down mid up)))))
 
 (define (maybe-builtin-swap n)
   (format #t "#if defined(HAVE_COMPILER_BUILTIN_BSWAP~d) && defined(UFW_USE_BUILTIN_SWAP)
@@ -214,12 +223,9 @@ The tabular alignment is handed in as arguments to the generator function."
   (format #t "#endif /* HAVE_COMPILER_BUILTIN_BSWAP~d */~%" n))
 
 (define (bvref n bv endianness)
-  ((case n
-     ((16) bytevector-u16-ref)
-     ((32) bytevector-u32-ref)
-     ((64) bytevector-u64-ref)
-     (else (throw 'unsupported-swap-word-width n)))
-   bv 0 endianness))
+  (unless (zero? (modulo n 8))
+    (throw 'invalid-word-width n))
+  (bytevector-uint-ref bv 0 endianness (/ n 8)))
 
 (define (make-swap-apidoc n)
   (let ((example #vu8(#x12 #x34 #x56 #x78 #x90 #xab #xcd #xef))
@@ -240,26 +246,28 @@ The tabular alignment is handed in as arguments to the generator function."
 
 (define (make-swap-octets n)
   "Generate an octet swapping function for word width n."
-  (newline)
-  (make-swap-apidoc n)
-  (format #t "static inline uint~d_t~%bf_swap~d(const uint~d_t value)~%{~%"
-          n n n)
-  (maybe-builtin-swap n)
-  (display *return-expr*)
-  (let ((shift-align (max-integer-width (make-swap-down-shifts n))))
-    (display
-     (string-join (map (lambda (args)
-                         (apply (make-mask-and-shifter 'value
-                                                       n
-                                                       shift-align
-                                                       (literal-suffix n))
-                                args))
-                       (make-swap-args n))
-                  *or-expr*)))
-  (display *end-expr*)
-  (newline)
-  (end-builtin-swap n)
-  (format #t "}~%"))
+  (let* ((typewidth (next-power-of-2 n))
+         (precise? (= typewidth n)))
+    (newline)
+    (make-swap-apidoc n)
+    (format #t "static inline uint~d_t~%bf_swap~d(const uint~d_t value)~%{~%"
+            typewidth n typewidth)
+    (when precise? (maybe-builtin-swap n))
+    (display *return-expr*)
+    (let ((shift-align (max-integer-width (make-swap-down-shifts n))))
+      (display
+       (string-join (map (lambda (args)
+                           (apply (make-mask-and-shifter 'value
+                                                         n
+                                                         shift-align
+                                                         (literal-suffix n))
+                                  args))
+                         (make-swap-args n))
+                    *or-expr*)))
+    (display *end-expr*)
+    (newline)
+    (when precise? (end-builtin-swap n))
+    (format #t "}~%")))
 
 (define (make-word-copy-expression dst src)
   (lambda (idx)
@@ -499,7 +507,7 @@ bf_set_~a~d~a(void *ptr, const ~a value)
 (newline)
 (make-ensure-byte-size)
 (make-conversion-unions)
-(for-each make-swap-octets *powers-of-two*)
+(for-each make-swap-octets *word-sizes*)
 (for-each make-reference-native *powers-of-two*)
 (for-each (lambda (w) (make-reference w #t)) *powers-of-two*)
 (for-each (lambda (w) (make-reference w #f)) *powers-of-two*)
