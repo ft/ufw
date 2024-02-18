@@ -153,6 +153,11 @@ union bf_convert64 {
                          "| ")))
 (define *end-expr* ");")
 
+(define (literal-suffix n)
+  (cond ((> n 32) 'ull)
+        ((> n 16) 'ul)
+        (else 'u)))
+
 (define (bits->digits n)
   "Calculate number of hex digits for a given number of bits.
 
@@ -168,7 +173,7 @@ Examples:
   (max-integer-width '(1 2 100)) → 3"
   (inexact->exact (ceiling (log10 (+ 1 (apply max lst))))))
 
-(define (make-mask-and-shifter sym bits shift-align literal-suffix)
+(define (make-mask-and-shifter sym bits shift-align suffix)
   "Return a function that generates a sub-expression in a swap expression.
 
 A sub-expression looks like this ((value & mask) OPERATOR shift).
@@ -176,7 +181,7 @@ A sub-expression looks like this ((value & mask) OPERATOR shift).
 The tabular alignment is handed in as arguments to the generator function."
   (lambda (mask op shift)
     (format #f "((~a & 0x~v,'0x~a) ~a ~vdu)"
-            sym (bits->digits bits) mask literal-suffix op shift-align shift)))
+            sym (bits->digits bits) mask suffix op shift-align shift)))
 
 (define (make-swap-down-shifts n)
   "Generate a list of down shifts required for a swap expression."
@@ -233,11 +238,8 @@ The tabular alignment is handed in as arguments to the generator function."
             digits (bvref n example 'big)
             digits (bvref n example 'little))))
 
-(define (make-swap-octets n literal-suffix)
-  "Generate an octet swapping function for word width n.
-
-The literal-suffix argument is used for the bitmask literals in the mask and
-shift expressions."
+(define (make-swap-octets n)
+  "Generate an octet swapping function for word width n."
   (newline)
   (make-swap-apidoc n)
   (format #t "static inline uint~d_t~%bf_swap~d(const uint~d_t value)~%{~%"
@@ -250,7 +252,7 @@ shift expressions."
                          (apply (make-mask-and-shifter 'value
                                                        n
                                                        shift-align
-                                                       literal-suffix)
+                                                       (literal-suffix n))
                                 args))
                        (make-swap-args n))
                   *or-expr*)))
@@ -305,11 +307,11 @@ shift expressions."
 "
           type order))
 
-(define (make-reference-native width literal-suffix)
+(define (make-reference-native width)
   (make-reference/apidoc (format #f "uint~d_t" width) "native")
   (make-reference-prototype width 'u 'n)
   (indent)
-  (format #t "uint~d_t buffer = 0~a;~%" width literal-suffix)
+  (format #t "uint~d_t buffer = 0~a;~%" width (literal-suffix width))
   (indent)
   (format #t "const unsigned char *src = ptr;~%")
   (indent)
@@ -497,8 +499,8 @@ bf_set_~a~d~a(void *ptr, const ~a value)
 (newline)
 (make-ensure-byte-size)
 (make-conversion-unions)
-(for-each make-swap-octets *powers-of-two* '(u ul ull))
-(for-each make-reference-native *powers-of-two* '(u ul ull))
+(for-each make-swap-octets *powers-of-two*)
+(for-each make-reference-native *powers-of-two*)
 (for-each (lambda (w) (make-reference w #t)) *powers-of-two*)
 (for-each (lambda (w) (make-reference w #f)) *powers-of-two*)
 (make-other-reference other-types)
