@@ -4,7 +4,7 @@
 
 ;; Generate binary-format API.
 ;;
-;; This code is pretty repetitive, and typing is out by hand is error prone.
+;; This code is pretty repetitive, and typing it out by hand is error prone.
 
 (use-modules (ice-9 format)
              (ice-9 match)
@@ -48,22 +48,25 @@
  * @brief Binary format conversion API
  *
  * This module implements a number of functions that revolve around reading and
- * writing value to/from raw memory. That is three octet-orders (endianness):
- * Native, big and little; where native endianness is one of the other two.
+ * writing values to/from raw memory. This is done in three octet-orders
+ * (endianness): Native, big and little; where native endianness is one of the
+ * other two.
  *
  * The API follows a naming scheme:
  *
  *     bf_[OPERATION]_[TYPEMNEMONIC][WIDTH][ORDER](...)
  *
- * Where OPERATION is either `ref` or `set`; and
+ * Where OPERATION is either `ref` or `set`. The `ref` (reference) operation
+ * extracts a datum from raw memory; and the `set` operation transfers a datum
+ * into raw memory.
  *
  * Where TYPEMNEMONIC is either `u` or `s` or `f` for unsigned integers, signed
  * integers and floating point values respectively; and
  *
- * Where OPERATION is either `ref` or `set`; and
- *
  * Where WIDTH is a width designation in bits. Integer operations support 16,
- * 32 and 64 bits; floating point values support 32 and 64 bits; and
+ * 32 and 64 bits; on machines where a byte is an octet, integer operations also
+ * support 24, 40, 48 and 56 bit word widths. Floating point values support 32
+ * and 64 bits.
  *
  * Where ORDER is either `n` or `b` or `l` for native, big or little endianness
  * respectively.
@@ -76,20 +79,58 @@
  *     bf_set_f32b(memory, 123.f);
  * @endcode
  *
- * Integer behaviour is pretty portable these days. Two's complement is used
- * universally in all modern architectures. There are things like IBM main
- * frames that use BCD for example, and there will be other examples, that
- * could be brought up here.
+ * Similarly, to reference a 32-bit floating point value in memory, in big 
+ * endian octet order:
  *
- * Floating point numbers are less portable, but IEEE754 is pretty common.
- * This module implements all accesses on the architecture's representation.
+ * @code
+ *     float foo = bf_ref_f32b(memory);
+ * @endcode
  *
- * The module works with big- and little-endian archtectures and using bytes
- * of either eight or sixteen bit size.
+ * In addition to these `ref` and `set` operations, the module also implements
+ * simple range-check functions, on systems that support the 24, 40, 48 and 56
+ * bit wide operations. When putting a datum into raw memory, no range checks
+ * are performed implicitly. If data such validation is required, use one of
+ * the functions that follow this API scheme:
  *
- * If your system does not use two's complement, signed-integer semantics will
- * be off. And similarly if your system does not use IEEE754 floating point
- * encoding, those semantics will be off.
+ *     bool bf_inrange_[TYPEMNEMONIC][WIDTH](const TYPE value);
+ *
+ * These functions return a boolean value indicating whether or not the provided
+ * value is valid for the indicated type and word width. The TYPEMNEMONIC part
+ * is either `u` for unsigned integers or `s` for signed integers. The WIDTH
+ * part is one of the aforementioned word widths.
+ *
+ * For example, to test if a value is a signed 40 bit integer use:
+ *
+ * @code
+ *     if (bf_inrange_s40(-12345)) {
+ *         bf_set_s40b(memory, -12345);
+ *     }
+ * @endcode
+ *
+ * Portability notes:
+ *
+ * The module supports (and was tested with) little and big endian machines.
+ *
+ * The size of a byte is the smallest addressable word in memory on a given
+ * machine. In particular, the colloquially used notion of a byte being eight
+ * bits of memory, is not correct in general. A more precise name for eight
+ * bits of memory is an octet. The POSIX specification requires a byte to be
+ * an octet, but the C language notably does not. This module supports systems
+ * that use 8 bit and 16 bit bytes (other byte sizes are not supported and
+ * will cause a build-failure). However, the parts of the API that support
+ * partial word-sizes (24, 40, 48, and 56) are only supported on 8-bit
+ * addressable machines.
+ *
+ * Integer encoding across architectures is pretty portable these days. Two's
+ * complement is used universally in all modern architectures. There are things
+ * like IBM main frames that use BCD for example, and there will be other
+ * examples, that could be brought up here. If your system does not use two's
+ * complement, signed-integer semantics will not work as intended.
+ *
+ * Floating point number encodings are less portable, but IEEE754 is pretty
+ * common. This module implements all accesses on the architecture's native
+ * representation. If your system does not use IEEE754 floating point
+ * encoding, floating point semantics will not work as intended.
  */
 "))
 
@@ -148,8 +189,9 @@ union bf_convert64 {
 (define *indent* (make-string 4 #\space))
 (define *return-expr* (string-concatenate (list *indent* "return ( ")))
 (define *or-expr* (string-concatenate
-                   (list (make-string 1 #\newline) (make-string (- (string-length *return-expr*) 2)
-                                         #\space)
+                   (list (make-string 1 #\newline)
+                         (make-string (- (string-length *return-expr*) 2)
+                                      #\space)
                          "| ")))
 (define *end-expr* ");")
 
@@ -205,7 +247,7 @@ The tabular alignment is handed in as arguments to the generator function."
   "Generate a list of arguments for mask-and-shifter function for word width n"
   (let* ((down* (make-swap-down-shifts n))
          (down (map (lambda (x) (list '>> x)) down*))
-         (mid (if (odd? (/ n 8))
+         (mid (if (odd? (/ n *bits-per-octet*))
                   '((<< 0))
                   '()))
          (up (map (lambda (x) (list '<< x)) (reverse down*))))
@@ -223,9 +265,9 @@ The tabular alignment is handed in as arguments to the generator function."
   (format #t "#endif /* HAVE_COMPILER_BUILTIN_BSWAP~d */~%" n))
 
 (define (bvref n bv endianness)
-  (unless (zero? (modulo n 8))
+  (unless (zero? (modulo n *bits-per-octet*))
     (throw 'invalid-word-width n))
-  (bytevector-uint-ref bv 0 endianness (/ n 8)))
+  (bytevector-uint-ref bv 0 endianness (/ n *bits-per-octet*)))
 
 (define (make-swap-apidoc n)
   (let ((example #vu8(#x12 #x34 #x56 #x78 #x90 #xab #xcd #xef))
@@ -270,108 +312,166 @@ The tabular alignment is handed in as arguments to the generator function."
     (format #t "}~%")))
 
 (define (make-word-copy-expression dst src)
-  (lambda (idx)
-    (format #f "~a[~du] = ~a[~du];" dst idx src idx)))
+  (lambda* (idx doffset soffset)
+    (format #f "~a[~du] = ~a[~du];" dst (+ doffset idx) src (+ soffset idx))))
 
 (define (indent)
   (display "    "))
 
 (define steps '(8 16))
 
-(define (make-reference-prototype width type endianness)
+(define (make-reference-prototype width typewidth type endianness)
   (format #t "static inline uint~d_t~%bf_ref_~a~d~a(const void *ptr)~%{~%"
-          width type width endianness))
+          typewidth type width endianness))
 
-(define (make-reference/apidoc type order)
-  (format #t "
+(define (make-reference/apidoc width type order)
+  (let ((octets (/ width *bits-per-octet*)))
+    (format #t "
 /**
- * Read ~a datum from buffer in ~a octet order
+ * Read ~d-bit value from memory in ~a octet order
  *
- * The buffer pointed to must obviously be able to carry a datum of the return
- * value's size.
+ * The buffer pointed to must be large enough to store a datum that is
+ * ~d octets in size.
  *
  * @param  ptr    Pointer to memory from which to read data.
  *
- * @return A ~a datum read from memory pointed to by ptr in
- *         ~a octet order.
+ * @return A ~a datum read from ~d octets from memory pointed to by
+ *         ptr in ~a octet order.
  * @sideeffects None.
  */
 "
-          type order type order))
-(define (make-set!/apidoc type order)
-  (format #t "
+            width order octets type octets order)))
+(define (make-set!/apidoc width type order)
+  (define (is-signed-type? type)
+    (member type '(uint16_t uint32_t uint64_t)))
+  (let ((octets (/ width *bits-per-octet*))
+        (precise? (= width (next-power-of-2 width))))
+    (format #t "
 /**
- * Store ~a datum into a buffer in ~a octet order
+ * Store ~d-bit value into a buffer in ~a octet order
  *
- * The buffer pointed to must obviously be able to carry a datum of the integer
- * value's size.
- *
- * @param  ptr    Pointer to memory from which to read data.
+ * The buffer pointed to must be large enough to store a datum that is
+ * ~d octets in size.
+"
+            width order octets)
+    (unless precise?
+      (format #t " *
+ * Note that this function's argument is able to store values that are
+ * beyond the indicated word width, and the function does not check if
+ * the value fits into the valid range. Use `bf_inrange_~a~d()' to
+ * perform this test manually if required.
+"
+              (if (is-signed-type? type) 's 'u) width))
+(format #t " *
+ * @param  ptr    Pointer to memory in which to store data.
  * @param  value  Value to store into memory
  *
- * @return Pointer to memory after the newly stored value.
+ * @return Pointer to memory on the first byte after the newly stored
+ *         value.
  * @sideeffects None.
  */
-"
-          type order))
+")))
 
 (define (make-reference-native width)
-  (make-reference/apidoc (format #f "uint~d_t" width) "native")
-  (make-reference-prototype width 'u 'n)
-  (indent)
-  (format #t "uint~d_t buffer = 0~a;~%" width (literal-suffix width))
-  (indent)
-  (format #t "const unsigned char *src = ptr;~%")
-  (indent)
-  (format #t "unsigned char *dst = (unsigned char*)&buffer;~%")
+  (let* ((typewidth (next-power-of-2 width))
+         (precise? (= typewidth width)))
+    (make-reference/apidoc width (format #f "uint~d_t" typewidth) "native")
+    (unless precise?
+      (format #t "#if UFW_BITS_PER_BYTE == 8~%"))
+    (make-reference-prototype width typewidth 'u 'n)
+    (indent)
+    (format #t "uint~d_t buffer = 0~a;~%" typewidth (literal-suffix width))
+    (indent)
+    (format #t "const unsigned char *src = ptr;~%")
+    (indent)
+    (format #t "unsigned char *dst = (unsigned char*)&buffer;~%")
 
-  (for-each (lambda (step)
-              (format #t "#if UFW_BITS_PER_BYTE == ~d~%" step)
-              (let loop ((n width)
-                         (i 0)
-                         (generate (make-word-copy-expression 'dst 'src)))
-                (cond ((> n 0)
-                       (indent)
-                       (display (generate i))
-                       (newline)
-                       (loop (- n step) (1+ i) generate))
-                      (else #f)))
-              (format #t "#endif /* UFW_BITS_PER_BYTE == ~d */~%" step))
-            steps)
+    (for-each (lambda (step)
+                (when precise?
+                  (format #t "#if UFW_BITS_PER_BYTE == ~d~%" step))
+                (letrec* ((generate (make-word-copy-expression 'dst 'src))
+                          (pexpr (lambda* (idx offset)
+                                   (indent)
+                                   (display (generate idx offset 0))
+                                   (newline)))
+                          (pexprs (lambda (n i o)
+                                    (when (> n 0)
+                                      (pexpr i o)
+                                      (pexprs (- n step) (1+ i) o))))
+                          (be-offset (/ (- typewidth width) *bits-per-octet*)))
+                  (if precise?
+                      (pexprs width 0 0)
+                      (begin
+                        (format #t "#if defined(SYSTEM_ENDIANNESS_BIG)~%")
+                        (pexprs width 0 be-offset)
+                        (format #t "#elif defined(SYSTEM_ENDIANNESS_LITTLE)~%")
+                        (pexprs width 0 0)
+                        (format #t "#else~%")
+                        (indent)
+                        (format #t "/* Top of file makes sure this can't happen. */~%")
+                        (format #t "#endif /* SYSTEM_ENDIANNESS_* */~%"))))
+                (when precise?
+                  (format #t "#endif /* UFW_BITS_PER_BYTE == ~d */~%" step)))
+              (if precise? steps (list *bits-per-octet*)))
 
-  (indent)
-  (format #t "return buffer;~%")
-  (format #t "}~%"))
+    (indent)
+    (format #t "return buffer;~%")
+    (format #t "}~%")
+    (unless precise?
+      (format #t "#endif /* UFW_BITS_PER_BYTE == 8 */~%"))))
 
-(define (make-set!-prototype width type endianness)
+(define (make-set!-prototype width typewidth type endianness)
   (format #t "static inline void*~%bf_set_~a~d~a(void *ptr, const uint~d_t value)~%{~%"
-          type width endianness width))
+          type width endianness typewidth))
 
 (define (make-set!-native width)
-  (make-set!/apidoc (format #f "uint~d_t" width) "native")
-  (make-set!-prototype width 'u 'n)
-  (indent)
-  (format #t "const unsigned char *src = (const unsigned char*)&value;~%")
-  (indent)
-  (format #t "unsigned char *dst = ptr;~%")
+  (let* ((typewidth (next-power-of-2 width))
+         (precise? (= width typewidth)))
+    (make-set!/apidoc width (format #f "uint~d_t" typewidth) "native")
+    (unless precise?
+      (format #t "#if UFW_BITS_PER_BYTE == 8~%"))
+    (make-set!-prototype width typewidth 'u 'n)
+    (indent)
+    (format #t "const unsigned char *src = (const unsigned char*)&value;~%")
+    (indent)
+    (format #t "unsigned char *dst = ptr;~%")
 
-  (for-each (lambda (step)
-              (format #t "#if UFW_BITS_PER_BYTE == ~d~%" step)
-              (let loop ((n width)
-                         (i 0)
-                         (generate (make-word-copy-expression 'dst 'src)))
-                (cond ((> n 0)
-                       (indent)
-                       (display (generate i))
-                       (newline)
-                       (loop (- n step) (1+ i) generate))
-                      (else #f)))
-              (format #t "#endif /* UFW_BITS_PER_BYTE == ~d */~%" step))
-            steps)
+    (for-each (lambda (step)
+                (when precise?
+                  (format #t "#if UFW_BITS_PER_BYTE == ~d~%" step))
+                (letrec* ((generate (make-word-copy-expression 'dst 'src))
+                          (pexpr (lambda* (idx offset)
+                                   (indent)
+                                   (display (generate idx 0 offset))
+                                   (newline)))
+                          (pexprs (lambda (n i o)
+                                    (when (> n 0)
+                                      (pexpr i o)
+                                      (pexprs (- n step) (1+ i) o))))
+                          (be-offset (/ (- typewidth width) *bits-per-octet*)))
+                  (if precise?
+                      (pexprs width 0 0)
+                      (begin
+                        (format #t "#if defined(SYSTEM_ENDIANNESS_BIG)~%")
+                        (pexprs width 0 be-offset)
+                        (format #t "#elif defined(SYSTEM_ENDIANNESS_LITTLE)~%")
+                        (pexprs width 0 0)
+                        (format #t "#else~%")
+                        (indent)
+                        (format #t "/* Top of file makes sure this can't happen. */~%")
+                        (format #t "#endif /* SYSTEM_ENDIANNESS_* */~%"))))
+                (when precise?
+                  (format #t "#endif /* UFW_BITS_PER_BYTE == ~d */~%" step)))
+              (if precise? steps (list *bits-per-octet*)))
 
-  (indent)
-  (format #t "return dst + sizeof(value);~%")
-  (format #t "}~%"))
+    (indent)
+    (format #t "return dst + ~a;~%"
+            (if precise?
+                "sizeof(value)"
+                (format #f "~au" (/ width *bits-per-octet*))))
+    (format #t "}~%")
+    (unless precise?
+      (format #t "#endif /* UFW_BITS_PER_BYTE == 8 */~%"))))
 
 (define (make-ref-and-swap width)
   (format #t "return bf_swap~d(bf_ref_u~dn(ptr));~%" width width))
@@ -382,20 +482,27 @@ The tabular alignment is handed in as arguments to the generator function."
       (format #t "return bf_ref_u~dn(ptr);~%" width)))
 
 (define (make-reference width big?)
-  (make-reference/apidoc (format #f "uint~d_t" width)
-                         (if big? "big endian" "little endian"))
-  (make-reference-prototype width 'u (if big? 'b 'l))
-  (format #t "#if defined(SYSTEM_ENDIANNESS_BIG)~%")
-  (indent)
-  (make-ref-return width (not big?))
-  (format #t "#elif defined(SYSTEM_ENDIANNESS_LITTLE)~%")
-  (indent)
-  (make-ref-return width big?)
-  (format #t "#else~%")
-  (indent)
-  (format #t "/* Top of file names sure this can't happen. */~%")
-  (format #t "#endif /* SYSTEM_ENDIANNESS_* */~%")
-  (format #t "}~%"))
+  (let* ((typewidth (next-power-of-2 width))
+         (precise? (= typewidth width)))
+    (make-reference/apidoc width
+                           (format #f "uint~d_t" typewidth)
+                           (if big? "big endian" "little endian"))
+    (unless precise?
+      (format #t "#if UFW_BITS_PER_BYTE == 8~%"))
+    (make-reference-prototype width typewidth 'u (if big? 'b 'l))
+    (format #t "#if defined(SYSTEM_ENDIANNESS_BIG)~%")
+    (indent)
+    (make-ref-return width (not big?))
+    (format #t "#elif defined(SYSTEM_ENDIANNESS_LITTLE)~%")
+    (indent)
+    (make-ref-return width big?)
+    (format #t "#else~%")
+    (indent)
+    (format #t "/* Top of file makes sure this can't happen. */~%")
+    (format #t "#endif /* SYSTEM_ENDIANNESS_* */~%")
+    (format #t "}~%")
+    (unless precise?
+      (format #t "#endif /* UFW_BITS_PER_BYTE == 8 */~%"))))
 
 (define (make-swap-and-set width)
   (format #t "return bf_set_u~dn(ptr, bf_swap~d(value));~%" width width))
@@ -406,31 +513,37 @@ The tabular alignment is handed in as arguments to the generator function."
       (format #t "return bf_set_u~dn(ptr, value);~%" width)))
 
 (define (make-set! width big?)
-  (make-set!/apidoc (format #f "uint~d_t" width)
-                    (if big? "big endian" "little endian"))
-  (make-set!-prototype width 'u (if big? 'b 'l))
-  (format #t "#if defined(SYSTEM_ENDIANNESS_BIG)~%")
-  (indent)
-  (make-set!-return width (not big?))
-  (format #t "#elif defined(SYSTEM_ENDIANNESS_LITTLE)~%")
-  (indent)
-  (make-set!-return width big?)
-  (format #t "#else~%")
-  (indent)
-  (format #t "/* Top of file names sure this can't happen. */~%")
-  (format #t "#endif /* SYSTEM_ENDIANNESS_* */~%")
-  (format #t "}~%"))
+  (let* ((typewidth (next-power-of-2 width))
+         (precise? (= typewidth width)))
+    (make-set!/apidoc width (format #f "uint~d_t" width)
+                      (if big? "big endian" "little endian"))
+    (unless precise?
+      (format #t "#if UFW_BITS_PER_BYTE == 8~%"))
+    (make-set!-prototype width typewidth 'u (if big? 'b 'l))
+    (format #t "#if defined(SYSTEM_ENDIANNESS_BIG)~%")
+    (indent)
+    (make-set!-return width (not big?))
+    (format #t "#elif defined(SYSTEM_ENDIANNESS_LITTLE)~%")
+    (indent)
+    (make-set!-return width big?)
+    (format #t "#else~%")
+    (indent)
+    (format #t "/* Top of file makes sure this can't happen. */~%")
+    (format #t "#endif /* SYSTEM_ENDIANNESS_* */~%")
+    (format #t "}~%")
+    (unless precise?
+      (format #t "#endif /* UFW_BITS_PER_BYTE == 8 */~%"))))
 
 (define (make-int-type-namer m)
   (lambda (w)
-    (format #f "~a~d_t" m w)))
+    (format #f "~a~d_t" m (next-power-of-2 w))))
 
 (define (make-float-type-namer m)
   (lambda (_)
     (symbol->string m)))
 
 (define other-types `(((mnemonics (s . ,(make-int-type-namer 'int)))
-                       (widths . ,*powers-of-two*))
+                       (widths . ,*word-sizes*))
                       ((mnemonics (f . ,(make-float-type-namer 'float)))
                        (widths 32))
                       ((mnemonics (f . ,(make-float-type-namer 'double)))
@@ -457,45 +570,114 @@ The tabular alignment is handed in as arguments to the generator function."
        ))
    typespec))
 
+(define (make-bit-suffix n)
+  (let* ((suffix (literal-suffix n))
+         (string (string-upcase (symbol->string suffix))))
+    (substring string 1)))
+
 (define (make-other-reference typespec)
   (for-typespec (lambda (endian short type width)
-                  (make-reference/apidoc type (if (eq? endian 'b)
-                                                  "big endian"
-                                                  "little endian"))
-                  (format #t "static inline ~a
+                  (let* ((typewidth (next-power-of-2 width))
+                         (precise? (= typewidth width))
+                         (with-sign-adjust? (and (not precise?) (eq? short 's)))
+                         (bit-suffix (make-bit-suffix typewidth))
+                         (const-prefix (if with-sign-adjust? "" "const ")))
+                    (make-reference/apidoc width
+                                           type
+                                           (if (eq? endian 'b)
+                                               "big endian"
+                                               "little endian"))
+                    (unless precise?
+                      (format #t "#if UFW_BITS_PER_BYTE == 8~%"))
+                    (format #t "static inline ~a
 bf_ref_~a~d~a(const void *ptr)
 {
-    const union bf_convert~d data = { .u~d = bf_ref_u~d~a(ptr) };
-    return data.~a~d;
+    ~aunion bf_convert~d data = { .u~d = bf_ref_u~d~a(ptr) };
+"
+                            type short width endian
+                            const-prefix typewidth typewidth width endian)
+                    (when with-sign-adjust?
+                      (format #t "    if (BIT_ISSET(data.u~d, BIT~a(~d))) {
+        data.u~d |= BIT~a_ONES(~d, ~d);
+    }
+"
+                              typewidth bit-suffix (1- width)
+                              typewidth bit-suffix (- typewidth width) width))
+                    (format #t "    return data.~a~d;
 }
 "
-                          type short width endian
-                          width width width endian
-                          short width))
+                            short typewidth)
+                    (unless precise?
+                      (format #t "#endif /* UFW_BITS_PER_BYTE == 8 */~%"))))
                 typespec))
 
 (define (make-other-set! typespec)
   (for-typespec (lambda (endian short type width)
-                  (make-set!/apidoc type (if (eq? endian 'b)
-                                             "big endian"
-                                             "little endian"))
-                  (format #t "static inline void*
+                  (let* ((typewidth (next-power-of-2 width))
+                         (precise? (= width typewidth)))
+                    (make-set!/apidoc width
+                                      type
+                                      (if (eq? endian 'b)
+                                          "big endian"
+                                          "little endian"))
+                    (unless precise?
+                      (format #t "#if UFW_BITS_PER_BYTE == 8~%"))
+                    (format #t "static inline void*
 bf_set_~a~d~a(void *ptr, const ~a value)
 {
     const union bf_convert~d data = { .~a~d = value };
     return bf_set_u~d~a(ptr, data.u~d);
 }
 "
-                          short width endian type
-                          width short width
-                          width endian width))
+                            short width endian type
+                            typewidth short typewidth
+                            width endian typewidth)
+                    (unless precise?
+                      (format #t "#endif /* UFW_BITS_PER_BYTE == 8 */~%"))))
                 typespec))
+
+(define (make-range-check/apidoc n signed?)
+  (format #t "
+/**
+ * Test if value is a valid ~d-bit ~asigned integer
+ *
+ * @param  value   ~aint~d_t datum to perform range test on.
+ *
+ * @return True if value is within valid range; false otherwise.
+ * @sideeffects None.
+ */
+"
+          n (if signed? "" "un")
+          (if signed? "" "u") (next-power-of-2 n)))
+
+(define (make-range-check n)
+  (let ((typewidth (next-power-of-2 n))
+        (m (1- n)))
+    (make-range-check/apidoc n #f)
+    (format #t "static inline bool
+bf_inrange_u~d(const uint~d_t value)
+{
+    return (value < (1~a << ~du));
+}
+"
+            n typewidth (literal-suffix n) n)
+    (make-range-check/apidoc n #t)
+    (format #t "static inline bool
+bf_inrange_s~d(const int~d_t value)
+{
+    const int~d_t a = (1~a << ~du);
+    return ((value >= (-1 * a)) && (value < a));
+}
+"
+            n typewidth
+            typewidth (literal-suffix n) m)))
 
 (make-copyright)
 (newline)
 (make-file-doc)
 (newline)
 (c-inclusion-guard-start)
+(c-include-system 'stdbool)
 (c-include-system 'stdint)
 (newline)
 (c-include-ufw 'bit-operations)
@@ -508,12 +690,16 @@ bf_set_~a~d~a(void *ptr, const ~a value)
 (make-ensure-byte-size)
 (make-conversion-unions)
 (for-each make-swap-octets *word-sizes*)
-(for-each make-reference-native *powers-of-two*)
-(for-each (lambda (w) (make-reference w #t)) *powers-of-two*)
-(for-each (lambda (w) (make-reference w #f)) *powers-of-two*)
+(for-each make-reference-native *word-sizes*)
+(for-each (lambda (w) (make-reference w #t)) *word-sizes*)
+(for-each (lambda (w) (make-reference w #f)) *word-sizes*)
 (make-other-reference other-types)
-(for-each make-set!-native *powers-of-two*)
-(for-each (lambda (w) (make-set! w #t)) *powers-of-two*)
-(for-each (lambda (w) (make-set! w #f)) *powers-of-two*)
+(for-each make-set!-native *word-sizes*)
+(for-each (lambda (w) (make-set! w #t)) *word-sizes*)
+(for-each (lambda (w) (make-set! w #f)) *word-sizes*)
 (make-other-set! other-types)
+(format #t "~%#if UFW_BITS_PER_BYTE == 8~%")
+(for-each make-range-check (filter (lambda (n) (not (memv n *powers-of-two*)))
+                                   *word-sizes*))
+(format #t "~%#endif /* UFW_BITS_PER_BYTE == 8 */~%")
 (c-inclusion-guard-end)
