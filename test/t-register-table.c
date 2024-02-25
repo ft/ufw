@@ -13,6 +13,7 @@
 #include <ufw/test/tap.h>
 
 #define REGISTER_TABLE_WITH_NAMES
+#include <ufw/binary-format.h>
 #include <ufw/register-table.h>
 
 #define cmp_code(a, op, b, ...)                 \
@@ -691,37 +692,37 @@ t_block_access(void)
 
     RegisterInit success = register_init(&bfg2000v2);
     cmp_code(success.code, ==, REG_INIT_SUCCESS, "BFG2000v2 initialises");
-    
+
     /* Reading the memory from one defined table entry has to work, if the
      * register table initialised.*/
     a = register_block_read(&bfg2000v2, 0x2, 1, buf);
     cmp_code(a.code, ==, REG_ACCESS_SUCCESS, "V2_MINOR_VERSION reads");
-    cmp_code(buf[0], ==, 427, "V2_MINOR_VERSION has correct value");
-    
+    cmp_code(bf_ref_u16l(buf), ==, 427, "V2_MINOR_VERSION has correct value");
+
     /* Now here's a spot in the address space, that's not mapped to memory.
      * That's what we call a hole. Accessing those fails. This hole is located
      * directly above a mapped area. */
     a = register_block_read(&bfg2000v2, 0x40, 1, buf);
     cmp_code(a.code, ==, REG_ACCESS_NOENTRY, "0x40 is the start of a hole");
     cmp_code(a.address, ==, 0x40, "Address 0x40 is correctly signaled");
-    
+
     /* Starting out in mapped addresses, but reading into a hole also fails.
      * And the system has to return the address where the error occured. */
     a = register_block_read(&bfg2000v2, 0x3f, 2, buf);
     cmp_code(a.code, ==, REG_ACCESS_NOENTRY, "0x3f is okay, but 0x40 still a hole");
     cmp_code(a.address, ==, 0x40, "Address 0x40 is correctly signaled (partial)");
-    
+
     /* This is a direct hole again. It's directly below a mapped area. */
     a = register_block_read(&bfg2000v2, 0xfff, 1, buf);
     cmp_code(a.code, ==, REG_ACCESS_NOENTRY, "0xfff is a hole");
     cmp_code(a.address, ==, 0xfff, "Address 0xfff is correctly signaled");
-    
+
     /* Starting in a hole fails. It doesn't matter if the block read would span
      * into mapped memory eventually. */
     a = register_block_read(&bfg2000v2, 0xfff, 2, buf);
     cmp_code(a.code, ==, REG_ACCESS_NOENTRY, "Still 0xfff is a hole");
     cmp_code(a.address, ==, 0xfff, "Address 0xfff is correctly signaled (partial)");
-    
+
     /* Now reading mapped memory that does not contain entries, will *work*.
      * This register implementation will initialise all unmapped memory to all
      * zero bits. Let's read 0x20 atoms starting at address 0x20. */
@@ -771,7 +772,7 @@ t_block_access(void)
     a = register_block_write(&bfg2000v2, 0x20, 0x02, buf);
     cmp_code(a.code, ==, REG_ACCESS_READONLY, "Block write into RO area fails");
     cmp_code(a.address, ==, 0x20, "Block write error indicates correct address");
-    
+
     /* Let's do a block write that succeeds and partially touches to register
      * values. */
     a = register_block_write(&bfg2000v2, 0x1001, 0x02, buf);
@@ -844,17 +845,21 @@ t_sanitise(void)
 
     RegisterInit success = register_init(&regs);
     cmp_code(success.code, ==, REG_INIT_SUCCESS, "sanitise: regs initialises");
-    
+
     /* Write stuff into memory outside the control of the system: */
-    regs.area->mem[0] =   0u;
-    regs.area->mem[1] =  10u;
-    regs.area->mem[2] = 201u;
-    regs.area->mem[3] = 200u;
+    bf_set_u16l(regs.area->mem + 0u, 0u);
+    bf_set_u16l(regs.area->mem + 1u, 10u);
+    bf_set_u16l(regs.area->mem + 2u, 201u);
+    bf_set_u16l(regs.area->mem + 3u, 200u);
 
     RegisterAccess acc = register_sanitise(&regs);
     cmp_code(acc.code, ==, REG_ACCESS_SUCCESS, "sanitise: process succeeded");
-    
-    uint16_t expect[] = { 20u, 30u, 40u, 200u };
+
+    uint16_t expect[4];
+    bf_set_u16l(expect + 0u, 20u);
+    bf_set_u16l(expect + 1u, 30u);
+    bf_set_u16l(expect + 2u, 40u);
+    bf_set_u16l(expect + 3u, 200u);
     cmp_mem(regs.area->mem, expect, 4u * sizeof(uint16_t),
             "sanitise sets up memory correctly, obeying constraints");
 }
