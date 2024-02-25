@@ -148,7 +148,7 @@ t_setup(const bool trace, const RPMemoryType mtype,
         const RPEndpointType eptype)
 {
     for (size_t i = 0u; i < MEMORY_SIZE; ++i) {
-        memory16[i] = (uint16_t)(i & 0xffffu);
+        bf_set_u16l(memory16 + i, (uint16_t)(i & 0xffffu));
     }
 
 #ifdef WITH_UINT8_T
@@ -296,7 +296,7 @@ main(UNUSED int argc, UNUSED char *argv[])
                "remote: Payload has expected size (1)");
             /* The memory transfered is uses the byte order of the machine it
              * was compiled for. So the native accessor is correct here. */
-            const uint16_t datum = bf_ref_u16n(mf.frame->payload.data);
+            const uint16_t datum = bf_ref_u16l(mf.frame->payload.data);
             ok(datum == 100u, "remote: Payload has expected value (100)");
         }
 
@@ -305,7 +305,8 @@ main(UNUSED int argc, UNUSED char *argv[])
         /* Now lets modify an entry in the register table and see if that work
          * by reading it again. */
 
-        const uint16_t newvalue = 0x100u;
+        uint16_t newvalue;
+        bf_set_u16l(&newvalue, 0x100u);
         rc = regp_req_write16(remote, 100, 1, &newvalue);
         okrc("remote: Sending write request signals success");
 #ifdef USE_CHECK_WIRE
@@ -391,7 +392,7 @@ main(UNUSED int argc, UNUSED char *argv[])
                "remote: Header reflects requested address (100)");
             ok(mf.frame->header.blocksize == 1u,
                "remote: Payload has expected size (1)");
-            const uint16_t datum = bf_ref_u16n(mf.frame->payload.data);
+            const uint16_t datum = bf_ref_u16l(mf.frame->payload.data);
             ok(datum == 0x100u, "remote: Payload has expected value (0x100)");
         }
 
@@ -552,7 +553,7 @@ main(UNUSED int argc, UNUSED char *argv[])
         okrc("remote: Receiving read response signals success");
         okmf("remote");
         with_good_mf(mf) {
-            const uint16_t datum = bf_ref_u16n(mf.frame->payload.data);
+            const uint16_t datum = bf_ref_u16l(mf.frame->payload.data);
             ok(datum == 100u, "remote: Payload has expected value (100)");
         }
 
