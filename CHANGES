@@ -2,9 +2,39 @@
   User-visible changes in ufw
 -------------------------------
 
+* v5.1.0 → v5.2.0 (released 2024-02-25):
+
+** New Features
+
+- binary: Add support for partial word-size integer values.
+- mips-linux-gnu toolchain file.
+- qemu-mips test runner for big-endian tests.
+
+** Bugfixes
+
+- crc-16-arc: Fix _u16() behaviour on big-endian systems.
+- register-table: Fix test-suite on big-endian systems.
+- regp: Fix test-suite on big-endian systems.
+
+** Diffstat:
+
+    .gitignore                            |    1 +
+    cmake/modules/SetupTargetCPU.cmake    |    6 +
+    cmake/modules/UFWTest.cmake           |   14 +-
+    cmake/toolchains/mips-linux-gnu.cmake |   31 +
+    include/ufw/binary-format.h           | 2563 ++++++++++++++++++++-----
+    src/crc-16-arc.c                      |    7 +
+    target/mips/bin/run                   |    3 +
+    test/t-binary-format.c                |  736 ++++++-
+    test/t-register-protocol.c            |   11 +-
+    test/t-register-table.c               |   35 +-
+    tools/make-binary-format.scm          |  566 ++++--
+    11 files changed, 3255 insertions(+), 718 deletions(-)
+
+
 * v5.0.1 → v5.1.0 (released 2024-02-12):
 
-This release mainly  reworks the way toolchain-file works.  Now toolchain files
+This release mainly  reworks the way toolchain-files work.  Now toolchain files
 have a unified behaviour with regards  to installation and compiler name custo-
 misation. See cmake/README.toolchains for details.
 
