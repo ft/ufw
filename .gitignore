@@ -36,3 +36,4 @@ build-*/
 build/
 ci-*/
 ci/
+focus
