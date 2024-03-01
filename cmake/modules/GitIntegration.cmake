@@ -23,7 +23,7 @@ function(gitint_options prefix outvar)
   endif()
 
   if (DEFINED ${prefix}TYPE)
-    list(APPEND GENERATE_OPTIONS -t "${${prefix}TARGET_TYPE}")
+    list(APPEND GENERATE_OPTIONS -t "${${prefix}TYPE}")
   endif()
 
   if (DEFINED CMAKE_BUILD_TYPE AND (NOT "${CMAKE_BUILD_TYPE}" STREQUAL ""))
