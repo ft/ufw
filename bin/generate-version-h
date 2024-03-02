@@ -5,22 +5,28 @@ shift
 
 . "${MICROFRAMEWORK_ROOT}/vcs-integration/build-information.sh"
 
-input="$1"
-output="$2"
-output_bn=${output##*/}
-outdir=${output%/*}
 
-if test "x$input" = x || test "x$output" = x; then
+if test "$#" -lt 2; then
     printf 'usage: generate-version-h <UFW-ROOT> [OPTION(s)] <VERSION-H-TEMPLATE> <OUTPUT> [FILES-TO-SOURCE...]\n'
     exit 1
 fi
+
+input="$1"
+shift 1
 
 if ! test -f "$input"; then
     printf 'generate-version-h error: Input file does not exist: %s\n' "$input" >&2
     exit 1
 fi
 
-shift 2
+case "$1" in
+*/*) output="$1" ;;
+*)   output="$PWD/$1" ;;
+esac
+
+output_bn=${output##*/}
+outdir=${output%/*}
+shift 1
 
 for file in "$@"; do
     case "$file" in
