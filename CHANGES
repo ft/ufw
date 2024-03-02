@@ -2,6 +2,27 @@
   User-visible changes in ufw
 -------------------------------
 
+* v5.2.0 → v5.3.0 (released 2024-03-02):
+
+** New Features
+
+- gitint: Add support for version tag prefixes.
+
+** Bugfixes
+
+- gitint: Fix handling of TYPE keyword argument.
+
+** Diffstat:
+
+    bin/generate-version-h               | 19 ++++++++-----
+    bin/print-commitdate                 | 35 +++++++++++++++++++-----
+    bin/print-version                    | 35 +++++++++++++++++++-----
+    cmake/modules/GitIntegration.cmake   | 40 +++++++++++++++++++---------
+    vcs-integration/build-information.sh |  3 +++
+    vcs-integration/git.sh               | 17 +++++++++---
+    6 files changed, 111 insertions(+), 38 deletions(-)
+
+
 * v5.1.0 → v5.2.0 (released 2024-02-25):
 
 ** New Features
