@@ -1,16 +1,37 @@
 #!/bin/sh
 
-if test "$#" -lt 1 || test "$#" -gt 2; then
-    printf 'usage: print-version MICROFRAMEWORK_ROOT [OUTPUT_FILE]\n'
+usage() {
+    printf 'usage: print-version MICROFRAMEWORK_ROOT [OPTION(s)] [OUTPUT_FILE]\n'
+}
+
+if test "$#" -lt 1; then
+    usage
     exit 1
 fi
 
-base="$1"
-. "$base/vcs-integration/git.sh"
+MICROFRAMEWORK_ROOT="$1"
+shift
+
+. "$MICROFRAMEWORK_ROOT/vcs-integration/build-information.sh"
+. "$MICROFRAMEWORK_ROOT/vcs-integration/git.sh"
 git_populate
 
-if test "x$2" = "x"; then
-    printf '%s\n' "$__GIT_VERSION__"
+if test "$#" -gt 1; then
+    usage
+    exit 1
+elif test "$#" -eq 1; then
+    outfile="$1"
+    if test -f "$outfile"; then
+        oldvalue="$(cat "$outfile")"
+    else
+        oldvalue=""
+    fi
+    if test "$oldvalue" = "$__GIT_VERSION__"; then
+        printf 'Version in output matches new value (%s). Leaving file untouched.\n' \
+               "$__GIT_VERSION__"
+    else
+        printf '%s\n' "$__GIT_VERSION__" > "$outfile"
+    fi
 else
-    printf '%s\n' "$__GIT_VERSION__" > "$2"
+    printf '%s\n' "$__GIT_VERSION__"
 fi
