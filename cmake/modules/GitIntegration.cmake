@@ -126,11 +126,11 @@ function(generate_revision_file)
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 endfunction()
 
-macro(generate_commitdate_file)
+function(generate_commitdate_file)
   cmake_parse_arguments(
     PARSED_ARGS
     ""
-    "TARGET;OUTPUT"
+    "TARGET;OUTPUT;PREFIX"
     ""
     ${ARGN})
   if (NOT MICROFRAMEWORK_ROOT)
@@ -143,15 +143,19 @@ macro(generate_commitdate_file)
     message(FATAL_ERROR "OUTPUT is not set!")
   endif()
 
+  set(GENERATE_OPTIONS)
+  gitint_options(PARSED_ARGS_ GENERATE_OPTIONS)
+
   add_custom_target(${PARSED_ARGS_TARGET})
   add_custom_command(
     TARGET "${PARSED_ARGS_TARGET}"
     COMMAND
     "${MICROFRAMEWORK_ROOT}/bin/print-commitdate"
     "${MICROFRAMEWORK_ROOT}"
+    ${GENERATE_OPTIONS}
     "${PARSED_ARGS_OUTPUT}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
-endmacro()
+endfunction()
 
 function(gitint_install)
   cmake_parse_arguments(
