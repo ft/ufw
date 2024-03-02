@@ -153,11 +153,11 @@ macro(generate_commitdate_file)
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 endmacro()
 
-macro(gitint_install)
+function(gitint_install)
   cmake_parse_arguments(
     PARSED_ARGS
     "LATEST_ARTIFACTS"
-    "DESTINATION;BUILD_VARIANT;NAME;TARGET_MCU;TYPE"
+    "DESTINATION;BUILD_VARIANT;NAME;TARGET_MCU;TYPE;PREFIX"
     "FILES;SCRIPTS"
     ${ARGN})
   if (NOT MICROFRAMEWORK_ROOT)
@@ -221,4 +221,4 @@ endforeach()
 "
   COMPONENT ${UFW_INSTALL_COMPONENT})
 
-endmacro(gitint_install)
+endfunction(gitint_install)
