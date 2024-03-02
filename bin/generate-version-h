@@ -5,7 +5,6 @@ shift
 
 . "${MICROFRAMEWORK_ROOT}/vcs-integration/build-information.sh"
 
-
 if test "$#" -lt 2; then
     printf 'usage: generate-version-h <UFW-ROOT> [OPTION(s)] <VERSION-H-TEMPLATE> <OUTPUT> [FILES-TO-SOURCE...]\n'
     exit 1

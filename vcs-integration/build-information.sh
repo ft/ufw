@@ -9,6 +9,8 @@ MAJOR_VERSION=0
 MINOR_VERSION=0
 PATCHLEVEL=0
 
+__GIT_VERSION_PREFIX__=''
+
 is_opt () {
     case "$1" in
     --) return 1 ;;
@@ -28,6 +30,7 @@ while is_opt "$1"; do
     -b) BUILD_VARIANT="$value" ;;
     -p) BUILD_PROFILE="$value" ;;
     -h) HARDWARE_TYPE="$value" ;;
+    -P) __GIT_VERSION_PREFIX__="$value" ;;
     *) printf 'Unknown option: %s\n' "$opt"
        exit 1
        ;;

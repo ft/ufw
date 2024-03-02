@@ -22,6 +22,10 @@
 #         __GIT_PRE_RELEASE_LEVEL__
 #         __GIT_IS_CLEAN_RELEASE_BUILD__
 #
+# The code uses the variable __GIT_VERSION_PREFIX__ as a string to match and
+# strip off of version tags. This allows users to use foobar/v1.0.0 to result
+# in v1.0.0 when __GIT_VERSION_PREFIX__='foobar'.
+#
 #   git_amend_versions: Overrides the MAJOR_VERSION, MINOR_VERSION and
 #       PATCHLEVEL shell parameters using their git counterparts.
 #
@@ -29,7 +33,8 @@
 #       looks reasonable.
 #
 #   git_exact_version: Returns true if the currently checked out commits points
-#       to an annotated tag in git that matches "v[0-9]*".
+#       to an annotated tag in git that matches "v[0-9]*". The value of the pa-
+#       rameter __GIT_VERSION_PREFIX__ is honoured by this function.
 #
 #   git_detached_head: Returns true, if __GIT_BRANCH__ suggests, the git
 #       repository is in DetachedHead state.
@@ -43,7 +48,10 @@
 #     git_got_info && git_amend_versions
 
 _git_version_ () {
-    REPLY="$(git describe --always --match 'v[0-9]*' --abbrev=0)"
+    REPLY="$(git describe --always \
+                          --match "${__GIT_VERSION_PREFIX__}"'v[0-9]*' \
+                          --abbrev=0)"
+    REPLY="${REPLY#${__GIT_VERSION_PREFIX__}}"
     case "$REPLY" in
     v*) : ;;
     *) REPLY=noversion
@@ -107,7 +115,8 @@ git_amend_versions () {
 }
 
 git_exact_version () {
-    REPLY="$(git describe --match 'v[0-9]*' --exact-match 2> /dev/null)"
+    REPLY="$(git describe --match "${__GIT_VERSION_PREFIX__}"'v[0-9]*' \
+                          --exact-match 2> /dev/null)"
     [ "x$REPLY" != x ]
 }
 
@@ -209,7 +218,7 @@ git_populate () {
             esac
 
             # Determine increment from tag to head:
-            _git_increment_ "$__GIT_VERSION__"
+            _git_increment_ "${__GIT_VERSION_PREFIX__}$__GIT_VERSION__"
             __GIT_INCREMENT__="$REPLY"
 
             # Now extend __GIT_VERSION__, if we're not exactly on a release

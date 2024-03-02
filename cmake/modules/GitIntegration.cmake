@@ -37,14 +37,20 @@ function(gitint_options prefix outvar)
     list(APPEND GENERATE_OPTIONS -h "${BOARD}")
   endif()
 
+  if (DEFINED ${prefix}PREFIX)
+    list(APPEND GENERATE_OPTIONS -P "${${prefix}PREFIX}")
+  elseif (DEFINED UFW_GIT_VERSION_PREFIX)
+    list(APPEND GENERATE_OPTIONS -P "${UFW_GIT_VERSION_PREFIX}")
+  endif()
+
   set(${outvar} "${GENERATE_OPTIONS}" PARENT_SCOPE)
 endfunction()
 
-macro(generate_version_h)
+function(generate_version_h)
   cmake_parse_arguments(
     PARSED_ARGS
     "SYSTEM_VERSION"
-    "BUILD_VARIANT;NAME;TARGET;TARGET_MCU;TEMPLATE;OUTPUT;TYPE"
+    "BUILD_VARIANT;NAME;TARGET;TARGET_MCU;TEMPLATE;OUTPUT;TYPE;PREFIX"
     "SCRIPTS;EXPANSIONS"
     ${ARGN})
   if (NOT MICROFRAMEWORK_ROOT)
@@ -87,7 +93,7 @@ macro(generate_version_h)
     "${MICROFRAMEWORK_ROOT}/vcs-integration/git.sh"
     -- ${PARSED_ARGS_EXPANSIONS}
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
-endmacro()
+endfunction()
 
 macro(generate_revision_file)
   cmake_parse_arguments(
