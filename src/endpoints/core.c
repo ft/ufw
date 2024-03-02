@@ -24,6 +24,9 @@
  * system to retry. If that is not meaningful with your endpoint, return a
  * meaningful error code instead. Drivers returning -EINTR will cause the
  * system to assume the operation was interrupted and it will thus retry.
+ * Similarly, drivers returning -EAGAIN are assumed to be in a temporary
+ * situation that prevented the previous call from performing any work, and
+ * thus the system will retry as well.
  *
  * Using a data count of zero, or one bigger than SSIZE_MAX causes the API to
  * return -EINVAL.
@@ -97,7 +100,7 @@ source_adapt(ByteSource source, void *driver, void *buf, const size_t n)
     size_t rest = n;
     while (rest > 0) {
         const int rc = source(driver, data + n - rest);
-        if (rc == -EINTR) {
+        if (rc == -EINTR || rc == -EAGAIN) {
             continue;
         } else if (rc < 0) {
             return (ssize_t)rc;
@@ -126,7 +129,7 @@ source_get_chunk(Source *source, void *buf, size_t n)
     size_t rest = n;
     while (rest > 0) {
         const ssize_t get = once_source_get_chunk(source, buf, rest);
-        if (get == -EINTR) {
+        if (get == -EINTR || get == -EAGAIN) {
             continue;
         } else if (get < 0) {
             return get;
@@ -150,7 +153,7 @@ sink_adapt(ByteSink sink, void *driver, const void *buf, const size_t n)
     size_t rest = n;
     while (rest > 0) {
         const int rc = sink(driver, data[n - rest]);
-        if (rc == -EINTR) {
+        if (rc == -EINTR || rc == -EAGAIN) {
             continue;
         } else if (rc < 0) {
             return (ssize_t)rc;
@@ -179,7 +182,7 @@ sink_put_chunk(Sink *sink, const void *buf, size_t n)
     size_t rest = n;
     while (rest > 0) {
         const ssize_t put = once_sink_put_chunk(sink, buf, rest);
-        if (put == -EINTR) {
+        if (put == -EINTR || put == -EAGAIN) {
             continue;
         } else if (put < 0) {
             return put;
