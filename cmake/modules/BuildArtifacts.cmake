@@ -36,13 +36,13 @@ function(build_artifacts source)
           OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
           DEPENDS ${source}
           COMMENT "Building intel-hex file: ${dest}"
-          COMMAND ${TI_OBJDUMP} --intel
-                                --diag_wrap=off
-                                --quiet
-                                --memwidth=8
-                                --romwidth=32
-                                -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
-                                $<TARGET_FILE:${source}>)
+          COMMAND ${OBJDUMP} --intel
+                             --diag_wrap=off
+                             --quiet
+                             --memwidth=8
+                             --romwidth=32
+                             -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
+                             $<TARGET_FILE:${source}>)
 
       elseif (${TOOLCHAIN_ID} STREQUAL "ti-arm" AND ${variant} STREQUAL "oad")
 
@@ -94,8 +94,8 @@ function(build_artifacts source)
           OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
           DEPENDS ${source}
           COMMENT "Building disassembly file: ${dest}"
-          COMMAND ${TI_DIS} $<TARGET_FILE:${source}>
-                            > ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest})
+          COMMAND ${DISASSEMBLER} $<TARGET_FILE:${source}>
+                                  > ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest})
       elseif (${variant} STREQUAL "lst")
         add_custom_command(
           OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
@@ -119,9 +119,9 @@ function(build_artifacts source)
           OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
           DEPENDS ${source}
           COMMENT "Building bootloader file: ${dest}"
-          COMMAND ${TI_OBJDUMP} --boot --binary --sci8
-                                -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
-                                $<TARGET_FILE:${source}>)
+          COMMAND ${OBJDUMP} --boot --binary --sci8
+                             -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
+                             $<TARGET_FILE:${source}>)
 
       elseif (${variant} STREQUAL "bin")
         list(FIND PA_VARIANTS hex __with_hex)
@@ -141,17 +141,17 @@ function(build_artifacts source)
           OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
           DEPENDS ${source}
           COMMENT "Building intel-hex file: ${dest}"
-          COMMAND ${TI_OBJDUMP} --intel --romwidth 16 --byte --swapbytes
-                                -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
-                                $<TARGET_FILE:${source}>)
+          COMMAND ${OBJDUMP} --intel --romwidth 16 --byte --swapbytes
+                             -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
+                             $<TARGET_FILE:${source}>)
 
       elseif (${variant} STREQUAL "lst")
         add_custom_command(
           OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest}
           DEPENDS ${source}
           COMMENT "Building disassembly file: ${dest}"
-          COMMAND ${TI_DIS} $<TARGET_FILE:${source}>
-                            > ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest})
+          COMMAND ${DISASSEMBLER} $<TARGET_FILE:${source}>
+                                  > ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${dest})
 
       else ()
         message(FATAL_ERROR "Unknown artifact variant: ${variant}")
