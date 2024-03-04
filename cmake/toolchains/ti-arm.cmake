@@ -35,6 +35,7 @@ set(AR                        ${TOOLCHAIN_BIN}/armar)
 set(OBJCOPY                   ${TOOLCHAIN_BIN}/armofd)
 set(OBJDUMP                   ${TOOLCHAIN_BIN}/armhex)
 set(SIZE                      arm-none-eabi-size)
+set(DISASSEMBLER              ${TOOLCHAIN_BIN}/armdis)
 set(LD                        ${TOOLCHAIN_BIN}/${cc})
 # Setting ranlib to touch, since TI's toolchain doesn't have this, and CMake
 # tends to pick up the one from the host's native toolchain, which in turn

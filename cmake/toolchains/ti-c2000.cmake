@@ -35,6 +35,7 @@ set(AR                        ${TOOLCHAIN_BIN}/ar2000)
 set(OBJCOPY                   ${TOOLCHAIN_BIN}/ofd2000)
 set(OBJDUMP                   ${TOOLCHAIN_BIN}/hex2000)
 set(SIZE                      ${TOOLCHAIN_BIN}/size2000)
+set(DISASSEMBLER              ${TOOLCHAIN_BIN}/dis2000)
 set(LD                        ${TOOLCHAIN_BIN}/${cc})
 # Setting ranlib to touch, since TI's toolchain doesn't have this, and CMake
 # tends to pick up the one from the host's native toolchain, which in turn
