@@ -4,6 +4,8 @@ endif()
 set(__UFW_UFWCompiler 1)
 
 include(CheckCSourceCompiles)
+
+function(ufw_compiler_has_type type var)
   check_c_source_compiles("
 #include <stdint.h>
 #include <stddef.h>
