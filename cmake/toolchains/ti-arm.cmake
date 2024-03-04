@@ -32,10 +32,11 @@ set(CMAKE_C_COMPILER          ${TOOLCHAIN_BIN}/${cc})
 set(CMAKE_CXX_COMPILER        ${TOOLCHAIN_BIN}/${cxx})
 set(AS                        ${TOOLCHAIN_BIN}/${cc})
 set(AR                        ${TOOLCHAIN_BIN}/armar)
-set(OBJCOPY                   ${TOOLCHAIN_BIN}/armofd)
+set(OBJCOPY                   arm-none-eabi-objcopy)
 set(OBJDUMP                   ${TOOLCHAIN_BIN}/armhex)
 set(SIZE                      arm-none-eabi-size)
 set(DISASSEMBLER              ${TOOLCHAIN_BIN}/armdis)
+set(OBJECTFILEDISPLAY         ${TOOLCHAIN_BIN}/armofd)
 set(LD                        ${TOOLCHAIN_BIN}/${cc})
 # Setting ranlib to touch, since TI's toolchain doesn't have this, and CMake
 # tends to pick up the one from the host's native toolchain, which in turn
