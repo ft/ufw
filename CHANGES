@@ -2,6 +2,24 @@
   User-visible changes in ufw
 -------------------------------
 
+* v5.3.0 → v5.3.1 (released 2024-03-05):
+
+** Bugfixes
+
+- ep: Handle EAGAIN like EINTR, namely retrying the previous action.
+- cmake: Remove workarounds for recursive cmake calls.
+- cmake: Fix BuildArtifacts behaviour with new toolchain files.
+
+** Diffstat:
+
+    cmake/modules/BuildArtifacts.cmake | 34 +++++++++++++++---------------
+    cmake/modules/UFWCompiler.cmake    |  9 --------
+    cmake/toolchains/ti-arm.cmake      |  4 +++-
+    cmake/toolchains/ti-c2000.cmake    |  1 +
+    src/endpoints/core.c               | 11 ++++++----
+    5 files changed, 28 insertions(+), 31 deletions(-)
+
+
 * v5.2.0 → v5.3.0 (released 2024-03-02):
 
 ** New Features

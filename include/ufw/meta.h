@@ -19,6 +19,6 @@
 #define UFW_LIBRARY_MINOR 3u
 
 /** Micro Framework Library Patchlevel */
-#define UFW_LIBRARY_PATCH 0u
+#define UFW_LIBRARY_PATCH 1u
 
 #endif /* INC_UFW_META_H_79507d68 */
