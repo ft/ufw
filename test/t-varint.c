@@ -9,14 +9,19 @@
  * @brief Variable Length Integer Unit Tests
  */
 
+/* See the src/registers/utilities.c for reasons to this. */
+#include <ufw/toolchain.h>
+
+#ifdef WITH_SYS_TYPES_H
+#include <sys/types.h>
+#endif /* WITH_SYS_TYPES_H */
+
+#include <inttypes.h>
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-/* newlib: This needs to be included after stdio.h at the moment (3.3.0) for
- * some reason. */
-#include <inttypes.h>
 
 #include <ufw/compat/errno.h>
 #include <ufw/compiler.h>
