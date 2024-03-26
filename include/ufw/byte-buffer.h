@@ -59,6 +59,7 @@ ssize_t byte_buffer_consume_at_most(ByteBuffer*, void*, size_t);
 
 int byte_buffer_rewind(ByteBuffer*);
 void byte_buffer_clear(ByteBuffer*);
+void byte_buffer_reset(ByteBuffer*);
 void byte_buffer_repeat(ByteBuffer*);
 
 size_t byte_buffer_avail(const ByteBuffer*);

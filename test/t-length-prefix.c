@@ -141,7 +141,7 @@ t_fixint_prefix(void)
         }
     }
 
-    byte_buffer_clear(&sinkb);
+    byte_buffer_reset(&sinkb);
 
     {
         const ssize_t n = flenp_memory_to_sink(
@@ -156,7 +156,7 @@ t_fixint_prefix(void)
         }
     }
 
-    byte_buffer_clear(&sinkb);
+    byte_buffer_reset(&sinkb);
 
     {
         const ssize_t n = flenp_memory_to_sink(
@@ -171,7 +171,7 @@ t_fixint_prefix(void)
         }
     }
 
-    byte_buffer_clear(&sinkb);
+    byte_buffer_reset(&sinkb);
 
     {
         const ssize_t n = flenp_memory_to_sink(
@@ -186,7 +186,7 @@ t_fixint_prefix(void)
         }
     }
 
-    byte_buffer_clear(&sinkb);
+    byte_buffer_reset(&sinkb);
 
     {
         const ssize_t n = flenp_memory_to_sink(

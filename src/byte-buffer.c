@@ -126,6 +126,12 @@ byte_buffer_clear(ByteBuffer *b)
 }
 
 void
+byte_buffer_reset(ByteBuffer *b)
+{
+    b->offset = b->used = 0u;
+}
+
+void
 byte_buffer_repeat(ByteBuffer *b)
 {
     b->offset = 0u;
