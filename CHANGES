@@ -2,11 +2,12 @@
   User-visible changes in ufw
 -------------------------------
 
-* v5.3.1 → v5.4.0 (unreleased):
+* v5.3.1 → v5.4.0 (released 2024-03-26):
 
 ** New Features
 
 - lenp: Add support for fixed width integer prefix framing.
+- bb: Add byte_buffer_reset() function.
 
 ** Bugfixes
 
@@ -21,13 +22,16 @@
 ** Diffstat:
 
     cmake/modules/GitIntegration.cmake |   5 +-
+    include/ufw/byte-buffer.h          |   1 +
     include/ufw/length-prefix.h        | 103 ++++++++++--
+    include/ufw/meta.h                 |   4 +-
+    src/byte-buffer.c                  |   6 +
     src/length-prefix.c                | 254 +++++++++++++++++++++--------
     src/registers/utilities.c          |  28 +++-
     test/t-length-prefix.c             | 139 +++++++++++++++-
     test/t-sx-parser.c                 |  13 +-
     test/t-varint.c                    |  13 +-
-    7 files changed, 458 insertions(+), 97 deletions(-)
+    10 files changed, 467 insertions(+), 99 deletions(-)
 
 
 * v5.3.0 → v5.3.1 (released 2024-03-05):
