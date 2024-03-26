@@ -2,6 +2,34 @@
   User-visible changes in ufw
 -------------------------------
 
+* v5.3.1 → v5.4.0 (unreleased):
+
+** New Features
+
+- lenp: Add support for fixed width integer prefix framing.
+
+** Bugfixes
+
+- cmake: Fix system version inclusion. This was a regression that has been
+  introduced in v5.3.0.
+
+** Miscellaneous
+
+- Update inttypes.h inclusion workaround with newest gcc-arm-none-eabi
+  toolchain and newlib on debian sid.
+
+** Diffstat:
+
+    cmake/modules/GitIntegration.cmake |   5 +-
+    include/ufw/length-prefix.h        | 103 ++++++++++--
+    src/length-prefix.c                | 254 +++++++++++++++++++++--------
+    src/registers/utilities.c          |  28 +++-
+    test/t-length-prefix.c             | 139 +++++++++++++++-
+    test/t-sx-parser.c                 |  13 +-
+    test/t-varint.c                    |  13 +-
+    7 files changed, 458 insertions(+), 97 deletions(-)
+
+
 * v5.3.0 → v5.3.1 (released 2024-03-05):
 
 ** Bugfixes
