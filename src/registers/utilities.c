@@ -16,7 +16,7 @@
  * internal files that set the required macros as well. This is a workaround.
  * Not pretty, but is seems to work.
  *
- * There are two bugs files against gcc-arm-none-eabi with debian:
+ * There are two bugs filed against gcc-arm-none-eabi with debian:
  *
  *   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=953844
  *   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1067692
