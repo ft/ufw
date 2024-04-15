@@ -1043,10 +1043,124 @@ t_big_endian(void)
     cmp_mem(exu64, pos, sizeof(uint64_t), "big-endian: u64 value is correct");
 }
 
+static void
+t_bit_operations(void)
+{
+    enum regs {
+        UNSIGNED16,
+        UNSIGNED32,
+        UNSIGNED64,
+        SIGNED16,
+        FLOAT32
+    };
+    RegisterTable table = {
+        .area = (RegisterArea[]) {
+            MEMORY_AREA(0x0000ul, 0x100ul),
+            REGISTER_AREA_END
+        },
+        .entry = (RegisterEntry[]) {
+            REG_U16(UNSIGNED16, 0x0000ul, 0x1234u),
+            REG_U32(UNSIGNED32, 0x0010ul, 0x12345678ul),
+            REG_U64(UNSIGNED64, 0x0020ul, 0x1234567890abcdefull),
+            REG_S16(SIGNED16,   0x0040ul, -1),
+            REG_F32(FLOAT32,    0x0050ul, 1.23),
+            REGISTER_ENTRY_END
+        }
+    };
+
+    RegisterTable *t = &table;
+
+    RegisterInit success = register_init(t);
+    cmp_code(success.code, ==, REG_INIT_SUCCESS, "bit-ops: t initialises");
+
+    RegisterValue u16 = RV(UINT16,  u16, 0x00f0u);
+    RegisterValue u32 = RV(UINT32,  u32, 0x00f00000ul);
+    RegisterValue u64 = RV(UINT64,  u64, 0x00f0000000000000ull);
+    RegisterValue s16 = RV(SINT16,  s16, -1);
+    RegisterValue f32 = RV(FLOAT32, f32, -1);
+    RegisterValue readback;
+
+    RegisterAccess rv;
+
+    rv = register_bit_set(t, SIGNED16, s16);
+    ok(rv.code == REG_ACCESS_INVALID,
+       "bit-opts: set: Invalid for signed registers");
+
+    rv = register_bit_set(t, FLOAT32, f32);
+    ok(rv.code == REG_ACCESS_INVALID,
+       "bit-opts: set: Invalid for float registers");
+
+    rv = register_bit_set(t, UNSIGNED16, u32);
+    ok(rv.code == REG_ACCESS_INVALID,
+       "bit-opts: set: Invalid for type-mismatch");
+
+    rv = register_bit_set(t, UNSIGNED16, u32);
+    ok(rv.code == REG_ACCESS_INVALID,
+       "bit-opts: set: Invalid for type-mismatch");
+
+    rv = register_bit_clear(t, SIGNED16, s16);
+    ok(rv.code == REG_ACCESS_INVALID,
+       "bit-opts: clear: Invalid for signed registers");
+
+    rv = register_bit_clear(t, FLOAT32, f32);
+    ok(rv.code == REG_ACCESS_INVALID,
+       "bit-opts: clear: Invalid for float registers");
+
+    rv = register_bit_clear(t, UNSIGNED16, u32);
+    ok(rv.code == REG_ACCESS_INVALID,
+       "bit-opts: clear: Invalid for type-mismatch");
+
+    rv = register_bit_clear(t, UNSIGNED16, u32);
+    ok(rv.code == REG_ACCESS_INVALID,
+       "bit-opts: clear: Invalid for type-mismatch");
+
+    rv = register_bit_set(t, UNSIGNED16, u16);
+    ok(rv.code == REG_ACCESS_SUCCESS, "bit-opts: set: Matching types: u16");
+    rv = register_get(t, UNSIGNED16, &readback);
+    ok(rv.code == REG_ACCESS_SUCCESS, "bit-opts: set: Get works: u16");
+    ok(readback.value.u16 == 0x12f4u,
+       "bit-opts: set: Bit pattern correct: u16");
+
+    rv = register_bit_set(t, UNSIGNED32, u32);
+    ok(rv.code == REG_ACCESS_SUCCESS, "bit-opts: set: Matching types: u32");
+    rv = register_get(t, UNSIGNED32, &readback);
+    ok(rv.code == REG_ACCESS_SUCCESS, "bit-opts: set: Get works: u32");
+    ok(readback.value.u32 == 0x12f45678ul,
+       "bit-opts: set: Bit pattern correct: u32");
+
+    rv = register_bit_set(t, UNSIGNED64, u64);
+    ok(rv.code == REG_ACCESS_SUCCESS, "bit-opts: set: Matching types: u64");
+    rv = register_get(t, UNSIGNED64, &readback);
+    ok(rv.code == REG_ACCESS_SUCCESS, "bit-opts: set: Get works: u64");
+    ok(readback.value.u64 == 0x12f4567890abcdefull,
+       "bit-opts: set: Bit pattern correct: u64");
+
+    rv = register_bit_clear(t, UNSIGNED16, u16);
+    ok(rv.code == REG_ACCESS_SUCCESS, "bit-opts: clear: Matching types: u16");
+    rv = register_get(t, UNSIGNED16, &readback);
+    ok(rv.code == REG_ACCESS_SUCCESS, "bit-opts: clear: Get works: u16");
+    ok(readback.value.u16 == 0x1204u,
+       "bit-opts: clear: Bit pattern correct: u16");
+
+    rv = register_bit_clear(t, UNSIGNED32, u32);
+    ok(rv.code == REG_ACCESS_SUCCESS, "bit-opts: clear: Matching types: u32");
+    rv = register_get(t, UNSIGNED32, &readback);
+    ok(rv.code == REG_ACCESS_SUCCESS, "bit-opts: clear: Get works: u32");
+    ok(readback.value.u32 == 0x12045678ul,
+       "bit-opts: clear: Bit pattern correct: u32");
+
+    rv = register_bit_clear(t, UNSIGNED64, u64);
+    ok(rv.code == REG_ACCESS_SUCCESS, "bit-opts: clear: Matching types: u64");
+    rv = register_get(t, UNSIGNED64, &readback);
+    ok(rv.code == REG_ACCESS_SUCCESS, "bit-opts: clear: Get works: u64");
+    ok(readback.value.u64 == 0x1204567890abcdefull,
+       "bit-opts: clear: Bit pattern correct: u64");
+}
+
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    plan(3+1+1+4+16+54+(7*18)+15+26+3+3+2+11+6+5+4);
+    plan(3+1+1+4+16+54+(7*18)+15+26+3+3+2+11+6+5+4+27);
     t_invalid_tables();    /*  3 */
     t_trivial_success();   /*  1 */
     t_trivial_fail();      /*  1 */
@@ -1069,5 +1183,6 @@ main(UNUSED int argc, UNUSED char *argv[])
     t_iterate_miss();      /*  6 */
     t_reg_entry_pointer(); /*  5 */
     t_big_endian();        /*  4 */
+    t_bit_operations();    /* 27 */
     return EXIT_SUCCESS;
 }

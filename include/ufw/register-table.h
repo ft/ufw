@@ -441,6 +441,10 @@ RegisterAccess register_set_unsafe(RegisterTable*, RegisterHandle,
                                    RegisterValue);
 RegisterAccess register_get(RegisterTable*, RegisterHandle,
                             RegisterValue*);
+
+RegisterAccess register_bit_set(RegisterTable*, RegisterHandle, RegisterValue);
+RegisterAccess register_bit_clear(RegisterTable*, RegisterHandle, RegisterValue);
+
 RegisterAccess register_default(RegisterTable*, RegisterHandle,
                                 RegisterValue*);
 RegisterAccess register_block_read(RegisterTable*, RegisterAddress,

@@ -1195,6 +1195,165 @@ register_get(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
     return rv;
 }
 
+/**
+ * Set bits in a register
+ *
+ * This function reads a register, sets the bits indicated by the ‘v’ parameter
+ * and writes the resulting value back to the register. The type of this ‘v’
+ * parameter must match the one of the register addressed by ’idx’. Note that
+ * bitwise manipulation is only supported on unsigned integer register types.
+ *
+ * REG_ACCESS_INVALID is returned either when the given register type does not
+ * match to the one read from the register table or when the register type is
+ * not supported, for example, float or signed integers.
+ *
+ * If the given address to the register is out of range, the function returns
+ * immediately with the return code of REG_ACCESS_NOENTRY.
+ *
+ * If the provided register table is not initialised by ‘register_init()’, the
+ * function immediately returns setting the return code to
+ * REG_ACCESS_UNINITIALISED.
+ *
+ * @param  t     Pointer to the register table to work on
+ * @param  idx   RegisterHandle (index) of the target register inside ‘t’
+ * @param  v     Pointer to the register value where the target bit is set
+ *
+ * @return REG_ACCESS_INVALID       if the given type is mismatching or unsupported;
+ *         REG_ACCESS_NOENTRY       if the given idx is out of range;
+ *         REG_ACCESS_UNINITIALISED if the table isn't initialised;
+ *         REG_ACCESS_SUCCESS otherwise.
+ *
+ * @sideeffects A bit in the register at the given idx is set to 1.
+ */
+RegisterAccess
+register_bit_set(RegisterTable *t,
+                 const RegisterHandle idx,
+                 const RegisterValue v)
+{
+    RegisterAccess rv = REG_ACCESS_RESULT_INIT;
+    RegisterValue reg;
+
+    rv = register_get(t, idx, &reg);
+    if (rv.code != REG_ACCESS_SUCCESS) {
+        return rv;
+    }
+
+    if (reg.type != v.type) {
+        goto invalid;
+    }
+
+    switch (reg.type) {
+    case REG_TYPE_UINT16:
+        BIT_SET(reg.value.u16, v.value.u16);
+        break;
+    case REG_TYPE_UINT32:
+        BIT_SET(reg.value.u32, v.value.u32);
+        break;
+    case REG_TYPE_UINT64:
+        BIT_SET(reg.value.u64, v.value.u64);
+        break;
+    case REG_TYPE_SINT16:
+        /* FALLTHROUGH */
+    case REG_TYPE_SINT32:
+        /* FALLTHROUGH */
+    case REG_TYPE_SINT64:
+        /* FALLTHROUGH */
+    case REG_TYPE_FLOAT32:
+        /* FALLTHROUGH */
+    case REG_TYPE_FLOAT64:
+        /* FALLTHROUGH */
+    case REG_TYPE_INVALID:
+        goto invalid;
+    }
+    rv = register_set(t, idx, reg);
+    return rv;
+
+invalid:
+    rv.code = REG_ACCESS_INVALID;
+    rv.address = idx;
+    return rv;
+}
+
+/**
+ * Clear bits in a register
+ *
+ * This function reads a register, clears the bits indicated by the ‘v’
+ * parameter and writes the resulting value back to the register. The type of
+ * this ‘v’ parameter must match the one of the register addressed by ’idx’.
+ * Note that bitwise manipulation is only supported on unsigned integer
+ * register types.
+ *
+ * REG_ACCESS_INVALID is returned either when the given register type does not
+ * match to the one read from the register table or when the register type is
+ * not supported, for example, float or signed integers.
+ *
+ * If the given address to the register is out of range, the function returns
+ * immediately with the return code of REG_ACCESS_NOENTRY.
+ *
+ * If the provided register table is not initialised by ‘register_init()’, the
+ * function immediately returns setting the return code to
+ * REG_ACCESS_UNINITIALISED.
+ *
+ * @param  t     Pointer to the register table to work on
+ * @param  idx   RegisterHandle (index) of the target register inside ‘t’
+ * @param  v     Pointer to the register value where the target bit is set
+ *
+ * @return REG_ACCESS_INVALID       if the given type is mismatching or unsupported;
+ *         REG_ACCESS_NOENTRY       if the given idx is out of range;
+ *         REG_ACCESS_UNINITIALISED if the table isn't initialised;
+ *         REG_ACCESS_SUCCESS otherwise.
+ *
+ * @sideeffects A bit in the register at the given idx is set to 0.
+ */
+RegisterAccess
+register_bit_clear(RegisterTable *t,
+                   const RegisterHandle idx,
+                   const RegisterValue v)
+{
+    RegisterAccess rv = REG_ACCESS_RESULT_INIT;
+    RegisterValue reg;
+
+    rv = register_get(t, idx, &reg);
+    if (rv.code != REG_ACCESS_SUCCESS) {
+        return rv;
+    }
+
+    if (reg.type != v.type) {
+        goto invalid;
+    }
+
+    switch (reg.type) {
+    case REG_TYPE_UINT16:
+        BIT_CLEAR(reg.value.u16, v.value.u16);
+        break;
+    case REG_TYPE_UINT32:
+        BIT_CLEAR(reg.value.u32, v.value.u32);
+        break;
+    case REG_TYPE_UINT64:
+        BIT_CLEAR(reg.value.u64, v.value.u64);
+        break;
+    case REG_TYPE_SINT16:
+        /* FALLTHROUGH */
+    case REG_TYPE_SINT32:
+        /* FALLTHROUGH */
+    case REG_TYPE_SINT64:
+        /* FALLTHROUGH */
+    case REG_TYPE_FLOAT32:
+        /* FALLTHROUGH */
+    case REG_TYPE_FLOAT64:
+        /* FALLTHROUGH */
+    case REG_TYPE_INVALID:
+        goto invalid;
+    }
+    rv = register_set(t, idx, reg);
+    return rv;
+
+invalid:
+    rv.code = REG_ACCESS_INVALID;
+    rv.address = idx;
+    return rv;
+}
+
 RegisterAccess
 register_default(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
 {
