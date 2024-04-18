@@ -2,6 +2,20 @@
   User-visible changes in ufw
 -------------------------------
 
+* v5.4.0 → v5.5.0 (released 2024-04-19):
+
+** New Features
+
+- regs: Add support for setting and clearing bits in registers.
+
+** Diffstat:
+
+    include/ufw/register-table.h |   4 +
+    src/registers/core.c         | 159 +++++++++++++++++++++++++++++++++++
+    test/t-register-table.c      | 117 +++++++++++++++++++++++++-
+    3 files changed, 279 insertions(+), 1 deletion(-)
+
+
 * v5.3.1 → v5.4.0 (released 2024-03-26):
 
 ** New Features

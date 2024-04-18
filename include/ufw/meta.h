@@ -16,7 +16,7 @@
 #define UFW_LIBRARY_MAJOR 5u
 
 /** Micro Framework Library Minor Version Number */
-#define UFW_LIBRARY_MINOR 4u
+#define UFW_LIBRARY_MINOR 5u
 
 /** Micro Framework Library Patchlevel */
 #define UFW_LIBRARY_PATCH 0u
