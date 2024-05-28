@@ -2,6 +2,18 @@
   User-visible changes in ufw
 -------------------------------
 
+* v5.5.0 → v5.6.0 (released 2024-05-28):
+
+** New Features
+
+- compat: Extend errno compatibility range
+
+** Diffstat:
+
+    include/ufw/compat/errno.h | 24 ++++++++++++++++++++++++
+    1 file changed, 24 insertions(+)
+
+
 * v5.4.0 → v5.5.0 (released 2024-04-19):
 
 ** New Features
