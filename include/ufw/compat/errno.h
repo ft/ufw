@@ -54,4 +54,28 @@
 #define EPROTO      (UFW_PRIVATE_ERRNO_OFFSET + 6)
 #endif /* EPROTO */
 
+#ifndef ENOBUFS
+#define ENOBUFS     (UFW_PRIVATE_ERRNO_OFFSET + 7)
+#endif /* ENOBUFS */
+
+#ifndef ENOMSG
+#define ENOMSG      (UFW_PRIVATE_ERRNO_OFFSET + 8)
+#endif /* ENOMSG */
+
+#ifndef EFAULT
+#define EFAULT      (UFW_PRIVATE_ERRNO_OFFSET + 9)
+#endif /* EFAULT */
+
+#ifndef EMSGSIZE
+#define EMSGSIZE    (UFW_PRIVATE_ERRNO_OFFSET + 10)
+#endif /* EMSGSIZE */
+
+#ifndef EDOM
+#define EDOM        (UFW_PRIVATE_ERRNO_OFFSET + 11)
+#endif /* EDOM */
+
+#ifndef ERANGE
+#define ERANGE      (UFW_PRIVATE_ERRNO_OFFSET + 12)
+#endif /* ERANGE */
+
 #endif /* INC_UFW_UFW_MATH_CONSTANTS_H */
