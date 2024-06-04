@@ -12,7 +12,7 @@ function(build_artifacts source)
   if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
   endif()
-  if (${TOOLCHAIN_ID} MATCHES "-arm$")
+  if (${TOOLCHAIN_ID} MATCHES "-arm$" OR ${TOOLCHAIN_ID} STREQUAL "ti-arm-clang")
     foreach (variant ${PA_VARIANTS})
       set(dest "${basename}.${variant}")
 
