@@ -106,8 +106,15 @@ function(ufw_force_compat outvar)
   # With zephr's minimal libc, cmake's test for existing symbols will probably
   # fail, because the test will likely use newlib (at least on ARM) which im-
   # plements these, which leads to false positives.
+  #
+  # With ti-arm-clang, the detection also doesn't work properly at the moment.
+  # So force inclusion for that toolchain as well.
   if (CONFIG_MINIMAL_LIBC AND "${CONFIG_MINIMAL_LIBC}" STREQUAL y)
     set(${outvar} 1 PARENT_SCOPE)
+    message(STATUS "ufw: Zephyr minimal libc: Forcing compat code inclusion")
+  elseif ("${TOOLCHAIN_ID}" STREQUAL ti-arm-clang)
+    set(${outvar} 1 PARENT_SCOPE)
+    message(STATUS "ufw: ${TOOLCHAIN_ID}: Forcing compat code inclusion")
   else()
     set(${outvar} 0 PARENT_SCOPE)
   endif()

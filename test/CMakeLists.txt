@@ -4,6 +4,12 @@ if (DEFINED UFW_ZEPHYR_KERNEL)
   return()
 endif()
 
+if (${TOOLCHAIN_ID} STREQUAL ti-arm-clang)
+  # The startup code used for some builds is not compatibile with this
+  # toolchain. So skip tests with these builds for now.
+  return()
+endif()
+
 include(UFWTest)
 ufw_test_init()
 
