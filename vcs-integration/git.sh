@@ -63,8 +63,8 @@ _git_increment_ () {
     REPLY="$(git rev-list --count "$1"..HEAD)"
 }
 
-_git_commitdate_ () {
-    REPLY="$(date -ud @"$(git show -s --format=%ct)" '+%Y-%m-%d')"
+_git_commitdate_unix_ () {
+    REPLY="$(git show -s --format=%ct)"
 }
 
 _git_hash_ () {
@@ -136,6 +136,7 @@ git_str_is_int () {
 git_populate () {
     __GIT_BRANCH__=''
     __GIT_COMMITDATE__=''
+    __GIT_COMMITDATE_UNIX__=''
     __GIT_DESCRIPTION__=''
     __GIT_DIRTY__=0
     __GIT_HASH__=''
@@ -154,8 +155,9 @@ git_populate () {
         _git_branch_
         __GIT_BRANCH__="$REPLY"
 
-        _git_commitdate_
-        __GIT_COMMITDATE__="$REPLY"
+        _git_commitdate_unix_
+        __GIT_COMMITDATE_UNIX__="$REPLY"
+        __GIT_COMMITDATE__="$(date -ud "@${__GIT_COMMITDATE_UNIX__}" "+%Y-%m-%d")"
 
         _git_description_
         __GIT_DESCRIPTION__="$REPLY"
