@@ -7,6 +7,7 @@
 #
 #         __GIT_BRANCH__
 #         __GIT_COMMITDATE__
+#         __GIT_COMMITDATE_UNIX__
 #         __GIT_DESCRIPTION__
 #         __GIT_DIRTY__
 #         __GIT_HASH__
@@ -64,6 +65,10 @@ _git_increment_ () {
 
 _git_commitdate_ () {
     REPLY="$(git show -s --date=format:%Y-%m-%d --format=%cd)"
+}
+
+_git_commitdate_unix_ () {
+    REPLY="$(git show -s --format=%ct)"
 }
 
 _git_hash_ () {
@@ -135,6 +140,7 @@ git_str_is_int () {
 git_populate () {
     __GIT_BRANCH__=''
     __GIT_COMMITDATE__=''
+    __GIT_COMMITDATE_UNIX__=''
     __GIT_DESCRIPTION__=''
     __GIT_DIRTY__=0
     __GIT_HASH__=''
@@ -155,6 +161,9 @@ git_populate () {
 
         _git_commitdate_
         __GIT_COMMITDATE__="$REPLY"
+
+        _git_commitdate_unix_
+        __GIT_COMMITDATE_UNIX__="$REPLY"
 
         _git_description_
         __GIT_DESCRIPTION__="$REPLY"
