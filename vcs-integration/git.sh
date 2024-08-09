@@ -7,6 +7,7 @@
 #
 #         __GIT_BRANCH__
 #         __GIT_COMMITDATE__
+#         __GIT_COMMITDATE_UNIX__
 #         __GIT_DESCRIPTION__
 #         __GIT_DIRTY__
 #         __GIT_HASH__
@@ -63,7 +64,7 @@ _git_increment_ () {
 }
 
 _git_commitdate_ () {
-    REPLY="$(date -d @"$(git show -s --format=%ct $1)" '+%Y-%m-%d')"
+    REPLY="$(date -d @"$(git show -s --format=%ct)" '+%Y-%m-%d')"
 }
 
 _git_hash_ () {
