@@ -11,6 +11,7 @@
 #         __GIT_DESCRIPTION__
 #         __GIT_DIRTY__
 #         __GIT_HASH__
+#         __GIT_HASH_FULL__
 #         __GIT_INCREMENT__
 #         __GIT_MAJOR__
 #         __GIT_MINOR__
@@ -72,7 +73,11 @@ _git_commitdate_unix_ () {
 }
 
 _git_hash_ () {
-    REPLY="$(git rev-parse HEAD | cut -c1-12)"
+    REPLY="$(git rev-parse --short=12 HEAD)"
+}
+
+_git_hash_full_ () {
+    REPLY="$(git rev-parse HEAD)"
 }
 
 _git_branch_ () {
@@ -144,6 +149,7 @@ git_populate () {
     __GIT_DESCRIPTION__=''
     __GIT_DIRTY__=0
     __GIT_HASH__=''
+    __GIT_HASH_FULL__=''
     __GIT_INCREMENT__=0
     __GIT_MAJOR__=0
     __GIT_MINOR__=0
@@ -176,6 +182,9 @@ git_populate () {
 
         _git_hash_
         __GIT_HASH__="$REPLY"
+
+        _git_hash_full_
+        __GIT_HASH_FULL__="$REPLY"
 
         _git_version_
         __GIT_VERSION__="$REPLY"
@@ -252,6 +261,7 @@ git_populate () {
         __GIT_DESCRIPTION__=""
         __GIT_DIRTY__=""
         __GIT_HASH__=""
+        __GIT_HASH_FULL__=""
         __GIT_INCREMENT__=""
         __GIT_MAJOR__=""
         __GIT_MINOR__=""
