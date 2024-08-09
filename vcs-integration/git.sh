@@ -24,7 +24,7 @@
 #
 # The code uses the variable __GIT_VERSION_PREFIX__ as a string to match and
 # strip off of version tags. This allows users to use foobar/v1.0.0 to result
-# in v1.0.0 when __GIT_VERSION_PREFIX__='foobar'.
+# in v1.0.0 when __GIT_VERSION_PREFIX__='foobar/'.
 #
 #   git_amend_versions: Overrides the MAJOR_VERSION, MINOR_VERSION and
 #       PATCHLEVEL shell parameters using their git counterparts.
