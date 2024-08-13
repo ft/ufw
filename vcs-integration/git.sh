@@ -63,7 +63,7 @@ _git_increment_ () {
 }
 
 _git_commitdate_ () {
-    REPLY="$(date -d @"$(git show -s --format=%ct --date=local $1)" '+%Y-%m-%d')"
+    REPLY="$(git show -s --date=format:%Y-%m-%d --format=%cd)"
 }
 
 _git_hash_ () {
