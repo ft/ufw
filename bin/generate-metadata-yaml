@@ -20,8 +20,6 @@ ufw_root="$1"
 template="$2"
 output="$3"
 
-echo 'Generating metadata YAML file'
-
 # load git.sh library
 git_library="$(realpath "$ufw_root")/${GIT_LIBRARY_RELATIVE}"
 # shellcheck disable=SC1090
