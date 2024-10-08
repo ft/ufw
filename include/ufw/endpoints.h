@@ -48,13 +48,30 @@ typedef ssize_t (*ChunkSink)(void*, const void*, size_t);
 /** Function type that produces a buffer of octets */
 typedef ssize_t (*ChunkSource)(void*, void*, size_t);
 
-typedef ByteBuffer (*SinkGetBuffer)(Sink*);
-typedef ByteBuffer (*SourceGetBuffer)(Source*);
-
 typedef enum ufw_data_kind {
     DATA_KIND_OCTET,
     DATA_KIND_CHUNK
 } DataKind;
+
+typedef ByteBuffer (*SinkGetBuffer)(Sink*);
+typedef ByteBuffer (*SourceGetBuffer)(Source*);
+
+struct ufw_ep_retry;
+typedef ssize_t (*EndpointRetryInit)(DataKind, struct ufw_ep_retry*);
+typedef ssize_t (*EndpointRetry)(DataKind, void*, void*, ssize_t);
+
+struct ufw_ep_retry {
+    EndpointRetryInit init;
+    EndpointRetry run;
+    uint32_t ctrl;
+    void *data;
+};
+
+#define EP_RETRY_INIT { .init = NULL, .run = NULL, .ctrl = 0u, .data = NULL }
+#define EP_RETRY_CTRL_OTHER    BITL(0)
+#define EP_RETRY_CTRL_NOTHING  BITL(1)
+#define EP_RETRY_CTRL_EAGAIN   BITL(2)
+#define EP_RETRY_CTRL_EINTR    BITL(3)
 
 struct ufw_source {
     DataKind kind;
@@ -63,6 +80,7 @@ struct ufw_source {
         ByteSource octet;
         ChunkSource chunk;
     } source;
+    struct ufw_ep_retry retry;
     struct {
         SourceGetBuffer getbuffer;
     } ext;
@@ -75,6 +93,7 @@ struct ufw_sink {
         ByteSink octet;
         ChunkSink chunk;
     } sink;
+    struct ufw_ep_retry retry;
     struct {
         SinkGetBuffer getbuffer;
     } ext;
@@ -84,24 +103,28 @@ struct ufw_sink {
         .kind = DATA_KIND_OCTET,        \
         .driver = (DRIVER),             \
         .source.octet = (CB),           \
+        .retry = EP_RETRY_INIT,         \
         .ext.getbuffer = NULL }
 
 #define CHUNK_SOURCE_INIT(CB, DRIVER) { \
         .kind = DATA_KIND_CHUNK,        \
         .driver = (DRIVER),             \
         .source.chunk = (CB),           \
+        .retry = EP_RETRY_INIT,         \
         .ext.getbuffer = NULL }
 
 #define OCTET_SINK_INIT(CB, DRIVER) {   \
         .kind = DATA_KIND_OCTET,        \
         .driver = (DRIVER),             \
         .sink.octet = (CB),             \
+        .retry = EP_RETRY_INIT,         \
         .ext.getbuffer = NULL }
 
 #define CHUNK_SINK_INIT(CB, DRIVER) {   \
         .kind = DATA_KIND_CHUNK,        \
         .driver = (DRIVER),             \
         .sink.chunk = (CB),             \
+        .retry = EP_RETRY_INIT,         \
         .ext.getbuffer = NULL }
 
 void octet_source_init(Source*, ByteSource, void*);
