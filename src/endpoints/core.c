@@ -28,6 +28,16 @@
  * situation that prevented the previous call from performing any work, and
  * thus the system will retry as well.
  *
+ * The retry-logic for values like EAGAIN and EINTR can be customised. This is
+ * done by way of the "retry" member, that contains two function pointers, one
+ * for initialisation purposes (run each time a transaction is performed) and
+ * one for each retry step done within such a transaction. The cases in which
+ * customisation happens can be selected using the "ctrl" datum, which is a bit
+ * mask that should be or'ed EP_RETRY_CTRL_* macros. Finally, an arbitrary data
+ * pointer is passed to the retry runner function. This can be initialised by
+ * the init function and used by the run function to achieve altered behaviour
+ * of the runner depending on the retry state.
+ *
  * Using a data count of zero, or one bigger than SSIZE_MAX causes the API to
  * return -EINVAL.
  */
@@ -47,6 +57,8 @@ octet_source_init(Source *instance, ByteSource source, void *driver)
     instance->kind = DATA_KIND_OCTET;
     instance->source.octet = source;
     instance->driver = driver;
+    instance->retry.run = NULL;
+    instance->retry.init = NULL;
     instance->ext.getbuffer = NULL;
 }
 
@@ -56,6 +68,8 @@ chunk_source_init(Source *instance, ChunkSource source, void *driver)
     instance->kind = DATA_KIND_CHUNK;
     instance->source.chunk = source;
     instance->driver = driver;
+    instance->retry.run = NULL;
+    instance->retry.init = NULL;
     instance->ext.getbuffer = NULL;
 }
 
@@ -65,6 +79,8 @@ octet_sink_init(Sink *instance, ByteSink sink, void *driver)
     instance->kind = DATA_KIND_OCTET;
     instance->sink.octet = sink;
     instance->driver = driver;
+    instance->retry.run = NULL;
+    instance->retry.init = NULL;
     instance->ext.getbuffer = NULL;
 }
 
@@ -74,6 +90,8 @@ chunk_sink_init(Sink *instance, ChunkSink sink, void *driver)
     instance->kind = DATA_KIND_CHUNK;
     instance->sink.chunk = sink;
     instance->driver = driver;
+    instance->retry.run = NULL;
+    instance->retry.init = NULL;
     instance->ext.getbuffer = NULL;
 }
 
@@ -94,16 +112,77 @@ sink_put_octet(Sink *sink, const unsigned char data)
 }
 
 static inline ssize_t
-source_adapt(ByteSource source, void *driver, void *buf, const size_t n)
+ep_retry(struct ufw_ep_retry *retry, const DataKind kind,
+         void *drv, const ssize_t rc)
 {
+    /*
+     * Only call this function if retry->run is a valid callback function!
+     *
+     * This function returning something larger than zero means retry whatever
+     * we've done before. Any other value will be returned from the endpoint as
+     * is. This allows injecting sideeffects (such as waiting), remapping error
+     * codes and custom handling of zero data.
+     *
+     * The set of controlled conditions can be chosed via retry->ctrl.
+     */
+    if (rc == -EAGAIN) {
+        if (BIT_ISSET(retry->ctrl, EP_RETRY_CTRL_EAGAIN)) {
+            return retry->run(kind, drv, retry->data, rc);
+        } else {
+            return 1;
+        }
+    }
+
+    if (rc == -EINTR) {
+        if (BIT_ISSET(retry->ctrl, EP_RETRY_CTRL_EINTR)) {
+            return retry->run(kind, drv, retry->data, rc);
+        } else {
+            return 1;
+        }
+    }
+
+    if (rc == 0) {
+        if (BIT_ISSET(retry->ctrl, EP_RETRY_CTRL_NOTHING)) {
+            return retry->run(kind, drv, retry->data, rc);
+        } else {
+            return 1;
+        }
+    }
+
+    if (BIT_ISSET(retry->ctrl, EP_RETRY_CTRL_OTHER)) {
+        return retry->run(kind, drv, retry->data, rc);
+    }
+
+    return rc;
+}
+
+static inline ssize_t
+source_adapt(ByteSource source, void *driver, void *buf,
+             struct ufw_ep_retry *retry, const size_t n)
+{
+    if (retry->init != NULL) {
+        retry->init(DATA_KIND_OCTET, retry);
+    }
+
     unsigned char *data = buf;
     size_t rest = n;
     while (rest > 0) {
         const int rc = source(driver, data + n - rest);
-        if (rc == -EINTR || rc == -EAGAIN) {
-            continue;
-        } else if (rc < 0) {
-            return (ssize_t)rc;
+        if (rc <= 0) {
+            if (retry->run == NULL) {
+                if (rc == -EINTR || rc == -EAGAIN) {
+                    continue;
+                } else if (rc < 0) {
+                    return (ssize_t)rc;
+                }
+            } else {
+                const ssize_t retried =
+                    ep_retry(retry, DATA_KIND_OCTET, driver, rc);
+                if (retried > 0) {
+                    continue;
+                }
+                return retried;
+            }
         }
         rest -= rc;
     }
@@ -115,7 +194,7 @@ static inline ssize_t
 once_source_get_chunk(Source *source, void *buf, size_t n)
 {
     return source->kind == DATA_KIND_OCTET
-        ? source_adapt(source->source.octet, source->driver, buf, n)
+        ? source_adapt(source->source.octet, source->driver, &source->retry, buf, n)
         : source->source.chunk(source->driver, buf, n);
 }
 
@@ -126,13 +205,29 @@ source_get_chunk(Source *source, void *buf, size_t n)
         return -EINVAL;
     }
 
+    if (source->retry.init != NULL) {
+        source->retry.init(DATA_KIND_CHUNK, &source->retry);
+    }
+
     size_t rest = n;
     while (rest > 0) {
         const ssize_t get = once_source_get_chunk(source, buf, rest);
-        if (get == -EINTR || get == -EAGAIN) {
-            continue;
-        } else if (get < 0) {
-            return get;
+        if (get <= 0) {
+            if (source->retry.run == NULL) {
+                if (get == -EINTR || get == -EAGAIN) {
+                    continue;
+                } else if (get < 0) {
+                    return (ssize_t)get;
+                }
+            } else {
+                const ssize_t retried =
+                    ep_retry(&source->retry, DATA_KIND_CHUNK,
+                             source->driver, get);
+                if (retried > 0) {
+                    continue;
+                }
+                return retried;
+            }
         }
         rest -= get;
     }
@@ -143,20 +238,65 @@ source_get_chunk(Source *source, void *buf, size_t n)
 ssize_t
 source_get_chunk_atmost(Source *source, void *buf, const size_t n)
 {
-    return once_source_get_chunk(source, buf, n);
+    if (n == 0 || n > SSIZE_MAX) {
+        return -EINVAL;
+    }
+
+    if (source->retry.init != NULL) {
+        source->retry.init(DATA_KIND_CHUNK, &source->retry);
+    }
+
+    size_t got = 0;
+    while (got == 0) {
+        const ssize_t rc = once_source_get_chunk(source, buf, n);
+        if (rc <= 0) {
+            if (source->retry.run == NULL) {
+                if (rc == -EINTR || rc == -EAGAIN) {
+                    continue;
+                } else if (rc < 0) {
+                    return rc;
+                }
+            } else {
+                const ssize_t retried =
+                    ep_retry(&source->retry, DATA_KIND_CHUNK,
+                             source->driver, rc);
+                if (retried > 0) {
+                    continue;
+                }
+                return retried;
+            }
+        }
+        got = (size_t)rc;
+    }
+
+    return got;
 }
 
 static inline ssize_t
-sink_adapt(ByteSink sink, void *driver, const void *buf, const size_t n)
+sink_adapt(ByteSink sink, void *driver, const void *buf,
+           struct ufw_ep_retry *retry, const size_t n)
 {
+    if (retry->init != NULL) {
+        retry->init(DATA_KIND_OCTET, retry);
+    }
+
     const unsigned char *data = buf;
     size_t rest = n;
     while (rest > 0) {
         const int rc = sink(driver, data[n - rest]);
-        if (rc == -EINTR || rc == -EAGAIN) {
-            continue;
-        } else if (rc < 0) {
-            return (ssize_t)rc;
+        if (retry->run == NULL) {
+            if (rc == -EINTR || rc == -EAGAIN) {
+                continue;
+            } else if (rc < 0) {
+                return (ssize_t)rc;
+            }
+        } else {
+            const ssize_t retried =
+                ep_retry(retry, DATA_KIND_OCTET, driver, rc);
+            if (retried > 0) {
+                continue;
+            }
+            return retried;
         }
         rest -= rc;
     }
@@ -168,7 +308,7 @@ static inline ssize_t
 once_sink_put_chunk(Sink *sink, const void *buf, size_t n)
 {
     return sink->kind == DATA_KIND_OCTET
-        ? sink_adapt(sink->sink.octet, sink->driver, buf, n)
+        ? sink_adapt(sink->sink.octet, sink->driver, buf, &sink->retry, n)
         : sink->sink.chunk(sink->driver, buf, n);
 }
 
@@ -179,13 +319,28 @@ sink_put_chunk(Sink *sink, const void *buf, size_t n)
         return -EINVAL;
     }
 
+    if (sink->retry.init != NULL) {
+        sink->retry.init(DATA_KIND_CHUNK, &sink->retry);
+    }
+
     size_t rest = n;
     while (rest > 0) {
         const ssize_t put = once_sink_put_chunk(sink, buf, rest);
-        if (put == -EINTR || put == -EAGAIN) {
-            continue;
-        } else if (put < 0) {
-            return put;
+        if (put <= 0) {
+            if (sink->retry.run == NULL) {
+                if (put == -EINTR || put == -EAGAIN) {
+                    continue;
+                } else if (put < 0) {
+                    return (ssize_t)put;
+                }
+            } else {
+                const ssize_t retried =
+                    ep_retry(&sink->retry, DATA_KIND_CHUNK, sink->driver, put);
+                if (retried > 0) {
+                    continue;
+                }
+                return retried;
+            }
         }
         rest -= put;
     }
@@ -315,9 +470,9 @@ ssize_t
 sts_some_aux(Source *source, Sink *sink, ByteBuffer *b)
 {
     void *buf = b->data + b->offset;
-    const size_t n = byte_buffer_rest(b);
+    const size_t n = byte_buffer_avail(b);
     const ssize_t rc = source_get_chunk_atmost(source, buf, n);
-    return (rc < 0) ? rc : sink_put_chunk(sink, buf, n);
+    return (rc < 0) ? rc : sink_put_chunk(sink, buf, rc);
 }
 
 ssize_t
