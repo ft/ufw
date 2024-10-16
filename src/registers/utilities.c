@@ -194,7 +194,7 @@ register_value_print(void *fh, RegisterValue *v)
         r_fprintf(fh, "%" PRId64, v->value.s64);
         break;
     case REG_TYPE_FLOAT32:
-        r_fprintf(fh, "%e", v->value.f32);
+        r_fprintf(fh, "%e", (double)v->value.f32);
         break;
     case REG_TYPE_FLOAT64:
         r_fprintf(fh, "%e", v->value.f64);

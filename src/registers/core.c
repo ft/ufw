@@ -297,7 +297,7 @@ static bool
 rds_f32_ser(const RegisterValue v, RegisterAtom *r, const bool bigendian)
 {
     assert(v.type == REG_TYPE_FLOAT32);
-    if ((v.value.f32 != 0.) && (isnormal(v.value.f32) == false)) {
+    if ((v.value.f32 != 0.f) && (isnormal(v.value.f32) == false)) {
         return false;
     }
     if (bigendian) {
@@ -317,7 +317,7 @@ rds_f32_des(const RegisterAtom *r, RegisterValue *v, const bool bigendian)
         v->value.f32 = bf_ref_f32l(r);
     }
     v->type = REG_TYPE_FLOAT32;
-    return ((v->value.f32 == 0.) || (isnormal(v->value.f32) == true));
+    return ((v->value.f32 == 0.f) || (isnormal(v->value.f32) == true));
 }
 
 static bool
