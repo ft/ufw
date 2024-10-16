@@ -16,6 +16,7 @@
 #define INC_UFW_UFW_COMPAT_STRINGS_H
 
 #include <stddef.h>
+#include <string.h>
 #include <ufw/toolchain.h>
 
 #ifdef __cplusplus

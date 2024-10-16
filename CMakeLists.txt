@@ -130,6 +130,8 @@ target_include_directories(ufw PUBLIC ${__ufw_include})
 if (UFW_USE_BUILTIN_SWAP)
   target_compile_definitions(ufw PUBLIC UFW_USE_BUILTIN_SWAP)
 endif()
+# TODO: Can we test for this requirement? Picolibc needs this.
+target_compile_definitions(ufw PUBLIC _DEFAULT_SOURCE)
 
 if (NOT ("${TOOLCHAIN_ID}" MATCHES "^ti-"))
   target_link_libraries(ufw PUBLIC m)
