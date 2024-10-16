@@ -99,7 +99,11 @@ set(__ufw_tap_sources src/test/memdiff.c
 
 set(__ufw_sx_sources src/sx.c)
 
+set(__ufw_targets)
+
 function(__ufw_setup lib)
+  list(APPEND __ufw_targets "${lib}")
+  set(__ufw_targets "${__ufw_targets}" PARENT_SCOPE)
   set_property(TARGET ${lib} PROPERTY C_STANDARD 99)
   set_target_cpu(${lib})
   MakeStrictCompilerC(${lib})
@@ -164,6 +168,10 @@ if ("${PROJECT_TARGET_CPU}" STREQUAL "native")
     __ufw_setup(${__lib}-nosan)
     target_link_libraries(${__lib}-nosan PUBLIC ufw-nosan)
   endforeach()
+endif()
+
+if (ZEPHYR_BASE)
+  include(zephyr/zephyr.cmake)
 endif()
 
 add_subdirectory(examples)
