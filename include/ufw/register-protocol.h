@@ -15,6 +15,10 @@
 #include <ufw/register-table.h>
 #include <ufw/toolchain.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 extern BlockAllocator rp_default_allocator;
 
 #define RP_IMPLEMENTATION_VERSION 0u
@@ -258,5 +262,9 @@ regaccess2blockaccess(const RegisterAccess access)
 
     return rc;
 }
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* INC_UFW_REGISTER_PROTOCOL_H_3d84e123 */

@@ -45,6 +45,10 @@
 #include <ufw/byte-buffer.h>
 #include <ufw/endpoints.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 typedef struct ContinuableIssue {
     /*
      * Error number value to encode possible conditions:
@@ -94,5 +98,9 @@ typedef struct ContinuableSink {
         .error.datacount = 0u               }
 
 void continuable_sink_init(Sink*, ContinuableSink*);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* INC_UFW_ENDPOINTS_CONTINUABLE_SINK_H_11229582 */

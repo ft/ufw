@@ -16,6 +16,10 @@
 #include <ufw/bit-operations.h>
 #include <ufw/byte-buffer.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /*
  * Core Data Types
  */
@@ -195,5 +199,9 @@ void instrumentable_no_error(InstrumentableBuffer*);
 void instrumentable_error_at(InstrumentableBuffer*, size_t, int);
 void instrumentable_source(Source*, InstrumentableBuffer*);
 void instrumentable_sink(Sink*, InstrumentableBuffer*);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* INC_UFW_SOURCES_AND_SINKS_H */

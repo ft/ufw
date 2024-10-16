@@ -18,6 +18,10 @@
 #include <stddef.h>
 #include <ufw/toolchain.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #ifndef UFW_COMPAT_HAVE_STRLCAT
 size_t strlcat(char *, const char *, size_t);
 #endif /* !UFW_COMPAT_HAVE_STRLCAT */

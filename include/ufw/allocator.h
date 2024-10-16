@@ -10,6 +10,10 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 typedef enum Allocator {
     UFW_ALLOC_GENERIC,
     UFW_ALLOC_SLAB
@@ -56,5 +60,9 @@ void block_free(BlockAllocator*, void*);
       .driver = NULL,                       \
       .alloc.generic = ufw_malloc,          \
       .free = ufw_mfree }
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* INC_UFW_ALLOCATOR_H_3ff7ef48 */

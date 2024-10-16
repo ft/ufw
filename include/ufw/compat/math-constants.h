@@ -18,6 +18,9 @@
  * constant is present already.
  *
  * If that is desired, first include math.h then ufw/compat/math-constants.h.
+ *
+ * __cplusplus note: This file is macro-only, so we don't need the extern C
+ * block in this header.
  */
 
 #ifndef INC_UFW_UFW_MATH_CONSTANTS_H

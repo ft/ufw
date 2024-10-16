@@ -7,6 +7,9 @@
 /**
  * @file meta.h
  * @brief Micro Framework Meta Information.
+ *
+ * __cplusplus note: This file is macro-only, so we don't need the extern C
+ * block in this header.
  */
 
 #ifndef INC_UFW_META_H_79507d68

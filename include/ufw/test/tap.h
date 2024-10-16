@@ -19,7 +19,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /* TAP worker API */
 
@@ -88,6 +88,6 @@ declare_printer(s64,  int64_t);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* INC_UFW_UFW_TEST_TAP_H */

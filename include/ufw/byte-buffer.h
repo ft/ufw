@@ -11,6 +11,10 @@
 
 #include <ufw/compat/ssize-t.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 typedef struct ufw_byte_buffer {
     unsigned char *data;
     size_t size;
@@ -64,5 +68,9 @@ void byte_buffer_repeat(ByteBuffer*);
 
 size_t byte_buffer_avail(const ByteBuffer*);
 size_t byte_buffer_rest(const ByteBuffer*);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* INC_UFW_BYTE_BUFFER_H */

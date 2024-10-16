@@ -121,6 +121,10 @@
 #error "System byte-size is unsupported! Cannot use binary-format.h for that reason!"
 #endif /* Unsupported Byte Size */
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 union bf_convert16 {
     uint16_t u16;
     int16_t s16;
@@ -2884,5 +2888,9 @@ bf_inrange_s56(const int64_t value)
 }
 
 #endif /* UFW_BITS_PER_BYTE == 8 */
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* INC_UFW_BINARY_FORMAT_H */

@@ -14,6 +14,9 @@
  *
  * This header tries to smooth over some differences. To use error handling
  * with ufw's API, include “ufw/compat/errno.h” instead of “errno.h”.
+ *
+ * __cplusplus note: This file is macro-only, so we don't need the extern C
+ * block in this header.
  */
 
 #ifndef INC_UFW_UFW_MATH_CONSTANTS_H

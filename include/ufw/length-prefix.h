@@ -18,6 +18,10 @@
 #include <ufw/endpoints.h>
 #include <ufw/variable-length-integer.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 typedef enum ufw_lenp_kind {
     LENP_VARIABLE,
     LENP_OCTET,
@@ -125,5 +129,9 @@ lenp_decode_source_to_sink(Source *source, Sink *sink)
 {
     return flenp_decode_source_to_sink(LENP_VARIABLE, source, sink);
 }
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* INC_UFW_LENGTH_PREFIX_H */

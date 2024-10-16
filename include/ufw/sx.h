@@ -13,6 +13,10 @@
 #include <stdint.h>
 #include <string.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 enum sx_status {
     SXS_SUCCESS,
     SXS_FOUND_LIST,
@@ -137,5 +141,9 @@ sx_cdr(struct sx_node *n)
 {
     return sx_is_pair(n) ? sx_cdr_unsafe(n) : NULL;
 }
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* INC_UFW_SX_H_8528c541 */

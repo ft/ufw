@@ -21,6 +21,10 @@
 #define RFC1055_WITH_SOF BITL(0)
 #define RFC1055_DEFAULT  0u
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 typedef struct rfc1055_context {
     enum {
         RFC1055_SEARCH_FOR_START,
@@ -40,5 +44,9 @@ typedef struct rfc1055_context {
 void rfc1055_context_init(RFC1055Context*, uint32_t);
 int rfc1055_encode(const RFC1055Context*, Source*, Sink*);
 int rfc1055_decode(RFC1055Context*, Source*, Sink*);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* INC_UFW_RFC1055_H */

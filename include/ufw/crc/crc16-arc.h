@@ -12,10 +12,18 @@
 
 #define CRC16_ARC_INITIAL 0x0000u
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 uint16_t ufw_crc16_arc(uint16_t, const void*, size_t);
 uint16_t ufw_buffer_crc16_arc(const void*, size_t);
 
 uint16_t ufw_crc16_arc_u16(uint16_t, const uint16_t*, size_t);
 uint16_t ufw_buffer_crc16_arc_u16(const uint16_t*, size_t);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* INC_UFW_CRC_CRC16_ARC_H_19c5e461 */

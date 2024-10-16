@@ -1,6 +1,9 @@
 /**
  * @file toolchain.h
  * @brief Toolchain introspection API
+ *
+ * __cplusplus note: This file is macro-only, so we don't need the extern C
+ * block in this header.
  */
 
 #ifndef INC_UFW_TOOLCHAIN_H
