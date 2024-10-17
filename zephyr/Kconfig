@@ -1,3 +1,11 @@
+config UFW_USE_BUILTIN_SWAP
+	bool "Use __builtin_bswapXX() if available."
+	default y
+
+config UFW_PRIVATE_ERRNO_OFFSET
+       int "Offset for errno-extensions."
+       default 16384
+
 config UFW_ZEPHYR
 	bool "Enable ufw-zephyr extensions"
 	default n

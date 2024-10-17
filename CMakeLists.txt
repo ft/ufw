@@ -8,6 +8,11 @@ include(CTest)
 enable_testing()
 
 option(UFW_USE_BUILTIN_SWAP "Use __builtin_bswapXX() if available." ON)
+set(UFW_PRIVATE_ERRNO_OFFSET 16384 CACHE STRING "Offset for errno-extensions")
+
+if (ZEPHYR_BASE)
+  include(zephyr/cmake-cache.cmake)
+endif()
 
 if ((NOT CMAKE_BUILD_TYPE) OR ("${CMAKE_BUILD_TYPE}" STREQUAL ""))
   set(CMAKE_BUILD_TYPE "debug")
@@ -61,8 +66,6 @@ else()
   set(UFW_COMPAT_HAVE_STRLCPY 0)
   set(UFW_COMPAT_HAVE_STRNLEN 0)
 endif()
-
-set(UFW_PRIVATE_ERRNO_OFFSET 16384 CACHE STRING "Offset for errno-extensions")
 
 configure_file("${PROJECT_SOURCE_DIR}/include/ufw/toolchain.h.in"
                "${PROJECT_BINARY_DIR}/include/ufw/toolchain.h" )

@@ -1,3 +1,4 @@
+name: ufw
 build:
   cmake: .
   kconfig: ./zephyr/Kconfig
