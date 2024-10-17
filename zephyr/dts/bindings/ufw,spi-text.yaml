@@ -1,0 +1,15 @@
+# Copyright (c) 2024 micro framework workers, All rights reserved.
+# Terms for redistribution and use can be found in LICENCE.
+
+description: Microframework SPI Text driver
+
+compatible: "ufw,spi-text"
+
+include:
+  - name: spi-controller.yaml
+    property-blocklist:
+      - label
+
+properties:
+  label:
+    type: string

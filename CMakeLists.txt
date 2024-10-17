@@ -171,6 +171,7 @@ if ("${PROJECT_TARGET_CPU}" STREQUAL "native")
 endif()
 
 if (ZEPHYR_BASE)
+  add_subdirectory_ifdef(CONFIG_UFW_ZEPHYR src/z)
   include(zephyr/zephyr.cmake)
 endif()
 

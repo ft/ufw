@@ -1,0 +1,44 @@
+config UFW_ZEPHYR
+	bool "Enable ufw-zephyr extensions"
+	default n
+
+if UFW_ZEPHYR
+
+config UFW_SHELL_ADDONS
+	bool "Enable ufw-zephyr's shell addons"
+        depends on SHELL
+	default n
+
+config UFW_ENDPOINT_UART_POLL
+	bool "Implementing endpoints with zephyr's uart-polling API"
+	default n
+
+config UFW_ENDPOINT_UART_FIFO
+	bool "Implementing endpoints with zephyr's uart-fifo API"
+	default n
+
+config UFW_SLAB_ALLOCATOR
+	bool "Allow using slab allocators as ufw BlockAllocators"
+	default n
+
+config UFW_SPI_TEXT
+	bool "Enable ufw-zephyr's text based SPI controller"
+	def_bool   DT_HAS_UFW_SPI_TEXT_ENABLED
+	depends on DT_HAS_UFW_SPI_TEXT_ENABLED
+
+config UFW_SPI_TEXT_INIT_PRIORITY
+       int "Init priority for the spi-text driver"
+       depends on UFW_SPI_TEXT
+       default 70
+
+config UFW_I2C_TEXT
+	bool "Enable ufw-zephyr's text based I2C controller"
+	def_bool   DT_HAS_UFW_I2C_TEXT_ENABLED
+	depends on DT_HAS_UFW_I2C_TEXT_ENABLED
+
+config UFW_I2C_TEXT_INIT_PRIORITY
+       int "Init priority for the i2c-text driver"
+       depends on UFW_I2C_TEXT
+       default 70
+
+endif # UFW_ZEPHYR
