@@ -1,60 +1,16 @@
 #!/bin/sh
 
-set -euf
+root="$1"
+shift
 
-USAGE="usage: generate-metadata-yaml <UFW-ROOT> <METADATA-YAML-TEMPLATE> <OUTPUT>
+bool='__GIT_DIRTY__:__GIT_VERSION_AVAILABLE__:__GIT_VERSION_IS_CANDIDATE__'
+bool="${bool}:__GIT_VERSION_IS_PRE_RELEASE__:__GIT_IS_CLEAN_RELEASE_BUILD__"
 
-The environment variable __GIT_VERSION_PREFIX__ has to be set. It should be
-either an empty string '' if the project uses the 'vMAJOR.MINOR.PATCH' format
-for release tags or e.g. 'EPOCH/' if the release tag format is
-'EPOCH/vMAJOR.MINOR.PATCH'."
-GIT_LIBRARY_RELATIVE='vcs-integration/git.sh'
+# "-Q" causes strings not to be automatically quoted. This matches previous
+# behaviour. "-B …" allows listing boolean tags, that will then be expanded as
+# true/false instead of 1/0.
 
-if [ "$#" != 3 ]
-then
-	echo "$USAGE"
-	exit 1
-fi
-
-ufw_root="$1"
-template="$2"
-output="$3"
-
-# load git.sh library
-git_library="$(realpath "$ufw_root")/${GIT_LIBRARY_RELATIVE}"
-# shellcheck disable=SC1090
-. "$git_library"
-git_populate
-git_got_info && git_amend_versions
-
-output_dir="$(realpath "$(dirname "$output")")"
-mkdir -pv "$output_dir"
-
-# convert_boolean takes a boolean value in the '0' or '1' format and converts
-# it into YAML-compatible 'false' and 'true' values.
-convert_boolean() {
-	c_style_input="$1"
-	if [ "$c_style_input" = '0' ]
-	then
-		echo 'false'
-	elif [ "$c_style_input" = '1' ]
-	then
-		echo 'true'
-	else
-		echo "convert_boolean: Failed to convert '${c_style_input}' to YAML boolean"
-		exit 1
-	fi
-}
-
-__GIT_IS_CLEAN_RELEASE_BUILD__="$(convert_boolean "$__GIT_IS_CLEAN_RELEASE_BUILD__")"
-__GIT_DIRTY__="$(convert_boolean "$__GIT_DIRTY__")"
-
-sed \
-	-e "s/@@__GIT_IS_CLEAN_RELEASE_BUILD__@@/${__GIT_IS_CLEAN_RELEASE_BUILD__}/g" \
-	-e "s/@@__GIT_DIRTY__@@/${__GIT_DIRTY__}/g" \
-	-e "s/@@__GIT_HASH_FULL__@@/${__GIT_HASH_FULL__}/g" \
-	-e "s/@@__GIT_COMMITDATE_UNIX__@@/${__GIT_COMMITDATE_UNIX__}/g" \
-	-e "s/@@__GIT_MAJOR__@@/${__GIT_MAJOR__}/g" \
-	-e "s/@@__GIT_MINOR__@@/${__GIT_MINOR__}/g" \
-	-e "s/@@__GIT_PATCHLEVEL__@@/${__GIT_PATCHLEVEL__}/g" \
-	< "$template" > "$output"
+exec "$root/bin/expand-template" "$root" -Q                                \
+                                         -B "$bool"                        \
+                                         "$@"                              \
+                                         "$root"/vcs-integration/git.sh

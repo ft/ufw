@@ -8,13 +8,18 @@ shift
 start_anchor=''
 header_text=''
 warn_vcs=1
+quote_values=1
 
 while is_opt "$1"; do
     case "$1" in
     -A) start_anchor="$2"
         shift 2 ;;
+    -B) boolean_tags="$2"
+        shift 2 ;;
     -H) header_text="$2"
         shift 2 ;;
+    -Q) quote_values=0
+        shift 1 ;;
     -V) warn_vcs=0
         shift 1 ;;
     *) break;
@@ -93,6 +98,27 @@ insert_header () {
 EOF
 }
 
+boolean_tag () {
+    if [ -z "$boolean_tags" ]; then
+        return 1
+    fi
+
+    needle="$1"
+    oldifs="$IFS"
+    IFS=':'
+    rc=1
+
+    for i in $boolean_tags; do
+        if [ "$i" = "$needle" ]; then
+            rc=0
+            break
+        fi
+    done
+
+    IFS="$oldifs"
+    return "$rc"
+}
+
 cmdline_expansion () {
     __exp=${1#\{}
     __exp=${__exp%%:*}
@@ -126,6 +152,13 @@ expand_tag () {
         dollar='$'
         quote='"'
         eval "REPLY=${quote}${dollar}${parameter}${quote}"
+    fi
+    if boolean_tag "$tag"; then
+        if [ "$tag" = 0 ]; then
+            REPLY='false'
+        else
+            REPLY='true'
+        fi
     fi
 }
 
@@ -173,7 +206,9 @@ maybe_expand () {
         tag="$REPLY"
         expand_tag "$tag" "$@"
         value="$REPLY"
-        if test "$tag" = "__GIT_HASH__"; then
+        if [ "$quote_values" = 0 ]; then
+            :
+        elif [ "$tag" = "__GIT_HASH__" ] || [ "$tag" = "__GIT_HASH_FULL__" ]; then
             # Force GIT_HASH to be a string.
             value='"'"$REPLY"'"'
         else
