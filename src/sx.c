@@ -122,7 +122,7 @@ sx_make_symboln(const char *s, size_t len)
     const size_t n = len + 1;
     struct sx_node *node = make_node();
     node->type = SXT_SYMBOL;
-    node->data.symbol = calloc(sizeof(char), n);
+    node->data.symbol = calloc(n, sizeof(char));
     if (node->data.symbol == NULL) {
         sxoom(__FILE__, __LINE__);
     }
@@ -214,7 +214,7 @@ make_pair(void)
 {
     struct sx_node *rv = make_node();
 
-    rv->data.pair = calloc(sizeof *rv->data.pair, 1u);
+    rv->data.pair = calloc(1u, sizeof *rv->data.pair);
     if (rv->data.pair == NULL) {
         sxoom(__FILE__, __LINE__);
     }
