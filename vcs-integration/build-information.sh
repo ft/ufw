@@ -1,3 +1,5 @@
+. "$MICROFRAMEWORK_ROOT"/bin/utils.sh
+
 FIRMWARE_NAME=no-name
 FIRMWARE_MCU=unknown
 FIRMWARE_TYPE=generic
@@ -10,14 +12,6 @@ MINOR_VERSION=0
 PATCHLEVEL=0
 
 __GIT_VERSION_PREFIX__=''
-
-is_opt () {
-    case "$1" in
-    --) return 1 ;;
-    -*) return 0 ;;
-    *) return 1 ;;
-    esac
-}
 
 while is_opt "$1"; do
     opt="$1"

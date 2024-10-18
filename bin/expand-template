@@ -1,0 +1,220 @@
+#!/bin/sh
+
+MICROFRAMEWORK_ROOT="$1"
+shift
+
+. "$MICROFRAMEWORK_ROOT"/bin/utils.sh
+
+start_anchor=''
+header_text=''
+warn_vcs=1
+
+while is_opt "$1"; do
+    case "$1" in
+    -A) start_anchor="$2"
+        shift 2 ;;
+    -H) header_text="$2"
+        shift 2 ;;
+    -V) warn_vcs=0
+        shift 1 ;;
+    *) break;
+    esac
+done
+
+. "${MICROFRAMEWORK_ROOT}/vcs-integration/build-information.sh"
+
+if test "$#" -lt 2; then
+    printf 'usage: expand-template <UFW-ROOT> [OPTION(s)] <TEMPLATE> <OUTPUT> [FILES-TO-SOURCE...]\n'
+    exit 1
+fi
+
+input="$1"
+shift 1
+
+if ! test -f "$input"; then
+    printf 'expand-template error: Input file does not exist: %s\n' "$input" >&2
+    exit 1
+fi
+
+case "$1" in
+*/*) output="$1" ;;
+*)   output="$PWD/$1" ;;
+esac
+
+output_bn=${output##*/}
+outdir=${output%/*}
+shift 1
+
+for file in "$@"; do
+    case "$file" in
+    --) shift;
+        break ;;
+    */*) ;;
+    *) file="./$file"
+    esac
+    if ! test -f "$file"; then
+        printf 'Script file does not exist: %s\n' "$file" >&2
+        exit 1
+    fi
+    . "$file"
+done
+
+if [ "$__GIT_LOADED__" = 1 ]; then
+    # User supplied git.sh in FILES-TO-SOURCE.
+    git_populate
+    git_got_info && git_amend_versions
+else
+    GIT_VERSION_AVAILABLE=0
+    GIT_VERSION_IS_CANDIDATE=0
+    GIT_VERSION_IS_PRE_RELEASE=0
+    GIT_DIRTY=0
+    if [ "$warn_vcs" = 1 ]; then
+        printf '%s: Git integration not loaded.' "${output_bn}"
+        printf ' Lots of information will be blank!\n'
+    fi
+fi
+
+if ! test -d "$outdir"; then
+    printf 'Output directory non-existent; Creating.\n' "$outdir"
+    mkdir -p "$outdir"
+fi
+
+if test -e "$output"; then
+    printf '%s: File exists, building dismissable file.\n' "${output_bn}"
+    stage="${output}.stage"
+else
+    printf '%s: File missing, building anew.\n' "${output_bn}"
+    stage="${output}"
+fi
+
+insert_header () {
+    printf '%s\n' "$header_text"
+    cat <<EOF
+EOF
+}
+
+cmdline_expansion () {
+    __exp=${1#\{}
+    __exp=${__exp%%:*}
+    __exp=${__exp%\}}
+    for t in "$@"; do
+        case "$t" in
+        "$__exp"=*) REPLY="${t#*=}"
+                return 0
+                ;;
+        *) ;;
+        esac
+    done
+    return 1
+}
+
+extract_tag () {
+    REPLY="$1"
+    REPLY="${REPLY#*@@}"
+    REPLY="${REPLY%@@*}"
+}
+
+expand_tag () {
+    tag="$1"
+    shift
+    if cmdline_expansion "$tag" "$@"; then
+        # Nothing, just forward $REPLY from cmdline_expansion.
+        true
+    else
+        parameter=${tag#@@}
+        parameter=${parameter%@@}
+        dollar='$'
+        quote='"'
+        eval "REPLY=${quote}${dollar}${parameter}${quote}"
+    fi
+}
+
+strip_quote () {
+    REPLY=''
+    oldifs="$IFS"
+    IFS='"'
+    for i in $1; do
+        REPLY="$REPLY$i"
+    done
+    IFS="$oldifs"
+}
+
+maybe_quote () {
+    value="$1"
+    if expr "$value" : '^0x[0-9a-fA-F][0-9a-fA-F]*$' > /dev/null; then
+        REPLY="$value"
+    elif expr "$value" : '^0[0-7][0-7]*$' > /dev/null; then
+        REPLY="$value"
+    elif expr "$value" : '^[01][01]*b$' > /dev/null; then
+        REPLY="$value"
+    elif expr "$value" : '^[0-9][0-9]*$' > /dev/null; then
+        REPLY="$value"
+    else
+        quote='"'
+        strip_quote "$value"
+        REPLY="${quote}${REPLY}${quote}"
+    fi
+}
+
+print_interleaved () {
+    line="$1"
+    value="$2"
+    start="${line%%@@*}"
+    end="${line##*@@}"
+    printf '%s%s%s\n' "$start" "$value" "$end"
+}
+
+maybe_expand () {
+    line="$1"
+    shift
+    case "$line" in
+    *@@*@@*)
+        extract_tag "$line"
+        tag="$REPLY"
+        expand_tag "$tag" "$@"
+        value="$REPLY"
+        if test "$tag" = "__GIT_HASH__"; then
+            # Force GIT_HASH to be a string.
+            value='"'"$REPLY"'"'
+        else
+            maybe_quote "$value"
+            value="$REPLY"
+        fi
+        print_interleaved "$line" "$value"
+        ;;
+    *) printf '%s\n' "$line"
+    esac
+}
+
+if [ -n "$start_anchor" ]; then
+    state=find-start
+else
+    if [ -n "$header_text" ]; then
+        insert_header
+    fi
+    state=active
+fi
+
+while IFS= read -r line; do
+    if test "$state" = find-start; then
+        if test "$line" = "$start_anchor"; then
+            state=active
+            insert_header
+        fi
+        continue
+    fi
+    maybe_expand "$line" "$@"
+done < "$input" > "$stage"
+
+if test "$stage" != "$output"; then
+    printf '%s: Checking for changes...\n' "${output_bn}"
+    # Diff returns failure, if the files differ, so:
+    if diff -q "$output" "$stage" > /dev/null 2>&1; then
+        printf '%s: No changes detected, leaving old version untouched!\n' "${output_bn}"
+        rm -f "$stage"
+    else
+        printf '%s: Changes detected, updating target!\n' "${output_bn}"
+        mv "$stage" "$output"
+    fi
+fi
+exit 0

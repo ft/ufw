@@ -5,6 +5,7 @@
 #   git_populate: Fetches information from git database and populates the
 #       following parameters, if it can:
 #
+#         __GIT_LOADED__
 #         __GIT_BRANCH__
 #         __GIT_COMMITDATE__
 #         __GIT_COMMITDATE_UNIX__
@@ -48,6 +49,8 @@
 #
 #     git_populate
 #     git_got_info && git_amend_versions
+
+__GIT_LOADED__=1
 
 _git_version_ () {
     REPLY="$(git describe --always \
