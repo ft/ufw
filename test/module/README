@@ -1,0 +1,33 @@
+This is a tiny  mmh system to check if using mmh as  a zephyr module works. You
+need to setup the zephyr kernel at  version 3.7.0 at "zephyr" and ufw in "ufw".
+The "setup" script helps with that:
+
+  % ./setup ZEPHYR-CHECKOUT-DIRECTORY
+
+
+Example:
+
+  % ./setup ~/src/zephyr
+
+
+In case you don't have zephyr checkout of the right version for the tests lying
+around, you can  use "download" in place  of the directory name,  and the setup
+utility will clone the right version for you into the "zephyr" subdirectory:
+
+  % ./setup download
+
+
+After that you can  just run mmh to build the system. You  can also use the run
+helper for convenience:
+
+  % ./run
+
+
+This helper produces TAP  output, so you can run it in  tap-harness or prove as
+well:
+
+  % prove -v -c run
+  % tap-harness -v -c run
+
+
+The helper makes the TAP test into a SKIPped test if "setup" was not run.

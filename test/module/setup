@@ -1,0 +1,47 @@
+#!/bin/sh
+
+zephyr_version='v3.7.0'
+zephyr_upstream='https://github.com/zephyrproject-rtos/zephyr.git'
+
+if [ "$#" != 1 ]; then
+    cat <<EOF
+usage: ./setup ZEPHYR-CHECKOUT-DIRECTORY
+
+The directory pointed to by ZEPHYR-CHECKOUT-DIRECTORY must contain a
+checkout of Zephyr $zephyr_version in order to work. Other versions may work as
+well, but that is more of a flexibility feature than a supported one.
+
+If ZEPHYR-CHECKOUT-DIRECTORY is "download", then zephyr's main upstream
+repository will be cloned at version $zephyr_version for use with these tests.
+EOF
+    exit 1
+fi
+
+zephyr="$1"
+ufw='../..'
+
+if [ -d zephyr ] && [ "$zephyr" != 'download' ]; then
+    printf 'Error: "zephyr" is a directory, without "download" argument.\n'
+    exit 1
+fi
+
+if [ -h zephyr ]; then
+    rm zephyr || exit 1
+fi
+
+if [ ! -d zephyr ] && [ "$zephyr" = 'download' ]; then
+    printf 'Cloning zephyr kernel %s\n' "$zephyr_version"
+    git clone -c 'advice.detachedHead=false' \
+              -b "$zephyr_version"           \
+              "$zephyr_upstream" zephyr || exit 1
+elif [ ! -e zephyr ]; then
+    printf 'Linking zephyr kernel: %s\n' "$zephyr"
+    ln -s "$zephyr" zephyr || exit 1
+fi
+
+if [ ! -e ufw ]; then
+    printf 'Linking ufw library  : %s\n' "$ufw"
+    ln -s "$ufw" ufw || exit 1
+fi
+
+printf 'Setting up module test system finished.\n'

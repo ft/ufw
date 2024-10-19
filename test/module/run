@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# TAP emitter
+
+__test_n__=0
+
+plan () {
+    printf '1..%d\n' "$1"
+}
+
+tap () {
+    _prereq="$1"
+    _runner="$2"
+    _title="$3"
+    _suffix=''
+    _result='not ok'
+    __test_n__=$( expr "$__test_n__" + 1 )
+    if ! "$_prereq"; then
+        _result='ok'
+        _suffix='SKIP'
+    elif "$_runner" 2>&1 | sed -e 's,^,# ,'; then
+        _result='ok'
+    fi
+    printf '%s %s - %s%s\n' "$_result"    \
+                            "$__test_n__" \
+                            "$_title"     \
+                            "${_suffix:+ # $_suffix}"
+}
+
+# Utilities
+
+canrun () {
+    test -e ufw && test -e zephyr
+}
+
+logged_mmh () {
+    mmh --log-to-file
+}
+
+# Test suite
+
+plan 1
+tap canrun logged_mmh 'Build minimal mmh system with ufw as a zephyr module'

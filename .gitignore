@@ -32,6 +32,8 @@ fuzz/afl-runner
 fuzz/ex-*/out
 config/*.mk
 config/*.h
+test/module/ufw
+test/module/zephyr
 build-*/
 build/
 ci-*/

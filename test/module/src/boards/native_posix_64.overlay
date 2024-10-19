@@ -1,0 +1,37 @@
+/ {
+        spi_text_0: spi@10000 {
+                compatible = "ufw,spi-text";
+                status = "okay";
+                #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0x10000 0x10>;
+                clock-frequency = <2000000>;
+        };
+
+        spi_text_1: spi@20000 {
+                compatible = "ufw,spi-text";
+                status = "okay";
+                #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0x20000 0x10>;
+                clock-frequency = <2000000>;
+        };
+
+        i2c_text_0: i2c@30000 {
+                compatible = "ufw,i2c-text";
+                status = "okay";
+                #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0x30000 0x10>;
+                clock-frequency = <2000000>;
+        };
+
+        i2c_text_1: i2c@40000 {
+                compatible = "ufw,i2c-text";
+                status = "okay";
+                #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0x40000 0x10>;
+                clock-frequency = <2000000>;
+        };
+};
