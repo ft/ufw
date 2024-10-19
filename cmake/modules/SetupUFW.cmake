@@ -43,7 +43,7 @@ macro(ufw_toplevel)
   include(HardwareAbstraction)
   include(CTest)
   if (DEFINED UFW_ZEPHYR_KERNEL)
-    message(STATUS "ufw: Enabling Zephyr Kernel")
+    message(STATUS "ufw: Enabling Zephyr Kernel ${UFW_ZEPHYR_KERNEL}")
     set(APPLICATION_SOURCE_DIR ${UFW_ZEPHYR_APPLICATION} CACHE PATH "Application Source Directory")
     # This is, so CMake's find_package will find the right place
     # for ZephyrConfig.cmake:
