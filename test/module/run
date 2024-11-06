@@ -3,24 +3,78 @@
 # TAP emitter
 
 __test_n__=0
+__suffix__=''
 
 plan () {
     printf '1..%d\n' "$1"
 }
 
+noplan () {
+    printf '1..%d\n' "$__test_n__"
+}
+
+SKIP () {
+    __suffix__=SKIP
+    "$@"
+    _rc="$?"
+    __suffix__=''
+    return "$_rc"
+}
+
+TODO () {
+    __suffix__=TODO
+    "$@"
+    _rc="$?"
+    __suffix__=''
+    return "$_rc"
+}
+
 tap () {
-    _prereq="$1"
-    _runner="$2"
-    _title="$3"
+    _prereq=''
+    _setup=''
+    _teardown=''
+
+    while getopts p:s:t: _opt; do
+        case "$_opt" in
+        p) _prereq="$OPTARG" ;;
+        s) _setup="$OPTARG" ;;
+        t) _teardown="$OPTARG" ;;
+        *) printf '# tap: Unknown option "-%s".\n' "$_opt"
+           return 1 ;;
+        esac
+    done
+    shift $(( OPTIND - 1 ))
+
+    if [ "$#" != 2 ]; then
+        printf '# usage: tap [OPTION(s)...] RUNNER TITLE\n'
+        return 1
+    fi
+
+    _runner="$1"
+    _title="$2"
     _suffix=''
     _result='not ok'
-    __test_n__=$( expr "$__test_n__" + 1 )
-    if ! "$_prereq"; then
+    __test_n__=$(( __test_n__ + 1 ))
+
+    if [ "$__suffix__" = SKIP ] || ! "$_prereq"; then
         _result='ok'
         _suffix='SKIP'
-    elif "$_runner" 2>&1 | sed -e 's,^,# ,'; then
-        _result='ok'
+    else
+        _suffix="$__suffix__"
+
+        if [ -n "$_setup" ] && ! "$_setup"; then
+            printf '# Setup (%s) returned failure!\n' "$_setup"
+        fi
+
+        if "$_runner" 2>&1 | sed -e 's,^,# ,'; then
+            _result='ok'
+        fi
+
+        if [ -n "$_teardown" ] && ! "$_teardown"; then
+            printf '# Teardown (%s) returned failure!\n' "$_teardown"
+        fi
     fi
+
     printf '%s %s - %s%s\n' "$_result"    \
                             "$__test_n__" \
                             "$_title"     \
@@ -40,4 +94,4 @@ logged_mmh () {
 # Test suite
 
 plan 1
-tap canrun logged_mmh 'Build minimal mmh system with ufw as a zephyr module'
+tap -p canrun logged_mmh 'Build minimal mmh system with ufw as a zephyr module'
