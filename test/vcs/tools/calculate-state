@@ -1,0 +1,38 @@
+#!/bin/sh
+
+. "${MICROFRAMEWORK_ROOT:-../..}"/vcs-integration/git.sh
+
+p () {
+    eval 'printf '\''%s=%s\n'\'' '"$1"' "${'"$1"'}"'
+}
+
+printall () {
+    p __GIT_BRANCH__
+    p __GIT_COMMITDATE__
+    p __GIT_COMMITDATE_UNIX__
+    p __GIT_DESCRIPTION__
+    p __GIT_DIRTY__
+    p __GIT_HASH__
+    p __GIT_HASH_FULL__
+    p __GIT_INCREMENT__
+    p __GIT_MAJOR__
+    p __GIT_MINOR__
+    p __GIT_PATCHLEVEL__
+    p __GIT_VERSION__
+    p __GIT_VERSION_AVAILABLE__
+    p __GIT_VERSION_IS_CANDIDATE__
+    p __GIT_CANDIDATE_LEVEL__
+    p __GIT_VERSION_IS_PRE_RELEASE__
+    p __GIT_PRE_RELEASE_LEVEL__
+    p __GIT_IS_CLEAN_RELEASE_BUILD__
+}
+
+if [ ! -d specimen ]; then
+    printf 'Directory missing: specimen.\n'
+    exit 1
+fi
+
+cd specimen || exit 1
+
+git_populate
+printall
