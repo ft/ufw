@@ -1,7 +1,5 @@
 #!/bin/sh
 
 cd .. || exit 1
-if [ "$keep" -eq 0 ]; then
-    rm -Rf specimen
-fi
+specimen_cleanup
 exit 0

@@ -40,6 +40,17 @@ run_with_data () {
     done < "$_data_file"
 }
 
+specimen_cleanup () {
+    if [ "$keep" -eq 0 ]; then
+        rm -Rf specimen
+    fi
+}
+
+test_abort () {
+    specimen_cleanup
+    exit 1
+}
+
 if [ -z "$SPECIMEN" ]; then
     printf '# prologue: SPECIMEN is empty! Giving up.\n'
     exit 1

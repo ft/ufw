@@ -18,9 +18,9 @@ printf '# Run tests with clean repository\n'
 git_populate
 run_with_data "$DATA_clean"
 
-mv README foo || exit 1
-head -n 5 foo > README || exit 1
-rm foo || exit 1
+mv README foo || test_abort
+head -n 5 foo > README || test_abort
+rm foo || test_abort
 
 printf '# Run tests with dirty repository\n'
 git_populate
