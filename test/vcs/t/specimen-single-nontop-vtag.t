@@ -10,8 +10,7 @@ SPECIMEN="$TOPLEVEL/catalogue/${name}.tar.gz"
 
 . "$LIB"/prologue.sh
 
-set -- "$DATA_clean" "$DATA_dirty"
-calculate_plan "$@"
+calculate_plan "$DATA_clean" "$DATA_dirty"
 plan "$REPLY"
 
 printf '# Run tests with clean repository\n'

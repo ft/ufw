@@ -9,8 +9,7 @@ SPECIMEN="$TOPLEVEL/catalogue/${name}.tar.gz"
 
 . "$LIB"/prologue.sh
 
-set -- "$DATA"
-calculate_plan "$@"
+calculate_plan "$DATA"
 plan "$REPLY"
 git_populate
 run_with_data "$DATA"
