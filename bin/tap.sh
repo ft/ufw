@@ -58,11 +58,12 @@
 #         This option takes something executable, and runs it just before
 #         a test is executed. If a prerequisite runner failed, this option
 #         is ignored. The runner should return success. Failure will emit
-#         a warning.
+#         a warning, and fail the test without running it.
 #
 #   -t <TEARDOWN-RUNNER>
 #         This option is similar to "-s", only that the runner gets executed
-#         just AFTER a test is executed.
+#         just AFTER a test is executed. Returning an error from this runner
+#         will invalidate the test.
 #
 # There are also two pre-commands for "tap", that modify a test's behaviour:
 #
@@ -135,6 +136,7 @@ TODO () {
 }
 
 tap () {
+    TAP_RESULT='0'
     _prereq=''
     _setup=''
     _teardown=''
@@ -159,7 +161,7 @@ tap () {
     _runner="$1"
     _title="$2"
     _suffix=''
-    _result='not ok'
+    _result='-init-'
     __test_n__=$(( __test_n__ + 1 ))
 
     if [ "$__suffix__" = SKIP ] || ! "$_prereq"; then
@@ -170,22 +172,36 @@ tap () {
 
         if [ -n "$_setup" ] && ! "$_setup"; then
             printf '# Setup (%s) returned failure!\n' "$_setup"
+            printf '# This fails the test without running it!\n'
+            TAP_RESULT='1'
         fi
 
-        # This is a little complex due to the fact that POSIX shell doesn't
-        # have $pipestatus like zsh or $PIPESTATUS like bash do. This basically
-        # hands around the information via additional file descriptors.
-        (((((exec 3>&- 4>&-; "$_runner" 2>&1);
-            printf '%s\n' "$?" >&3) |
-               sed -e 's,^,# ,' >&4) 3>&1) |
-             (read rc; exit "$rc")) 4>&1
-        TAP_RESULT="$?"
+        if [ "$TAP_RESULT" -eq 0 ]; then
+            # This is a little complex due to the fact that POSIX shell does
+            # not have $pipestatus like zsh or $PIPESTATUS like bash do. This
+            # basically hands around the information via additional file
+            # descriptors.
+            (((((exec 3>&- 4>&-; "$_runner" 2>&1);
+                printf '%s\n' "$?" >&3) |
+                   sed -e 's,^,# ,' >&4) 3>&1) |
+                 (read rc; exit "$rc")) 4>&1
+            TAP_RESULT="$?"
+            if [ -n "$_teardown" ] && ! "$_teardown"; then
+                # A failing teardown runner fails the test even if the test
+                # runner itself indicated success.
+                printf '# Teardown (%s) returned failure!\n' "$_teardown"
+                if [ "$TAP_RESULT" -eq 0 ]; then
+                    printf '# This fails the test even though it succeeded'
+                    printf ' in itself!\n'
+                fi
+                TAP_RESULT='1'
+            fi
+        fi
+
         if [ "$TAP_RESULT" -eq 0 ]; then
             _result='ok'
-        fi
-
-        if [ -n "$_teardown" ] && ! "$_teardown"; then
-            printf '# Teardown (%s) returned failure!\n' "$_teardown"
+        else
+            _result='not ok'
         fi
     fi
 
