@@ -103,8 +103,8 @@ setup_repository () {
     git_reset --hard  || test_abort
     git_clean -xdf    || test_abort
     git_checkout "$1" || test_abort
-   case "$2" in
-    *-dirty.state) make_dirty ;;
+    case "$2" in
+    *-dirty[.-]*) make_dirty ;;
     esac
     return 0
 }
