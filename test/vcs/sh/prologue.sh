@@ -72,8 +72,8 @@ version_to_state () {
 }
 
 make_dirty () {
-    mv README foo || test_abort
-    head -n 5 foo > README || test_abort
+    mv .gitignore foo || test_abort
+    head -n 5 foo > .gitignore || test_abort
     rm foo || test_abort
     return 0
 }
