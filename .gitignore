@@ -38,6 +38,7 @@ test/vcs/specimen
 !test/vcs/catalogue/*.tar.*
 build-*/
 build/
+release/
 ci-*/
 ci/
 focus

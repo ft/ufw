@@ -1,0 +1,14 @@
+remove:
+  buildconfigs: True
+  buildtools:   True
+  toolchains:   True
+
+buildconfigs: [ debug ]
+buildtools:   [ ninja ]
+toolchains:
+  - name: gnu
+    architecture: [ native ]
+  - name: gnu-arm-none-eabi
+    architecture: [ cortex-m3 ]
+  - name: mips-linux-gnu
+    architecture: [ mips ]
