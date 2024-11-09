@@ -138,6 +138,9 @@ git_is_clean_full_release () {
     test "$__GIT_INCREMENT__" = 0 || return 1
     test "$__GIT_VERSION_IS_CANDIDATE__" = 0 || return 1
     test "$__GIT_VERSION_IS_PRE_RELEASE__" = 0 || return 1
+    case "$__GIT_VERSION__" in
+    NoVersion*) return 1
+    esac
     return 0
 }
 

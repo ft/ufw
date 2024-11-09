@@ -15,7 +15,4 @@ __GIT_VERSION_IS_CANDIDATE__=0
 __GIT_CANDIDATE_LEVEL__=0
 __GIT_VERSION_IS_PRE_RELEASE__=0
 __GIT_PRE_RELEASE_LEVEL__=0
-
-# TODO: This is a little odd. If there are no tags, how can this
-#       be a clean release build? Leaving this for now.
-__GIT_IS_CLEAN_RELEASE_BUILD__=1
+__GIT_IS_CLEAN_RELEASE_BUILD__=0
