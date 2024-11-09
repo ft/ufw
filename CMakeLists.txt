@@ -175,7 +175,6 @@ endif()
 
 if (ZEPHYR_BASE)
   add_subdirectory_ifdef(CONFIG_UFW_ZEPHYR src/z)
-  include(zephyr/zephyr.cmake)
 endif()
 
 add_subdirectory(examples)
