@@ -8,13 +8,13 @@ common:
   install: ufw-git-install
 
 zephyr-aliases:
-  native-posix: native_posix/native/64
+  native-sim: native_sim/native/64
 
 zephyr:
   - application: mini-zephyr-fw
     source: ${system}/src
     build:
       - toolchains: [ host ]
-        boards: [ native-posix ]
+        boards: [ native-sim ]
         modules:
           - ufw
