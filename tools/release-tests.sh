@@ -133,15 +133,17 @@ fi
 
 printf 'Checking mmh version...'
 
-mmh_version=$(mmh --version | \
-              head -n1      | \
-              grep -o '[0-9][0-9]*\(\.[0-9][0-9]*\)*')
+mmh_version=$(mmh --version                           | \
+              head -n1                                | \
+              grep -o '[0-9][0-9]*\(\.[0-9][0-9]*\)*' | \
+              head -n1)
 
-mmh_version_fields=$(printf '%s' "$mmh_version" | awk '{ gsub("[^.]", "");
-                                                         print length+1; }')
+mmh_version_fields=$(printf '%s' "$mmh_version" | \
+                     awk '{ gsub("[^.]", "");
+                            print length+1; }')
 
 if [ "$mmh_version_fields" != 2 ]; then
-    printf 'Invalid mmh version: "%s"\n' "$mmh_version"
+    printf '\n\nInvalid mmh version: "%s"\n\n' "$mmh_version"
     exit 1
 fi
 
@@ -158,7 +160,7 @@ then
     exit 1
 fi
 
-printf ' ok\n'
+printf ' ok (%s)\n' "$mmh_version"
 
 mmh_toolchains_ok='1'
 printf 'Checking for mandatory mmh toolchains...\n'
