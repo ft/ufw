@@ -115,6 +115,7 @@ zephyr_module_setup_ok () {
 check_prg awk
 check_prg cmake
 check_prg gzip
+check_prg make
 check_prg mmh
 check_prg ninja
 check_prg prove
