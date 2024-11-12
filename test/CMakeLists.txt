@@ -20,6 +20,7 @@ endif()
 list(APPEND test_names
   t-convolution-low-pass
   t-endpoints
+  t-ep-retry-ctrl
   t-length-prefix
   t-hexdump
   t-persistent-storage
