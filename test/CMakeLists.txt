@@ -19,6 +19,7 @@ if (WITH_UINT8_T)
 endif()
 list(APPEND test_names
   t-convolution-low-pass
+  t-endpoints
   t-length-prefix
   t-hexdump
   t-persistent-storage
