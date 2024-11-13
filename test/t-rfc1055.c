@@ -129,8 +129,8 @@ main(UNUSED int argc, UNUSED char **argv)
     byte_buffer_space(&sink_buffer.buffer, sink_memory, MEMORY_SIZE);
 
     /* Make buffer abstractions accessible via sink/source interface */
-    instrumentable_source(&source, &source_buffer);
-    instrumentable_sink(&sink, &sink_buffer);
+    instrumentable_source(DATA_KIND_OCTET, &source, &source_buffer);
+    instrumentable_sink(DATA_KIND_OCTET, &sink, &sink_buffer);
 
     /* Setup RFC1055 context without start-of-frame delimiter use (classic
      * mode) */
@@ -180,13 +180,13 @@ main(UNUSED int argc, UNUSED char **argv)
      * bytes. But the sink can run out of space or error otherwise.
      */
 
-    instrumentable_error_at(&sink_buffer, 10, -EIO);
+    instrumentable_until_error_at(&sink_buffer.write.error, 10, -EIO);
     byte_buffer_repeat(&source_buffer.buffer);
     byte_buffer_clear(&sink_buffer.buffer);
     rfc1055_context_init(&rfc1055_with_sof, RFC1055_WITH_SOF);
     rc = rfc1055_encode(&rfc1055_with_sof, &source, &sink);
     ok(rc == -EIO, "RFC1055 encoder passes error code correctly, %d", rc);
-    instrumentable_no_error(&sink_buffer);
+    instrumentable_reset_error(&sink_buffer.write.error);
 
     /*
      * General decoding tests
@@ -382,7 +382,7 @@ main(UNUSED int argc, UNUSED char **argv)
             "RFC1055 Frame after error has correct contents");
 
     /* Finally check that errors are passed properly */
-    instrumentable_error_at(&sink_buffer, 10, -EIO);
+    instrumentable_until_error_at(&sink_buffer.write.error, 10, -EIO);
 
     byte_buffer_space(&sink_buffer.buffer, sink_memory, MEMORY_SIZE);
     byte_buffer_space(&source_buffer.buffer, source_memory, MEMORY_SIZE);
@@ -394,7 +394,7 @@ main(UNUSED int argc, UNUSED char **argv)
     rc = rfc1055_decode(&rfc1055_with_sof, &source, &sink);
 
     ok(rc == -EIO, "RFC1055 decoder passes error code correctly, %d", rc);
-    instrumentable_no_error(&sink_buffer);
+    instrumentable_reset_error(&sink_buffer.write.error);
 
     return EXIT_SUCCESS;
 }

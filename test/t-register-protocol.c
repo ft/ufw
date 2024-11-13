@@ -196,10 +196,10 @@ main(UNUSED int argc, UNUSED char *argv[])
 
 
     /* Initialise instrumentable wire endpoints */
-    instrumentable_source(&l2r_source, &l2r_buffer);
-    instrumentable_sink(  &l2r_sink,   &l2r_buffer);
-    instrumentable_source(&r2l_source, &r2l_buffer);
-    instrumentable_sink(  &r2l_sink,   &r2l_buffer);
+    instrumentable_source(DATA_KIND_OCTET, &l2r_source, &l2r_buffer);
+    instrumentable_sink(  DATA_KIND_OCTET, &l2r_sink,   &l2r_buffer);
+    instrumentable_source(DATA_KIND_OCTET, &r2l_source, &r2l_buffer);
+    instrumentable_sink(  DATA_KIND_OCTET, &r2l_sink,   &r2l_buffer);
 
     /* Initialise test state */
     t_setup(false, RP_MEMTYPE_16, RP_EP_TCP);

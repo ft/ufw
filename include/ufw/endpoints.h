@@ -201,27 +201,73 @@ void sink_to_buffer(Sink*, ByteBuffer*);
  * Instrumentable Sources and Sinks
  */
 
-#define INSTRUMENTABLE_ERROR_AT_COUNT BITLL(0)
-#define INSTRUMENTABLE_ENABLE_TRACE   BITLL(1)
+/* Common flags */
+#define INSTRUMENTABLE_COMMON_ENABLE_TRACE   BITLL(0)
+
+/* Error specific flags */
+#define INSTRUMENTABLE_UNTIL_FAILURE  BITLL(0)
+#define INSTRUMENTABLE_UNTIL_SUCCESS  BITLL(1)
+
+typedef struct ufw_instrumentable_access_stats {
+    size_t bytes;
+    size_t accesses;
+} InstrumentableAccessStats;
+
+#define INSTRUMENTABLE_ACCESS_STATS                                     \
+    ((InstrumentableAccessStats){ .bytes = 0u, .accesses = 0u })
+
+typedef struct ufw_instrumentable_error {
+    uint64_t flags;
+    int number;
+    size_t at;
+} InstrumentableError;
+
+#define INSTRUMENTABLE_ERROR                                            \
+    ((InstrumentableError){ .flags = 0u, .number = 0, .at = 0u })
 
 typedef struct ufw_instrumentable_buffer {
     uint64_t flags;
     struct {
-        size_t read;
-        size_t write;
-    } count;
+        InstrumentableAccessStats stat;
+        InstrumentableError error;
+    } read;
     struct {
-        int number;
-        size_t at;
-    } error;
+        InstrumentableAccessStats stat;
+        InstrumentableError error;
+    } write;
+    /**
+     * Chunk size of chunk-based endpoints. We're simulating an endpoint making
+     * at most chunksize transfers. This is useful for testing the repetition
+     * logic.
+     */
+    size_t chunksize;
+    /** The actual bytebuffer, that is enhanced by this data type. */
     ByteBuffer buffer;
 } InstrumentableBuffer;
 
+#define INSTRUMENTABLE_BUFFER(DATA, SIZE)               \
+    ((InstrumentableBuffer){                            \
+        .flags = 0u,                                    \
+        .read.stat = INSTRUMENTABLE_ACCESS_STATS,       \
+        .read.error = INSTRUMENTABLE_ERROR,             \
+        .write.stat = INSTRUMENTABLE_ACCESS_STATS,      \
+        .write.error = INSTRUMENTABLE_ERROR,            \
+        .chunksize = 0u,                                \
+        .buffer = BYTE_BUFFER_EMPTY(DATA, SIZE)         \
+    })
+
 void instrumentable_set_trace(InstrumentableBuffer*, bool);
-void instrumentable_no_error(InstrumentableBuffer*);
-void instrumentable_error_at(InstrumentableBuffer*, size_t, int);
-void instrumentable_source(Source*, InstrumentableBuffer*);
-void instrumentable_sink(Sink*, InstrumentableBuffer*);
+void instrumentable_source(DataKind, Source*, InstrumentableBuffer*);
+void instrumentable_sink(DataKind, Sink*, InstrumentableBuffer*);
+void instrumentable_until_error_at(InstrumentableError*, size_t, int);
+void instrumentable_until_success_at(InstrumentableError*, size_t, int);
+void instrumentable_reset_error(InstrumentableError*);
+void instrumentable_reset_stats(InstrumentableAccessStats*);
+static inline void
+instrumentable_chunksize(InstrumentableBuffer *b, const size_t n)
+{
+    b->chunksize = n;
+}
 
 #ifdef __cplusplus
 }

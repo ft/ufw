@@ -44,6 +44,9 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#ifdef UFW_WITH_EP_CORE_TRACE
+#include <stdio.h>
+#endif /* UFW_WITH_EP_CORE_TRACE */
 #include <string.h>
 
 #include <ufw/compat/errno.h>
@@ -51,9 +54,16 @@
 
 #include <ufw/endpoints.h>
 
+#ifdef UFW_WITH_EP_CORE_TRACE
+#define trace() printf("# trace %s\n", __func__)
+#else
+#define trace() ((void)0)
+#endif
+
 void
 octet_source_init(Source *instance, ByteSource source, void *driver)
 {
+    trace();
     instance->kind = DATA_KIND_OCTET;
     instance->source.octet = source;
     instance->driver = driver;
@@ -65,6 +75,7 @@ octet_source_init(Source *instance, ByteSource source, void *driver)
 void
 chunk_source_init(Source *instance, ChunkSource source, void *driver)
 {
+    trace();
     instance->kind = DATA_KIND_CHUNK;
     instance->source.chunk = source;
     instance->driver = driver;
@@ -76,6 +87,7 @@ chunk_source_init(Source *instance, ChunkSource source, void *driver)
 void
 octet_sink_init(Sink *instance, ByteSink sink, void *driver)
 {
+    trace();
     instance->kind = DATA_KIND_OCTET;
     instance->sink.octet = sink;
     instance->driver = driver;
@@ -87,6 +99,7 @@ octet_sink_init(Sink *instance, ByteSink sink, void *driver)
 void
 chunk_sink_init(Sink *instance, ChunkSink sink, void *driver)
 {
+    trace();
     instance->kind = DATA_KIND_CHUNK;
     instance->sink.chunk = sink;
     instance->driver = driver;
@@ -98,6 +111,7 @@ chunk_sink_init(Sink *instance, ChunkSink sink, void *driver)
 int
 source_get_octet(Source *source, void *data)
 {
+    trace();
     return source->kind == DATA_KIND_OCTET
         ? source->source.octet(source->driver, data)
         : source->source.chunk(source->driver, data, 1u);
@@ -106,6 +120,7 @@ source_get_octet(Source *source, void *data)
 int
 sink_put_octet(Sink *sink, const unsigned char data)
 {
+    trace();
     return sink->kind == DATA_KIND_OCTET
         ? sink->sink.octet(sink->driver, data)
         : sink->sink.chunk(sink->driver, &data, 1u);
@@ -115,6 +130,7 @@ static inline ssize_t
 ep_retry(struct ufw_ep_retry *retry, const DataKind kind,
          void *drv, const ssize_t rc)
 {
+    trace();
     /*
      * Only call this function if retry->run is a valid callback function!
      *
@@ -157,9 +173,10 @@ ep_retry(struct ufw_ep_retry *retry, const DataKind kind,
 }
 
 static inline ssize_t
-source_adapt(ByteSource source, void *driver, void *buf,
-             struct ufw_ep_retry *retry, const size_t n)
+source_adapt(ByteSource source, void *driver, struct ufw_ep_retry *retry,
+             void *buf, const size_t n)
 {
+    trace();
     if (retry->init != NULL) {
         retry->init(DATA_KIND_OCTET, retry);
     }
@@ -187,12 +204,13 @@ source_adapt(ByteSource source, void *driver, void *buf,
         rest -= rc;
     }
 
-    return 0;
+    return n;
 }
 
 static inline ssize_t
 once_source_get_chunk(Source *source, void *buf, size_t n)
 {
+    trace();
     return source->kind == DATA_KIND_OCTET
         ? source_adapt(source->source.octet, source->driver, &source->retry, buf, n)
         : source->source.chunk(source->driver, buf, n);
@@ -201,6 +219,7 @@ once_source_get_chunk(Source *source, void *buf, size_t n)
 ssize_t
 source_get_chunk(Source *source, void *buf, size_t n)
 {
+    trace();
     if (n == 0 || n > SSIZE_MAX) {
         return -EINVAL;
     }
@@ -238,6 +257,7 @@ source_get_chunk(Source *source, void *buf, size_t n)
 ssize_t
 source_get_chunk_atmost(Source *source, void *buf, const size_t n)
 {
+    trace();
     if (n == 0 || n > SSIZE_MAX) {
         return -EINVAL;
     }
@@ -276,6 +296,7 @@ static inline ssize_t
 sink_adapt(ByteSink sink, void *driver, const void *buf,
            struct ufw_ep_retry *retry, const size_t n)
 {
+    trace();
     if (retry->init != NULL) {
         retry->init(DATA_KIND_OCTET, retry);
     }
@@ -307,6 +328,7 @@ sink_adapt(ByteSink sink, void *driver, const void *buf,
 static inline ssize_t
 once_sink_put_chunk(Sink *sink, const void *buf, size_t n)
 {
+    trace();
     return sink->kind == DATA_KIND_OCTET
         ? sink_adapt(sink->sink.octet, sink->driver, buf, &sink->retry, n)
         : sink->sink.chunk(sink->driver, buf, n);
@@ -315,6 +337,7 @@ once_sink_put_chunk(Sink *sink, const void *buf, size_t n)
 ssize_t
 sink_put_chunk(Sink *sink, const void *buf, size_t n)
 {
+    trace();
     if (n == 0 || n > SSIZE_MAX) {
         return -EINVAL;
     }
@@ -351,18 +374,21 @@ sink_put_chunk(Sink *sink, const void *buf, size_t n)
 ssize_t
 sink_put_chunk_atmost(Sink *sink, const void *buf, const size_t n)
 {
+    trace();
     return once_sink_put_chunk(sink, buf, n);
 }
 
 static inline bool
 channel_has_buffer_ext(Source *source, Sink *sink)
 {
+    trace();
     return (source->ext.getbuffer != NULL || sink->ext.getbuffer != NULL);
 }
 
 static ssize_t
 sts_atmost_via_sink(Source *source, Sink *sink, const size_t n)
 {
+    trace();
     if (sink->ext.getbuffer == NULL) {
         return -ENOMEM;
     }
@@ -382,6 +408,7 @@ sts_atmost_via_sink(Source *source, Sink *sink, const size_t n)
 static ssize_t
 sts_atmost_via_source(Source *source, Sink *sink, const size_t n)
 {
+    trace();
     if (source->ext.getbuffer == NULL) {
         return -EPIPE;
     }
@@ -403,6 +430,7 @@ sts_atmost_via_source(Source *source, Sink *sink, const size_t n)
 ssize_t
 sts_atmost(Source *source, Sink *sink, size_t n)
 {
+    trace();
     if (channel_has_buffer_ext(source, sink) == false) {
         /* This works, but has a pretty heavy runtime overhead. Using sinks
          * with exposable buffers is preferable. */
@@ -415,12 +443,14 @@ sts_atmost(Source *source, Sink *sink, size_t n)
 ssize_t
 sts_some(Source *source, Sink *sink)
 {
+    trace();
     return sts_atmost(source, sink, 0u);
 }
 
 ssize_t
 sts_n(Source *source, Sink *sink, const size_t n)
 {
+    trace();
     size_t rest = n;
     bool shortcut = false;
     while (rest > 0) {
@@ -445,6 +475,7 @@ sts_n(Source *source, Sink *sink, const size_t n)
 ssize_t
 sts_drain(Source *source, Sink *sink)
 {
+    trace();
     ssize_t rc = 0;
     bool shortcut = false;
 
@@ -469,6 +500,7 @@ sts_drain(Source *source, Sink *sink)
 ssize_t
 sts_some_aux(Source *source, Sink *sink, ByteBuffer *b)
 {
+    trace();
     void *buf = b->data + b->offset;
     const size_t n = byte_buffer_avail(b);
     const ssize_t rc = source_get_chunk_atmost(source, buf, n);
@@ -478,6 +510,7 @@ sts_some_aux(Source *source, Sink *sink, ByteBuffer *b)
 ssize_t
 sts_atmost_aux(Source *source, Sink *sink, ByteBuffer *b, const size_t n)
 {
+    trace();
     ByteBuffer buffer;
     memcpy(&buffer, b, sizeof(*b));
     if (buffer.size > n) {
@@ -489,6 +522,7 @@ sts_atmost_aux(Source *source, Sink *sink, ByteBuffer *b, const size_t n)
 ssize_t
 sts_n_aux(Source *source, Sink *sink, ByteBuffer *b, const size_t n)
 {
+    trace();
     size_t rest = n;
 
     while (rest > 0) {
@@ -506,6 +540,7 @@ sts_n_aux(Source *source, Sink *sink, ByteBuffer *b, const size_t n)
 ssize_t
 sts_drain_aux(Source *source, Sink *sink, ByteBuffer *b)
 {
+    trace();
     const size_t n = b->size;
     ssize_t rc = 0;
 
@@ -524,6 +559,7 @@ sts_drain_aux(Source *source, Sink *sink, ByteBuffer *b)
 ssize_t
 sts_cbc(Source *source, Sink *sink)
 {
+    trace();
     unsigned char buf;
 
     const int rc = source_get_octet(source, &buf);
@@ -537,6 +573,7 @@ sts_cbc(Source *source, Sink *sink)
 ssize_t
 sts_n_cbc(Source *source, Sink *sink, const size_t n)
 {
+    trace();
     for (size_t i = 0u; i < n; ++i) {
         const ssize_t rc = sts_cbc(source, sink);
         if (rc < 0) {
@@ -550,6 +587,7 @@ sts_n_cbc(Source *source, Sink *sink, const size_t n)
 ssize_t
 sts_drain_cbc(Source *source, Sink *sink)
 {
+    trace();
     ssize_t rc = 0;
 
     for (;;) {

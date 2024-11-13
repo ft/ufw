@@ -2,6 +2,10 @@ config UFW_USE_BUILTIN_SWAP
 	bool "Use __builtin_bswapXX() if available."
 	default y
 
+config UFW_WITH_EP_CORE_TRACE
+	bool "Enable printf() trace in endpoints/core.c"
+	default n
+
 config UFW_PRIVATE_ERRNO_OFFSET
        int "Offset for errno-extensions."
        default 16384
