@@ -66,6 +66,10 @@ void byte_buffer_clear(ByteBuffer*);
 void byte_buffer_reset(ByteBuffer*);
 void byte_buffer_repeat(ByteBuffer*);
 
+void byte_buffer_fill(ByteBuffer*, unsigned char);
+void byte_buffer_fillx(ByteBuffer*, unsigned char, signed char);
+void byte_buffer_fill_cb(ByteBuffer*, size_t, int(*)(size_t, unsigned char*));
+
 size_t byte_buffer_avail(const ByteBuffer*);
 size_t byte_buffer_rest(const ByteBuffer*);
 

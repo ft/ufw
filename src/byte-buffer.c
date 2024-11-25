@@ -310,3 +310,91 @@ byte_buffer_repeat(ByteBuffer *b)
 {
     b->offset = 0u;
 }
+
+/**
+ * Fill ByteBuffer completely with a fixed datum
+ *
+ * This is basically memset() for a ByteBuffer. Note that this will mark all
+ * memory in the ByteBuffer as used.
+ *
+ * @param  b      The ByteBuffer instance to use.
+ * @param  datum  Datum to write to all bytes in memory.
+ *
+ * @return void
+ * @sideeffects Modifies byte buffer meta data and memory
+ */
+void
+byte_buffer_fill(ByteBuffer *b, const unsigned char datum)
+{
+    memset(b->data, datum, b->size);
+    b->used = b->size;
+}
+
+/**
+ * Incrementally fill data in a ByteBuffer completely
+ *
+ * Instead of filling memory with a single datum like byte_buffer_fill(), this
+ * allows specifying an initial value to a use and an increment to be applied
+ * from byte to byte.
+ *
+ * @param  b          The ByteBuffer instance to use.
+ * @param  init       Initially value at index zero.
+ * @param  increment  Increment to apply at each iteration.
+ *
+ * @return void
+ * @sideeffects Modifies byte buffer meta data and memory.
+ */
+void
+byte_buffer_fillx(ByteBuffer *b,
+                  const unsigned char init,
+                  const signed char increment)
+{
+    unsigned char datum = init;
+    for (size_t i = 0u; i < b->size; ++i) {
+        b->data[i] = datum;
+        datum += increment;
+    }
+    b->used = b->size;
+}
+
+/**
+ * Run a function to produce initialisation values for ByteBuffer memory
+ *
+ * This is the most flexible kind of memory initialisation for ByteBuffer
+ * instances. This function iterates over each byte in memory starting at
+ * "offset". For each byte the callback function "cb" is called with the
+ * current index into the ByteBuffer and the pointer to the byte initialise.
+ *
+ * Initialisation stops, if the end of the buffer is reached, or the callback
+ * function returns a negative value.
+ *
+ * Note that the pointer handed to the callback is into the buffer directly, to
+ * avoid additional copying. That means if an early iteration termination is
+ * signaled using a negative return value, the function should not modify the
+ * value this pointer points to.
+ *
+ * Finally, the process mark is set to the "offset" parameter, and the number
+ * of used bytes in the buffer is set to the index at which the iteration
+ * stopped.
+ *
+ * @param  b       The ByteBuffer instance to use.
+ * @param  offset  Index at which to start the initialisation process.
+ * @param  cb      Function to call to produce initialisation values.
+ *
+ * @return void
+ * @sideeffects Modifies byte buffer meta data and memory.
+ */
+void
+byte_buffer_fill_cb(ByteBuffer *b, const size_t offset,
+                    int(*cb)(size_t, unsigned char*))
+{
+    size_t i;
+    for (i = offset; i < b->size; ++i) {
+        const int rc = cb(i, b->data);
+        if (rc < 0) {
+            break;
+        }
+    }
+    b->offset = offset;
+    b->used = i;
+}
