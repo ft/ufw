@@ -236,7 +236,7 @@ byte_buffer_consume_at_most(ByteBuffer *b, void *data, size_t size)
  * This is useful to move some leftover data to the front of a ByteBuffer so
  * more room is available more more appending to the buffer.
  *
- * @param  b  TODO: The ByteBuffer instance to use.
+ * @param  b  The ByteBuffer instance to use.
  *
  * @return -EINVAL of the ByteBuffer's memory is NULL; zero otherwise.
  * @sideeffects Modifies byte buffer meta data and memory.
@@ -253,9 +253,10 @@ byte_buffer_rewind(ByteBuffer *b)
         return 0;
     }
 
-    memmove(b->data,
-            b->data + b->offset,
-            b->used - b->offset);
+    const size_t rest = b->used - b->offset;
+    memmove(b->data, b->data + b->offset, rest);
+    b->used = rest;
+    b->offset = 0u;
 
     return 0;
 }
@@ -390,7 +391,7 @@ byte_buffer_fill_cb(ByteBuffer *b, const size_t offset,
 {
     size_t i;
     for (i = offset; i < b->size; ++i) {
-        const int rc = cb(i, b->data);
+        const int rc = cb(i, b->data + i);
         if (rc < 0) {
             break;
         }

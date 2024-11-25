@@ -18,6 +18,7 @@ if (WITH_UINT8_T)
   list(APPEND test_names t-binary-format)
 endif()
 list(APPEND test_names
+  t-byte-buffer
   t-convolution-low-pass
   t-endpoints
   t-ep-retry-ctrl
