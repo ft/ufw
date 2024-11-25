@@ -54,10 +54,22 @@ tap_result(const bool result,
 }
 
 void
+tap_init(void)
+{
+    test_count = 0u;
+}
+
+void
 plan(long unsigned int n)
 {
+    tap_init();
     printf("1..%lu\n", n);
-    test_count = 0u;
+}
+
+void
+noplan(void)
+{
+    printf("1..%lu\n", test_count);
 }
 
 bool

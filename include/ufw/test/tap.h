@@ -34,7 +34,9 @@ bool ufw_test_cmp_mem(const char*, long unsigned int,
 
 /* TAP user API */
 
+void tap_init(void);
 void plan(long unsigned int);
+void noplan(void);
 
 #define ok(expr, ...)                           \
     ufw_test_ok(__FILE__, __LINE__,             \
