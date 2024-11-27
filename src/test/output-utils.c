@@ -5,13 +5,44 @@
  */
 
 #include <inttypes.h>
+#include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 
 #include <ufw/compiler.h>
+#include <ufw/hexdump.h>
 #include <ufw/toolchain.h>
 
 #include <ufw/test/tap.h>
+
+static int
+tap_hd_printf(UNUSED void *driver, const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    const int rc = vprintf(fmt, args);
+    va_end(args);
+    return rc;
+}
+
+int
+ufw_tap_hexdump(const char *file, const unsigned long line,
+                const char *sdata, const char *ssize,
+                const void *data, const size_t size)
+{
+    struct hexdump_cfg hd = {
+        .printf = tap_hd_printf,
+        .driver = NULL,
+        .per_line_prefix = "# ",
+        .octets_per_line  = HEXDUMP_DEFAULT_OCTETS_PER_LINE,
+        .octets_per_chunk = HEXDUMP_DEFAULT_OCTETS_PER_CHUNK
+    };
+    printf("# %s:%lu:\n", file, line);
+    printf("#     thexdump(%s, %s): <%zu>\n#\n", sdata, ssize, size);
+    const int rc = hexdump(&hd, data, size, 0u);
+    printf("#\n");
+    return rc;
+}
 
 #define define_printer(N,T)                                             \
     void                                                                \

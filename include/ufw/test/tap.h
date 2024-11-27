@@ -61,6 +61,12 @@ void print_word_hex(const void*, size_t, size_t, size_t);
 
 /* Output utilities */
 
+int ufw_tap_hexdump(const char*, unsigned long,
+                    const char*, const char*,
+                    const void*, size_t);
+#define thexdump(data, size) ufw_tap_hexdump(__FILE__, __LINE__,        \
+                                             #data, #size, data, size)
+
 #define declare_printer(N,T)                                    \
     void ufw_test_pr ## N(const char*, T, const char*, T)
 

@@ -138,6 +138,7 @@ main(int argc, char **argv)
     struct hexdump_cfg hd = {
         .printf = t_printf,
         .driver = &outconf,
+        .per_line_prefix = NULL,
         .octets_per_line  = HEXDUMP_DEFAULT_OCTETS_PER_LINE,
         .octets_per_chunk = HEXDUMP_DEFAULT_OCTETS_PER_CHUNK
     };
