@@ -23,6 +23,7 @@ extern "C" {
 
 struct hexdump_cfg {
     int (*printf)(void*, const char*, ...);
+    const char *per_line_prefix;
     void *driver;
     size_t octets_per_line;
     size_t octets_per_chunk;

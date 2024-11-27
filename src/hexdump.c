@@ -75,11 +75,18 @@ hexdump(const struct hexdump_cfg *cfg, const void *mem,
     const size_t lastn = n % cfg->octets_per_line;
     const size_t pad = lastn > 0 ? cfg->octets_per_line - lastn : 0u;
 
+    if (cfg->per_line_prefix != NULL) {
+        printf("%s", cfg->per_line_prefix);
+    }
+
     size_t bol = 0u;
     for (size_t i = 0u; i < (n + pad); ++i) {
         if ((i % cfg->octets_per_line) == 0) {
             if (i > 0u) {
                 hexdump_ascii(cfg, mem, bol, i - bol);
+                if (cfg->per_line_prefix != NULL) {
+                    printf("%s", cfg->per_line_prefix);
+                }
             }
             /* Some embedded toolchains don't implement %zx in printf, which
              * will lead to unexpected output. PRIx32 from inttypes.h seems to
@@ -130,6 +137,7 @@ hexdump_stdout(const void *mem, const size_t n, const size_t doffset)
     struct hexdump_cfg hd = {
         .printf = hd_printf,
         .driver = stdout,
+        .per_line_prefix = NULL,
         .octets_per_line  = HEXDUMP_DEFAULT_OCTETS_PER_LINE,
         .octets_per_chunk = HEXDUMP_DEFAULT_OCTETS_PER_CHUNK
     };
@@ -152,6 +160,7 @@ hexdump_stderr(const void *mem, const size_t n, const size_t doffset)
     struct hexdump_cfg hd = {
         .printf = hd_printf,
         .driver = stderr,
+        .per_line_prefix = NULL,
         .octets_per_line  = HEXDUMP_DEFAULT_OCTETS_PER_LINE,
         .octets_per_chunk = HEXDUMP_DEFAULT_OCTETS_PER_CHUNK
     };
