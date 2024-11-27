@@ -167,8 +167,7 @@ run_instrumentable_chunk_source(void *driver, void *data, size_t n)
         }
     }
 
-    const ssize_t rc = byte_buffer_consume(&b->buffer, data, n);
-    return rc < 0 ? rc : (ssize_t)n;
+    return byte_buffer_consume_at_most(&b->buffer, data, n);
 }
 
 static ssize_t

@@ -213,8 +213,7 @@ typedef struct ufw_instrumentable_access_stats {
     size_t accesses;
 } InstrumentableAccessStats;
 
-#define INSTRUMENTABLE_ACCESS_STATS                                     \
-    ((InstrumentableAccessStats){ .bytes = 0u, .accesses = 0u })
+#define INSTRUMENTABLE_ACCESS_STATS { .bytes = 0u, .accesses = 0u }
 
 typedef struct ufw_instrumentable_error {
     uint64_t flags;
@@ -222,8 +221,7 @@ typedef struct ufw_instrumentable_error {
     size_t at;
 } InstrumentableError;
 
-#define INSTRUMENTABLE_ERROR                                            \
-    ((InstrumentableError){ .flags = 0u, .number = 0, .at = 0u })
+#define INSTRUMENTABLE_ERROR { .flags = 0u, .number = 0, .at = 0u }
 
 typedef struct ufw_instrumentable_buffer {
     uint64_t flags;
@@ -246,7 +244,7 @@ typedef struct ufw_instrumentable_buffer {
 } InstrumentableBuffer;
 
 #define INSTRUMENTABLE_BUFFER(DATA, SIZE)               \
-    ((InstrumentableBuffer){                            \
+    {                                                   \
         .flags = 0u,                                    \
         .read.stat = INSTRUMENTABLE_ACCESS_STATS,       \
         .read.error = INSTRUMENTABLE_ERROR,             \
@@ -254,7 +252,7 @@ typedef struct ufw_instrumentable_buffer {
         .write.error = INSTRUMENTABLE_ERROR,            \
         .chunksize = 0u,                                \
         .buffer = BYTE_BUFFER_EMPTY(DATA, SIZE)         \
-    })
+    }
 
 void instrumentable_set_trace(InstrumentableBuffer*, bool);
 void instrumentable_source(DataKind, Source*, InstrumentableBuffer*);

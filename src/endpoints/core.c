@@ -346,9 +346,10 @@ sink_put_chunk(Sink *sink, const void *buf, size_t n)
         sink->retry.init(DATA_KIND_CHUNK, &sink->retry);
     }
 
+    const unsigned char *data = buf;
     size_t rest = n;
     while (rest > 0) {
-        const ssize_t put = once_sink_put_chunk(sink, buf, rest);
+        const ssize_t put = once_sink_put_chunk(sink, data + n - rest, rest);
         if (put <= 0) {
             if (sink->retry.run == NULL) {
                 if (put == -EINTR || put == -EAGAIN) {
@@ -501,6 +502,7 @@ ssize_t
 sts_some_aux(Source *source, Sink *sink, ByteBuffer *b)
 {
     trace();
+    byte_buffer_reset(b);
     void *buf = b->data + b->offset;
     const size_t n = byte_buffer_avail(b);
     const ssize_t rc = source_get_chunk_atmost(source, buf, n);
@@ -526,7 +528,7 @@ sts_n_aux(Source *source, Sink *sink, ByteBuffer *b, const size_t n)
     size_t rest = n;
 
     while (rest > 0) {
-        byte_buffer_rewind(b);
+        byte_buffer_reset(b);
         const ssize_t rc = sts_atmost_aux(source, sink, b, rest);
         if (rc < 0) {
             return rc;
@@ -541,19 +543,23 @@ ssize_t
 sts_drain_aux(Source *source, Sink *sink, ByteBuffer *b)
 {
     trace();
+    byte_buffer_reset(b);
     const size_t n = b->size;
-    ssize_t rc = 0;
+    ssize_t acc = 0;
 
     for (;;) {
-        byte_buffer_rewind(b);
-        rc = sts_atmost_aux(source, sink, b, n);
+        byte_buffer_reset(b);
+        const ssize_t rc = sts_atmost_aux(source, sink, b, n);
         if (rc < 0) {
-            break;
+            if (rc == -ENODATA) {
+                break;
+            }
+            return rc;
         }
-
+        acc += rc;
     }
 
-    return rc;
+    return acc;
 }
 
 ssize_t
