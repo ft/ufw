@@ -114,6 +114,7 @@ zephyr_module_setup_ok () {
 
 check_prg awk
 check_prg cmake
+check_prg gcovr
 check_prg gzip
 check_prg make
 check_prg mmh
@@ -243,6 +244,7 @@ mmh "$@"
 mmh --quiet result --short release.log || exit 1
 (cd test/module && prove -v -c run)    || exit 1
 (cd test/vcs    && prove -c t/*.t)     || exit 1
+./tools/coverage-build.sh              || exit 1
 
 cat <<EOF
 
