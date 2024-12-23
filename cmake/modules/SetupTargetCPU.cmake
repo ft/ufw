@@ -4,6 +4,7 @@ endif()
 set(__UFW_SetupTargetCPU 1)
 
 include(TestBigEndian)
+include(InitialiseToolchain)
 
 function(add_target_link_flags _target _link_flags)
     set(new_link_flags ${_link_flags})
@@ -131,6 +132,16 @@ function(set_target_cpu target)
     # This one comes from the toolchain files too.
     message(FATAL_ERROR "-- COMPILER_API is not set! Giving up.")
     return()
+  endif()
+
+  if (UFW_ENABLE_COVERAGE)
+    if ("${COMPILER_API}" STREQUAL "gnu")
+      message(STATUS "Enabling coverage tracking in ${target}")
+      target_compile_options(${target} PRIVATE --coverage -g)
+      target_link_options(${target} PRIVATE --coverage)
+    else()
+      message(STATUS "${target}: Toolchain not supported for coverage tracking")
+    endif()
   endif()
 
   if ("${TOOLCHAIN_ID}" STREQUAL "gcc-arm")

@@ -9,6 +9,9 @@ include(GNUCompilerWarnings)
 include(TICompilerWarnings)
 include(ToolchainFeatures)
 
+set(UFW_ENABLE_COVERAGE OFF CACHE BOOL
+  "Enable coverage tracking in toolchain")
+
 function(ufw_toolchain_id_adjust compiler outvar)
   if (${compiler} STREQUAL gnu)
     set(compiler gcc)
