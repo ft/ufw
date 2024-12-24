@@ -73,6 +73,10 @@ build_the_thing "$dir_this"
 lib="libufw-full.so"
 subdir="ci/build/$variant"
 
+dump_filter () {
+    sed '/^ctags:/d'
+}
+
 dump_the_thing () {
     dir="$1"
     state="$2"
@@ -85,9 +89,10 @@ dump_the_thing () {
     cd ..
 }
 
-dump_the_thing "$dir_prev" "$state_prev"
-dump_the_thing "$dir_this" "$state_this"
+{ dump_the_thing "$dir_prev" "$state_prev"; } 2>&1 | dump_filter
+{ dump_the_thing "$dir_this" "$state_this"; } 2>&1 | dump_filter
 
+printf '\nRunning ABI/API checker...\n'
 exec abi-compliance-checker -l "$name"               \
                             -report-path report.html \
                             -old previous/ABI.dump   \
