@@ -256,10 +256,11 @@ if [ "$top_level_command" = quick ]; then
 fi
 
 mmh "$@"
-mmh --quiet result --short release.log || exit 1
-(cd test/module && prove -v -c run)    || exit 1
-(cd test/vcs    && prove -c t/*.t)     || exit 1
-./tools/coverage-build.sh              || exit 1
+mmh --quiet result --short release.log  || exit 1
+mmh --quiet result --report release.log || exit 1
+(cd test/module && prove -v -c run)     || exit 1
+(cd test/vcs    && prove -c t/*.t)      || exit 1
+./tools/coverage-build.sh               || exit 1
 
 if [ -n "$previous_version" ]; then
     set -- "$previous_version"
