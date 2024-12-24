@@ -10,6 +10,18 @@ config UFW_PRIVATE_ERRNO_OFFSET
        int "Offset for errno-extensions."
        default 16384
 
+config UFW_ENABLE_COVERAGE
+	bool "Enable coverage tracking in toolchain"
+	default n
+
+config UFW_INSTALL_COMPONENT
+	string "CMake Installation Component name for ufw installation items"
+	default "ufw-git-install"
+
+config GENERATE_API_DOCUMENTATION
+	bool "Generate API Documentation"
+	default n
+
 config UFW_ZEPHYR
 	bool "Enable ufw-zephyr extensions"
 	default n

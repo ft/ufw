@@ -7,6 +7,7 @@ include(CheckSymbolExists)
 include(CTest)
 enable_testing()
 
+option(GENERATE_API_DOCUMENTATION "Generate API Documentation" OFF)
 option(UFW_WITH_EP_CORE_TRACE "Enable printf() trace in endpoints/core.c" OFF)
 option(UFW_USE_BUILTIN_SWAP "Use __builtin_bswapXX() if available." ON)
 set(UFW_PRIVATE_ERRNO_OFFSET 16384 CACHE STRING "Offset for errno-extensions")
@@ -16,10 +17,6 @@ set(UFW_PRIVATE_ERRNO_OFFSET 16384 CACHE STRING "Offset for errno-extensions")
 # is called libufw-full.
 option(UFW_ENABLE_DYNAMIC_LIBRARY
   "Enable dynamic libufw build with full API" OFF)
-
-if (ZEPHYR_BASE)
-  include(zephyr/cmake-cache.cmake)
-endif()
 
 if ((NOT CMAKE_BUILD_TYPE) OR ("${CMAKE_BUILD_TYPE}" STREQUAL ""))
   set(CMAKE_BUILD_TYPE "debug")
@@ -48,6 +45,11 @@ else()
 endif()
 
 include(SetupTargetCPU)
+
+if (ZEPHYR_BASE)
+  include(zephyr/cmake-cache.cmake)
+endif()
+
 check_include_file("sys/types.h" WITH_SYS_TYPES_H)
 
 check_include_file("ctype.h" WITH_CTYPE_H)
