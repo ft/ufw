@@ -35,12 +35,13 @@ being met.
 EOF
 }
 
-if [ "$#" -ne 1 ]; then
+if [ "$#" -lt 1 ]; then
     usage
     exit 1
 fi
 
 top_level_command="$1"
+shift
 
 case "$top_level_command" in
 check|run|quick)
@@ -51,6 +52,16 @@ clean) cleanup; exit 0 ;;
 *)     printf 'Unknown command "%s"!\n\n' "$1";
        usage;   exit 1 ;;
 esac
+
+previous_version=''
+while getopts p: _opt; do
+    case "$_opt" in
+    p) previous_version="$OPTARG" ;;
+    *) printf '# tap: Unknown option "-%s".\n' "$_opt"
+       return 1 ;;
+    esac
+done
+shift $(( OPTIND - 1 ))
 
 cat <<EOF
 =================================
@@ -249,7 +260,14 @@ mmh --quiet result --short release.log || exit 1
 (cd test/module && prove -v -c run)    || exit 1
 (cd test/vcs    && prove -c t/*.t)     || exit 1
 ./tools/coverage-build.sh              || exit 1
-./tools/compat-build.sh                || {
+
+if [ -n "$previous_version" ]; then
+    set -- "$previous_version"
+else
+    set --
+fi
+
+./tools/compat-build.sh "$@"           || {
     printf 'Warning: ABI/API compatibility may be broken!\n'
 }
 
