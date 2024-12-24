@@ -10,6 +10,12 @@ enable_testing()
 option(UFW_USE_BUILTIN_SWAP "Use __builtin_bswapXX() if available." ON)
 set(UFW_PRIVATE_ERRNO_OFFSET 16384 CACHE STRING "Offset for errno-extensions")
 
+# This is mainly used for development, to test ABI/API compatibility. Users
+# should use static linking with ufw. This will create a dynamic library, that
+# is called libufw-full.
+option(UFW_ENABLE_DYNAMIC_LIBRARY
+  "Enable dynamic libufw build with full API" OFF)
+
 if (ZEPHYR_BASE)
   include(zephyr/cmake-cache.cmake)
 endif()
@@ -171,6 +177,17 @@ if ("${PROJECT_TARGET_CPU}" STREQUAL "native")
     __ufw_setup(${__lib}-nosan)
     target_link_libraries(${__lib}-nosan PUBLIC ufw-nosan)
   endforeach()
+endif()
+
+if (UFW_ENABLE_DYNAMIC_LIBRARY)
+  add_library(ufw-full SHARED
+    ${__ufw_sources}
+    ${__ufw_sx_sources}
+    ${__ufw_tap_sources})
+  __ufw_setup(ufw-full)
+  __ufw_sanitise(ufw)
+  target_include_directories(ufw-full PUBLIC ${__ufw_include})
+  target_compile_definitions(ufw-full PUBLIC _DEFAULT_SOURCE)
 endif()
 
 if (ZEPHYR_BASE)

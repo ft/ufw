@@ -1,4 +1,4 @@
-set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR native)
 
 set(TOOLCHAIN_ID "gcc-native")
