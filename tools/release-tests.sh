@@ -112,9 +112,13 @@ zephyr_module_setup_ok () {
 
 # Check the environment for a suitable setup ##################################
 
+check_prg abi-compliance-checker
+check_prg abi-dumper
 check_prg awk
 check_prg cmake
+check_prg ctags
 check_prg gcovr
+check_prg git
 check_prg gzip
 check_prg make
 check_prg mmh
@@ -245,13 +249,20 @@ mmh --quiet result --short release.log || exit 1
 (cd test/module && prove -v -c run)    || exit 1
 (cd test/vcs    && prove -c t/*.t)     || exit 1
 ./tools/coverage-build.sh              || exit 1
+./tools/compat-build.sh                || {
+    printf 'Warning: ABI/API compatibility may be broken!\n'
+}
 
 cat <<EOF
 
 Looks like everthing passed. Nice.
 
 Do not forget to update include/ufw/meta.h and update CHANGES before
-tagging the system for release!
+tagging the system for release! Also check if the abi-compliance
+checker concurs with the type of release you have in mind! Check:
+
+  build-coverage/index.html
+  build-compat/report.html
 
 EOF
 
