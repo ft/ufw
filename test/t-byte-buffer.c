@@ -150,7 +150,7 @@ main(UNUSED int argc, UNUSED char **argv)
         byte_buffer_clear(&s);
         byte_buffer_fillx(&s, 0x10u, -3);
         for (size_t i = 0u; i < m; ++i) {
-            buf[i] = i*-3 + 0x10u;
+            buf[i] = (ssize_t)i * (-3) + 0x10u;
         }
         cmp_mem(s.data, buf, m,
                 "_fillx fills buffer correctly (neg. increment)");
