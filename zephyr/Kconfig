@@ -7,8 +7,8 @@ config UFW_WITH_EP_CORE_TRACE
 	default n
 
 config UFW_PRIVATE_ERRNO_OFFSET
-       int "Offset for errno-extensions."
-       default 16384
+	int "Offset for errno-extensions."
+	default 16384
 
 config UFW_ENABLE_COVERAGE
 	bool "Enable coverage tracking in toolchain"
@@ -30,7 +30,7 @@ if UFW_ZEPHYR
 
 config UFW_SHELL_ADDONS
 	bool "Enable ufw-zephyr's shell addons"
-        depends on SHELL
+	depends on SHELL
 	default n
 
 config UFW_ENDPOINT_UART_POLL
@@ -51,9 +51,9 @@ config UFW_SPI_TEXT
 	depends on DT_HAS_UFW_SPI_TEXT_ENABLED
 
 config UFW_SPI_TEXT_INIT_PRIORITY
-       int "Init priority for the spi-text driver"
-       depends on UFW_SPI_TEXT
-       default 70
+	int "Init priority for the spi-text driver"
+	depends on UFW_SPI_TEXT
+	default 70
 
 config UFW_I2C_TEXT
 	bool "Enable ufw-zephyr's text based I2C controller"
@@ -61,8 +61,8 @@ config UFW_I2C_TEXT
 	depends on DT_HAS_UFW_I2C_TEXT_ENABLED
 
 config UFW_I2C_TEXT_INIT_PRIORITY
-       int "Init priority for the i2c-text driver"
-       depends on UFW_I2C_TEXT
-       default 70
+	int "Init priority for the i2c-text driver"
+	depends on UFW_I2C_TEXT
+	default 70
 
 endif # UFW_ZEPHYR
