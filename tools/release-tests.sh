@@ -1,5 +1,18 @@
 #!/bin/sh
 
+fail () {
+    printf 'FATAL: Stage %s did not succeed.\n' "$1"
+    exit 1
+}
+
+bad_stuff=''
+
+bad () {
+    printf 'WARNING: Stage %s did not succeed.\n' "$1"
+    bad_stuff="${bad_stuff:+$bad_stuff }$1"
+    return 0
+}
+
 cleanup () {
     for file in test/module/build.log \
                 test/module/build     \
@@ -8,10 +21,10 @@ cleanup () {
     do
         if [ -d "$file" ]; then
             printf 'Removing directory %s...\n' "$file"
-            rm -r "$file" || exit 1
+            rm -r "$file" || fail rm-dir-"$file"
         elif [ -f "$file" ]; then
             printf 'Removing file %s...\n' "$file"
-            rm "$file" || exit 1
+            rm "$file" || fail rm-file-"$file"
         fi
     done
 }
@@ -161,7 +174,7 @@ mmh_version_fields=$(printf '%s' "$mmh_version" | \
 
 if [ "$mmh_version_fields" != 2 ]; then
     printf '\n\nInvalid mmh version: "%s"\n\n' "$mmh_version"
-    exit 1
+    fail mmh-version-validity
 fi
 
 mmh_major="${mmh_version%.*}"
@@ -174,7 +187,7 @@ then
     printf 'We need at least %s.%s, but only found %s.\n' \
            "$mmh_min_major" "$mmh_min_minor" "$mmh_version"
     printf 'Please upgrade!\n\n'
-    exit 1
+    fail mmh-version-requirement
 fi
 
 printf ' ok (%s)\n' "$mmh_version"
@@ -221,7 +234,7 @@ base. Consider things like clang, arm-zephyr-eabi, or ti-c2000, for
 extra bonus points!
 
 EOF
-    exit 1
+    fail mmh-minimum-toolchains
 else
     printf 'Checking for mandatory mmh toolchains... ok\n'
 fi
@@ -237,7 +250,7 @@ Please run the setup script in test/module to enable the zephyr
 module build test-suite.
 
 EOF
-    exit 1
+    fail zephyr-module-test-setup
 fi
 
 if [ "$top_level_command" = check ]; then
@@ -256,11 +269,11 @@ if [ "$top_level_command" = quick ]; then
 fi
 
 mmh "$@"
-mmh --quiet result --short release.log  || exit 1
-mmh --quiet result --report release.log || exit 1
-(cd test/module && prove -v -c run)     || exit 1
-(cd test/vcs    && prove -c t/*.t)      || exit 1
-./tools/coverage-build.sh               || exit 1
+mmh --quiet result --short release.log  || bad mmh-release-build
+mmh --quiet result --report release.log || bad mmh-release-warnings
+(cd test/module && prove -v -c run)     || bad zephyr-module-build
+(cd test/vcs    && prove -c t/*.t)      || bad vcs-integration
+./tools/coverage-build.sh               || bad test-coverage-build
 
 if [ -n "$previous_version" ]; then
     set -- "$previous_version"
@@ -270,12 +283,20 @@ fi
 
 ./tools/compat-build.sh "$@"           || {
     printf 'Warning: ABI/API compatibility may be broken!\n'
+    bad library-abi-api-compatibility
 }
 
+if [ -n "$bad_stuff" ]; then
+    printf '\nEncountered bad test results:\n\n'
+    for thing in $bad_stuff; do
+        printf '  - %s\n' "$thing"
+    done
+    printf '\n'
+else
+    printf '\nLooks like everthing passed. Nice.\n\n'
+fi
+
 cat <<EOF
-
-Looks like everthing passed. Nice.
-
 Do not forget to update include/ufw/meta.h and update CHANGES before
 tagging the system for release! Also check if the abi-compliance
 checker concurs with the type of release you have in mind! Check:
