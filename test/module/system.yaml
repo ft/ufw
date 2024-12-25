@@ -5,6 +5,7 @@ common:
   build-tool: ninja
   zephyr-kernel: '${system}/zephyr'
   zephyr-module-path: [ '${system}' ]
+  ufw: '${system}/ufw'
   install: ufw-git-install
 
 zephyr-aliases:
