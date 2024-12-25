@@ -1,30 +1,85 @@
 config UFW_USE_BUILTIN_SWAP
 	bool "Use __builtin_bswapXX() if available."
 	default y
+	help
+	  The InitialiseToolchain module of ufw tests for the existence
+	  of functions like __builtin_bswap32(). When this option is set,
+	  the ufw/binary-format.h API will use them explicitly instead of
+	  using self-rolled octet-swapping functions.
 
 config UFW_WITH_EP_CORE_TRACE
 	bool "Enable printf() trace in endpoints/core.c"
 	default n
+	help
+	  This option enables function call tracing output in endpoints/core.c
+	  via printf(), which results in a lot of output in any code that uses
+	  the endpoint API. This is meant for debugging only and should never
+	  be enabled for any real purpose.
 
 config UFW_PRIVATE_ERRNO_OFFSET
 	int "Offset for errno-extensions."
 	default 16384
+	help
+	  The error number system (errno from errno.h of your C library) uses
+	  maybe a couple hundred numbers to encode many error situations, that
+	  might occur when a function runs. The ufw library uses errno in many
+	  places. Unfortunately, errno is not very rigidly specified at all,
+	  and it can be the case that a toolchain used with ufw does not care
+	  to implement too errno codes, that ufw uses, which is why in the
+	  compat/errno.h header, ufw defines codes that might be missing from
+	  a toolchain's errno.h file. This integer option specifies at which
+	  number ufw's compatibility specifications will start to to be defined.
+	  The default should be good enough for any libc, unless you a faced
+	  with a libc that uses eight bit values for errno, which the author
+	  has not seen before.
 
 config UFW_ENABLE_COVERAGE
 	bool "Enable coverage tracking in toolchain"
 	default n
+	help
+	  This option enables gathering coverage information in targets that
+	  use its set_target_cpu() cmake function. At the moment, this has no
+	  impact in Zephyr builds, but that might change in the future.
 
 config UFW_INSTALL_COMPONENT
 	string "CMake Installation Component name for ufw installation items"
 	default "ufw-git-install"
+	help
+	  The ufw library uses CMake's installation system to extract important
+	  build artefacts from a potentially messy build tree. To leverage that
+	  user can use a number of additional CMake APIs like ufw_install(),
+	  build_artifacts() and gitint_install() in order to create consistent
+	  artefact storages. Unfortunately, not all projects using CMake for
+	  embedded purposes have fully working installation procedures, which
+	  breaks this aspect of ufw.
+
+	  CMake has the concept of install components, which allows selecting
+	  a set of artefacts to be installed instead of everything. This string
+	  defines the name of the installation component that all of ufw's APIs
+	  will use. When calling "cmake --install" this component can be used
+	  via cmake's --component option, sidestepping any and all breakages in
+	  other codebases that use CMake.
 
 config GENERATE_API_DOCUMENTATION
 	bool "Generate API Documentation"
 	default n
+	help
+	  This option enables the GENERATE_API_DOCUMENTATION CMake variable. It
+	  is the condition for ufw's API documentation being generated via doxy-
+	  gen. It is possible for other library's to use this parameter as well.
 
 config UFW_ZEPHYR
 	bool "Enable ufw-zephyr extensions"
 	default n
+	help
+	  The ufw library can be a zephyr module itself (this probably does not
+	  come as surprise, as you are reading this documentation via Zephyr's
+	  Kconfig system). And as such it can be built inside of Zephyr's build
+	  system. It is then possible to build a part of ufw, that depends on
+	  Zephyr APIs. These are in the "ufwz/…" header namespace.
+
+	  This part of the libary is guarded by this option and is disabled by
+	  default. Enable it to change this.
 
 if UFW_ZEPHYR
 
@@ -32,37 +87,83 @@ config UFW_SHELL_ADDONS
 	bool "Enable ufw-zephyr's shell addons"
 	depends on SHELL
 	default n
+	help
+	  Zephyr's shell system is a powerful developer tool for interacting
+	  with a live embedded system. The ufw libary implements some commands
+	  to extend the shell system for interacting with some of its features.
+	  Currently this is the "regshow" command to display register tables
+	  from the ufw/register-table.h module.
 
 config UFW_ENDPOINT_UART_POLL
 	bool "Implementing endpoints with zephyr's uart-polling API"
 	default n
+	help
+	  The ufw library's endpoint API is an abstraction for sources and sinks
+	  of data. The UART polling driver can serve as a backend for this ab-
+	  straction. Enable this option if you want to use this implementation.
 
 config UFW_ENDPOINT_UART_FIFO
 	bool "Implementing endpoints with zephyr's uart-fifo API"
 	default n
+	help
+	  The ufw library's endpoint API is an abstraction for sources and sinks
+	  of data. The UART fifo driver can serve as a backend for this abstrac-
+	  tion. Enable this option if you want to use this implementation.
 
 config UFW_SLAB_ALLOCATOR
 	bool "Allow using slab allocators as ufw BlockAllocators"
 	default n
+	help
+	  The ufw library has an abstraction for block-alloctor implementations.
+	  Zephyr's slab-allocators can be used drive this abstraction. Enable
+	  this option if you want to use an implementation of this.
 
 config UFW_SPI_TEXT
 	bool "Enable ufw-zephyr's text based SPI controller"
 	def_bool   DT_HAS_UFW_SPI_TEXT_ENABLED
 	depends on DT_HAS_UFW_SPI_TEXT_ENABLED
+	help
+	  This enables a SPI controller that does not talk to hardware, but will
+	  instead print all its interactions via printf(). Additionally it can
+	  be loaded with data that it is expected to return on bus reads. This
+	  is intended for testing purposes.
+
+	  This option is not enabled manually but gets toggled automatically, if
+	  a device with ufw,spi-text compatibility id is used.
+
+	  This feature is still very experimental.
 
 config UFW_SPI_TEXT_INIT_PRIORITY
 	int "Init priority for the spi-text driver"
 	depends on UFW_SPI_TEXT
 	default 70
+	help
+	  This specifies the initialisation priority for the text-only SPI im-
+	  plementation enabled via CONFIG_UFW_SPI_TEXT.
+	  See its documentation for details.
 
 config UFW_I2C_TEXT
 	bool "Enable ufw-zephyr's text based I2C controller"
 	def_bool   DT_HAS_UFW_I2C_TEXT_ENABLED
 	depends on DT_HAS_UFW_I2C_TEXT_ENABLED
+	help
+	  This enables a I2C controller that does not talk to hardware, but will
+	  instead print all its interactions via printf(). Additionally it can
+	  be loaded with data that it is expected to return on bus reads. This
+	  is intended for testing purposes.
+
+	  This option is not enabled manually but gets toggled automatically, if
+	  a device with ufw,i2c-text compatibility id is used.
+
+	  This feature is still very experimental.
 
 config UFW_I2C_TEXT_INIT_PRIORITY
 	int "Init priority for the i2c-text driver"
 	depends on UFW_I2C_TEXT
 	default 70
+	help
+	  This specifies the initialisation priority for the text-only I2C im-
+	  plementation enabled via CONFIG_UFW_SPI_TEXT.
+	  See its documentation for details.
 
 endif # UFW_ZEPHYR
