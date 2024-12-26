@@ -258,7 +258,7 @@ if [ "$top_level_command" = check ]; then
     exit 0
 fi
 
-printf '\nEnvironment looks suitable. Let'\''s go!\n\n'
+printf '\nEnvironment looks suitable. Let'\''s go!\n'
 
 # Running the actual tests now. Rather easy once everything is in place. ######
 
@@ -268,11 +268,15 @@ if [ "$top_level_command" = quick ]; then
     set -- "$@" --config tools/quick.yaml
 fi
 
+printf '\nRelease build...\n'
 mmh "$@"
 mmh --quiet result --short release.log  || bad mmh-release-build
 mmh --quiet result --report release.log || bad mmh-release-warnings
+printf '\nZephyr module build...\n'
 (cd test/module && prove -v -c run)     || bad zephyr-module-build
+printf '\nVCS integration tests...\n'
 (cd test/vcs    && prove -c t/*.t)      || bad vcs-integration
+printf '\nTest coverage build...\n'
 ./tools/coverage-build.sh               || bad test-coverage-build
 
 if [ -n "$previous_version" ]; then
@@ -281,6 +285,7 @@ else
     set --
 fi
 
+printf '\nABI/API compatibility test build...\n'
 ./tools/compat-build.sh "$@"           || {
     printf 'Warning: ABI/API compatibility may be broken!\n'
     bad library-abi-api-compatibility
