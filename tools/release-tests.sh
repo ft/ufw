@@ -289,6 +289,9 @@ fi
 printf '\n'
 ./tools/check-changes.sh || bad check-changes-file
 
+printf '\n'
+./tools/check-meta-h.sh || bad check-meta-h-file
+
 if [ -n "$bad_stuff" ]; then
     printf '\nEncountered bad test results:\n\n'
     for thing in $bad_stuff; do
@@ -297,17 +300,17 @@ if [ -n "$bad_stuff" ]; then
         mmh-release-build)
             cat <<EOF
 
-    The release build failed. This absolutely cannot happen. This may also cause
-    other sub-tests to fail. This can build caused by build errors or test suite
-    failures. Fix this!
+    The  release build  failed. This  absolutely cannot  happen. This  may also
+    cause other  sub-tests to fail.  This can build  caused by build  errors or
+    test suite failures. Fix this!
 
 EOF
         ;;
         mmh-release-warnings)
             cat <<EOF
 
-    MakeMeHappy detected compiler incidents (errors, warnings, etc) in the log
-    file of the release build. The library should be warning free at release
+    MakeMeHappy detected compiler incidents (errors,  warnings, etc) in the log
+    file of  the release build. The  library should be warning  free at release
     time. Fix this before continuing with the release process!
 
 EOF
@@ -315,7 +318,7 @@ EOF
         zephyr-module-build)
             cat <<EOF
 
-    Where was an issue in the zephyr module build type test. This cannot be
+    Where was  an issue in  the zephyr module build  type test. This  cannot be
     allowed in a release. Check test/module/build.log and fix the issue!
 
 EOF
@@ -323,8 +326,8 @@ EOF
         vcs-integration)
             cat <<EOF
 
-    At least on of the version-control integration tests failed. This test
-    suite must pass before release. Run "cd test/vcs && prove -vc ./t/\*.t"
+    At  least on  of the  version-control integration  tests failed.  This test
+    suite must  pass before release.  Run "cd  test/vcs && prove  -vc ./t/\*.t"
     find the issue and fix it!
 
 EOF
@@ -332,8 +335,8 @@ EOF
         test-coverage-build)
             cat <<EOF
 
-    The test-coverage build failed. This should not happen, unless the release
-    build also failed. This basically just adds --coverage to the compiler and
+    The test-coverage build failed. This  should not happen, unless the release
+    build also failed. This basically just  adds --coverage to the compiler and
     linker flags used in the build, which GCC should support.
 
 EOF
@@ -341,22 +344,35 @@ EOF
         check-changes-file)
             cat <<EOF
 
-    The CHANGES file has issues. Maybe the release notes for the new release
-    are missing. Maybe there is still an "unreleased" date in there. Or maybe
-    the date for the release is incorrect. There are other possible issues.
-    Fix this before pushing data to public repositories!
+    The CHANGES  file has issues. Maybe  the release notes for  the new release
+    are missing. Maybe  there is still an "unreleased" date  in there. Or maybe
+    the date for the release is incorrect. There are other possible issues. Fix
+    this before pushing data to public repositories!
+
+EOF
+        ;;
+        check-meta-h-file)
+            cat <<EOF
+
+    The  file include/ufw/meta.h  reflects the  release version  of ufw.  It is
+    maintained manually, in order to simplify  the build process of ufw as much
+    as possible.  Currently there is a  mismatch between the macros  defined in
+    the file and the state reflected by  git. In some instances, the macros are
+    already bumped to the intended next version tag during development. In that
+    case, the issue  will be resolved when  the new tag is put  into place. But
+    make sure the situation is correct before pushing to public repositories!
 
 EOF
         ;;
         library-abi-api-compatibility)
             cat <<EOF
 
-    The ABI and/or API compatibility check failed. It is possible that the
-    build connected to the check failed, or the ABI/API was extended or
-    broken comparing to the last release. This may be intended. But you
-    need to make sure, that the release type (major, minor) matches the
-    kinds of changes detected in this check. Patch releases MUST NOT change
-    the API or ABI at all!
+    The ABI  and/or API  compatibility check  failed. It  is possible  that the
+    build connected to the check failed,  or the ABI/API was extended or broken
+    comparing to the last  release. This may be intended. But  you need to make
+    sure, that  the release type  (major, minor)  matches the kinds  of changes
+    detected in this  check. Patch releases MUST  NOT change the API  or ABI at
+    all!
 
 EOF
         ;;
