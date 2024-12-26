@@ -70,8 +70,8 @@ previous_version=''
 while getopts p: _opt; do
     case "$_opt" in
     p) previous_version="$OPTARG" ;;
-    *) printf '# tap: Unknown option "-%s".\n' "$_opt"
-       return 1 ;;
+    *) printf 'Unknown option "-%s".\n' "$_opt"
+       exit 1 ;;
     esac
 done
 shift $(( OPTIND - 1 ))
@@ -286,20 +286,89 @@ fi
     bad library-abi-api-compatibility
 }
 
+printf '\n'
+./tools/check-changes.sh || bad check-changes-file
+
 if [ -n "$bad_stuff" ]; then
     printf '\nEncountered bad test results:\n\n'
     for thing in $bad_stuff; do
         printf '  - %s\n' "$thing"
+        case "$thing" in
+        mmh-release-build)
+            cat <<EOF
+
+    The release build failed. This absolutely cannot happen. This may also cause
+    other sub-tests to fail. This can build caused by build errors or test suite
+    failures. Fix this!
+
+EOF
+        ;;
+        mmh-release-warnings)
+            cat <<EOF
+
+    MakeMeHappy detected compiler incidents (errors, warnings, etc) in the log
+    file of the release build. The library should be warning free at release
+    time. Fix this before continuing with the release process!
+
+EOF
+        ;;
+        zephyr-module-build)
+            cat <<EOF
+
+    Where was an issue in the zephyr module build type test. This cannot be
+    allowed in a release. Check test/module/build.log and fix the issue!
+
+EOF
+        ;;
+        vcs-integration)
+            cat <<EOF
+
+    At least on of the version-control integration tests failed. This test
+    suite must pass before release. Run "cd test/vcs && prove -vc ./t/\*.t"
+    find the issue and fix it!
+
+EOF
+        ;;
+        test-coverage-build)
+            cat <<EOF
+
+    The test-coverage build failed. This should not happen, unless the release
+    build also failed. This basically just adds --coverage to the compiler and
+    linker flags used in the build, which GCC should support.
+
+EOF
+        ;;
+        check-changes-file)
+            cat <<EOF
+
+    The CHANGES file has issues. Maybe the release notes for the new release
+    are missing. Maybe there is still an "unreleased" date in there. Or maybe
+    the date for the release is incorrect. There are other possible issues.
+    Fix this before pushing data to public repositories!
+
+EOF
+        ;;
+        library-abi-api-compatibility)
+            cat <<EOF
+
+    The ABI and/or API compatibility check failed. It is possible that the
+    build connected to the check failed, or the ABI/API was extended or
+    broken comparing to the last release. This may be intended. But you
+    need to make sure, that the release type (major, minor) matches the
+    kinds of changes detected in this check. Patch releases MUST NOT change
+    the API or ABI at all!
+
+EOF
+        ;;
+        esac
     done
-    printf '\n'
 else
-    printf '\nLooks like everthing passed. Nice.\n\n'
+    printf '\nLooks like everthing passed. Nice.\n'
 fi
 
 cat <<EOF
-Do not forget to update include/ufw/meta.h and update CHANGES before
-tagging the system for release! Also check if the abi-compliance
-checker concurs with the type of release you have in mind! Check:
+
+Reports for review:
 
   build-coverage/index.html
   build-compat/report.html
