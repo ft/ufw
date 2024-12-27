@@ -300,7 +300,9 @@ printf '\n'
 printf '\n'
 ./tools/check-meta-h.sh || bad check-meta-h-file
 
+return_value=0
 if [ -n "$bad_stuff" ]; then
+    return_value=1
     printf '\nEncountered bad test results:\n\n'
     for thing in $bad_stuff; do
         printf '  - %s\n' "$thing"
@@ -395,6 +397,7 @@ maintainer. Everything must be fixed before making a release public!
 EOF
 
     if [ "$bad_stuff" = library-abi-api-compatibility ]; then
+        return_value=0
         printf '\nThis is the case here!\n'
     fi
 else
@@ -410,4 +413,4 @@ Reports for review:
 
 EOF
 
-exit 0
+exit "$return_value"
