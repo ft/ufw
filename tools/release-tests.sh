@@ -386,6 +386,17 @@ EOF
         ;;
         esac
     done
+
+    cat <<EOF
+Note that  among the possible failures,  only library-abi-api-compatibility can
+be allowed with to  remain with a valid release. ABI and/or  API changes can be
+intended with minor  or major releases. This is within  the discretion of ufw's
+maintainer. Everything must be fixed before making a release public!
+EOF
+
+    if [ "$bad_stuff" = library-abi-api-compatibility ]; then
+        printf '\nThis is the case here!\n'
+    fi
 else
     printf '\nLooks like everthing passed. Nice.\n'
 fi
