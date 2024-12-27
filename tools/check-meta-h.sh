@@ -45,14 +45,34 @@ mismatch () {
     fi
 }
 
+count () {
+    name="$1"
+    count="$2"
+    if [ "$count" -ne 1 ]; then
+        printf 'Definition for UFW_LIBRARY_%s was found %d times!\n' \
+               "$name" "$count"
+        return_value=1
+    fi
+}
+
+maj=0
+min=0
+pat=0
 while read line; do
     if version "$line" MAJOR; then
+        maj=$(( maj + 1 ))
         mismatch major "$major" "$REPLY"
     elif version "$line" MINOR; then
+        min=$(( min + 1 ))
         mismatch minor "$minor" "$REPLY"
     elif version "$line" PATCH; then
+        pat=$(( pat + 1 ))
         mismatch patchlevel "$patch" "$REPLY"
     fi
 done < include/ufw/meta.h
+
+count MAJOR "$maj"
+count MINOR "$min"
+count PATCH "$pat"
 
 exit "$return_value"
