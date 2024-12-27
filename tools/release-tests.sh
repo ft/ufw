@@ -221,11 +221,14 @@ the mips toolchain to work.
 
   - gcc-mips-linux-gnu
   - g++-mips-linux-gnu
-  - g++-12-mips-linux-gnu
-  - gcc-12-multilib-mips-linux-gnu
-  - g++-12-multilib-mips-linux-gnu
   - g++-multilib-mips-linux-gnu
   - gcc-multilib-mips-linux-gnu
+
+A config snippet for mmh to add this toolchains could look like this:
+
+  toolchains:
+    - name: mips-linux-gnu
+      architecture: [ mips ]
 
 Good luck!
 
