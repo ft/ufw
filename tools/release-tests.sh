@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# This runs many tests with ufw, that previously were done manually upon re-
+# lease, to make sure no unforseen issues crept in. This obviously runs the
+# full range of builds (which depends on mmh configuration), but also checks
+# ABI/API compatibility, as well as updates to ufw/meta.h and CHANGES, among
+# other tests as well.
+
 fail () {
     printf 'FATAL: Stage %s did not succeed.\n' "$1"
     exit 1
@@ -300,6 +306,8 @@ printf '\n'
 printf '\n'
 ./tools/check-meta-h.sh || bad check-meta-h-file
 
+# Summarise test results ######################################################
+
 return_value=0
 if [ -n "$bad_stuff" ]; then
     return_value=1
@@ -412,5 +420,7 @@ Reports for review:
   build-compat/report.html
 
 EOF
+
+# Aaaand we are done... #######################################################
 
 exit "$return_value"
