@@ -506,7 +506,9 @@ sts_some_aux(Source *source, Sink *sink, ByteBuffer *b)
     void *buf = b->data + b->offset;
     const size_t n = byte_buffer_avail(b);
     const ssize_t rc = source_get_chunk_atmost(source, buf, n);
-    return (rc < 0) ? rc : sink_put_chunk(sink, buf, rc);
+    return (rc == 0)
+        ? -ENODATA : (rc < 0)
+        ? rc : sink_put_chunk(sink, buf, rc);
 }
 
 ssize_t

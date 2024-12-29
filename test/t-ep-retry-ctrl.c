@@ -96,28 +96,30 @@ test_reset(void)
     isrc.buffer.used = 256u;
 }
 
-int
-main(UNUSED int argc, UNUSED char **argv)
+static void
+t_dump_to_null(void)
 {
-    ssize_t rc;
-    ByteBuffer aux = BYTE_BUFFER_EMPTY(auxb, AUX_SIZE);
-
-    plan(8);
-
     /* Let the thing run without error indication. Our endpoints do not
      * implement the get_buffer extension, so sts_n will fall back to
      * byte-for-byte transfers. So the source gets run 128 times here. */
+    ssize_t rc;
     test_reset();
     rc = sts_n(&src, &sink_null, 128u);
     ok(rc == 128u, "Trivial source runs");
     ok(isrc.read.stat.accesses == 128u,
        "sts_n without buffer extension runs 128 times");
+}
 
+static void
+t_dump_to_null_until_success(void)
+{
     /* If we're not handling EAGAIN, the endpoint handler will do it for us. It
      * will just rerun the source until it gets a value. We must instruct our
      * source to do this. If we just blindly return EAGAIN, we end up in an
      * infinite loop. chunk=8, until=16 runs the source three times until it
      * succeeds. */
+    ssize_t rc;
+    ByteBuffer aux = BYTE_BUFFER_EMPTY(auxb, AUX_SIZE);
     test_reset();
     instrumentable_until_success_at(&isrc.read.error, 16u, -EAGAIN);
     instrumentable_chunksize(&isrc, 8u);
@@ -127,21 +129,44 @@ main(UNUSED int argc, UNUSED char **argv)
     ok(isrc.read.stat.accesses == 16u + 128u / 8u, "Source ran %zu times",
        16u + 128u / 8u);
     ok(retry_data.count == 0u, "Retry runner did not run");
+}
 
+static void
+t_dump_to_null_until_error(const int e, const uint32_t ctrl)
+{
     /* Now lets run until we catch an error. Namely EAGAIN. This configures the
      * retry runner to retry two times before giving up, running the retry run-
      * ner three times. */
+    ssize_t rc;
+    ByteBuffer aux = BYTE_BUFFER_EMPTY(auxb, AUX_SIZE);
     test_reset();
     byte_buffer_rewind(&isrc.buffer);
-    instrumentable_until_error_at(&isrc.read.error, 16u, -EAGAIN);
+    instrumentable_until_error_at(&isrc.read.error, 16u, e);
     instrumentable_chunksize(&isrc, 8u);
     instrumentable_reset_stats(&isrc.read.stat);
-    src.retry.ctrl = EP_RETRY_CTRL_EAGAIN;
+    src.retry.ctrl = ctrl;
     retry_data.retries = 2u;
     rc = sts_n_aux(&src, &sink_null, &aux, 128u);
-    ok(rc == -EAGAIN, "Error code gets forwarded");
+    if (e < 0) {
+        ok(rc == e, "Error code gets forwarded");
+    } else if (e == 0) {
+        ok(rc == -ENODATA, "If zero is returned, -ENODATA is used");
+    }
     ok(isrc.read.stat.accesses == 3u, "Source ran three times");
     ok(retry_data.count == 3u, "Retry runner ran two times");
+}
+
+int
+main(UNUSED int argc, UNUSED char **argv)
+{
+    plan(17);
+
+    t_dump_to_null();
+    t_dump_to_null_until_success();
+    t_dump_to_null_until_error(-EAGAIN, EP_RETRY_CTRL_EAGAIN);
+    t_dump_to_null_until_error(-EINTR, EP_RETRY_CTRL_EINTR);
+    t_dump_to_null_until_error(-EIO, EP_RETRY_CTRL_OTHER);
+    t_dump_to_null_until_error(0, EP_RETRY_CTRL_NOTHING);
 
     return EXIT_SUCCESS;
 }
