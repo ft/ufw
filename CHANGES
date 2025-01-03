@@ -23,6 +23,7 @@
 - vcs: Add __GIT_COMMITDATE_UNIX__ in "git.sh".
 - vcs: Add `__GIT_HASH_FULL__` in "git.sh".
 - Add 'generate-metadata-yaml' (similar to 'generate-version-h').
+- hexdump: Support a per-line prefix string in configuration.
 
 ** Bugfixes
 
