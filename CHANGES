@@ -37,6 +37,7 @@
 - Reduce dependencies in "git.sh".
 - Release test automation.
 - Test suite for git vcs-integration.
+- Test coverage reporting.
 - The usual CMake-based build time configuration is shifted into Kconfig in
   Zephyr builds.
 
