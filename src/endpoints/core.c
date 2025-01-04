@@ -59,7 +59,7 @@
  *
  * - _drain: APIs that transfer all data available in a source into a sink.
  *
- * The module offers low-level the APIs source_read() and sink_write(), which
+ * The module offers the low-level APIs source_read() and sink_write(), which
  * implement similar functionality as POSIX read() and write(), but for
  * arbitrary sources and sinks. In most cases it is advisable to use the higher
  * level functions, that implement common issue handling on top of the these
@@ -184,7 +184,7 @@ chunk_sink_init(Sink *instance, ChunkSink sink, void *driver)
  * returned.
  *
  * @param  source  Pointer to the source instance to read from
- * @param  driver    Pointer to arbitrary data handed to the source driver
+ * @param  data    Pointer to byte datum to store a single byte into
  *
  * @return Negative errno on failure, or the number of bytes read upon success.
  * @sideeffects Any sideeffects performed by the driver of the source instance.
@@ -208,8 +208,8 @@ source_get_octet(Source *source, void *data)
  * Upon successful completion, the number of transferred bytes (thus 1) is
  * returned.
  *
- * @param  sink      Pointer to the sink instance to write to
- * @param  driver    Pointer to arbitrary data handed to the sink driver
+ * @param  sink    Pointer to the sink instance to write to
+ * @param  data    Single byte to put into the sink
  *
  * @return Negative errno on failure; the number of bytes written on success.
  * @sideeffects Any sideeffects performed by the driver of the sink instance.
@@ -239,10 +239,10 @@ sink_put_octet(Sink *sink, const unsigned char data)
  * This allows injecting sideeffects (such as waiting), remapping error codes
  * and custom handling of zero data.
  *
- * The set of controlled conditions can be chosed via retry->ctrl.
+ * The set of controlled conditions can be chosen via retry->ctrl.
  *
  * @param  retry  Pointer to retry configuration to use
- * @param  drv    pointer to endpoint driver
+ * @param  drv    Pointer to endpoint driver
  * @param  rc     Copy of the return code that cause this function to be called
  *
  * @return A positive return value indicates the user wants the IO action that
@@ -294,7 +294,7 @@ ep_retry(struct ufw_ep_retry *retry, void *drv, const ssize_t rc)
  * @param  source  ByteSource function pointer to adapt
  * @param  driver  Pointer to source driver data
  * @param  buf     Pointer to memory for the adaptation process
- * @param  n       Size of the memory pointed to be buf
+ * @param  n       Size of the memory pointed to by buf
  *
  * @return Negative values use -errno to encode errors; other values indicate
  *         the amount of data that was read.
@@ -329,7 +329,7 @@ source_adapt(ByteSource source, void *driver, void *buf, const size_t n)
  *
  * @param  source  Pointer to the source to read from
  * @param  buf     Pointer to memory to read into
- * @param  n       Size of the memory pointed to be buf
+ * @param  n       Size of the memory pointed to by buf
  *
  * @return Negative values use -errno to encode errors; other values indicate
  *         the amount of data that was read.
@@ -419,7 +419,7 @@ done:
  *
  * @param  source  Pointer to the source to read from
  * @param  buf     Pointer to memory to read into
- * @param  n       Size of the memory pointed to be buf
+ * @param  n       Exact amount of data to write into buf
  *
  * @return Negative values use -errno to encode errors; other values indicate
  *         the amount of data that was read.
@@ -450,7 +450,7 @@ source_get_chunk(Source *source, void *buf, size_t n)
  *
  * @param  source  Pointer to the source to read from
  * @param  buf     Pointer to memory to read into
- * @param  n       Size of the memory pointed to be buf
+ * @param  n       Maximum amount of data to write into buf
  *
  * @return Negative values use -errno to encode errors; other values indicate
  *         the amount of data that was read.
@@ -478,7 +478,7 @@ source_get_chunk_atmost(Source *source, void *buf, const size_t n)
  * @param  sink    ByteSink function pointer to adapt
  * @param  driver  Pointer to sink driver data
  * @param  buf     Pointer to memory for the adaptation process
- * @param  n       Size of the memory pointed to be buf
+ * @param  n       Size of the memory pointed to by buf
  *
  * @return Negative values use -errno to encode errors; other values indicate
  *         the amount of data that was written.
@@ -512,7 +512,7 @@ sink_adapt(ByteSink sink, void *driver, const void *buf, const size_t n)
  *
  * @param  sink  Pointer to sink instance to write to
  * @param  buf   Pointer to memory to read into
- * @param  n     Size of the memory pointed to be buf
+ * @param  n     Size of the memory pointed to by buf
  *
  * @return Negative values use -errno to encode errors; other values indicate
  *         the amount of data that was written.
@@ -594,7 +594,7 @@ done:
  *
  * @param  sink  Pointer to sink instance to write to
  * @param  buf   Pointer to memory to read into
- * @param  n     Size of the memory pointed to be buf
+ * @param  n     Exact amount of data to transfer from buf
  *
  * @return Negative values use -errno to encode errors; other values indicate
  *         the amount of data that was written.
@@ -613,13 +613,12 @@ sink_put_chunk(Sink *sink, const void *buf, const size_t n)
 /**
  * Write a limited amount of data to a sink
  *
- * TODO: This is a synonym to sink_put_chunk() currently. I suppose having this
- * option may have its uses. Possibly cases, where partial writes may still be
- * useful. This is not that function, yet, however.
+ * This is similar to sink_put_chunk(), with the difference in behaviour that
+ * not tranmitting exactly the specified amount of data is not an error.
  *
  * @param  sink  Pointer to sink instance to write to
  * @param  buf   Pointer to memory to read into
- * @param  n     Size of the memory pointed to be buf
+ * @param  n     Maximum amount of data to transfer from buf
  *
  * @return Negative values use -errno to encode errors; other values indicate
  *         the amount of data that was written.
