@@ -66,6 +66,7 @@
  * low level functions.
  */
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #ifdef UFW_WITH_EP_CORE_TRACE
@@ -344,6 +345,69 @@ source_read(Source *source, void *buf, const size_t n)
         : source->source.chunk(source->driver, buf, n);
 }
 
+struct size_error {
+    int error;
+    size_t size;
+};
+
+/* This is the worker for source_get_chunk() and source_get_chunk_atmost().
+ * Both use source_read() multiple times, but they react to incomplete reads
+ * differently. That's why this returns both the error condition and the,
+ * possibly partial, read count. */
+static inline struct size_error
+source_read_multi(Source *source, void *buf, const size_t n)
+{
+    trace();
+    struct size_error rc = { 0, 0u };
+
+    if (n == 0 || n > SSIZE_MAX) {
+        rc.error = -EINVAL;
+        goto done;
+    }
+
+    if (source->retry.init != NULL) {
+        source->retry.init(&source->retry);
+    }
+
+    size_t rest = n;
+    while (rest > 0) {
+        unsigned char *dst = buf;
+        const size_t done = n - rest;
+        const ssize_t get = source_read(source, dst + done, rest);
+        if (get <= 0) {
+            if (source->retry.run == NULL) {
+                if (get == -EINTR || get == -EAGAIN) {
+                    continue;
+                } else if (get < 0) {
+                    rc.error = (int)get;
+                    rc.size = done;
+                    goto done;
+                }
+            } else {
+                const ssize_t retried =
+                    ep_retry(&source->retry, source->driver, get);
+                if (retried > 0) {
+                    continue;
+                } else if (retried == 0) {
+                    rc.error = -ENODATA;
+                    rc.size = done;
+                    goto done;
+                }
+                /* negative */
+                rc.error = (int)retried;
+                rc.size = done;
+                goto done;
+            }
+        }
+        assert((size_t)get <= rest);
+        rest -= get;
+    }
+    rc.size = n;
+
+done:
+    return rc;
+}
+
 /**
  * Read a chunk of exact size from a source
  *
@@ -366,37 +430,12 @@ ssize_t
 source_get_chunk(Source *source, void *buf, size_t n)
 {
     trace();
-    if (n == 0 || n > SSIZE_MAX) {
-        return -EINVAL;
-    }
-
-    if (source->retry.init != NULL) {
-        source->retry.init(&source->retry);
-    }
-
-    size_t rest = n;
-    while (rest > 0) {
-        const ssize_t get = source_read(source, buf, rest);
-        if (get <= 0) {
-            if (source->retry.run == NULL) {
-                if (get == -EINTR || get == -EAGAIN) {
-                    continue;
-                } else if (get < 0) {
-                    return (ssize_t)get;
-                }
-            } else {
-                const ssize_t retried =
-                    ep_retry(&source->retry, source->driver, get);
-                if (retried > 0) {
-                    continue;
-                }
-                return retried;
-            }
-        }
-        rest -= get;
-    }
-
-    return (ssize_t)n;
+    const struct size_error rc = source_read_multi(source, buf, n);
+    /* If error is zero, n bytes where transfered. This is what this function
+     * promises to do, so return the size, which will be equal to n. */
+    assert(rc.size == n);
+    assert(rc.size <= SSIZE_MAX);
+    return (rc.error == 0) ? (ssize_t)rc.size : rc.error;
 }
 
 /**
@@ -422,37 +461,13 @@ ssize_t
 source_get_chunk_atmost(Source *source, void *buf, const size_t n)
 {
     trace();
-    if (n == 0 || n > SSIZE_MAX) {
-        return -EINVAL;
-    }
-
-    if (source->retry.init != NULL) {
-        source->retry.init(&source->retry);
-    }
-
-    size_t got = 0;
-    while (got == 0) {
-        const ssize_t rc = source_read(source, buf, n);
-        if (rc <= 0) {
-            if (source->retry.run == NULL) {
-                if (rc == -EINTR || rc == -EAGAIN) {
-                    continue;
-                } else if (rc < 0) {
-                    return rc;
-                }
-            } else {
-                const ssize_t retried =
-                    ep_retry(&source->retry, source->driver, rc);
-                if (retried > 0) {
-                    continue;
-                }
-                return retried;
-            }
-        }
-        got = (size_t)rc;
-    }
-
-    return got;
+    const struct size_error rc = source_read_multi(source, buf, n);
+    /* Even if an error was signaled, if data was read, that satisfies the
+     * promise of this function, so return the size. If nothing could be read,
+     * however, return the error. */
+    assert(rc.size <= n);
+    assert(rc.size <= SSIZE_MAX);
+    return (rc.size == 0) ? rc.error : (ssize_t)rc.size;
 }
 
 /**
