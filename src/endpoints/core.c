@@ -359,6 +359,7 @@ source_read_multi(Source *source, void *buf, const size_t n)
 {
     trace();
     struct size_error rc = { 0, 0u };
+    size_t rest = n;
 
     if (n == 0 || n > SSIZE_MAX) {
         rc.error = -EINVAL;
@@ -369,7 +370,6 @@ source_read_multi(Source *source, void *buf, const size_t n)
         source->retry.init(&source->retry);
     }
 
-    size_t rest = n;
     while (rest > 0) {
         unsigned char *dst = buf;
         const size_t done = n - rest;
@@ -534,6 +534,7 @@ sink_write_multi(Sink *sink, const void *buf, const size_t n)
 {
     trace();
     struct size_error rc = { 0, 0u };
+    size_t rest = n;
 
     if (n == 0 || n > SSIZE_MAX) {
         rc.error = -EINVAL;
@@ -544,7 +545,6 @@ sink_write_multi(Sink *sink, const void *buf, const size_t n)
         sink->retry.init(&sink->retry);
     }
 
-    size_t rest = n;
     while (rest > 0) {
         const unsigned char *src = buf;
         const size_t done = n - rest;
