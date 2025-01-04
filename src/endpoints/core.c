@@ -58,6 +58,12 @@
  * - _n: APIs that transfer an exact amount of data; exactly n bytes.
  *
  * - _drain: APIs that transfer all data available in a source into a sink.
+ *
+ * The module offers low-level the APIs source_read() and sink_write(), which
+ * implement similar functionality as POSIX read() and write(), but for
+ * arbitrary sources and sinks. In most cases it is advisable to use the higher
+ * level functions, that implement common issue handling on top of the these
+ * low level functions.
  */
 
 #include <stdbool.h>
@@ -320,9 +326,6 @@ source_adapt(ByteSource source, void *driver, void *buf, const size_t n)
  * retry logic in this function. Use source_get_chunk() for the full endpoint
  * functionality.
  *
- * TODO: This function should be source_read(), and public. Although that may
- * lose us the inline. Hm.
- *
  * @param  source  Pointer to the source to read from
  * @param  buf     Pointer to memory to read into
  * @param  n       Size of the memory pointed to be buf
@@ -332,8 +335,8 @@ source_adapt(ByteSource source, void *driver, void *buf, const size_t n)
  * @sideeffects The procedure moves data from the source to the supplied
  *              memory.
  */
-static inline ssize_t
-once_source_get_chunk(Source *source, void *buf, size_t n)
+ssize_t
+source_read(Source *source, void *buf, const size_t n)
 {
     trace();
     return source->kind == DATA_KIND_OCTET
@@ -373,7 +376,7 @@ source_get_chunk(Source *source, void *buf, size_t n)
 
     size_t rest = n;
     while (rest > 0) {
-        const ssize_t get = once_source_get_chunk(source, buf, rest);
+        const ssize_t get = source_read(source, buf, rest);
         if (get <= 0) {
             if (source->retry.run == NULL) {
                 if (get == -EINTR || get == -EAGAIN) {
@@ -429,7 +432,7 @@ source_get_chunk_atmost(Source *source, void *buf, const size_t n)
 
     size_t got = 0;
     while (got == 0) {
-        const ssize_t rc = once_source_get_chunk(source, buf, n);
+        const ssize_t rc = source_read(source, buf, n);
         if (rc <= 0) {
             if (source->retry.run == NULL) {
                 if (rc == -EINTR || rc == -EAGAIN) {
@@ -492,9 +495,6 @@ sink_adapt(ByteSink sink, void *driver, const void *buf, const size_t n)
  * retry logic in this function. Use source_put_chunk() for the full endpoint
  * functionality.
  *
- * TODO: This function should be source_write(), and public. Although that may
- * lose us the inline. Hm.
- *
  * @param  sink  Pointer to sink instance to write to
  * @param  buf   Pointer to memory to read into
  * @param  n     Size of the memory pointed to be buf
@@ -503,8 +503,8 @@ sink_adapt(ByteSink sink, void *driver, const void *buf, const size_t n)
  *         the amount of data that was written.
  * @sideeffects The procedure moves data from the supplied memory to the sink.
  */
-static inline ssize_t
-once_sink_put_chunk(Sink *sink, const void *buf, size_t n)
+ssize_t
+sink_write(Sink *sink, const void *buf, const size_t n)
 {
     trace();
     return sink->kind == DATA_KIND_OCTET
@@ -544,7 +544,7 @@ sink_put_chunk(Sink *sink, const void *buf, size_t n)
     const unsigned char *data = buf;
     size_t rest = n;
     while (rest > 0) {
-        const ssize_t put = once_sink_put_chunk(sink, data + n - rest, rest);
+        const ssize_t put = sink_write(sink, data + n - rest, rest);
         if (put <= 0) {
             if (sink->retry.run == NULL) {
                 if (put == -EINTR || put == -EAGAIN) {
@@ -586,7 +586,7 @@ ssize_t
 sink_put_chunk_atmost(Sink *sink, const void *buf, const size_t n)
 {
     trace();
-    return once_sink_put_chunk(sink, buf, n);
+    return sink_write(sink, buf, n);
 }
 
 /**
