@@ -102,12 +102,12 @@ EOF
         vprintf '  Current release tag exists.\n'
         if [ "$entry" -eq 1 ]; then
             master=$(git rev-parse master)
-            tag=$(git rev-parse "$c")
+            tag=$(git rev-parse "$c"'^{}')
             if [ "$master" != "$tag" ]; then
                 printf 'CHANGES(%d): Release tag does not match master!\n' \
                        "$entry"
                 printf '  master: %s\n' "$master"
-                printf '     tag: %s (%s)\n' "$master" "$c"
+                printf '     tag: %s (%s)\n' "$tag" "$c"
                 exit 1
             else
                 vprintf '  Release tag matches master.\n'
