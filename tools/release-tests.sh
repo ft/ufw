@@ -434,8 +434,9 @@ fi
 
 cat <<EOF
 
-Reports for review:
+Reports and documentation for review:
 
+  api/index.html
   build-coverage/index.html
   build-compat/report.html
 
