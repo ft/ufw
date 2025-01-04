@@ -282,7 +282,7 @@ latest=$(git describe --always --abbrev=0)
 if [ "$mode" = check ]; then
     printf 'Checking copyright notices in codebase...\n'
     if [ "$current" = "$latest" ]; then
-        tag_year
+        tag_year "$current"
         endyear="$REPLY"
         printf 'Using end-year from tag (%s): %s\n' "$latest" "$endyear"
     else
