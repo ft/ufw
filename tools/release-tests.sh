@@ -152,6 +152,7 @@ check_prg awk
 check_prg cmake
 check_prg ctags
 check_prg date
+check_prg doxygen
 check_prg gcovr
 check_prg git
 check_prg gzip

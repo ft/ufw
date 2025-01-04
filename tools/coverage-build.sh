@@ -48,7 +48,9 @@ xninja () {
 if [ "$rerun" -eq 0 ]; then
     mmh -l -P -d "$out" prepare || fail prepare
     mmh -l -P -d "$out" run cmake/native/ufw/gnu/debug/ninja \
-        ++ -DUFW_ENABLE_COVERAGE=ON || fail build
+        ++ -DUFW_ENABLE_COVERAGE=ON                          \
+           -DGENERATE_API_DOCUMENTATION=ON                   \
+        || fail build
 else
     xninja all  || fail rebuild
     xninja test || fail retest
