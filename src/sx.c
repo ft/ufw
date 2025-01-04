@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2020-2023 chip-remote workers, All rights reserved.
- * Copyright (c) 2024 micro framework workers, All rights reserved.
+ * Copyright (c) 2024-2025 ufw workers, All rights reserved.
  *
  * Terms for redistribution and use can be found in LICENCE.
  */
