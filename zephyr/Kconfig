@@ -16,6 +16,15 @@ config UFW_WITH_EP_CORE_TRACE
 	  the endpoint API. This is meant for debugging only and should never
 	  be enabled for any real purpose.
 
+config UFW_WITH_RUNTIME_ASSERT
+	bool "Enable assert() from assert.h in ufw"
+	default n
+	help
+	  This option enables runtime assertions via assert() from "assert.h".
+	  If set, the option removes the NDEBUG macro for the ufw library
+	  sources, which enables assert() operation. The option does not have
+	  an effect on other code bases. See assert.h(7) for details.
+
 config UFW_PRIVATE_ERRNO_OFFSET
 	int "Offset for errno-extensions."
 	default 16384
