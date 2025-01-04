@@ -2,8 +2,26 @@
 #
 # Terms for redistribution and use can be found in LICENCE.
 
+menu "Micro Framework Portable Options"
+
+config GENERATE_API_DOCUMENTATION
+	bool "Generate API Documentation"
+	default n
+	help
+	  This option enables the GENERATE_API_DOCUMENTATION CMake variable. It
+	  is the condition for ufw's API documentation being generated via doxy-
+	  gen. It is possible for other library's to use this parameter as well.
+
+config UFW_ENABLE_COVERAGE
+	bool "Enable coverage tracking in toolchain"
+	default n
+	help
+	  This option enables gathering coverage information in targets that
+	  use its set_target_cpu() cmake function. At the moment, this has no
+	  impact in Zephyr builds, but that might change in the future.
+
 config UFW_USE_BUILTIN_SWAP
-	bool "Use __builtin_bswapXX() if available."
+	bool "Use __builtin_bswapXX() if available"
 	default y
 	help
 	  The InitialiseToolchain module of ufw tests for the existence
@@ -30,7 +48,7 @@ config UFW_WITH_RUNTIME_ASSERT
 	  an effect on other code bases. See assert.h(7) for details.
 
 config UFW_PRIVATE_ERRNO_OFFSET
-	int "Offset for errno-extensions."
+	int "Offset for errno-extensions"
 	default 16384
 	help
 	  The error number system (errno from errno.h of your C library) uses
@@ -45,14 +63,6 @@ config UFW_PRIVATE_ERRNO_OFFSET
 	  The default should be good enough for any libc, unless you a faced
 	  with a libc that uses eight bit values for errno, which the author
 	  has not seen before.
-
-config UFW_ENABLE_COVERAGE
-	bool "Enable coverage tracking in toolchain"
-	default n
-	help
-	  This option enables gathering coverage information in targets that
-	  use its set_target_cpu() cmake function. At the moment, this has no
-	  impact in Zephyr builds, but that might change in the future.
 
 config UFW_INSTALL_COMPONENT
 	string "CMake Installation Component name for ufw installation items"
@@ -73,16 +83,10 @@ config UFW_INSTALL_COMPONENT
 	  via cmake's --component option, sidestepping any and all breakages in
 	  other codebases that use CMake.
 
-config GENERATE_API_DOCUMENTATION
-	bool "Generate API Documentation"
-	default n
-	help
-	  This option enables the GENERATE_API_DOCUMENTATION CMake variable. It
-	  is the condition for ufw's API documentation being generated via doxy-
-	  gen. It is possible for other library's to use this parameter as well.
+endmenu # Portable UFW
 
-config UFW_ZEPHYR
-	bool "Enable ufw-zephyr extensions"
+menuconfig UFW_ZEPHYR
+	bool "Micro Framework Zephyr Options"
 	default n
 	help
 	  The ufw library can be a zephyr module itself (this probably does not
