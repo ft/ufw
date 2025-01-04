@@ -2,7 +2,14 @@
   User-visible changes in ufw
 -------------------------------
 
-* v5.6.0 → v6.0.0 (unreleased):
+* v5.6.0 → v6.0.0 (released 2025-01-04):
+
+** Deprecation:
+
+- All FPGA building support will be removed in an upcoming major release. The
+  support is limited to Xilinx, and specifically the ISE tooling, which has
+  been marked as legacy tooling by Xilinx a while ago. UFW cannot support this
+  indefinitely and therefore it is on the chopping block.
 
 ** Breaking compatibility
 
@@ -11,6 +18,17 @@
   der to work with this release. In  the vast majority of cases, no adjustments
   need to be  made. Notably, ufwz and  ufw 6.0.0+ should not be  enabled at the
   same time.
+- The instrumentable-sink API has seen some changes: Error conditions are more
+  clearly configurable, which led to replacing the "error" API of this module.
+  Also the initialising functions now take DataKind parameter, because these
+  types of instrumentable buffer endpoints can bow be of chunk and octet type.
+  The members of the implementing structure have changed to more expressive
+  data types as well.
+- The two endpoint types ufw_source and ufw_sink now have a "retry" member.
+  This is ABI rather than API breakage. Recompiling ufw alongside your project
+  will make this a non-issue.
+- Similarly, the hexdump_cfg data type now has a "per-line-prefix" member.
+- InitialiseToolchain does not set the NDEBUG macro anymore.
 
 ** New Features
 
@@ -23,10 +41,25 @@
 - vcs: Add __GIT_COMMITDATE_UNIX__ in "git.sh".
 - vcs: Add `__GIT_HASH_FULL__` in "git.sh".
 - Add 'generate-metadata-yaml' (similar to 'generate-version-h').
-- hexdump: Support a per-line prefix string in configuration.
+- hexdump: Support a per-line prefix string in configuration; this is used to
+  implement thexdump(), a macro to hexdump data in TAP compatible ways.
+- tap: Support for non-deterministic test-suites via tap_init() and noplan().
+- ep: Intrumentable buffer backed endpoints can now be chunk endpoints.
+- ep: Intrumentable buffer backed endpoints can be much pre precisely configured.
+- ep: The retry logic for recoverable error conditions can be completely
+  customised.
+- ep: Added source_read() and sink_write() APIs which are akin to read() and
+  write() from POSIX.
+- ep: Added sts_atmost_cbc().
+- ep: Compile-time support for printf() based function tracing.
+- bb: APIs for filling byte-buffers with common data patterns.
+- buildsys: Support for enabling assert() inside ufw at compile time.
+- buildsys: Inherit zephyr compiler setup in set_target_cpu().
 
 ** Bugfixes
 
+- A number of bugs in the endpoint module where fixed; most of them where
+  hidden in the source-to-sink type APIs (sts_*).
 - Clean up some new warnings emitted by GCC 14.
 - Better support for picolibc (strl*() detection specifically).
 - Be more consistent with __cplusplus handling.
@@ -37,160 +70,285 @@
 
 - Reduce dependencies in "git.sh".
 - Release test automation.
+- Unit tests for endpoints, endpoint-retry costumisation, and byte-buffers.
 - Test suite for git vcs-integration.
+- Test case for ufw-as-a-zephyr-module builds.
+- Test suite for ABI/API compatibility checks.
+- Checks for CHANGES and ufw/meta.h consistency.
+- Check for copyright notice consistency in codebase.
 - Test coverage reporting.
+- Some modules gained API documentation.
+- Consistent use of copyright notices throughout the codebase.
 - The usual CMake-based build time configuration is shifted into Kconfig in
   Zephyr builds.
 
 ** Diffstat:
 
-    .gitignore                                    |   5 +
+    .gcovr.conf                                   |   9 +
+    .gitignore                                    |   7 +
     AUTHORS                                       |   1 +
-    CMakeLists.txt                                |  18 +-
-    bin/expand-template                           | 255 ++++++++++++++++++
-    bin/generate-metadata-yaml                    |  16 ++
-    bin/generate-version-h                        | 199 +-------------
-    bin/tap.sh                                    | 212 +++++++++++++++
-    bin/utils.sh                                  |  14 +
-    cmake/modules/BuildArtifacts.cmake            |   2 +-
-    cmake/modules/SetupTargetCPU.cmake            |   9 +-
-    cmake/modules/SetupUFW.cmake                  |  24 +-
-    cmake/modules/ToolchainFeatures.cmake         |   7 +
-    cmake/toolchains/ti-arm-clang.cmake           |  40 +++
-    include/ufw/allocator.h                       |   8 +
-    include/ufw/binary-format.h                   |   8 +
-    include/ufw/bit-operations.h                  |   3 +
-    include/ufw/byte-buffer.h                     |   8 +
-    include/ufw/compat/errno.h                    |   3 +
-    include/ufw/compat/math-constants.h           |   3 +
-    include/ufw/compat/strings.h                  |   5 +
-    include/ufw/compiler.h                        |   3 +
-    include/ufw/convolution-low-pass.h            |   3 +
-    include/ufw/crc/crc16-arc.h                   |   8 +
-    include/ufw/endpoints.h                       |   8 +
-    include/ufw/endpoints/continuable-sink.h      |   8 +
-    include/ufw/hexdump.h                         |   8 +
-    include/ufw/length-prefix.h                   |   8 +
-    include/ufw/meta.h                            |   3 +
-    include/ufw/octet-ring.h                      |   8 +
-    include/ufw/register-protocol.h               |   8 +
-    include/ufw/rfc1055.h                         |   8 +
-    include/ufw/ring-buffer.h                     |   3 +
-    include/ufw/sx.h                              |   8 +
-    include/ufw/test/tap.h                        |   4 +-
-    include/ufw/toolchain.h.in                    |   3 +
-    include/ufw/variable-length-integer.h         |   8 +
-    include/ufwz/endpoint-uart-fifo.h             |  35 +++
-    include/ufwz/endpoint-uart-poll.h             |  19 ++
-    include/ufwz/shell-addons.h                   |  17 ++
-    include/ufwz/slab-allocator.h                 |  19 ++
-    src/registers/core.c                          |   4 +-
-    src/registers/utilities.c                     |   2 +-
-    src/sx.c                                      |   4 +-
-    src/test/output-utils.c                       |   8 +-
-    src/z/CMakeLists.txt                          |  11 +
-    src/z/driver-i2c-text.c                       |  45 ++++
-    src/z/driver-spi-text.c                       |  63 +++++
-    src/z/endpoint-uart-fifo.c                    |  57 ++++
-    src/z/endpoint-uart-poll.c                    |  23 ++
-    src/z/shell-addons.c                          | 233 ++++++++++++++++
-    src/z/slab-allocator.c                        |  19 ++
-    test/CMakeLists.txt                           |   6 +
-    test/module/CMakeLists.txt                    |  16 ++
-    test/module/README                            |  33 +++
-    test/module/run                               |  14 +
-    test/module/setup                             |  47 ++++
-    test/module/src/CMakeLists.txt                |   4 +
-    test/module/src/boards/native_posix_64.conf   |  11 +
-    .../module/src/boards/native_posix_64.overlay |  37 +++
-    test/module/src/main.c                        |  18 ++
-    test/module/src/prj.conf                      |   2 +
-    test/module/system.yaml                       |  20 ++
+    CMakeLists.txt                                |  58 +-
+    LICENCE                                       |   2 +-
+    bin/expand-template                           | 259 ++++++
+    bin/generate-artifacts                        |   4 +
+    bin/generate-metadata-yaml                    |  20 +
+    bin/generate-version-h                        | 201 +---
+    bin/print-commitdate                          |   4 +
+    bin/print-version                             |   4 +
+    bin/tap.sh                                    | 212 +++++
+    bin/utils.sh                                  |  18 +
+    cmake/kconfig/debug.conf                      |   4 +
+    cmake/kconfig/minsizerel.conf                 |   4 +
+    cmake/kconfig/release.conf                    |   4 +
+    cmake/kconfig/relwithdebinfo.conf             |   4 +
+    cmake/modules/AddNanoPB.cmake                 |   4 +
+    cmake/modules/ArmCmsis.cmake                  |   4 +
+    cmake/modules/BuildArtifacts.cmake            |   6 +-
+    cmake/modules/FakeTimeSupport.cmake           |   4 +
+    cmake/modules/FreeRTOS.cmake                  |   4 +
+    cmake/modules/GNUAttributes.cmake             |   4 +
+    cmake/modules/GNUBuiltins.cmake               |   4 +
+    cmake/modules/GNUCompilerWarnings.cmake       |   4 +
+    cmake/modules/GenerateGraphics.cmake          |   4 +
+    cmake/modules/GitIntegration.cmake            |   4 +
+    cmake/modules/HardwareAbstraction.cmake       |   4 +
+    cmake/modules/InitialiseToolchain.cmake       |  35 +-
+    cmake/modules/Libtap.cmake                    |   4 +
+    cmake/modules/Newlib.cmake                    |   4 +
+    cmake/modules/STCmsis.cmake                   |   4 +
+    cmake/modules/STM32HAL.cmake                  |   4 +
+    cmake/modules/STM32HAL_f0.cmake               |   4 +
+    cmake/modules/STM32HAL_f1.cmake               |   4 +
+    cmake/modules/STM32HAL_f2.cmake               |   4 +
+    cmake/modules/STM32HAL_f3.cmake               |   4 +
+    cmake/modules/STM32HAL_f4.cmake               |   4 +
+    cmake/modules/STM32HAL_f7.cmake               |   4 +
+    cmake/modules/STM32HAL_g0.cmake               |   4 +
+    cmake/modules/STM32HAL_g4.cmake               |   4 +
+    cmake/modules/STM32HAL_h7.cmake               |   4 +
+    cmake/modules/STM32HAL_l0.cmake               |   4 +
+    cmake/modules/STM32HAL_l1.cmake               |   4 +
+    cmake/modules/STM32HAL_l4.cmake               |   4 +
+    cmake/modules/STM32HAL_l5.cmake               |   4 +
+    cmake/modules/STM32HAL_wb.cmake               |   4 +
+    cmake/modules/SetupTargetCPU.cmake            |  24 +-
+    cmake/modules/SetupUFW.cmake                  |  28 +-
+    cmake/modules/TICompilerWarnings.cmake        |   4 +
+    cmake/modules/ToolchainFeatures.cmake         |  11 +
+    cmake/modules/UFWCompiler.cmake               |   4 +
+    cmake/modules/UFWTest.cmake                   |   4 +
+    cmake/modules/UFWTools.cmake                  |   4 +
+    cmake/modules/XilinxISEToolchain.cmake        |   4 +
+    cmake/toolchains/afl++.cmake                  |   4 +
+    cmake/toolchains/arm-zephyr-eabi.cmake        |   4 +
+    cmake/toolchains/clang-arm-none-eabi.cmake    |   4 +
+    cmake/toolchains/clang.cmake                  |   6 +-
+    cmake/toolchains/gnu-arm-none-eabi.cmake      |   4 +
+    cmake/toolchains/gnu.cmake                    |   6 +-
+    cmake/toolchains/mips-linux-gnu.cmake         |   4 +
+    cmake/toolchains/ti-arm-clang.cmake           |  44 +
+    cmake/toolchains/ti-arm.cmake                 |   4 +
+    cmake/toolchains/ti-c2000.cmake               |   4 +
+    cmake/toolchains/xilinx-ise.cmake             |   4 +
+    doc/CMakeLists.txt                            |   5 +-
+    examples/CMakeLists.txt                       |   5 +
+    examples/ex-regp-parse-frame.c                |   2 +-
+    examples/ex-rfc1055-parse-frame.c             |   2 +-
+    fuzz/afl++.yaml                               |   4 +
+    fuzz/run                                      |   4 +
+    include/ufw/allocator.h                       |  10 +-
+    include/ufw/binary-format.h                   |  10 +-
+    include/ufw/bit-operations.h                  |   5 +-
+    include/ufw/byte-buffer.h                     |  14 +-
+    include/ufw/compat.h                          |   2 +-
+    include/ufw/compat/errno.h                    |   5 +-
+    include/ufw/compat/math-constants.h           |   5 +-
+    include/ufw/compat/ssize-t.h                  |   2 +-
+    include/ufw/compat/strings.h                  |   7 +-
+    include/ufw/compiler.h                        |   5 +-
+    include/ufw/convolution-low-pass.h            |   5 +-
+    include/ufw/crc/crc16-arc.h                   |  10 +-
+    include/ufw/endpoints.h                       | 111 ++-
+    include/ufw/endpoints/continuable-sink.h      |  10 +-
+    include/ufw/hexdump.h                         |  11 +-
+    include/ufw/length-prefix.h                   |  10 +-
+    include/ufw/meta.h                            |   9 +-
+    include/ufw/octet-ring.h                      |  10 +-
+    include/ufw/persistent-storage.h              |   2 +-
+    include/ufw/register-protocol.h               |  10 +-
+    include/ufw/register-table.h                  |   2 +-
+    include/ufw/register-utilities.h              |   2 +-
+    include/ufw/rfc1055.h                         |  10 +-
+    include/ufw/ring-buffer-iter.h                |   2 +-
+    include/ufw/ring-buffer.h                     |   5 +-
+    include/ufw/sx.h                              |  10 +-
+    include/ufw/test/tap.h                        |  14 +-
+    include/ufw/toolchain.h.in                    |   9 +
+    include/ufw/variable-length-integer.h         |  14 +
+    include/ufwz/endpoint-uart-fifo.h             |  35 +
+    include/ufwz/endpoint-uart-poll.h             |  19 +
+    include/ufwz/shell-addons.h                   |  17 +
+    include/ufwz/slab-allocator.h                 |  19 +
+    module.yaml                                   |   4 +
+    scheme/ufw/register-table.scm                 |   2 +-
+    scheme/ufw/utilities.scm                      |   2 +-
+    src/allocator.c                               |   2 +-
+    src/byte-buffer.c                             | 273 +++++-
+    src/compat/strlcat.c                          |   2 +-
+    src/compat/strlcpy.c                          |   2 +-
+    src/compat/strnlen.c                          |   2 +-
+    src/crc-16-arc.c                              |   2 +-
+    src/endpoints/buffer.c                        |   2 +-
+    src/endpoints/continuable-sink.c              |   2 +-
+    src/endpoints/core.c                          | 876 ++++++++++++++++--
+    src/endpoints/instrumentable.c                | 228 ++++-
+    src/endpoints/posix.c                         |   2 +-
+    src/endpoints/trivial.c                       |   2 +-
+    src/hexdump.c                                 |  11 +-
+    src/length-prefix.c                           |   2 +-
+    src/octet-ring.c                              |   2 +-
+    src/persistent-storage.c                      |   2 +-
+    src/register-protocol.c                       |   2 +-
+    src/registers/core.c                          |   6 +-
+    src/registers/internal.h                      |   2 +-
+    src/registers/utilities.c                     |   4 +-
+    src/rfc1055.c                                 |   2 +-
+    src/ring-buffer-iter.c                        |   2 +-
+    src/sx.c                                      |   6 +-
+    src/test/memdiff.c                            |   2 +-
+    src/test/output-utils.c                       |  41 +-
+    src/test/tap.c                                |  16 +-
+    src/variable-length-integer.c                 |   6 +
+    src/z/CMakeLists.txt                          |  15 +
+    src/z/driver-i2c-text.c                       |  45 +
+    src/z/driver-spi-text.c                       |  63 ++
+    src/z/endpoint-uart-fifo.c                    |  57 ++
+    src/z/endpoint-uart-poll.c                    |  23 +
+    src/z/shell-addons.c                          | 233 +++++
+    src/z/slab-allocator.c                        |  19 +
+    target/cortex-m3/bin/run                      |   4 +
+    target/cortex-m3/init/startup.c               |   2 +-
+    target/cortex-m3/ld/arm-cortex-qemu.ld        |   2 +-
+    target/mips/bin/run                           |   4 +
+    test/CMakeLists.txt                           |  13 +
+    test/module/CMakeLists.txt                    |  20 +
+    test/module/README                            |  33 +
+    test/module/run                               |  18 +
+    test/module/setup                             |  51 +
+    test/module/src/CMakeLists.txt                |   8 +
+    test/module/src/boards/native_posix_64.conf   |  15 +
+    .../module/src/boards/native_posix_64.overlay |  43 +
+    test/module/src/main.c                        |  18 +
+    test/module/src/prj.conf                      |   6 +
+    test/module/system.yaml                       |  25 +
+    test/t-binary-format.c                        |   2 +-
+    test/t-byte-buffer.c                          | 195 ++++
+    test/t-convolution-low-pass.c                 |   2 +-
+    test/t-endpoints.c                            | 131 +++
+    test/t-ep-retry-ctrl.c                        | 178 ++++
+    test/t-hexdump.c                              |   3 +-
+    test/t-length-prefix.c                        |   2 +-
+    test/t-persistent-storage.c                   |   2 +-
+    test/t-register-protocol.c                    |  10 +-
+    test/t-register-table-persistent-storage.c    |   2 +-
+    test/t-register-table.c                       |   2 +-
+    test/t-rfc1055.c                              |  18 +-
+    test/t-ring-buffer.c                          |   2 +-
+    test/t-sx-parser.c                            |   2 +-
+    test/t-varint.c                               |   2 +-
     .../vcs/catalogue/specimen-multi-mixed.tar.gz | Bin 0 -> 21219 bytes
     test/vcs/catalogue/specimen-notags.tar.gz     | Bin 0 -> 14783 bytes
     .../vcs/catalogue/specimen-pre-release.tar.gz | Bin 0 -> 15068 bytes
     .../specimen-release-candidate.tar.gz         | Bin 0 -> 15275 bytes
     .../specimen-single-nontop-vtag.tar.gz        | Bin 0 -> 19565 bytes
     .../catalogue/specimen-single-top-vtag.tar.gz | Bin 0 -> 18005 bytes
-    ...n-multi-mixed-g098d055-clean-default.state |  18 ++
-    ...en-multi-mixed-g098d055-clean-prefix.state |  18 ++
-    ...n-multi-mixed-g098d055-dirty-default.state |  18 ++
-    ...en-multi-mixed-g098d055-dirty-prefix.state |  18 ++
-    ...n-multi-mixed-g4c33abf-clean-default.state |  18 ++
-    ...en-multi-mixed-g4c33abf-clean-prefix.state |  18 ++
-    ...n-multi-mixed-g4c33abf-dirty-default.state |  18 ++
-    ...en-multi-mixed-g4c33abf-dirty-prefix.state |  18 ++
-    ...n-multi-mixed-gd1ba1bc-clean-default.state |  18 ++
-    ...en-multi-mixed-gd1ba1bc-clean-prefix.state |  18 ++
-    ...n-multi-mixed-gd1ba1bc-dirty-default.state |  18 ++
-    ...en-multi-mixed-gd1ba1bc-dirty-prefix.state |  18 ++
-    ...n-multi-mixed-ge21d10a-clean-default.state |  18 ++
-    ...en-multi-mixed-ge21d10a-clean-prefix.state |  18 ++
-    ...n-multi-mixed-ge21d10a-dirty-default.state |  18 ++
-    ...en-multi-mixed-ge21d10a-dirty-prefix.state |  18 ++
-    ...cimen-multi-mixed-p100-clean-default.state |  18 ++
-    ...ecimen-multi-mixed-p100-clean-prefix.state |  18 ++
-    ...cimen-multi-mixed-p100-dirty-default.state |  18 ++
-    ...ecimen-multi-mixed-p100-dirty-prefix.state |  18 ++
-    ...cimen-multi-mixed-p200-clean-default.state |  18 ++
-    ...ecimen-multi-mixed-p200-clean-prefix.state |  18 ++
-    ...cimen-multi-mixed-p200-dirty-default.state |  18 ++
-    ...ecimen-multi-mixed-p200-dirty-prefix.state |  18 ++
-    ...cimen-multi-mixed-p300-clean-default.state |  18 ++
-    ...ecimen-multi-mixed-p300-clean-prefix.state |  18 ++
-    ...cimen-multi-mixed-p300-dirty-default.state |  18 ++
-    ...ecimen-multi-mixed-p300-dirty-prefix.state |  18 ++
-    ...cimen-multi-mixed-p310-clean-default.state |  18 ++
-    ...ecimen-multi-mixed-p310-clean-prefix.state |  18 ++
-    ...cimen-multi-mixed-p310-dirty-default.state |  18 ++
-    ...ecimen-multi-mixed-p310-dirty-prefix.state |  18 ++
-    ...cimen-multi-mixed-v100-clean-default.state |  18 ++
-    ...ecimen-multi-mixed-v100-clean-prefix.state |  18 ++
-    ...cimen-multi-mixed-v100-dirty-default.state |  18 ++
-    ...ecimen-multi-mixed-v100-dirty-prefix.state |  18 ++
-    ...imen-multi-mixed-v1000-clean-default.state |  18 ++
-    ...cimen-multi-mixed-v1000-clean-prefix.state |  18 ++
-    ...imen-multi-mixed-v1000-dirty-default.state |  18 ++
-    ...cimen-multi-mixed-v1000-dirty-prefix.state |  18 ++
-    ...cimen-multi-mixed-v200-clean-default.state |  18 ++
-    ...ecimen-multi-mixed-v200-clean-prefix.state |  18 ++
-    ...cimen-multi-mixed-v200-dirty-default.state |  18 ++
-    ...ecimen-multi-mixed-v200-dirty-prefix.state |  18 ++
-    test/vcs/data/specimen-notags-clean.state     |  18 ++
-    test/vcs/data/specimen-notags-dirty.state     |  18 ++
-    .../specimen-pre-release-gmain-clean.state    |  18 ++
-    .../specimen-pre-release-gmain-dirty.state    |  18 ++
-    ...specimen-pre-release-v100-pre1-clean.state |  18 ++
-    ...specimen-pre-release-v100-pre1-dirty.state |  18 ++
-    ...ecimen-release-candidate-gmain-clean.state |  18 ++
-    ...ecimen-release-candidate-gmain-dirty.state |  18 ++
-    ...men-release-candidate-v100-rc1-clean.state |  18 ++
-    ...men-release-candidate-v100-rc1-dirty.state |  18 ++
-    .../specimen-single-nontop-vtag-clean.state   |  18 ++
-    .../specimen-single-nontop-vtag-dirty.state   |  18 ++
-    .../data/specimen-single-top-vtag-clean.state |  18 ++
-    .../data/specimen-single-top-vtag-dirty.state |  18 ++
-    test/vcs/sh/epilogue.sh                       |   5 +
-    test/vcs/sh/generate-states.sh                |  18 ++
-    test/vcs/sh/prologue.sh                       | 128 +++++++++
-    test/vcs/t/0001-specimen-notags.t             |  26 ++
-    test/vcs/t/0002-specimen-single-top-vtag.t    |  26 ++
-    test/vcs/t/0003-specimen-single-nontop-vtag.t |  26 ++
-    test/vcs/t/0004-specimen-multi-mixed.t        |  35 +++
-    test/vcs/t/0005-specimen-pre-release.t        |  29 ++
-    test/vcs/t/0006-specimen-release-candidate.t  |  29 ++
-    test/vcs/tools/calculate-state                |  38 +++
-    tools/quick.yaml                              |  14 +
-    tools/release-tests.sh                        | 253 +++++++++++++++++
-    vcs-integration/build-information.sh          |  10 +-
-    vcs-integration/git.sh                        |  31 ++-
-    zephyr/Kconfig                                |  52 ++++
-    zephyr/cmake-cache.cmake                      |  15 ++
-    zephyr/dts/bindings/ufw,i2c-text.yaml         |  15 ++
-    zephyr/dts/bindings/ufw,spi-text.yaml         |  15 ++
+    ...n-multi-mixed-g098d055-clean-default.state |  18 +
+    ...en-multi-mixed-g098d055-clean-prefix.state |  18 +
+    ...n-multi-mixed-g098d055-dirty-default.state |  18 +
+    ...en-multi-mixed-g098d055-dirty-prefix.state |  18 +
+    ...n-multi-mixed-g4c33abf-clean-default.state |  18 +
+    ...en-multi-mixed-g4c33abf-clean-prefix.state |  18 +
+    ...n-multi-mixed-g4c33abf-dirty-default.state |  18 +
+    ...en-multi-mixed-g4c33abf-dirty-prefix.state |  18 +
+    ...n-multi-mixed-gd1ba1bc-clean-default.state |  18 +
+    ...en-multi-mixed-gd1ba1bc-clean-prefix.state |  18 +
+    ...n-multi-mixed-gd1ba1bc-dirty-default.state |  18 +
+    ...en-multi-mixed-gd1ba1bc-dirty-prefix.state |  18 +
+    ...n-multi-mixed-ge21d10a-clean-default.state |  18 +
+    ...en-multi-mixed-ge21d10a-clean-prefix.state |  18 +
+    ...n-multi-mixed-ge21d10a-dirty-default.state |  18 +
+    ...en-multi-mixed-ge21d10a-dirty-prefix.state |  18 +
+    ...cimen-multi-mixed-p100-clean-default.state |  18 +
+    ...ecimen-multi-mixed-p100-clean-prefix.state |  18 +
+    ...cimen-multi-mixed-p100-dirty-default.state |  18 +
+    ...ecimen-multi-mixed-p100-dirty-prefix.state |  18 +
+    ...cimen-multi-mixed-p200-clean-default.state |  18 +
+    ...ecimen-multi-mixed-p200-clean-prefix.state |  18 +
+    ...cimen-multi-mixed-p200-dirty-default.state |  18 +
+    ...ecimen-multi-mixed-p200-dirty-prefix.state |  18 +
+    ...cimen-multi-mixed-p300-clean-default.state |  18 +
+    ...ecimen-multi-mixed-p300-clean-prefix.state |  18 +
+    ...cimen-multi-mixed-p300-dirty-default.state |  18 +
+    ...ecimen-multi-mixed-p300-dirty-prefix.state |  18 +
+    ...cimen-multi-mixed-p310-clean-default.state |  18 +
+    ...ecimen-multi-mixed-p310-clean-prefix.state |  18 +
+    ...cimen-multi-mixed-p310-dirty-default.state |  18 +
+    ...ecimen-multi-mixed-p310-dirty-prefix.state |  18 +
+    ...cimen-multi-mixed-v100-clean-default.state |  18 +
+    ...ecimen-multi-mixed-v100-clean-prefix.state |  18 +
+    ...cimen-multi-mixed-v100-dirty-default.state |  18 +
+    ...ecimen-multi-mixed-v100-dirty-prefix.state |  18 +
+    ...imen-multi-mixed-v1000-clean-default.state |  18 +
+    ...cimen-multi-mixed-v1000-clean-prefix.state |  18 +
+    ...imen-multi-mixed-v1000-dirty-default.state |  18 +
+    ...cimen-multi-mixed-v1000-dirty-prefix.state |  18 +
+    ...cimen-multi-mixed-v200-clean-default.state |  18 +
+    ...ecimen-multi-mixed-v200-clean-prefix.state |  18 +
+    ...cimen-multi-mixed-v200-dirty-default.state |  18 +
+    ...ecimen-multi-mixed-v200-dirty-prefix.state |  18 +
+    test/vcs/data/specimen-notags-clean.state     |  18 +
+    test/vcs/data/specimen-notags-dirty.state     |  18 +
+    .../specimen-pre-release-gmain-clean.state    |  18 +
+    .../specimen-pre-release-gmain-dirty.state    |  18 +
+    ...specimen-pre-release-v100-pre1-clean.state |  18 +
+    ...specimen-pre-release-v100-pre1-dirty.state |  18 +
+    ...ecimen-release-candidate-gmain-clean.state |  18 +
+    ...ecimen-release-candidate-gmain-dirty.state |  18 +
+    ...men-release-candidate-v100-rc1-clean.state |  18 +
+    ...men-release-candidate-v100-rc1-dirty.state |  18 +
+    .../specimen-single-nontop-vtag-clean.state   |  18 +
+    .../specimen-single-nontop-vtag-dirty.state   |  18 +
+    .../data/specimen-single-top-vtag-clean.state |  18 +
+    .../data/specimen-single-top-vtag-dirty.state |  18 +
+    test/vcs/sh/epilogue.sh                       |   9 +
+    test/vcs/sh/generate-states.sh                |  22 +
+    test/vcs/sh/prologue.sh                       | 132 +++
+    test/vcs/t/0001-specimen-notags.t             |  30 +
+    test/vcs/t/0002-specimen-single-top-vtag.t    |  30 +
+    test/vcs/t/0003-specimen-single-nontop-vtag.t |  30 +
+    test/vcs/t/0004-specimen-multi-mixed.t        |  39 +
+    test/vcs/t/0005-specimen-pre-release.t        |  33 +
+    test/vcs/t/0006-specimen-release-candidate.t  |  33 +
+    test/vcs/tools/calculate-state                |  42 +
+    tools/check-changes.sh                        | 172 ++++
+    tools/check-copyright.sh                      | 325 +++++++
+    tools/check-meta-h.sh                         |  82 ++
+    tools/compat-build.sh                         | 103 ++
+    tools/coverage-build.sh                       |  63 ++
+    tools/make-binary-format.scm                  |   4 +-
+    tools/make-register-macros.scm                |   2 +-
+    tools/quick.yaml                              |  18 +
+    tools/release-tests.sh                        | 447 +++++++++
+    tools/run                                     |   4 +
+    vcs-integration/build-information.sh          |  14 +-
+    vcs-integration/git.sh                        |  35 +-
+    zephyr/Kconfig                                | 186 ++++
+    zephyr/cmake-cache.cmake                      |  64 ++
+    zephyr/dts/bindings/ufw,i2c-text.yaml         |  15 +
+    zephyr/dts/bindings/ufw,spi-text.yaml         |  15 +
     zephyr/dts/bindings/vendor-prefixes.txt       |   1 +
-    zephyr/module.yml                             |   6 +
-    146 files changed, 3302 insertions(+), 220 deletions(-)
+    zephyr/module.yml                             |  10 +
+    264 files changed, 6914 insertions(+), 441 deletions(-)
 
 
 * v5.5.0 → v5.6.0 (released 2024-05-28):
