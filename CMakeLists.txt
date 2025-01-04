@@ -1,3 +1,7 @@
+# Copyright (c) 2018-2025 ufw workers, All rights reserved.
+#
+# Terms for redistribution and use can be found in LICENCE.
+
 cmake_minimum_required (VERSION 3.13.4)
 project(ufw C CXX)
 

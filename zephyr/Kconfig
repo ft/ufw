@@ -1,3 +1,7 @@
+# Copyright (c) 2024-2025 ufw workers, All rights reserved.
+#
+# Terms for redistribution and use can be found in LICENCE.
+
 config UFW_USE_BUILTIN_SWAP
 	bool "Use __builtin_bswapXX() if available."
 	default y

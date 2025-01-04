@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Copyright (c) 2019-2025 ufw workers, All rights reserved.
+#
+# Terms for redistribution and use can be found in LICENCE.
+
 # This library has these public functions:
 #
 #   git_populate: Fetches information from git database and populates the

@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Copyright (c) 2024-2025 ufw workers, All rights reserved.
+#
+# Terms for redistribution and use can be found in LICENCE.
+
 zephyr_version='v3.7.0'
 zephyr_upstream='https://github.com/zephyrproject-rtos/zephyr.git'
 

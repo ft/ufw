@@ -1,3 +1,7 @@
+# Copyright (c) 2021-2025 ufw workers, All rights reserved.
+#
+# Terms for redistribution and use can be found in LICENCE.
+
 if(__UFW_FakeTimeSupport)
   return()
 endif()

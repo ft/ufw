@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022-2025 ufw workers, All rights reserved.
+ *
+ * Terms for redistribution and use can be found in LICENCE.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -1,3 +1,7 @@
+# Copyright (c) 2018-2025 ufw workers, All rights reserved.
+#
+# Terms for redistribution and use can be found in LICENCE.
+
 if (${CMAKE_TOOLCHAIN_FILE})
 endif()
 

@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Copyright (c) 2024-2025 ufw workers, All rights reserved.
+#
+# Terms for redistribution and use can be found in LICENCE.
+
 if [ "$#" -ne 0 ] && [ "$#" -ne 1 ]; then
     cat <<EOF
 usage: compliance-build.sh [PREVIOUS-STATE]

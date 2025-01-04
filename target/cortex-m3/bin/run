@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Copyright (c) 2020-2025 ufw workers, All rights reserved.
+#
+# Terms for redistribution and use can be found in LICENCE.
+
 # This is the emulation-based program runner for the ufw test-suite. This
 # script runs an ARM Cortex-M3 program via QEMU. It enables semihosting, and
 # disables all graphical output. That way, stdio is connected to that of the

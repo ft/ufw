@@ -1,3 +1,7 @@
+# Copyright (c) 2020-2025 ufw workers, All rights reserved.
+#
+# Terms for redistribution and use can be found in LICENCE.
+
 if(__UFW_STM32HAL_h7)
   return()
 endif()

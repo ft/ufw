@@ -1,3 +1,7 @@
+# Copyright (c) 2021-2025 ufw workers, All rights reserved.
+#
+# Terms for redistribution and use can be found in LICENCE.
+
 . "$MICROFRAMEWORK_ROOT"/bin/utils.sh
 
 FIRMWARE_NAME=no-name

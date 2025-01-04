@@ -1,3 +1,7 @@
+# Copyright (c) 2024-2025 ufw workers, All rights reserved.
+#
+# Terms for redistribution and use can be found in LICENCE.
+
 # If this ufw is built as a zephyr module. Override cmake cache values with
 # data from Kconfig now.
 if (ZEPHYR_CURRENT_MODULE_NAME AND ("${ZEPHYR_CURRENT_MODULE_NAME}" STREQUAL "ufw"))

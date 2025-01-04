@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Copyright (c) 2024-2025 ufw workers, All rights reserved.
+#
+# Terms for redistribution and use can be found in LICENCE.
+
 # This checks the contents of "include/ufw/meta.h". The macros defined therein
 # must reflect the major, minor, and patchlevel fields of the closest tag visi-
 # ble. In connection with check-changes.sh, this makes sure that all fields are

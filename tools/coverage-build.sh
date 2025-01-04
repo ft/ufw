@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Copyright (c) 2024-2025 ufw workers, All rights reserved.
+#
+# Terms for redistribution and use can be found in LICENCE.
+
 # This runs a single build of ufw  with coverage tracking enabled. The build is
 # done with  a native toolchain, and  exacutes the test-suite, of  course. This
 # run will log the coverage data to  the build-tree. The script then runs gcovr

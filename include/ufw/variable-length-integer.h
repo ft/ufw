@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022-2025 ufw workers, All rights reserved.
+ *
+ * Terms for redistribution and use can be found in LICENCE.
+ */
+
 #ifndef INC_UFW_VARIABLE_LENGTH_INTEGER_H
 #define INC_UFW_VARIABLE_LENGTH_INTEGER_H
 

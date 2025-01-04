@@ -1,3 +1,7 @@
+# Copyright (c) 2020-2025 ufw workers, All rights reserved.
+#
+# Terms for redistribution and use can be found in LICENCE.
+
 set(XILINX_ISE_ROOT "/opt/xilinx-ise/14.7/ISE_DS/ISE/bin/lin64")
 
 # set target system
