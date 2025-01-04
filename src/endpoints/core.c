@@ -527,6 +527,62 @@ sink_write(Sink *sink, const void *buf, const size_t n)
         : sink->sink.chunk(sink->driver, buf, n);
 }
 
+/* Similar to source_read_multi(), this is the worker for sink_put_chunk() and
+ * sink_put_chunk_atmost(). */
+static inline struct size_error
+sink_write_multi(Sink *sink, const void *buf, const size_t n)
+{
+    trace();
+    struct size_error rc = { 0, 0u };
+
+    if (n == 0 || n > SSIZE_MAX) {
+        rc.error = -EINVAL;
+        goto done;
+    }
+
+    if (sink->retry.init != NULL) {
+        sink->retry.init(&sink->retry);
+    }
+
+    size_t rest = n;
+    while (rest > 0) {
+        const unsigned char *src = buf;
+        const size_t done = n - rest;
+        const ssize_t get = sink_write(sink, src + done, rest);
+        if (get <= 0) {
+            if (sink->retry.run == NULL) {
+                if (get == -EINTR || get == -EAGAIN) {
+                    continue;
+                } else if (get < 0) {
+                    rc.error = (int)get;
+                    rc.size = done;
+                    goto done;
+                }
+            } else {
+                const ssize_t retried =
+                    ep_retry(&sink->retry, sink->driver, get);
+                if (retried > 0) {
+                    continue;
+                } else if (retried == 0) {
+                    rc.error = -ENODATA;
+                    rc.size = done;
+                    goto done;
+                }
+                /* negative */
+                rc.error = (int)retried;
+                rc.size = done;
+                goto done;
+            }
+        }
+        assert((size_t)get <= rest);
+        rest -= get;
+    }
+    rc.size = n;
+
+done:
+    return rc;
+}
+
 /**
  * Write a piece of memory to a Sink instance
  *
@@ -545,41 +601,13 @@ sink_write(Sink *sink, const void *buf, const size_t n)
  * @sideeffects The procedure moves data from the supplied memory to the sink.
  */
 ssize_t
-sink_put_chunk(Sink *sink, const void *buf, size_t n)
+sink_put_chunk(Sink *sink, const void *buf, const size_t n)
 {
     trace();
-    if (n == 0 || n > SSIZE_MAX) {
-        return -EINVAL;
-    }
-
-    if (sink->retry.init != NULL) {
-        sink->retry.init(&sink->retry);
-    }
-
-    const unsigned char *data = buf;
-    size_t rest = n;
-    while (rest > 0) {
-        const ssize_t put = sink_write(sink, data + n - rest, rest);
-        if (put <= 0) {
-            if (sink->retry.run == NULL) {
-                if (put == -EINTR || put == -EAGAIN) {
-                    continue;
-                } else if (put < 0) {
-                    return (ssize_t)put;
-                }
-            } else {
-                const ssize_t retried =
-                    ep_retry(&sink->retry, sink->driver, put);
-                if (retried > 0) {
-                    continue;
-                }
-                return retried;
-            }
-        }
-        rest -= put;
-    }
-
-    return (ssize_t)n;
+    const struct size_error rc = sink_write_multi(sink, buf, n);
+    assert(rc.size == n);
+    assert(rc.size <= SSIZE_MAX);
+    return (rc.error == 0) ? (ssize_t)rc.size : rc.error;
 }
 
 /**
@@ -601,7 +629,10 @@ ssize_t
 sink_put_chunk_atmost(Sink *sink, const void *buf, const size_t n)
 {
     trace();
-    return sink_write(sink, buf, n);
+    const struct size_error rc = sink_write_multi(sink, buf, n);
+    assert(rc.size <= n);
+    assert(rc.size <= SSIZE_MAX);
+    return (rc.size == 0) ? rc.error : (ssize_t)rc.size;
 }
 
 /**
