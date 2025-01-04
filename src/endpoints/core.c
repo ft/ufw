@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 ufw workers, All rights reserved.
+ * Copyright (c) 2022-2025 ufw workers, All rights reserved.
  *
  * Terms for redistribution and use can be found in LICENCE.
  */
@@ -40,6 +40,24 @@
  *
  * Using a data count of zero, or one bigger than SSIZE_MAX causes the API to
  * return -EINVAL.
+ *
+ * Some of the naming conventions used herein:
+ *
+ * - sts_: Source to Sink plumbing APIs
+ *
+ * - _cbc: Character by Character transfer APIs
+ *
+ * - _aux: APIs using user-supplied auxiliary buffers
+ *
+ * - _some: APIs that transfer some, greater than zero bytes, amount of data,
+ *   determined by the system
+ *
+ * - _atmost: APIs that transfer some, greater than zero bytes, amount of data,
+ *   determined by the user.
+ *
+ * - _n: APIs that transfer an exact amount of data; exactly n bytes.
+ *
+ * - _drain: APIs that transfer all data available in a source into a sink.
  */
 
 #include <stdbool.h>
@@ -60,6 +78,16 @@
 #define trace() ((void)0)
 #endif
 
+/**
+ * Initialise a source of kind DATA_KIND_OCTET
+ *
+ * @param  instance  Pointer to the Source instance to initialise
+ * @param  source    ByteSource function that should drive the source
+ * @param  driver    Pointer to arbitrary data handed to the driver function
+ *
+ * @return void
+ * @sideeffects Modifies the instance pointer
+ */
 void
 octet_source_init(Source *instance, ByteSource source, void *driver)
 {
@@ -72,6 +100,16 @@ octet_source_init(Source *instance, ByteSource source, void *driver)
     instance->ext.getbuffer = NULL;
 }
 
+/**
+ * Initialise a source of kind DATA_KIND_CHUNK
+ *
+ * @param  instance  Pointer to the Source instance to initialise
+ * @param  source    ChunkSource function that should drive the source
+ * @param  driver    Pointer to arbitrary data handed to the driver function
+ *
+ * @return void
+ * @sideeffects Modifies the instance pointer
+ */
 void
 chunk_source_init(Source *instance, ChunkSource source, void *driver)
 {
@@ -84,6 +122,16 @@ chunk_source_init(Source *instance, ChunkSource source, void *driver)
     instance->ext.getbuffer = NULL;
 }
 
+/**
+ * Initialise a sink of kind DATA_KIND_OCTET
+ *
+ * @param  instance  Pointer to the Sink instance to initialise
+ * @param  sink      ByteSink function that should drive the sink
+ * @param  driver    Pointer to arbitrary data handed to the driver function
+ *
+ * @return void
+ * @sideeffects Modifies the instance pointer
+ */
 void
 octet_sink_init(Sink *instance, ByteSink sink, void *driver)
 {
@@ -96,6 +144,16 @@ octet_sink_init(Sink *instance, ByteSink sink, void *driver)
     instance->ext.getbuffer = NULL;
 }
 
+/**
+ * Initialise a sink of kind DATA_KIND_CHUNK
+ *
+ * @param  instance  Pointer to the Sink instance to initialise
+ * @param  sink      ChunkSink function that should drive the sink
+ * @param  driver    Pointer to arbitrary data handed to the driver function
+ *
+ * @return void
+ * @sideeffects Modifies the instance pointer
+ */
 void
 chunk_sink_init(Sink *instance, ChunkSink sink, void *driver)
 {
@@ -108,6 +166,22 @@ chunk_sink_init(Sink *instance, ChunkSink sink, void *driver)
     instance->ext.getbuffer = NULL;
 }
 
+/**
+ * Get a single octet from an arbitrary source
+ *
+ * This function gets a single datum from a source and stores it in the memory
+ * pointed to by the data argument. The function can return error condition as
+ * negative integers, with negated values from "errno.h".
+ *
+ * Upon successful completion, the number of transferred bytes (thus 1) is
+ * returned.
+ *
+ * @param  source  Pointer to the source instance to read from
+ * @param  driver    Pointer to arbitrary data handed to the source driver
+ *
+ * @return Negative errno on failure, or the number of bytes read upon success.
+ * @sideeffects Any sideeffects performed by the driver of the source instance.
+ */
 int
 source_get_octet(Source *source, void *data)
 {
@@ -117,6 +191,22 @@ source_get_octet(Source *source, void *data)
         : source->source.chunk(source->driver, data, 1u);
 }
 
+/**
+ * Put a single octet from an arbitrary sink
+ *
+ * This function puts a single datum into a sink and stores it in the memory.
+ * The function can return error condition as negative integers, with negated
+ * values from "errno.h".
+ *
+ * Upon successful completion, the number of transferred bytes (thus 1) is
+ * returned.
+ *
+ * @param  sink      Pointer to the sink instance to write to
+ * @param  driver    Pointer to arbitrary data handed to the sink driver
+ *
+ * @return Negative errno on failure; the number of bytes written on success.
+ * @sideeffects Any sideeffects performed by the driver of the sink instance.
+ */
 int
 sink_put_octet(Sink *sink, const unsigned char data)
 {
@@ -126,24 +216,41 @@ sink_put_octet(Sink *sink, const unsigned char data)
         : sink->sink.chunk(sink->driver, &data, 1u);
 }
 
+/**
+ * Implementation of the endpoint-retry machinery
+ *
+ * Note that this is an internal function!
+
+ * Only call this function if retry->run is a valid callback function!
+ *
+ * The endpoint system performs automatic read/write retries on common system
+ * issues, like EAGAIN, EINTR, and so on. There may be situations, in which it
+ * is desirable to perform custom handling of these situations.
+ *
+ * This function returning something larger than zero means retry whatever
+ * we've done before. Any other value will be returned from the endpoint as is.
+ * This allows injecting sideeffects (such as waiting), remapping error codes
+ * and custom handling of zero data.
+ *
+ * The set of controlled conditions can be chosed via retry->ctrl.
+ *
+ * @param  retry  Pointer to retry configuration to use
+ * @param  drv    pointer to endpoint driver
+ * @param  rc     Copy of the return code that cause this function to be called
+ *
+ * @return A positive return value indicates the user wants the IO action that
+ *         caused this function to be called to the retried. Other values will
+ *         cause the system to abort the current transaction with that value.
+ * @sideeffects None in of itself, but the retry system functions may cause
+ *              arbitrary side-effects.
+ */
 static inline ssize_t
-ep_retry(struct ufw_ep_retry *retry, const DataKind kind,
-         void *drv, const ssize_t rc)
+ep_retry(struct ufw_ep_retry *retry, void *drv, const ssize_t rc)
 {
     trace();
-    /*
-     * Only call this function if retry->run is a valid callback function!
-     *
-     * This function returning something larger than zero means retry whatever
-     * we've done before. Any other value will be returned from the endpoint as
-     * is. This allows injecting sideeffects (such as waiting), remapping error
-     * codes and custom handling of zero data.
-     *
-     * The set of controlled conditions can be chosed via retry->ctrl.
-     */
     if (rc == -EAGAIN) {
         if (BIT_ISSET(retry->ctrl, EP_RETRY_CTRL_EAGAIN)) {
-            return retry->run(kind, drv, retry->data, rc);
+            return retry->run(drv, retry->data, rc);
         } else {
             return 1;
         }
@@ -151,7 +258,7 @@ ep_retry(struct ufw_ep_retry *retry, const DataKind kind,
 
     if (rc == -EINTR) {
         if (BIT_ISSET(retry->ctrl, EP_RETRY_CTRL_EINTR)) {
-            return retry->run(kind, drv, retry->data, rc);
+            return retry->run(drv, retry->data, rc);
         } else {
             return 1;
         }
@@ -159,47 +266,46 @@ ep_retry(struct ufw_ep_retry *retry, const DataKind kind,
 
     if (rc == 0) {
         if (BIT_ISSET(retry->ctrl, EP_RETRY_CTRL_NOTHING)) {
-            return retry->run(kind, drv, retry->data, rc);
+            return retry->run(drv, retry->data, rc);
         } else {
             return 1;
         }
     }
 
     if (BIT_ISSET(retry->ctrl, EP_RETRY_CTRL_OTHER)) {
-        return retry->run(kind, drv, retry->data, rc);
+        return retry->run(drv, retry->data, rc);
     }
 
     return rc;
 }
 
+/**
+ * Perform chunk reads on an octet source
+ *
+ * This uses a separate buffer to implement chunk reads for octet sources.
+ *
+ * @param  source  ByteSource function pointer to adapt
+ * @param  driver  Pointer to source driver data
+ * @param  buf     Pointer to memory for the adaptation process
+ * @param  n       Size of the memory pointed to be buf
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was read.
+ * @sideeffects The procedure moves data from the source to the supplied
+ *              memory.
+ */
 static inline ssize_t
-source_adapt(ByteSource source, void *driver, struct ufw_ep_retry *retry,
-             void *buf, const size_t n)
+source_adapt(ByteSource source, void *driver, void *buf, const size_t n)
 {
     trace();
-    if (retry->init != NULL) {
-        retry->init(DATA_KIND_OCTET, retry);
-    }
-
     unsigned char *data = buf;
     size_t rest = n;
     while (rest > 0) {
         const int rc = source(driver, data + n - rest);
-        if (rc <= 0) {
-            if (retry->run == NULL) {
-                if (rc == -EINTR || rc == -EAGAIN) {
-                    continue;
-                } else if (rc < 0) {
-                    return (ssize_t)rc;
-                }
-            } else {
-                const ssize_t retried =
-                    ep_retry(retry, DATA_KIND_OCTET, driver, rc);
-                if (retried > 0) {
-                    continue;
-                }
-                return retried;
-            }
+        if (rc < 0) {
+            return (rest == n) ? (ssize_t)rc : (ssize_t)(n - rest);
+        } else if (rc == 0) {
+            return (rest == n) ? -EAGAIN : (ssize_t)(n - rest);
         }
         rest -= rc;
     }
@@ -207,15 +313,52 @@ source_adapt(ByteSource source, void *driver, struct ufw_ep_retry *retry,
     return n;
 }
 
+/**
+ * Read a chunk of data from a source without retry-logic
+ *
+ * This is similar to POSIX read() for arbitrary Source instances. There is no
+ * retry logic in this function. Use source_get_chunk() for the full endpoint
+ * functionality.
+ *
+ * TODO: This function should be source_read(), and public. Although that may
+ * lose us the inline. Hm.
+ *
+ * @param  source  Pointer to the source to read from
+ * @param  buf     Pointer to memory to read into
+ * @param  n       Size of the memory pointed to be buf
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was read.
+ * @sideeffects The procedure moves data from the source to the supplied
+ *              memory.
+ */
 static inline ssize_t
 once_source_get_chunk(Source *source, void *buf, size_t n)
 {
     trace();
     return source->kind == DATA_KIND_OCTET
-        ? source_adapt(source->source.octet, source->driver, &source->retry, buf, n)
+        ? source_adapt(source->source.octet, source->driver, buf, n)
         : source->source.chunk(source->driver, buf, n);
 }
 
+/**
+ * Read a chunk of exact size from a source
+ *
+ * This function reads from source until exactly the indicated amount of memory
+ * is transferred. This may require a number of actual reads. The function
+ * automatically retries reads on well-known error codes like EAGAIN and EINTR.
+ * This retry behaviour can be customised by using the endpoint's retry
+ * configuration.
+ *
+ * @param  source  Pointer to the source to read from
+ * @param  buf     Pointer to memory to read into
+ * @param  n       Size of the memory pointed to be buf
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was read.
+ * @sideeffects The procedure moves data from the source to the supplied
+ *              memory.
+ */
 ssize_t
 source_get_chunk(Source *source, void *buf, size_t n)
 {
@@ -225,7 +368,7 @@ source_get_chunk(Source *source, void *buf, size_t n)
     }
 
     if (source->retry.init != NULL) {
-        source->retry.init(DATA_KIND_CHUNK, &source->retry);
+        source->retry.init(&source->retry);
     }
 
     size_t rest = n;
@@ -240,8 +383,7 @@ source_get_chunk(Source *source, void *buf, size_t n)
                 }
             } else {
                 const ssize_t retried =
-                    ep_retry(&source->retry, DATA_KIND_CHUNK,
-                             source->driver, get);
+                    ep_retry(&source->retry, source->driver, get);
                 if (retried > 0) {
                     continue;
                 }
@@ -254,6 +396,25 @@ source_get_chunk(Source *source, void *buf, size_t n)
     return (ssize_t)n;
 }
 
+/**
+ * Get a limited amount of bytes from a source
+ *
+ * This is very similar to source_get_chunk(), except that being able to read
+ * less than the indicated amount of data is not an error. This can have a
+ * number of uses, like reading data from a source that has a fixed but unknown
+ * number of bytes to give. Reading this chunk by chunk will cause a final read
+ * with less data in the general case. An example of such a source would be a
+ * regular file on many operating systems.
+ *
+ * @param  source  Pointer to the source to read from
+ * @param  buf     Pointer to memory to read into
+ * @param  n       Size of the memory pointed to be buf
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was read.
+ * @sideeffects The procedure moves data from the source to the supplied
+ *              memory.
+ */
 ssize_t
 source_get_chunk_atmost(Source *source, void *buf, const size_t n)
 {
@@ -263,7 +424,7 @@ source_get_chunk_atmost(Source *source, void *buf, const size_t n)
     }
 
     if (source->retry.init != NULL) {
-        source->retry.init(DATA_KIND_CHUNK, &source->retry);
+        source->retry.init(&source->retry);
     }
 
     size_t got = 0;
@@ -278,8 +439,7 @@ source_get_chunk_atmost(Source *source, void *buf, const size_t n)
                 }
             } else {
                 const ssize_t retried =
-                    ep_retry(&source->retry, DATA_KIND_CHUNK,
-                             source->driver, rc);
+                    ep_retry(&source->retry, source->driver, rc);
                 if (retried > 0) {
                     continue;
                 }
@@ -292,32 +452,32 @@ source_get_chunk_atmost(Source *source, void *buf, const size_t n)
     return got;
 }
 
+/**
+ * Perform chunk writes on an octet sink
+ *
+ * This uses a separate buffer to implement writes reads for octet sinks.
+ *
+ * @param  sink    ByteSink function pointer to adapt
+ * @param  driver  Pointer to sink driver data
+ * @param  buf     Pointer to memory for the adaptation process
+ * @param  n       Size of the memory pointed to be buf
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was written.
+ * @sideeffects The procedure moves data from the supplied memory to the sink.
+ */
 static inline ssize_t
-sink_adapt(ByteSink sink, void *driver, const void *buf,
-           struct ufw_ep_retry *retry, const size_t n)
+sink_adapt(ByteSink sink, void *driver, const void *buf, const size_t n)
 {
     trace();
-    if (retry->init != NULL) {
-        retry->init(DATA_KIND_OCTET, retry);
-    }
-
     const unsigned char *data = buf;
     size_t rest = n;
     while (rest > 0) {
         const int rc = sink(driver, data[n - rest]);
-        if (retry->run == NULL) {
-            if (rc == -EINTR || rc == -EAGAIN) {
-                continue;
-            } else if (rc < 0) {
-                return (ssize_t)rc;
-            }
-        } else {
-            const ssize_t retried =
-                ep_retry(retry, DATA_KIND_OCTET, driver, rc);
-            if (retried > 0) {
-                continue;
-            }
-            return retried;
+        if (rc < 0) {
+            return (rest == n) ? (ssize_t)rc : (ssize_t)(n - rest);
+        } else if (rc == 0) {
+            return (rest == n) ? -EAGAIN : (ssize_t)(n - rest);
         }
         rest -= rc;
     }
@@ -325,15 +485,50 @@ sink_adapt(ByteSink sink, void *driver, const void *buf,
     return n;
 }
 
+/**
+ * Write a chunk of data to a sink without retry-logic
+ *
+ * This is similar to POSIX write() for arbitrary Sink instances. There is no
+ * retry logic in this function. Use source_put_chunk() for the full endpoint
+ * functionality.
+ *
+ * TODO: This function should be source_write(), and public. Although that may
+ * lose us the inline. Hm.
+ *
+ * @param  sink  Pointer to sink instance to write to
+ * @param  buf   Pointer to memory to read into
+ * @param  n     Size of the memory pointed to be buf
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was written.
+ * @sideeffects The procedure moves data from the supplied memory to the sink.
+ */
 static inline ssize_t
 once_sink_put_chunk(Sink *sink, const void *buf, size_t n)
 {
     trace();
     return sink->kind == DATA_KIND_OCTET
-        ? sink_adapt(sink->sink.octet, sink->driver, buf, &sink->retry, n)
+        ? sink_adapt(sink->sink.octet, sink->driver, buf, n)
         : sink->sink.chunk(sink->driver, buf, n);
 }
 
+/**
+ * Write a piece of memory to a Sink instance
+ *
+ * This function writes to a sink until exactly the indicated amount of memory
+ * is transferred. This may require a number of actual writes. The function
+ * automatically retries writes on well-known error codes like EAGAIN and
+ * EINTR. This retry behaviour can be customised by using the endpoint's retry
+ * configuration.
+ *
+ * @param  sink  Pointer to sink instance to write to
+ * @param  buf   Pointer to memory to read into
+ * @param  n     Size of the memory pointed to be buf
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was written.
+ * @sideeffects The procedure moves data from the supplied memory to the sink.
+ */
 ssize_t
 sink_put_chunk(Sink *sink, const void *buf, size_t n)
 {
@@ -343,7 +538,7 @@ sink_put_chunk(Sink *sink, const void *buf, size_t n)
     }
 
     if (sink->retry.init != NULL) {
-        sink->retry.init(DATA_KIND_CHUNK, &sink->retry);
+        sink->retry.init(&sink->retry);
     }
 
     const unsigned char *data = buf;
@@ -359,7 +554,7 @@ sink_put_chunk(Sink *sink, const void *buf, size_t n)
                 }
             } else {
                 const ssize_t retried =
-                    ep_retry(&sink->retry, DATA_KIND_CHUNK, sink->driver, put);
+                    ep_retry(&sink->retry, sink->driver, put);
                 if (retried > 0) {
                     continue;
                 }
@@ -372,6 +567,21 @@ sink_put_chunk(Sink *sink, const void *buf, size_t n)
     return (ssize_t)n;
 }
 
+/**
+ * Write a limited amount of data to a sink
+ *
+ * TODO: This is a synonym to sink_put_chunk() currently. I suppose having this
+ * option may have its uses. Possibly cases, where partial writes may still be
+ * useful. This is not that function, yet, however.
+ *
+ * @param  sink  Pointer to sink instance to write to
+ * @param  buf   Pointer to memory to read into
+ * @param  n     Size of the memory pointed to be buf
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was written.
+ * @sideeffects The procedure moves data from the supplied memory to the sink.
+ */
 ssize_t
 sink_put_chunk_atmost(Sink *sink, const void *buf, const size_t n)
 {
@@ -379,19 +589,92 @@ sink_put_chunk_atmost(Sink *sink, const void *buf, const size_t n)
     return once_sink_put_chunk(sink, buf, n);
 }
 
+/**
+ * Query is a source instance implements the getbuffer extension
+ *
+ * @param  source  Pointer to the source instance to query
+ *
+ * @return True of the source implements ths getbuffer extension; false
+ *         otherwise.
+ * @sideeffects None
+ */
 static inline bool
-channel_has_buffer_ext(Source *source, Sink *sink)
+source_has_buffer_ext(const Source *source)
 {
     trace();
-    return (source->ext.getbuffer != NULL || sink->ext.getbuffer != NULL);
+    return (source->ext.getbuffer != NULL);
 }
 
+/**
+ * Query is a sink instance implements the getbuffer extension
+ *
+ * @param  sink  Pointer to the source instance to query
+ *
+ * @return True of the sink implements ths getbuffer extension; false
+ *         otherwise.
+ * @sideeffects None
+ */
+static inline bool
+sink_has_buffer_ext(const Sink *sink)
+{
+    trace();
+    return (sink->ext.getbuffer != NULL);
+}
+
+/**
+ * Query if a pair of source and sink endpoints implement getbuffer
+ *
+ * This returns true if either the source or the sink implements the getbuffer
+ * extension.
+ *
+ * @param  source  Pointer to the source to query
+ * @param  sink    Pointer to the sink to query
+ *
+ * @return True of either the sink or the source implements ths getbuffer
+ *         extension; false otherwise.
+ * @sideeffects None
+ */
+static inline bool
+channel_has_buffer_ext(const Source *source, const Sink *sink)
+{
+    trace();
+    return (source_has_buffer_ext(source) || sink_has_buffer_ext(sink));
+}
+
+/*
+ * Plumbing API, Source-to-Sink (sts_)
+ *
+ * Endpoints can be plugged into each other, to form something akin to a
+ * channel of some sort. These functions implement such plumbing, to transfer
+ * data from sources to sinks. This is the Source->Sink pattern.
+ *
+ * Another pattern, that is possible is Sink->Source which can be described as
+ * a conduit. Here, a sink where data can be written to, immediately also
+ * implements a Source interface to be able to read the same data from. This
+ * kind of access pattern is not implemented by this module yet.
+ */
+
+/**
+ * Move data using a sink's exposed buffer
+ *
+ * This requires the Sink to implement the getbuffer extension.
+ *
+ * @param  source  Pointer of Source instance to read from
+ * @param  sink    Pointer of Sink instance to write to
+ * @param  n       Limit for the amount of data being transferred
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was transferred.
+ * @sideeffects The procedure moves data from source to sink; with most real
+ *              world implementations of those, that means IO, which is a side
+ *              effect.
+ */
 static ssize_t
 sts_atmost_via_sink(Source *source, Sink *sink, const size_t n)
 {
     trace();
     if (sink->ext.getbuffer == NULL) {
-        return -ENOMEM;
+        return -EPIPE;
     }
 
     ByteBuffer b = sink->ext.getbuffer(sink);
@@ -406,6 +689,21 @@ sts_atmost_via_sink(Source *source, Sink *sink, const size_t n)
         : source_get_chunk(source, buf, m);
 }
 
+/**
+ * Move data using a source's exposed buffer
+ *
+ * This requires the Source to implement the getbuffer extension.
+ *
+ * @param  source  Pointer of Source instance to read from
+ * @param  sink    Pointer of Sink instance to write to
+ * @param  n       Limit for the amount of data being transferred
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was transferred.
+ * @sideeffects The procedure moves data from source to sink; with most real
+ *              world implementations of those, that means IO, which is a side
+ *              effect.
+ */
 static ssize_t
 sts_atmost_via_source(Source *source, Sink *sink, const size_t n)
 {
@@ -428,19 +726,58 @@ sts_atmost_via_source(Source *source, Sink *sink, const size_t n)
     return (rc < 0) ? rc : sink_put_chunk(sink, buf, rc);
 }
 
+/**
+ * Move data from source to sink
+ *
+ * Note that this will use the character-by-character (cbc) API if neither
+ * source nor sink implement the getbuffer extension. The cbc API has a very
+ * high overhead when copying large buffers.
+ *
+ * Consider using the APIs using an auxiliary buffer (aux) APIs that accept an
+ * user provided buffer to perform larger transfers in chunks of the size of
+ * that auxiliary buffer.
+ *
+ * @param  source  Pointer of Source instance to read from
+ * @param  sink    Pointer of Sink instance to write to
+ * @param  n       Limit for the amount of data being transferred
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was transferred.
+ * @sideeffects The procedure moves data from source to sink; with most real
+ *              world implementations of those, that means IO, which is a side
+ *              effect.
+ */
 ssize_t
 sts_atmost(Source *source, Sink *sink, size_t n)
 {
     trace();
-    if (channel_has_buffer_ext(source, sink) == false) {
-        /* This works, but has a pretty heavy runtime overhead. Using sinks
-         * with exposable buffers is preferable. */
-        return sts_cbc(source, sink);
+    if (source_has_buffer_ext(source)) {
+        return sts_atmost_via_source(source, sink, n);
     }
-    const ssize_t sinkrc = sts_atmost_via_sink(source, sink, n);
-    return (sinkrc >= 0) ? sinkrc : sts_atmost_via_source(source, sink, n);
+    if (sink_has_buffer_ext(sink)) {
+        return sts_atmost_via_sink(source, sink, n);
+    }
+    return (n == 0u)
+        ? sts_cbc(source, sink)
+        : sts_atmost_cbc(source, sink, n);
 }
 
+/**
+ * Transfer some data from a source to a sink endpoint
+ *
+ * This transfers some data, the exact amount is determined by the system. This
+ * uses sts_atmost() under the hood, and the performance considerations
+ * mentioned in that function's descriptions apply to this as well, therefore.
+ *
+ * @param  source  Pointer of Source instance to read from
+ * @param  sink    Pointer of Sink instance to write to
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was transferred.
+ * @sideeffects The procedure moves data from source to sink; with most real
+ *              world implementations of those, that means IO, which is a side
+ *              effect.
+ */
 ssize_t
 sts_some(Source *source, Sink *sink)
 {
@@ -448,6 +785,22 @@ sts_some(Source *source, Sink *sink)
     return sts_atmost(source, sink, 0u);
 }
 
+/**
+ * Transfer exactly n bytes from a source to a sink
+ *
+ * Note that this uses sts_atmost() under the hood, and the performace note
+ * made in its description holds true for this function as well.
+ *
+ * @param  source  Pointer of Source instance to read from
+ * @param  sink    Pointer of Sink instance to write to
+ * @param  n       Limit for the amount of data being transferred
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was transferred.
+ * @sideeffects The procedure moves data from source to sink; with most real
+ *              world implementations of those, that means IO, which is a side
+ *              effect.
+ */
 ssize_t
 sts_n(Source *source, Sink *sink, const size_t n)
 {
@@ -473,6 +826,21 @@ sts_n(Source *source, Sink *sink, const size_t n)
     return n;
 }
 
+/**
+ * Completely drain a source into a sink
+ *
+ * Note that this uses sts_atmost() under the hood, and the performace note
+ * made in its description holds true for this function as well.
+ *
+ * @param  source  Pointer of Source instance to read from
+ * @param  sink    Pointer of Sink instance to write to
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was transferred.
+ * @sideeffects The procedure moves data from source to sink; with most real
+ *              world implementations of those, that means IO, which is a side
+ *              effect.
+ */
 ssize_t
 sts_drain(Source *source, Sink *sink)
 {
@@ -498,23 +866,64 @@ sts_drain(Source *source, Sink *sink)
     return rc;
 }
 
+/**
+ * Transfer some data from a source to a sink endpoint via aux buffer
+ *
+ * The value of "some" is up to the implementation.
+ *
+ * @param  source  Pointer of Source instance to read from
+ * @param  sink    Pointer of Sink instance to write to
+ * @param  b       Pointer to ByteBuffer instance to use as auxiliary buffer
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was transferred.
+ * @sideeffects The procedure moves data from source to sink; with most real
+ *              world implementations of those, that means IO, which is a side
+ *              effect.
+ */
 ssize_t
 sts_some_aux(Source *source, Sink *sink, ByteBuffer *b)
 {
     trace();
     byte_buffer_reset(b);
     void *buf = b->data + b->offset;
+    /* This is the "implementation" mentioned in the API documentation. We are
+     * not making this information part of that documentation, since it might
+     * change. Currently the amount of data transferred is minimum of the data
+     * available in th e source and the size of the auxiliary buffer. Also, any
+     * effect of the _get…_atmost() function may reduce this. */
     const size_t n = byte_buffer_avail(b);
     const ssize_t rc = source_get_chunk_atmost(source, buf, n);
-    return (rc == 0)
-        ? -ENODATA : (rc < 0)
-        ? rc : sink_put_chunk(sink, buf, rc);
+    return (rc == 0) ? -ENODATA
+        : (rc < 0) ? rc
+        : sink_put_chunk(sink, buf, rc);
 }
 
+/**
+ * Transfer a limited amount of date from a source to a sink via aux buffer
+ *
+ * This is similar to sts_some_aux(), but allows for an additional limit to
+ * imposed on the transfer.
+ *
+ * @param  source  Pointer of Source instance to read from
+ * @param  sink    Pointer of Sink instance to write to
+ * @param  b       Pointer to ByteBuffer instance to use as auxiliary buffer
+ * @param  n       Limit for the amount of data being transferred
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was transferred.
+ * @sideeffects The procedure moves data from source to sink; with most real
+ *              world implementations of those, that means IO, which is a side
+ *              effect.
+ */
 ssize_t
 sts_atmost_aux(Source *source, Sink *sink, ByteBuffer *b, const size_t n)
 {
     trace();
+    /* Here, we make a copy of the provided auxiliary buffer, to be able to
+     * artificially limit its size to n. If its size is less than or equal to
+     * n, the we don't have to do anything, because sts_some_aux() will already
+     * do the correct limiting for the promise of this API to be true. */
     ByteBuffer buffer;
     memcpy(&buffer, b, sizeof(*b));
     if (buffer.size > n) {
@@ -523,6 +932,23 @@ sts_atmost_aux(Source *source, Sink *sink, ByteBuffer *b, const size_t n)
     return sts_some_aux(source, sink, &buffer);
 }
 
+/**
+ * Transfer a fixed amount of data from a source to a sink via aux buffer
+ *
+ * This repeatedly calls sts_atmost_aux() until the desired amount of data
+ * was transferred.
+ *
+ * @param  source  Pointer of Source instance to read from
+ * @param  sink    Pointer of Sink instance to write to
+ * @param  b       Pointer to ByteBuffer instance to use as auxiliary buffer
+ * @param  n       Exact amount of data being transferred
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was transferred.
+ * @sideeffects The procedure moves data from source to sink; with most real
+ *              world implementations of those, that means IO, which is a side
+ *              effect.
+ */
 ssize_t
 sts_n_aux(Source *source, Sink *sink, ByteBuffer *b, const size_t n)
 {
@@ -541,6 +967,22 @@ sts_n_aux(Source *source, Sink *sink, ByteBuffer *b, const size_t n)
     return n;
 }
 
+/**
+ * Transfer all data from a source into a sink via auxiliary buffer
+ *
+ * This procedure transfers data from "source" to "sink" until the source runs
+ * out of data. Transfers are conducted through the auxiliary buffer provided.
+ *
+ * @param  source  Pointer of Source instance to read from
+ * @param  sink    Pointer of Sink instance to write to
+ * @param  b       Pointer to ByteBuffer instance to use as auxiliary buffer
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was transferred.
+ * @sideeffects The procedure moves data from source to sink; with most real
+ *              world implementations of those, that means IO, which is a side
+ *              effect.
+ */
 ssize_t
 sts_drain_aux(Source *source, Sink *sink, ByteBuffer *b)
 {
@@ -564,6 +1006,23 @@ sts_drain_aux(Source *source, Sink *sink, ByteBuffer *b)
     return acc;
 }
 
+/**
+ * Transfer a character from source to sink
+ *
+ * This works with any source or sink, and does not require any additional
+ * memory (like another buffer). However, transfering data like this has a
+ * large overhead, and should only be used in places that can allow for this to
+ * be the case.
+ *
+ * @param  source  Pointer of Source instance to read from
+ * @param  sink    Pointer of Sink instance to write to
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was transferred.
+ * @sideeffects The procedure moves data from source to sink; with most real
+ *              world implementations of those, that means IO, which is a side
+ *              effect.
+ */
 ssize_t
 sts_cbc(Source *source, Sink *sink)
 {
@@ -578,6 +1037,22 @@ sts_cbc(Source *source, Sink *sink)
     return sink_put_octet(sink, buf);
 }
 
+/**
+ * Transfer a fixed amount of data from source to sink by character
+ *
+ * This uses sts_cbc() to transfer a fixed amount of data. See that function
+ * for considerations regarding the function's runtime overhead.
+ *
+ * @param  source  Pointer of Source instance to read from
+ * @param  sink    Pointer of Sink instance to write to
+ * @param  n       Exact amount of data being transferred
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was transferred.
+ * @sideeffects The procedure moves data from source to sink; with most real
+ *              world implementations of those, that means IO, which is a side
+ *              effect.
+ */
 ssize_t
 sts_n_cbc(Source *source, Sink *sink, const size_t n)
 {
@@ -592,6 +1067,51 @@ sts_n_cbc(Source *source, Sink *sink, const size_t n)
     return n;
 }
 
+/**
+ * Transfer a limited amount of data data from source to sink by character
+ *
+ * This uses sts_cbc() to transfer a limited amount of data. See that function
+ * for considerations regarding the function's runtime overhead.
+ *
+ * @param  source  Pointer of Source instance to read from
+ * @param  sink    Pointer of Sink instance to write to
+ * @param  n       Limit for the amount of data being transferred
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was transferred.
+ * @sideeffects The procedure moves data from source to sink; with most real
+ *              world implementations of those, that means IO, which is a side
+ *              effect.
+ */
+ssize_t
+sts_atmost_cbc(Source *source, Sink *sink, const size_t n)
+{
+    trace();
+    for (size_t i = 0u; i < n; ++i) {
+        const ssize_t rc = sts_cbc(source, sink);
+        if (rc <= 0) {
+            return (i == 0) ? rc : (ssize_t)i;
+        }
+    }
+
+    return n;
+}
+
+/**
+ * Transfer all data from a source into a sink by character
+ *
+ * This uses sts_cbc() to transfer all data from a source into a sink. See that
+ * function for considerations regarding the function's runtime overhead.
+ *
+ * @param  source  Pointer of Source instance to read from
+ * @param  sink    Pointer of Sink instance to write to
+ *
+ * @return Negative values use -errno to encode errors; other values indicate
+ *         the amount of data that was transferred.
+ * @sideeffects The procedure moves data from source to sink; with most real
+ *              world implementations of those, that means IO, which is a side
+ *              effect.
+ */
 ssize_t
 sts_drain_cbc(Source *source, Sink *sink)
 {

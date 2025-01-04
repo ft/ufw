@@ -22,7 +22,7 @@ struct epr_data {
     .retries = 0u }
 
 static void
-retry_init(UNUSED DataKind kind, struct ufw_ep_retry *epr)
+retry_init(struct ufw_ep_retry *epr)
 {
     struct epr_data *data = epr->data;
     printf("# %s: do_init: %s\n", __func__,
@@ -34,7 +34,7 @@ retry_init(UNUSED DataKind kind, struct ufw_ep_retry *epr)
 }
 
 static ssize_t
-retry_run(UNUSED DataKind kind, UNUSED void *drv, void *vdata, ssize_t rc)
+retry_run(UNUSED void *drv, void *vdata, ssize_t rc)
 {
     struct epr_data *data = vdata;
     printf("# %s: do_init: %u++ retries: %u\n",

@@ -61,8 +61,8 @@ typedef ByteBuffer (*SinkGetBuffer)(Sink*);
 typedef ByteBuffer (*SourceGetBuffer)(Source*);
 
 struct ufw_ep_retry;
-typedef void (*EndpointRetryInit)(DataKind, struct ufw_ep_retry*);
-typedef ssize_t (*EndpointRetry)(DataKind, void*, void*, ssize_t);
+typedef void (*EndpointRetryInit)(struct ufw_ep_retry*);
+typedef ssize_t (*EndpointRetry)(void*, void*, ssize_t);
 
 struct ufw_ep_retry {
     EndpointRetryInit init;
@@ -164,6 +164,7 @@ ssize_t sts_drain_aux(Source*, Sink*, ByteBuffer*);
 
 /* Character-by-Character Plumbing */
 ssize_t sts_cbc(Source*, Sink*);
+ssize_t sts_atmost_cbc(Source*, Sink*, size_t);
 ssize_t sts_n_cbc(Source*, Sink*, size_t);
 ssize_t sts_drain_cbc(Source*, Sink*);
 
