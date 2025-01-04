@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Copyright (c) 2024-2025 ufw workers, All rights reserved.
+#
+# Terms for redistribution and use can be found in LICENCE.
+
 # This runs many tests with ufw, that previously were done manually upon re-
 # lease, to make sure no unforseen issues crept in. This obviously runs the
 # full range of builds (which depends on mmh configuration), but also checks
@@ -147,12 +151,14 @@ check_prg abi-dumper
 check_prg awk
 check_prg cmake
 check_prg ctags
+check_prg date
 check_prg gcovr
 check_prg git
 check_prg gzip
 check_prg make
 check_prg mmh
 check_prg ninja
+check_prg perl
 check_prg prove
 check_prg qemu-system-arm
 check_prg sed
@@ -306,6 +312,9 @@ printf '\n'
 printf '\n'
 ./tools/check-meta-h.sh || bad check-meta-h-file
 
+printf '\n'
+./tools/check-copyright.sh || bad check-copyright
+
 # Summarise test results ######################################################
 
 return_value=0
@@ -379,6 +388,16 @@ EOF
     already bumped to the intended next version tag during development. In that
     case, the issue  will be resolved when  the new tag is put  into place. But
     make sure the situation is correct before pushing to public repositories!
+
+EOF
+        ;;
+        check-copyright)
+            cat <<EOF
+
+    The release-tests  detected issues with  copyright notices in at  least one
+    file. All files that need it should  have a copyright notice, that is up to
+    date. At  the very  latest this has  to be the  case upon  release. Earlier
+    would better, of course.
 
 EOF
         ;;
