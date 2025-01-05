@@ -115,7 +115,7 @@ git_start_date () {
     REPLY=$(git log --diff-filter=A  \
                     --follow         \
                     --date=format:%Y \
-                    --format=%cd     \
+                    --format=%ad     \
                     --  "$__filename__" | tail -n1)
 }
 
