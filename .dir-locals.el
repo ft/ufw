@@ -1,5 +1,5 @@
 ((nil
-  (meta:project-author  . "micro framework workers")
+  (meta:project-author  . "ufw workers")
   (meta:project-licence . "LICENCE")
   (meta:project-code "include"
                      "src"
