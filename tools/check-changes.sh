@@ -22,7 +22,15 @@
 # Since this is part of release-tests, the top-level release tag and the local
 # master branch must point to the same commit.
 
-printf 'Checking state of CHANGES file...\n'
+esc=''
+
+label () {
+    printf '%s' "${esc}[36m"
+    printf "$@"
+    printf '%s' "${esc}[39m"
+}
+
+label 'Checking state of CHANGES file...\n'
 
 return_value=0
 verbose=0
@@ -168,5 +176,9 @@ for release in "$@"; do
     check_entry "$previous" "$current" "$date" || exit 1
     connect="$previous"
 done
+
+if [ "$return_value" -eq 0 ]; then
+    printf 'CHANGES looks consistent.\n'
+fi
 
 exit "$return_value"

@@ -9,6 +9,14 @@
 # ble. In connection with check-changes.sh, this makes sure that all fields are
 # correct at release-time. Both of these are combined in release-tests.sh.
 
+esc=''
+
+label () {
+    printf '%s' "${esc}[36m"
+    printf "$@"
+    printf '%s' "${esc}[39m"
+}
+
 release="$(git describe --always)"
 major="${release#v}"
 major="${major%%.*}"
@@ -18,8 +26,8 @@ patch="${release#*.}"
 patch="${patch#*.}"
 patch="${patch%%[!0-9]*}"
 
-printf 'Checking meta.h for major(%s), minor(%s), patchlevel(%s)...\n' \
-       "$major" "$minor" "$patch"
+label 'Checking meta.h for major(%s), minor(%s), patchlevel(%s)...\n' \
+      "$major" "$minor" "$patch"
 
 rematch () {
     expr "$1" : "$2" > /dev/null
@@ -78,5 +86,9 @@ done < include/ufw/meta.h
 count MAJOR "$maj"
 count MINOR "$min"
 count PATCH "$pat"
+
+if [ "$return_value" -eq 0 ]; then
+    printf 'ufw/meta.h looks consistent.\n'
+fi
 
 exit "$return_value"

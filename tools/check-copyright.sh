@@ -279,8 +279,16 @@ check_file () {
 current=$(git describe --always)
 latest=$(git describe --always --abbrev=0)
 
+esc=''
+
+label () {
+    printf '%s' "${esc}[36m"
+    printf "$@"
+    printf '%s' "${esc}[39m"
+}
+
 if [ "$mode" = check ]; then
-    printf 'Checking copyright notices in codebase...\n'
+    label 'Checking copyright notices in codebase...\n'
     if [ "$current" = "$latest" ]; then
         tag_year "$current"
         endyear="$REPLY"
@@ -321,5 +329,9 @@ for file in "$@"; do
         ;;
     esac
 done
+
+if [ "$mode" = check ] && [ "$rc" -eq 0 ]; then
+    printf 'Copyright notices are consistent.\n'
+fi
 
 exit "$rc"

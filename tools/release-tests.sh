@@ -10,6 +10,14 @@
 # ABI/API compatibility, as well as updates to ufw/meta.h and CHANGES, among
 # other tests as well.
 
+esc=''
+
+label () {
+    printf '%s' "${esc}[36m"
+    printf "$@"
+    printf '%s' "${esc}[39m"
+}
+
 fail () {
     printf 'FATAL: Stage %s did not succeed.\n' "$1"
     exit 1
@@ -284,15 +292,15 @@ if [ "$top_level_command" = quick ]; then
     set -- "$@" --config tools/quick.yaml
 fi
 
-printf '\nRelease build...\n'
+label '\nRelease build...\n'
 mmh "$@"
 mmh --quiet result --short release.log  || bad mmh-release-build
 mmh --quiet result --report release.log || bad mmh-release-warnings
-printf '\nZephyr module build...\n'
+label '\nZephyr module build...\n'
 (cd test/module && prove -v -c run)     || bad zephyr-module-build
-printf '\nVCS integration tests...\n'
+label '\nVCS integration tests...\n'
 (cd test/vcs    && prove -c t/*.t)      || bad vcs-integration
-printf '\nTest coverage build...\n'
+label '\nTest coverage build...\n'
 ./tools/coverage-build.sh               || bad test-coverage-build
 
 if [ -n "$previous_version" ]; then
@@ -301,7 +309,7 @@ else
     set --
 fi
 
-printf '\nABI/API compatibility test build...\n'
+label '\nABI/API compatibility test build...\n'
 ./tools/compat-build.sh "$@"           || {
     printf 'Warning: ABI/API compatibility may be broken!\n'
     bad library-abi-api-compatibility
