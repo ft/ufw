@@ -852,7 +852,6 @@ FILE_PATTERNS          = *.c \
                          *.f08 \
                          *.f \
                          *.for \
-                         *.tcl \
                          *.vhd \
                          *.vhdl \
                          *.ucf \
