@@ -5,7 +5,7 @@
  */
 
 /**
- * @addtogroup protocols Protocols
+ * @addtogroup protoslip Serial Line IP (SLIP)
  * @{
  */
 

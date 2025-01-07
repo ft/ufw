@@ -8,7 +8,7 @@
 #define INC_UFW_RFC1055_H
 
 /**
- * @addtogroup protocols Protocols
+ * @addtogroup protoslip Serial Line IP (SLIP)
  * @{
  */
 

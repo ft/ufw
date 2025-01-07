@@ -9,7 +9,7 @@
 #define INC_UFW_SX_H_8528c541
 
 /**
- * @addtogroup protocols Protocols
+ * @addtogroup protosexp Simple S-Expression Parser
  * @{
  */
 

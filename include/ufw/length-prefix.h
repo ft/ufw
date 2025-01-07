@@ -5,7 +5,7 @@
  */
 
 /**
- * @addtogroup protocols Protocols
+ * @addtogroup protolenp Length Prefix Framing
  * @{
  */
 

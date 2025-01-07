@@ -5,7 +5,7 @@
  */
 
 /**
- * @addtogroup protocols Protocols
+ * @addtogroup varint Variable Length Integers
  * @{
  */
 

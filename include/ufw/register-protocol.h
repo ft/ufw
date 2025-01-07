@@ -8,7 +8,7 @@
 #define INC_UFW_REGISTER_PROTOCOL_H_3d84e123
 
 /**
- * @addtogroup protocols Protocols
+ * @addtogroup protoregp Simple Register Protocol
  * @{
  */
 

@@ -6,7 +6,7 @@
  */
 
 /**
- * @addtogroup protocols Protocols
+ * @addtogroup protosexp Simple S-Expression Parser
  * @{
  */
 

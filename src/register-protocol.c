@@ -5,7 +5,7 @@
  */
 
 /**
- * @addtogroup protocols Protocols
+ * @addtogroup protoregp Simple Register Protocol
  * @{
  */
 

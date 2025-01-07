@@ -5,6 +5,11 @@
  */
 
 /**
+ * @addtogroup protolenp Length Prefix Framing
+ * @{
+ */
+
+/**
  * @file length-prefix.c
  * @brief Length prefix framing implementation
  *
@@ -390,3 +395,7 @@ flenp_decode_source_to_sink(const LengthPrefixKind k,
 
     return sts_n(source, sink, len);
 }
+
+/**
+ * @}
+ */
