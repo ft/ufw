@@ -64,12 +64,21 @@ void block_free(BlockAllocator*, void*);
       .alloc.slab = (_alloc),                                    \
       .free = (_free) }
 
-#define MAKE_STDHEAD_BLOCKALLOC(_blocksize) \
+#define MAKE_STDHEAP_BLOCKALLOC(_blocksize) \
     { .type = UFW_ALLOC_GENERIC,            \
       .blocksize = (_blocksize),            \
       .driver = NULL,                       \
       .alloc.generic = ufw_malloc,          \
       .free = ufw_mfree }
+
+/*
+ * This is for backward compatibility. Previously there only was the STDHEAD
+ * variant. However, this is due to a typo "HEAD vs. HEAP". In case users
+ * already started using this, we add both names.
+ *
+ * This will be removed in ufw 7.0.0
+ */
+#define MAKE_STDHEAD_BLOCKALLOC(_blocksize) MAKE_STDHEAP_BLOCKALLOC(_blocksize)
 
 #ifdef __cplusplus
 }

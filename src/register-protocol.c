@@ -464,7 +464,7 @@ range_end(const RPRange *b)
  */
 
 BlockAllocator rp_default_allocator =
-    MAKE_STDHEAD_BLOCKALLOC(RP_DEFAULT_BUFFER_SIZE);
+    MAKE_STDHEAP_BLOCKALLOC(RP_DEFAULT_BUFFER_SIZE);
 
 RPBlockAccess
 regp_void_read16(uint32_t address,
