@@ -39,8 +39,9 @@ div.contents {
 }
 
 div.fragment {
-    width: 48em;
+    width: 52em;
     margin-right: auto;
+    margin-left: -2em;
 }
 
 .github-corner svg {
