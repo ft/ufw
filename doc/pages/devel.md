@@ -2,6 +2,24 @@
 
 TBD.
 
+
+## MakeMeHappy Module Support {#develmmh}
+
+The `mmh` build program uses some of `ufw`'s CMake modules to perform its job.
+In other words, if you would like to use `mmh` for build orchestration, you
+must depend on `ufw`. It is not required to link against any of the `ufw`
+libraries, but some of the CMake modules are non-optional. On top of this,
+`mmh` has support for running modular builds. For this to work, modules need to
+specify their features and requirements. The file to perform this specification
+is `module.yaml`, which needs to exist in a software module's root directory.
+`ufw` is such a module. It is a also a leaf-node in dependency graphs (i.e. it
+does not have any additional dependencies). Next to the `ufw` C library, the
+module specification lists CMake modules, and toolchains, and extensions.
+
+As such, `ufw` can serve as a foundational piece for modularised software
+builds. That is libraries, applications, as well as Zephyr applications.
+
+
 ## Fuzz-Testing for ufw {#develfuzz}
 
 ### Introduction
