@@ -4,6 +4,14 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
+#ifndef INC_UFW_UFW_MATH_CONSTANTS_H
+#define INC_UFW_UFW_MATH_CONSTANTS_H
+
+/**
+ * @addtogroup compat Compatibility Layer
+ * @{
+ */
+
 /**
  * @file errno.h
  * @brief Compatibility layer for POSIX error numbers
@@ -18,9 +26,6 @@
  * __cplusplus note: This file is macro-only, so we don't need the extern C
  * block in this header.
  */
-
-#ifndef INC_UFW_UFW_MATH_CONSTANTS_H
-#define INC_UFW_UFW_MATH_CONSTANTS_H
 
 #include <errno.h>
 
@@ -80,5 +85,9 @@
 #ifndef ERANGE
 #define ERANGE      (UFW_PRIVATE_ERRNO_OFFSET + 12)
 #endif /* ERANGE */
+
+/**
+ * @}
+ */
 
 #endif /* INC_UFW_UFW_MATH_CONSTANTS_H */

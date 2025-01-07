@@ -5,6 +5,11 @@
  */
 
 /**
+ * @addtogroup output Output Utilities
+ * @{
+ */
+
+/**
  * @file hexdump.h
  * @brief Memory dumper in the style of the hexdump(1) utility
  */
@@ -38,3 +43,7 @@ int hexdump_stderr(const void*, size_t, size_t);
 #endif /* __cplusplus */
 
 #endif /* INC_UFW_HEXDUMP_H_998d0241 */
+
+/**
+ * @}
+ */

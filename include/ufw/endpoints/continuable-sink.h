@@ -4,6 +4,14 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
+#ifndef INC_UFW_ENDPOINTS_CONTINUABLE_SINK_H_11229582
+#define INC_UFW_ENDPOINTS_CONTINUABLE_SINK_H_11229582
+
+/**
+ * @addtogroup endpoints Endpoints
+ * @{
+ */
+
 /**
  * @file continuable-sink.h
  * @brief API for continuable sinks
@@ -34,9 +42,6 @@
  * buffer. If that is also not provided, the sink basically behaves like
  * the trivial "null" sink (see ufw/endpoints.h for details).
  */
-
-#ifndef INC_UFW_ENDPOINTS_CONTINUABLE_SINK_H_11229582
-#define INC_UFW_ENDPOINTS_CONTINUABLE_SINK_H_11229582
 
 #include <stddef.h>
 #include <stdint.h>
@@ -102,5 +107,9 @@ void continuable_sink_init(Sink*, ContinuableSink*);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+/**
+ * @}
+ */
 
 #endif /* INC_UFW_ENDPOINTS_CONTINUABLE_SINK_H_11229582 */

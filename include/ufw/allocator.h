@@ -7,6 +7,16 @@
 #ifndef INC_UFW_ALLOCATOR_H_3ff7ef48
 #define INC_UFW_ALLOCATOR_H_3ff7ef48
 
+/**
+ * @addtogroup blockallocator Block Allocator Abstraction
+ * @{
+ */
+
+/**
+ * @file allocator.h
+ * @brief Block Allocator API
+ */
+
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -64,5 +74,9 @@ void block_free(BlockAllocator*, void*);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+/**
+ * @}
+ */
 
 #endif /* INC_UFW_ALLOCATOR_H_3ff7ef48 */

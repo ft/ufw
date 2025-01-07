@@ -8,6 +8,16 @@
 #ifndef INC_UFW_SX_H_8528c541
 #define INC_UFW_SX_H_8528c541
 
+/**
+ * @addtogroup protocols Protocols
+ * @{
+ */
+
+/**
+ * @file sx.h
+ * @brief Simple S-Expression Parser API
+ */
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

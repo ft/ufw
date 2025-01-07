@@ -5,6 +5,11 @@
  */
 
 /**
+ * @addtogroup endpoints Endpoints
+ * @{
+ */
+
+/**
  * @file endpoints/trivial.c
  * @brief Sources and sinks that are very simple to implement
  *
@@ -40,3 +45,7 @@ run_source_empty(UNUSED void *driver, UNUSED void *data, UNUSED size_t n)
 Source source_empty = CHUNK_SOURCE_INIT(run_source_empty, NULL);
 Source source_zero  = CHUNK_SOURCE_INIT(run_source_zero,  NULL);
 Sink   sink_null    = CHUNK_SINK_INIT(  run_sink_null,    NULL);
+
+/**
+ * @}
+ */

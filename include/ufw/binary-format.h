@@ -7,7 +7,7 @@
  */
 
 /**
- * @addtogroup binformat Binary Format Access
+ * @addtogroup binformat Binary Format Conversion
  * @{
  */
 

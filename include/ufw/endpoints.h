@@ -7,6 +7,16 @@
 #ifndef INC_UFW_SOURCES_AND_SINKS_H
 #define INC_UFW_SOURCES_AND_SINKS_H
 
+/**
+ * @addtogroup endpoints Endpoints
+ * @{
+ */
+
+/**
+ * @file endpoints.h
+ * @brief Endpoints API
+ */
+
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -274,5 +284,9 @@ instrumentable_chunksize(InstrumentableBuffer *b, const size_t n)
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+/**
+ * @}
+ */
 
 #endif /* INC_UFW_SOURCES_AND_SINKS_H */

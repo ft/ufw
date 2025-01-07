@@ -4,6 +4,16 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
+/**
+ * @addtogroup testing Unit Testing Framework
+ * @{
+ */
+
+/**
+ * @file output-utils.c
+ * @brief Output utilities for testing framework
+ */
+
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdint.h>
@@ -103,3 +113,7 @@ define_printer(s64,  int64_t) { printer_body(PRId64, PRIx64, 16, PRIo64, 22); }
 unsupported(u64, uint64_t) { unsupported_body(uint64_t); }
 unsupported(s64,  int64_t) { unsupported_body( int64_t); }
 #endif /* defined(PRId64) && defined(PRIx64) && defined (PRIo64) */
+
+/**
+ * @}
+ */

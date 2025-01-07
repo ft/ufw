@@ -4,6 +4,16 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
+/**
+ * @addtogroup protocols Protocols
+ * @{
+ */
+
+/**
+ * @file register-protocol.c
+ * @brief Simple Register Protocol API
+ */
+
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>
@@ -1155,3 +1165,7 @@ regp_empty_intersection(const RPRange *intersect)
 {
     return (intersect->size > 0);
 }
+
+/**
+ * @}
+ */

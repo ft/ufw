@@ -5,6 +5,11 @@
  */
 
 /**
+ * @addtogroup endpoints Endpoints
+ * @{
+ */
+
+/**
  * @file endpoints/buffer.c
  * @brief Sources and sinks interfacing byte buffer.
  */
@@ -75,3 +80,7 @@ sink_to_buffer(Sink *instance, ByteBuffer *buffer)
 {
     chunk_sink_init(instance, write_to_buffer, buffer);
 }
+
+/**
+ * @}
+ */

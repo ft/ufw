@@ -5,6 +5,11 @@
  */
 
 /**
+ * @addtogroup endpoints Endpoints
+ * @{
+ */
+
+/**
  * @file endpoints/core.c
  * @brief Implementation of a Sink and Source abstraction
  *
@@ -1172,3 +1177,7 @@ sts_drain_cbc(Source *source, Sink *sink)
 
     return rc;
 }
+
+/**
+ * @}
+ */

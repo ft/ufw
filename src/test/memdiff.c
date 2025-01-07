@@ -5,6 +5,11 @@
  */
 
 /**
+ * @addtogroup testing Unit Testing Framework
+ * @{
+ */
+
+/**
  * @file memdiff.c
  * @brief Hexdump-like memory diffing utility
  *
@@ -418,3 +423,7 @@ memdiff(const void *a, const void *b, size_t n)
 
     return diff.count;
 }
+
+/**
+ * @}
+ */

@@ -21,6 +21,11 @@ extern "C" {
  * @{
  */
 
+/**
+ * @file ring-buffer-iter.h
+ * @brief Interators for ringbuffers from `ring-buffer.h`.
+ */
+
 typedef enum {
     RING_BUFFER_ITER_OLD_TO_NEW,
     RING_BUFFER_ITER_NEW_TO_OLD

@@ -6,7 +6,12 @@
  */
 
 /**
- * @file sx-parser.c
+ * @addtogroup protocols Protocols
+ * @{
+ */
+
+/**
+ * @file sx.c
  * @brief Simple S-Expression Parser
  *
  * This module implements an S-Expression parser, for use in instrumentation
@@ -513,3 +518,7 @@ sx_cons(struct sx_node *car, struct sx_node *cdr)
     cons->data.pair->cdr = cdr;
     return cons;
 }
+
+/**
+ * @}
+ */

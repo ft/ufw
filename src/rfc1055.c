@@ -5,6 +5,11 @@
  */
 
 /**
+ * @addtogroup protocols Protocols
+ * @{
+ */
+
+/**
  * @file rfc1055.c
  * @brief RFC1055: Transmission of IP Datagrams over Serial Lines: SLIP
  *
@@ -242,3 +247,7 @@ rfc1055_decode(RFC1055Context *ctx, Source *source, Sink *sink)
 
     /* NOTREACHED */
 }
+
+/**
+ * @}
+ */

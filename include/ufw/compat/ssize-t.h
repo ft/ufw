@@ -4,6 +4,14 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
+#ifndef INC_UFW_UFW_COMPAT_SSIZE_T_H
+#define INC_UFW_UFW_COMPAT_SSIZE_T_H
+
+/**
+ * @addtogroup compat Compatibility Layer
+ * @{
+ */
+
 /**
  * @file ssize-t.h
  * @brief Compatibility layer for ssize_t
@@ -11,9 +19,6 @@
  * Provide ssize_t for toolchains/targets that do not support it by
  * implementing <sys/types.h>.
  */
-
-#ifndef INC_UFW_UFW_COMPAT_SSIZE_T_H
-#define INC_UFW_UFW_COMPAT_SSIZE_T_H
 
 #include <ufw/toolchain.h>
 
@@ -66,5 +71,9 @@ typedef long int ssize_t;
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+/**
+ * @}
+ */
 
 #endif /* INC_UFW_UFW_COMPAT_SSIZE_T_H */

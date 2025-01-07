@@ -5,6 +5,11 @@
  */
 
 /**
+ * @addtogroup endpoints Endpoints
+ * @{
+ */
+
+/**
  * @file endpoints/instrumentable.c
  * @brief Sources and sinks that can be instrumented for testing purposes.
  *
@@ -288,3 +293,7 @@ instrumentable_reset_stats(InstrumentableAccessStats *s)
     s->accesses = 0u;
     s->bytes= 0u;
 }
+
+/**
+ * @}
+ */

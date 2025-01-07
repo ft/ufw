@@ -7,6 +7,16 @@
 #ifndef INC_UFW_RFC1055_H
 #define INC_UFW_RFC1055_H
 
+/**
+ * @addtogroup protocols Protocols
+ * @{
+ */
+
+/**
+ * @file rfc1055.h
+ * @brief RFC1055: Transmission of IP Datagrams over Serial Lines: SLIP
+ */
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -48,5 +58,9 @@ int rfc1055_decode(RFC1055Context*, Source*, Sink*);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+/**
+ * @}
+ */
 
 #endif /* INC_UFW_RFC1055_H */

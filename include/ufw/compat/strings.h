@@ -4,6 +4,14 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
+#ifndef INC_UFW_UFW_COMPAT_STRINGS_H
+#define INC_UFW_UFW_COMPAT_STRINGS_H
+
+/**
+ * @addtogroup compat Compatibility Layer
+ * @{
+ */
+
 /**
  * @file strings.h
  * @brief Compatibility header for bsd-ish extensions to string library
@@ -11,9 +19,6 @@
  * Declare OpenBSD style string operation if configuration couldn't find them
  * in the system's std-c lib.
  */
-
-#ifndef INC_UFW_UFW_COMPAT_STRINGS_H
-#define INC_UFW_UFW_COMPAT_STRINGS_H
 
 #include <stddef.h>
 #include <string.h>
@@ -38,5 +43,9 @@ size_t strnlen(const char *, size_t);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+/**
+ * @}
+ */
 
 #endif /* INC_UFW_UFW_COMPAT_STRINGS_H */

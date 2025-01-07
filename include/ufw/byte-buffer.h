@@ -7,6 +7,16 @@
 #ifndef INC_UFW_BYTE_BUFFER_H
 #define INC_UFW_BYTE_BUFFER_H
 
+/**
+ * @addtogroup bytebuffer Byte Buffers
+ * @{
+ */
+
+/**
+ * @file byte-buffer.h
+ * @brief Byte Buffer API
+ */
+
 #include <stddef.h>
 
 #include <ufw/compat/ssize-t.h>
@@ -76,5 +86,9 @@ size_t byte_buffer_rest(const ByteBuffer*);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+/**
+ * @}
+ */
 
 #endif /* INC_UFW_BYTE_BUFFER_H */

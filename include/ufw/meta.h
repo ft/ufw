@@ -5,6 +5,11 @@
  */
 
 /**
+ * @addtogroup meta Library Meta Information
+ * @{
+ */
+
+/**
  * @file meta.h
  * @brief Micro Framework Meta Information.
  *

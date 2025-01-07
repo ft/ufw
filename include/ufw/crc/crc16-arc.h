@@ -7,6 +7,11 @@
 #ifndef INC_UFW_CRC_CRC16_ARC_H_19c5e461
 #define INC_UFW_CRC_CRC16_ARC_H_19c5e461
 
+/**
+ * @addtogroup checksums Checksum Algorithms
+ * @{
+ */
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -25,5 +30,9 @@ uint16_t ufw_buffer_crc16_arc_u16(const uint16_t*, size_t);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+/**
+ * @}
+ */
 
 #endif /* INC_UFW_CRC_CRC16_ARC_H_19c5e461 */

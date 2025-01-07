@@ -4,6 +4,16 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
+/**
+ * @addtogroup bytebuffer Byte Buffers
+ * @{
+ */
+
+/**
+ * @file byte-buffer.c
+ * @brief Byte Buffer Implementation
+ */
+
 #include <stddef.h>
 #include <string.h>
 

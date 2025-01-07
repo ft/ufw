@@ -4,6 +4,14 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
+#ifndef INC_UFW_UFW_MATH_CONSTANTS_H
+#define INC_UFW_UFW_MATH_CONSTANTS_H
+
+/**
+ * @addtogroup compat Compatibility Layer
+ * @{
+ */
+
 /**
  * @file math-constants.h
  * @brief Compatibility layer for math constants
@@ -22,9 +30,6 @@
  * __cplusplus note: This file is macro-only, so we don't need the extern C
  * block in this header.
  */
-
-#ifndef INC_UFW_UFW_MATH_CONSTANTS_H
-#define INC_UFW_UFW_MATH_CONSTANTS_H
 
 #ifndef M_E
 /** Euler's number (e) */
@@ -90,5 +95,9 @@
 /** 1 / sqrt(2) */
 #define M_SQRT1_2 0.70710678118654752440
 #endif
+
+/**
+ * @}
+ */
 
 #endif /* INC_UFW_UFW_MATH_CONSTANTS_H */

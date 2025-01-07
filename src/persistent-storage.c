@@ -5,6 +5,11 @@
  */
 
 /**
+ * @addtogroup pstorage Persistent Storage
+ * @{
+ */
+
+/**
  * @file persistent-storage.c
  * @brief Persistent storage implementation
  */
@@ -627,3 +632,7 @@ persistent_reset(PersistentStorage *store, unsigned char item)
     }
     return persistent_writen(store, store->data.address, item, store->data.size);
 }
+
+/**
+ * @}
+ */

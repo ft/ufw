@@ -5,6 +5,11 @@
  */
 
 /**
+ * @addtogroup pstorage Persistent Storage
+ * @{
+ */
+
+/**
  * @file persistent-storage.h
  * @brief Persistent storage API
  *
@@ -165,5 +170,9 @@ PersistentAccess persistent_reset(PersistentStorage*, unsigned char);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+/**
+ * @}
+ */
 
 #endif /* INC_UFW_PERSISTENT_STORE_H */

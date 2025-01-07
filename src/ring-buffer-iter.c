@@ -14,6 +14,11 @@
  * @{
  */
 
+/**
+ * @file ring-buffer-iter.c
+ * @brief Interators for ringbuffers from `ring-buffer.h`.
+ */
+
 bool
 rb_iter_done(const rb_iter *iter)
 {

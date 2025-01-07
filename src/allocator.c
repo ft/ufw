@@ -4,6 +4,16 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
+/**
+ * @addtogroup blockallocator Block Allocator Abstraction
+ * @{
+ */
+
+/**
+ * @file allocator.c
+ * @brief Common block-allocator implementations
+ */
+
 #include <stddef.h>
 #include <stdlib.h>
 
@@ -40,3 +50,7 @@ block_free(BlockAllocator *ba, void *m)
 {
     ba->free(ba->driver, m);
 }
+
+/**
+ * @}
+ */

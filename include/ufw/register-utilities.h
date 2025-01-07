@@ -7,6 +7,16 @@
 #ifndef INC_UFW_REGISTER_UTILITIES_H
 #define INC_UFW_REGISTER_UTILITIES_H
 
+/**
+ * @addtogroup registers Register Table
+ * @{
+ */
+
+/**
+ * @file register-utilities.h
+ * @brief Register Table Utilities API
+ */
+
 #include <stdio.h>
 
 #ifdef __cplusplus
@@ -33,5 +43,9 @@ void register_set_printer(fprintf_like);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+/**
+ * @}
+ */
 
 #endif /* INC_UFW_REGISTER_UTILITIES_H */

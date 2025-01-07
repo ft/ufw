@@ -4,6 +4,16 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
+/**
+ * @addtogroup registers Register Table
+ * @{
+ */
+
+/**
+ * @file core.c
+ * @brief Register Table Implementation
+ */
+
 #include <assert.h>
 #include <ctype.h>
 #include <math.h>
@@ -1872,3 +1882,7 @@ register_get_entry(const RegisterTable *t, const RegisterHandle r)
 
     return t->entry + r;
 }
+
+/**
+ * @}
+ */

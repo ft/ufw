@@ -5,6 +5,11 @@
  */
 
 /**
+ * @addtogroup testing Unit Testing Framework
+ * @{
+ */
+
+/**
  * @file tap.c
  * @brief Minimal TAP emitting testing module
  */
@@ -117,3 +122,7 @@ ufw_test_cmp_mem(const char *file, long unsigned int line,
 
     return result;
 }
+
+/**
+ * @}
+ */

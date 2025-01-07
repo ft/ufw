@@ -5,6 +5,11 @@
  */
 
 /**
+ * @addtogroup protocols Protocols
+ * @{
+ */
+
+/**
  * @file length-prefix.h
  * @brief Length prefix framing implementation
  */
@@ -135,3 +140,7 @@ lenp_decode_source_to_sink(Source *source, Sink *sink)
 #endif /* __cplusplus */
 
 #endif /* INC_UFW_LENGTH_PREFIX_H */
+
+/**
+ * @}
+ */

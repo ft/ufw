@@ -4,6 +4,16 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
+/**
+ * @addtogroup registers Register Table
+ * @{
+ */
+
+/**
+ * @file utilities.h
+ * @brief Register Table Utilities implementation
+ */
+
 /* Needed for WITH_SYS_TYPES_H. */
 #include <ufw/toolchain.h>
 
@@ -351,3 +361,7 @@ register_validatortype_to_string(RegisterValidatorType type)
 
     return map[type];
 }
+
+/**
+ * @}
+ */

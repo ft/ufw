@@ -7,6 +7,16 @@
 #ifndef INC_UFW_REGISTER_PROTOCOL_H_3d84e123
 #define INC_UFW_REGISTER_PROTOCOL_H_3d84e123
 
+/**
+ * @addtogroup protocols Protocols
+ * @{
+ */
+
+/**
+ * @file register-protocol.h
+ * @brief Simple Register Protocol API
+ */
+
 #include <stdint.h>
 
 #include <ufw/allocator.h>
@@ -268,3 +278,7 @@ regaccess2blockaccess(const RegisterAccess access)
 #endif /* __cplusplus */
 
 #endif /* INC_UFW_REGISTER_PROTOCOL_H_3d84e123 */
+
+/**
+ * @}
+ */

@@ -5,6 +5,11 @@
  */
 
 /**
+ * @addtogroup output Output Utilities
+ * @{
+ */
+
+/**
  * @file hexdump.c
  * @brief Memory dumper in the style of the hexdump(1) utility
  */
@@ -166,3 +171,7 @@ hexdump_stderr(const void *mem, const size_t n, const size_t doffset)
     };
     return hexdump(&hd, mem, n, doffset);
 }
+
+/**
+ * @}
+ */
