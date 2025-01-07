@@ -1,4 +1,4 @@
-# Micro Framework Documentation
+# Overview
 
 The library before you is called `micro-framework`; or `μfw` for short; or —
 more commonly and to avoid the requirement for characters beyond ASCII — `ufw`.
