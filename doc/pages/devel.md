@@ -98,3 +98,18 @@ parameter are passed to the afl-runner (`afl-fuzz`) program.
 
 This cleans up build artefacts from other `run` invocations. Use the `-a`
 option to `clean` to remove fuzzer outputs as well.
+
+
+### Full Example
+
+Here is a full example, which assumes that `AFL++` is installed in
+`~/src/AFLplusplus`:
+
+```
+./run init -A ~/src/AFLplusplus
+./run fuzzer ex-regp-parse-frame
+```
+
+The final command will run `afl-fuzz` with an instrumented version of
+`examples/ex-regp-parse-frame.c` with state from `fuzz/ex-regp-parse-frame`. To
+exit the program, press `CTRL-C`.
