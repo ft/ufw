@@ -17,9 +17,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /**
- * @addtogroup ufw
- * @{
- * @addtogroup ringbuffer
+ * @addtogroup ringbuffer Ringbuffer
  * @{
  */
 
@@ -88,7 +86,6 @@ size_t rb_iter_advance(rb_iter *);
     }
 
 /**
- * @}
  * @}
  */
 

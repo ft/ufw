@@ -8,9 +8,7 @@
 #define INC_UFW_CONVOLUTION_LOW_PASS_H
 
 /**
- * @addtogroup ufw
- * @{
- * @addtogroup convolution low pass filters
+ * @addtogroup clpfilter Convolution Low Pass Filters
  * @{
  */
 
@@ -135,7 +133,6 @@
     }
 
 /**
- * @}
  * @}
  */
 

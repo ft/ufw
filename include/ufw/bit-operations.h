@@ -18,9 +18,7 @@
 #include <limits.h>
 
 /**
- * @addtogroup ufw
- * @{
- * @addtogroup bit-operations
+ * @addtogroup bitops Bit Operations
  * @{
  */
 
@@ -359,7 +357,6 @@
 #define BIT_TOGGLE(container, mask) ((container) ^= (mask))
 
 /**
- * @}
  * @}
  */
 

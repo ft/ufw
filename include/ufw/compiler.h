@@ -18,9 +18,7 @@
 #include <ufw/toolchain.h>
 
 /**
- * @addtogroup ufw
- * @{
- * @addtogroup compiler
+ * @addtogroup compiler Compiler Features
  * @{
  */
 
@@ -248,7 +246,6 @@
 #endif /* HAVE_COMPILER_ATTRIBUTE_DEPRECATED */
 
 /**
- * @}
  * @}
  */
 

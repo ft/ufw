@@ -8,9 +8,7 @@
 #define INC_UFW_RING_BUFFER_H
 
 /**
- * @addtogroup ufw
- * @{
- * @addtogroup ringbuffer
+ * @addtogroup ringbuffer Ringbuffer
  * @{
  */
 
@@ -188,7 +186,6 @@
     }
 
 /**
- * @}
  * @}
  */
 

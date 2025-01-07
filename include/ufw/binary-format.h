@@ -7,6 +7,11 @@
  */
 
 /**
+ * @addtogroup binformat Binary Format Access
+ * @{
+ */
+
+/**
  * @file binary-format.h
  * @brief Binary format conversion API
  *
@@ -2892,5 +2897,9 @@ bf_inrange_s56(const int64_t value)
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+/**
+ * @}
+ */
 
 #endif /* INC_UFW_BINARY_FORMAT_H */

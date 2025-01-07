@@ -10,9 +10,7 @@
 #include "ufw/ring-buffer-iter.h"
 
 /**
- * @addtogroup ufw
- * @{
- * @addtogroup ringbuffer
+ * @addtogroup ringbuffer Ringbuffer
  * @{
  */
 
@@ -43,6 +41,5 @@ rb_iter_advance(rb_iter *iter)
 }
 
 /**
- * @}
  * @}
  */
