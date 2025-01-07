@@ -21,6 +21,9 @@ as well. In addition to this, `ufw` also supports running test-suites for
 foreign architectures via [QEMU](https://www.qemu.org), using custom startup
 code in some cases (such as for the `cortex-m3` architecture).
 
+
+## Building the Library
+
 For convenient cross-compilation of the library, the use of its companion tool
 `mmh` (short for [MakeMeHappy](https://github.com/ft/makemehappy)) is advised.
 This is not a strict requirement. The library can be build via CMake alone
@@ -79,3 +82,27 @@ Zephyr's build-system, in which the library can be used as a Zephyr-module, as
 which it fully integrates with Zephyr's configuration and build flags. And
 while it is possible to build `ufw` standalone alongside Zephyr, it is
 recommended to use it as a Zephyr-module when building a Zephyr application.
+
+
+## Library Pieces
+
+The `ufw` library is really a set of multiple libraries:
+
+- `ufw` — This is the core library containing most of its features, all of them
+  intended for production purposes, unless marked experimental otherwise.
+- `ufw-sx` — This part contains the "Simple S-Expression Parser" feature. It is
+  mostly meant for automatic system integration tests. This library uses
+  `malloc()`, which makes it unusable for many embedded purposes.
+- `ufw-tap` — This part contains the Test Anything Protocol emitting testing
+  framework. This is meant for testing purposes. It uses variable argument
+  lists.
+
+With `native` targets, the system also builds `-nosan` versions of all these
+libraries, which disable compiler sanitizers, whereas the default builds enable
+them whenever available.
+
+Note that there is also a dynamic library (`libufw-full.so`), that is build
+with `native` targets. This is only built for running ABI/API compatibility
+tests. This library is **NOT** intended for normal use, but for this
+maintenance task only. Users should stick to the static libraries mentioned
+above. The dynamic library is not supported.
