@@ -2,7 +2,7 @@
 
 TBD.
 
-## Fuzz-testing for ufw {#develfuzz}
+## Fuzz-Testing for ufw {#develfuzz}
 
 ### Introduction
 
