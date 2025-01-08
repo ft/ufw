@@ -6,6 +6,7 @@
 
 /**
  * @addtogroup endpoints Endpoints
+ * @{
  *
  * @file endpoints/instrumentable.c
  * @brief Sources and sinks that can be instrumented for testing purposes.
