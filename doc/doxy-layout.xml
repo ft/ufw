@@ -41,7 +41,7 @@
     <!--
     <tab type="files" visible="yes" title="">
     -->
-      <tab type="filelist" visible="yes" title="" intro=""/>
+      <tab type="filelist" visible="yes" title="C Library File List" intro=""/>
     <!--
       <tab type="globals" visible="yes" title="" intro=""/>
     </tab>
