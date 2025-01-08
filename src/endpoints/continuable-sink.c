@@ -14,6 +14,10 @@
  * @brief Implementation for continuable sinks
  */
 
+/**
+ * @}
+ */
+
 #include <ufw/allocator.h>
 #include <ufw/compat/errno.h>
 #include <ufw/endpoints.h>
@@ -104,7 +108,3 @@ continuable_sink_init(Sink *instance, ContinuableSink *driver)
     driver->error.datacount = 0u;
     chunk_sink_init(instance, run_continuable_sink, driver);
 }
-
-/**
- * @}
- */

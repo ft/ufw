@@ -9,12 +9,76 @@
 
 /**
  * @addtogroup endpoints Endpoints
+ *
+ * Abstraction for generic source and sink endpoints
+ *
+ * This implements a generic sink and source data type. The main idea here is
+ * to be able to reuse implementations of protocols like SLIP for a wide array
+ * of applications.
+ *
+ * The API implements getting and putting octets and buffers of octets from/to
+ * sources/sinks. The underlying driver can be either of those access paradigms
+ * and the abstraction implements the other on top of it.
+ *
+ * Functions implementing endpoints must return the number of octet transmitted
+ * (i.e. read or written). In case of an error, the functions must return
+ * `-ERRNO`. Additionally, when sources run out of data permanently, they need
+ * to return `-ENODATA`. When sinks run out of space to store date, they need
+ * to return `-ENOMEM`. Returning zero is allowed, strictly, but will cause the
+ * system to retry. If that is not meaningful with your endpoint, return a
+ * meaningful error code instead. Drivers returning `-EINTR` will cause the
+ * system to assume the operation was interrupted and it will thus retry.
+ * Similarly, drivers returning -EAGAIN are assumed to be in a temporary
+ * situation that prevented the previous call from performing any work, and
+ * thus the system will retry as well.
+ *
+ * The retry-logic for values like `EAGAIN` and `EINTR` can be customised. This
+ * is done by way of the "retry" member, that contains two function pointers,
+ * one for initialisation purposes (run each time a transaction is performed)
+ * and one for each retry step done within such a transaction. The cases in
+ * which customisation happens can be selected using the "ctrl" datum, which is
+ * a bit mask that should be or'ed `EP_RETRY_CTRL_*` macros. Finally, an
+ * arbitrary data pointer is passed to the retry runner function. This can be
+ * initialised by the init function and used by the run function to achieve
+ * altered behaviour of the runner depending on the retry state.
+ *
+ * Using a data count of zero, or one bigger than `SSIZE_MAX` causes the API to
+ * return `-EINVAL`.
+ *
+ * Some of the naming conventions used herein:
+ *
+ * - `sts_`: Source to Sink plumbing APIs
+ *
+ * - `_cbc`: Character by Character transfer APIs
+ *
+ * - `_aux`: APIs using user-supplied auxiliary buffers
+ *
+ * - `_some`: APIs that transfer some, greater than zero bytes, amount of data,
+ *   determined by the system
+ *
+ * - `_atmost`: APIs that transfer some, greater than zero bytes, amount of
+ *    data, determined by the user.
+ *
+ * - `_n`: APIs that transfer an exact amount of data; exactly n bytes.
+ *
+ * - `_drain`: APIs that transfer all data available in a source into a sink.
+ *
+ * The module offers the low-level APIs `source_read()` and `sink_write()`,
+ * which implement similar functionality as POSIX `read()` and `write()`, but
+ * for arbitrary sources and sinks. In most cases it is advisable to use the
+ * higher level functions, that implement common issue handling on top of the
+ * these low level functions.
+ *
  * @{
  */
 
 /**
  * @file endpoints.h
  * @brief Endpoints API
+ */
+
+/**
+ * @}
  */
 
 #include <stdbool.h>
@@ -284,9 +348,5 @@ instrumentable_chunksize(InstrumentableBuffer *b, const size_t n)
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_SOURCES_AND_SINKS_H */

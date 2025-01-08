@@ -18,6 +18,10 @@
  * occur.
  */
 
+/**
+ * @}
+ */
+
 #include <assert.h>
 #include <ctype.h>
 #include <inttypes.h>
@@ -293,7 +297,3 @@ instrumentable_reset_stats(InstrumentableAccessStats *s)
     s->accesses = 0u;
     s->bytes= 0u;
 }
-
-/**
- * @}
- */

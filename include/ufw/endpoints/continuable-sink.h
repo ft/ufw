@@ -43,6 +43,10 @@
  * the trivial "null" sink (see ufw/endpoints.h for details).
  */
 
+/**
+ * @}
+ */
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -107,9 +111,5 @@ void continuable_sink_init(Sink*, ContinuableSink*);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_ENDPOINTS_CONTINUABLE_SINK_H_11229582 */

@@ -14,6 +14,10 @@
  * @brief Sources and sinks interfacing byte buffer.
  */
 
+/**
+ * @}
+ */
+
 #include <stddef.h>
 
 #include <ufw/compat/errno.h>
@@ -80,7 +84,3 @@ sink_to_buffer(Sink *instance, ByteBuffer *buffer)
 {
     chunk_sink_init(instance, write_to_buffer, buffer);
 }
-
-/**
- * @}
- */
