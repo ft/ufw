@@ -11,6 +11,59 @@
 
 /**
  * @addtogroup compiler Compiler Features
+ *
+ * Access and utilities for compiler features and extensions
+ *
+ * The `ufw` library has some support for finding information about the
+ * toolchain, that is currently active, and implements a number of helpers to
+ * more succinctly use some of the detected extensions.
+ *
+ * The `toolchain.h` header (which is generated from `toolchain.h.in` at
+ * configuration time) defines a number of macros, that reflect the test
+ * results for compiler command line options, all of which at the moment are
+ * tests for for warning-options. These tests are run for the C and C++
+ * compilers of a toolchain. The C macros have the form `UFW_CC_HAS_*`, while
+ * the C++ macros look like `UFW_CXX_HAS_*`. For instance:
+ *
+ * - `UFW_CC_HAS_Wused_but_marked_unused`
+ * - `UFW_CXX_HAS_Wused_but_marked_unused`
+ *
+ * Similarly, there are tests for extension attributes and builtins supported
+ * by the C and C++ compilers. Examples:
+ *
+ * - `UFW_CC_HAS_ATTRIBUTE_COLD`
+ * - `UFW_CXX_HAS_ATTRIBUTE_COLD`
+ * - `UFW_CC_HAS_BUILTIN_EXPECT`
+ * - `UFW_CXX_HAS_BUILTIN_EXPECT`
+ *
+ * There are more macros for various kinds of environment tests, for instance:
+ *
+ * - `WITH_UNISTD_H`
+ * - `WITH_SYS_TYPES_H`
+ * - `WITH_UINT8_T`
+ * - `UFW_HAVE_POSIX_READ`
+ *
+ * See the documentation for `toolchain.h` for all details.
+ *
+ * Additionally, `compiler.h` implements short-hands for `__attribute__((...))`
+ * extensions of a compiler, like `packed` and others. Code (that is unportable
+ * by definition) that depends on these attributes, can test for the
+ * availability of the attribute in a toolchain by checking the according macro
+ * from `toolchain.h`. Example:
+ *
+ * @code
+ * #if UFW_CC_HAS_ATTRIBUTE_PACKED == 0
+ * #error Code depends on "packed" support in compiler. Cannot continue!
+ * #endif
+ *
+ * struct foobar {
+ *     // ...
+ * } PACKED;
+ * @endcode
+ *
+ * See the documentation of `compiler.h` for all attributes, that are supported
+ * in this way.
+ *
  * @{
  */
 
