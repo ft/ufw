@@ -9,12 +9,19 @@
 
 /**
  * @addtogroup registers Register Table
+ *
+ * Featureful register table implementation
+ *
  * @{
  */
 
 /**
  * @file register-table.h
  * @brief Register Table API
+ */
+
+/**
+ * @}
  */
 
 #include <stdbool.h>
@@ -531,9 +538,5 @@ register_was_touched(RegisterTable *t, RegisterHandle reg)
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_REGISTER_TABLE_H */

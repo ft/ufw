@@ -17,6 +17,10 @@
  * @brief Register Table Implementation (internal definitions)
  */
 
+/**
+ * @}
+ */
+
 #include <ufw/register-table.h>
 
 #ifdef __cplusplus
@@ -55,9 +59,5 @@ is_end_of_entries(RegisterEntry *e)
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_REGISTER_INTERNAL_H */

@@ -10,8 +10,12 @@
  */
 
 /**
- * @file utilities.h
+ * @file utilities.c
  * @brief Register Table Utilities implementation
+ */
+
+/**
+ * @}
  */
 
 /* Needed for WITH_SYS_TYPES_H. */
@@ -361,7 +365,3 @@ register_validatortype_to_string(RegisterValidatorType type)
 
     return map[type];
 }
-
-/**
- * @}
- */
