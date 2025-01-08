@@ -12,53 +12,10 @@
 /**
  * @file length-prefix.c
  * @brief Length prefix framing implementation
- *
- * This module implements two length prefix encoding schemes: One based on
- * variable-length integers as specified in Google's protobuf serialisation
- * format. The other is a family of encodings based on different fixed word
- * width integer encodings.
- *
- * Rationale: For unreliable data channels, RFC1055 (SLIP) implements a robust,
- * automatically re-synchronising kind of framing. SLIP however has two large
- * downsides: A large worst case overhead, and the inability to make use of
- * techniques such as DMA. For a SLIP implementation see the rfc1055.h module.
- *
- * For reliable channels, such as TCP, length prefixing immediately fixes the
- * latter, because it does not transform the its payload. For naïve integer
- * encodings, length prefixing either poses a significant overhead, if mainly
- * used with tiny frames, or it significantly limits the maximum representable
- * frame size.
- *
- * Using variable-length integers solves this issue: Small frames only take an
- * overhead of a single octet. Using 64 bit integers allow for, for all intends
- * and purposes, infinitely large frames.
- *
- * Of course, there is a limit, but with unsigned 64 bit values, 16 exbi bytes
- * (~18.4e18 bytes) is large by any standard. Since the endpoint API uses
- * negative numbers to encode errors, ufw's implementation allows a maximum of
- * half that.
- *
- * The actual limits depends on the size of ‘size_t’ if that is smaller than
- * ‘uint64_t’. None of that should make any sort of a difference in embedded
- * systems.
- *
- * This implements two kinds of encoders: One that directly sends into a sink
- * and another, that keeps the encoded variant inside of a data type, in case
- * the result is required multiple times.
- *
- * The previously described API uses variable length integers, combining low
- * overhead with small frames while allowing for arbitrarily large frames as
- * well. While this is a rather elegant solution, there are systems that use a
- * fixed number of octets to perform a similar job. These systems use different
- * kinds of octet orders and word sizes in their encoding. We can use the API
- * from binary-format.h to deal with that, but it leads to a whole family of
- * different possible implementations.
- *
- * This module also implements this family of encodings for 8, 16, and 32 bits,
- * with little and big endian octet orders. Other word widths are possible of
- * course, but these two seem most applicable to embedded systems. So we will
- * stick with these for now. The code is written in a style that makes is easy
- * to extend these encoding kinds later.
+ */
+
+/**
+ * @}
  */
 
 #include <stddef.h>
@@ -395,7 +352,3 @@ flenp_decode_source_to_sink(const LengthPrefixKind k,
 
     return sts_n(source, sink, len);
 }
-
-/**
- * @}
- */
