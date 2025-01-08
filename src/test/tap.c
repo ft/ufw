@@ -14,6 +14,10 @@
  * @brief Minimal TAP emitting testing module
  */
 
+/**
+ * @}
+ */
+
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -122,7 +126,3 @@ ufw_test_cmp_mem(const char *file, long unsigned int line,
 
     return result;
 }
-
-/**
- * @}
- */

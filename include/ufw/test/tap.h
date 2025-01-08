@@ -9,12 +9,32 @@
 
 /**
  * @addtogroup testing Unit Testing Framework
+ *
+ * Tiny, highly portable TAP emitting testing framework
+ *
+ * The Test Anything Protocol (TAP) is a text-only protocol to express the
+ * result of tests that have been executes. Implementations for this protocol
+ * exist for virtually any and all programming languages. This makes it a very
+ * promising mechanism for reporting test results even in large, very diverse
+ * code bases. It being a protocol also allows it to directly transport test
+ * results from one system to another, which makes it a candicate for running
+ * tests on embedded systems. This implementation of TAP is very portable, much
+ * more portable than `libtap` for instance, making it suitable for expressing
+ * test-suites in embedded systems.
+ *
+ * This feature is not part the `ufw` library, but is an extension in
+ * `ufw-tap`. Tests that elect to use it must link against this library.
+ *
  * @{
  */
 
 /**
  * @file tap.h
  * @brief API for a minimal TAP emitting testing module
+ */
+
+/**
+ * @}
  */
 
 #include <stdarg.h>
@@ -102,9 +122,5 @@ declare_printer(s64,  int64_t);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_UFW_TEST_TAP_H */

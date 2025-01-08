@@ -32,6 +32,10 @@
  * straight forward.
  */
 
+/**
+ * @}
+ */
+
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -423,7 +427,3 @@ memdiff(const void *a, const void *b, size_t n)
 
     return diff.count;
 }
-
-/**
- * @}
- */
