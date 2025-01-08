@@ -4,6 +4,24 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
+#ifndef INC_UFW_BITOPS_H
+#define INC_UFW_BITOPS_H
+
+/**
+ * @addtogroup bitops Bit Operations
+ *
+ * Reading and manipulating bits in integer data
+ *
+ * This feature implements a consistent set of macros for expressing bit
+ * operations. While it is arguable, that `foo |= 0x40u;` seems easy enough and
+ * thus `BIT_SET(foo, 0x40u)` may be useless; it is also arguable, that
+ * `BIT_CLEAR(foo, 0x40u);` is clearer than `foo &= (~0x40u);`. With that,
+ * consistency is the major reason to use the former as well, if the latter is
+ * useful. See the documentation for `ufw/bit-operations.h` for details.
+ *
+ * @{
+ */
+
 /**
  * @file bit-operations.h
  * @brief Macros implementing bit operations and related constants
@@ -12,15 +30,11 @@
  * block in this header.
  */
 
-#ifndef INC_UFW_BITOPS_H
-#define INC_UFW_BITOPS_H
+/**
+ * @}
+ */
 
 #include <limits.h>
-
-/**
- * @addtogroup bitops Bit Operations
- * @{
- */
 
 /*
  * Constants
@@ -355,9 +369,5 @@
  * @sideeffects Modifies container as described.
  */
 #define BIT_TOGGLE(container, mask) ((container) ^= (mask))
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_BITOPS_H */
