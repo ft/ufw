@@ -16,6 +16,10 @@
  * See https://www.rfc-editor.org/rfc/rfc1055.txt for details.
  */
 
+/**
+ * @}
+ */
+
 #include <stdint.h>
 
 #include <ufw/compat/errno.h>
@@ -247,7 +251,3 @@ rfc1055_decode(RFC1055Context *ctx, Source *source, Sink *sink)
 
     /* NOTREACHED */
 }
-
-/**
- * @}
- */

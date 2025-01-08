@@ -9,12 +9,19 @@
 
 /**
  * @addtogroup protoslip Serial Line IP (SLIP)
+ *
+ * Implementation of the RFC1055 SLIP framing protocol
+ *
  * @{
  */
 
 /**
  * @file rfc1055.h
  * @brief RFC1055: Transmission of IP Datagrams over Serial Lines: SLIP
+ */
+
+/**
+ * @}
  */
 
 #include <stdbool.h>
@@ -58,9 +65,5 @@ int rfc1055_decode(RFC1055Context*, Source*, Sink*);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_RFC1055_H */
