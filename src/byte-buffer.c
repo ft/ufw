@@ -14,6 +14,10 @@
  * @brief Byte Buffer Implementation
  */
 
+/**
+ * @}
+ */
+
 #include <stddef.h>
 #include <string.h>
 

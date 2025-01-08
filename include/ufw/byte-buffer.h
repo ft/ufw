@@ -9,12 +9,31 @@
 
 /**
  * @addtogroup bytebuffer Byte Buffers
+ *
+ * Featureful access to memory buffers
+ *
+ * In C, strings are implemented using memory that is terminated by a `NUL`
+ * byte. It is arguable whether or not that is a good design decision. With
+ * arbitrary memory buffers this cannot done, because no byte can have special
+ * semantics. Pointers in C are just that: They point to an address in memory.
+ * There is no length information associated with it. What is worse is that
+ * array arguments to functions degrade to pointers, losing any length
+ * information that they may have carried at the calling site. This module
+ * implements a data type, that embellishes a pointer with size information.
+ * Additionally, there are two additional indices into the memory, that can be
+ * used as read and write pointers into the memory referenced at by the
+ * pointer.
+ *
  * @{
  */
 
 /**
  * @file byte-buffer.h
  * @brief Byte Buffer API
+ */
+
+/**
+ * @}
  */
 
 #include <stddef.h>
@@ -86,9 +105,5 @@ size_t byte_buffer_rest(const ByteBuffer*);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_BYTE_BUFFER_H */
