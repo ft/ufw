@@ -6,6 +6,13 @@
 
 /**
  * @addtogroup meta Library Meta Information
+ *
+ * Version Information for the Micro Framework Library
+ *
+ * The `ufw/meta.h` file defines a couple of macros that reflect the version of
+ * the `ufw` library. This file is **not** generated at configuration time to
+ * keep the build process for the library as simple as possible.
+ *
  * @{
  */
 
