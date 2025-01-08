@@ -6,12 +6,19 @@
 
 /**
  * @addtogroup output Output Utilities
+ *
+ * Common useful output utilities
+ *
  * @{
  */
 
 /**
  * @file hexdump.h
  * @brief Memory dumper in the style of the hexdump(1) utility
+ */
+
+/**
+ * @}
  */
 
 #ifndef INC_UFW_HEXDUMP_H_998d0241
@@ -43,7 +50,3 @@ int hexdump_stderr(const void*, size_t, size_t);
 #endif /* __cplusplus */
 
 #endif /* INC_UFW_HEXDUMP_H_998d0241 */
-
-/**
- * @}
- */

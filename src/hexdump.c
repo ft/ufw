@@ -14,6 +14,10 @@
  * @brief Memory dumper in the style of the hexdump(1) utility
  */
 
+/**
+ * @}
+ */
+
 #include <ctype.h>
 #include <inttypes.h>
 #include <stdarg.h>
@@ -171,7 +175,3 @@ hexdump_stderr(const void *mem, const size_t n, const size_t doffset)
     };
     return hexdump(&hd, mem, n, doffset);
 }
-
-/**
- * @}
- */
