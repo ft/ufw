@@ -6,17 +6,24 @@
 
 /**
  * @addtogroup pstorage Persistent Storage
+ *
+ * Consistent storage in persistent memory stores
+ *
+ * A common task in embedded systems is to store data in persistent storage
+ * (like flash or eeprom memory), for it to survive system reboots. For this to
+ * be useful, it is required for a client (the firmware) to decide whether or
+ * not the contents of a field of data is valid.
+ *
  * @{
  */
 
 /**
  * @file persistent-storage.h
  * @brief Persistent storage API
- *
- * A common task in embedded systems is to store data in persistent storage
- * (like flash or eeprom memory), for it to survive system reboots. For this to
- * be useful, it is required for a client (the firmware) to decide whether or
- * not the contents of a field of data is valid.
+ */
+
+/**
+ * @}
  */
 
 #ifndef INC_UFW_PERSISTENT_STORE_H
@@ -170,9 +177,5 @@ PersistentAccess persistent_reset(PersistentStorage*, unsigned char);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_PERSISTENT_STORE_H */

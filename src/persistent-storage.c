@@ -14,6 +14,10 @@
  * @brief Persistent storage implementation
  */
 
+/**
+ * @}
+ */
+
 #include <stdint.h>
 #include <string.h>
 
@@ -632,7 +636,3 @@ persistent_reset(PersistentStorage *store, unsigned char item)
     }
     return persistent_writen(store, store->data.address, item, store->data.size);
 }
-
-/**
- * @}
- */
