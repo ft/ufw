@@ -57,14 +57,10 @@
  * to extend these encoding kinds later.
  *
  * @{
- */
-
-/**
+ *
  * @file length-prefix.h
  * @brief Length prefix framing implementation
- */
-
-/**
+ *
  * @}
  */
 

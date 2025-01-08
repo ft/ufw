@@ -10,9 +10,7 @@
 /**
  * @addtogroup compat Compatibility Layer
  * @{
- */
-
-/**
+ *
  * @file errno.h
  * @brief Compatibility layer for POSIX error numbers
  *
@@ -26,9 +24,7 @@
  *
  * __cplusplus note: This file is macro-only, so we don't need the extern C
  * block in this header.
- */
-
-/**
+ *
  * @}
  */
 

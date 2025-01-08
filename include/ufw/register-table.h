@@ -13,14 +13,10 @@
  * Featureful register table implementation
  *
  * @{
- */
-
-/**
+ *
  * @file register-table.h
  * @brief Register Table API
- */
-
-/**
+ *
  * @}
  */
 

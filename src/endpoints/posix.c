@@ -7,11 +7,11 @@
 /**
  * @addtogroup endpoints Endpoints
  * @{
- */
-
-/**
+ *
  * @file endpoints/posix.c
  * @brief Sources and sinks implementable on POSIX systems
+ *
+ * @}
  */
 
 #include <ufw/toolchain.h>
@@ -57,7 +57,3 @@ sink_to_filedesc(Sink *instance, int *fd)
     chunk_sink_init(instance, run_write, fd);
 }
 #endif /* UFW_HAVE_POSIX_WRITE */
-
-/**
- * @}
- */

@@ -70,14 +70,10 @@
  * these low level functions.
  *
  * @{
- */
-
-/**
+ *
  * @file endpoints.h
  * @brief Endpoints API
- */
-
-/**
+ *
  * @}
  */
 

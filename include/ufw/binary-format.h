@@ -19,9 +19,7 @@
  * the full description and API.
  *
  * @{
- */
-
-/**
+ *
  * @file binary-format.h
  * @brief Binary format conversion API
  *
@@ -109,9 +107,7 @@
  * common. This module implements all accesses on the architecture's native
  * representation. If your system does not use IEEE754 floating point
  * encoding, floating point semantics will not work as intended.
- */
-
-/**
+ *
  * @}
  */
 

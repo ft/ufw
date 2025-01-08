@@ -12,14 +12,10 @@
 /**
  * @addtogroup ringbuffer Ringbuffer
  * @{
- */
-
-/**
+ *
  * @file ring-buffer-iter.c
  * @brief Interators for ringbuffers from `ring-buffer.h`.
- */
-
-/**
+ *
  * @}
  */
 

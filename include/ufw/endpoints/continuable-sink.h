@@ -10,9 +10,7 @@
 /**
  * @addtogroup endpoints Endpoints
  * @{
- */
-
-/**
+ *
  * @file continuable-sink.h
  * @brief API for continuable sinks
  *
@@ -41,9 +39,7 @@
  * If no allocator is provided, the sink will only operate on the fallback
  * buffer. If that is also not provided, the sink basically behaves like
  * the trivial "null" sink (see ufw/endpoints.h for details).
- */
-
-/**
+ *
  * @}
  */
 

@@ -14,14 +14,10 @@
  * an implementation of this encoding.
  *
  * @{
- */
-
-/**
+ *
  * @file variable-length-integer.h
  * @brief Variable Length Integers (Protobuf Style) API
- */
-
-/**
+ *
  * @}
  */
 

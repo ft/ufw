@@ -10,17 +10,13 @@
 /**
  * @addtogroup compat Compatibility Layer
  * @{
- */
-
-/**
+ *
  * @file strings.h
  * @brief Compatibility header for bsd-ish extensions to string library
  *
  * Declare OpenBSD style string operation if configuration couldn't find them
  * in the system's std-c lib.
- */
-
-/**
+ *
  * @}
  */
 

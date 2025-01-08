@@ -34,18 +34,14 @@
  * See the individual header files documentation for all the details.
  *
  * @{
- */
-
-/**
+ *
  * @file compat.h
  * @brief Top level compatibility header
  *
  * This header includes all compatbility layers at once. It is mainly added for
  * backward compatibility. Consider using the compatibility portion you
  * actually need.
- */
-
-/**
+ *
  * @}
  */
 

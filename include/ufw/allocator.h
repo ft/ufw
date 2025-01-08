@@ -25,14 +25,10 @@
  * Allocator API based on the standard C library's `malloc()` allocator.
  *
  * @{
- */
-
-/**
+ *
  * @file allocator.h
  * @brief Block Allocator API
- */
-
-/**
+ *
  * @}
  */
 

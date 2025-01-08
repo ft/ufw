@@ -7,9 +7,7 @@
 /**
  * @addtogroup testing Unit Testing Framework
  * @{
- */
-
-/**
+ *
  * @file memdiff.c
  * @brief Hexdump-like memory diffing utility
  *
@@ -30,9 +28,7 @@
  * Each iteration only produces *one* new difference position. That way,
  * producing the context, that is surrounding the differences becomes rather
  * straight forward.
- */
-
-/**
+ *
  * @}
  */
 

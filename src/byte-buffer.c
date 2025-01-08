@@ -7,14 +7,10 @@
 /**
  * @addtogroup bytebuffer Byte Buffers
  * @{
- */
-
-/**
+ *
  * @file byte-buffer.c
  * @brief Byte Buffer Implementation
- */
-
-/**
+ *
  * @}
  */
 

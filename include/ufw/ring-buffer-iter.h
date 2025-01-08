@@ -19,14 +19,10 @@ extern "C" {
 /**
  * @addtogroup ringbuffer Ringbuffer
  * @{
- */
-
-/**
+ *
  * @file ring-buffer-iter.h
  * @brief Interators for ringbuffers from `ring-buffer.h`.
- */
-
-/**
+ *
  * @}
  */
 

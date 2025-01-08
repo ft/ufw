@@ -25,14 +25,10 @@
  * pointer.
  *
  * @{
- */
-
-/**
+ *
  * @file byte-buffer.h
  * @brief Byte Buffer API
- */
-
-/**
+ *
  * @}
  */
 

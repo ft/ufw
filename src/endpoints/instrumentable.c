@@ -6,19 +6,14 @@
 
 /**
  * @addtogroup endpoints Endpoints
- * @{
- */
-
-/**
+ *
  * @file endpoints/instrumentable.c
  * @brief Sources and sinks that can be instrumented for testing purposes.
  *
  * These endpoints are similar to buffer-backed endpoints, except that you can
  * control their error behaviour. Namely at which offset a certain error should
  * occur.
- */
-
-/**
+ *
  * @}
  */
 

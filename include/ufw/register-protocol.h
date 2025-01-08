@@ -13,14 +13,10 @@
  * Implementation of a register protocol for embedded systems
  *
  * @{
- */
-
-/**
+ *
  * @file register-protocol.h
  * @brief Simple Register Protocol API
- */
-
-/**
+ *
  * @}
  */
 

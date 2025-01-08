@@ -7,14 +7,10 @@
 /**
  * @addtogroup endpoints Endpoints
  * @{
- */
-
-/**
+ *
  * @file endpoints/buffer.c
  * @brief Sources and sinks interfacing byte buffer.
- */
-
-/**
+ *
  * @}
  */
 

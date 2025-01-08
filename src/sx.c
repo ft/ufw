@@ -8,9 +8,7 @@
 /**
  * @addtogroup protosexp Simple S-Expression Parser
  * @{
- */
-
-/**
+ *
  * @file sx.c
  * @brief Simple S-Expression Parser
  *
@@ -26,9 +24,7 @@
  *
  * That's it. Lists can be nested, so this allows for arbitrarily complex
  * structures.
- */
-
-/**
+ *
  * @}
  */
 

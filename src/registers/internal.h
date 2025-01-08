@@ -10,14 +10,10 @@
 /**
  * @addtogroup registers Register Table
  * @{
- */
-
-/**
+ *
  * @file internal.h
  * @brief Register Table Implementation (internal definitions)
- */
-
-/**
+ *
  * @}
  */
 

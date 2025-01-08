@@ -10,9 +10,7 @@
 /**
  * @addtogroup compat Compatibility Layer
  * @{
- */
-
-/**
+ *
  * @file math-constants.h
  * @brief Compatibility layer for math constants
  *
@@ -29,9 +27,7 @@
  *
  * __cplusplus note: This file is macro-only, so we don't need the extern C
  * block in this header.
- */
-
-/**
+ *
  * @}
  */
 

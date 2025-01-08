@@ -7,14 +7,10 @@
 /**
  * @addtogroup protolenp Length Prefix Framing
  * @{
- */
-
-/**
+ *
  * @file length-prefix.c
  * @brief Length prefix framing implementation
- */
-
-/**
+ *
  * @}
  */
 

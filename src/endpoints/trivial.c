@@ -7,16 +7,12 @@
 /**
  * @addtogroup endpoints Endpoints
  * @{
- */
-
-/**
+ *
  * @file endpoints/trivial.c
  * @brief Sources and sinks that are very simple to implement
  *
  * This implements a source like /dev/zero and a sink like /dev/null.
- */
-
-/**
+ *
  * @}
  */
 

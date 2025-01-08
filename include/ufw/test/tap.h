@@ -26,14 +26,10 @@
  * `ufw-tap`. Tests that elect to use it must link against this library.
  *
  * @{
- */
-
-/**
+ *
  * @file tap.h
  * @brief API for a minimal TAP emitting testing module
- */
-
-/**
+ *
  * @}
  */
 

@@ -7,14 +7,10 @@
 /**
  * @addtogroup testing Unit Testing Framework
  * @{
- */
-
-/**
+ *
  * @file tap.c
  * @brief Minimal TAP emitting testing module
- */
-
-/**
+ *
  * @}
  */
 

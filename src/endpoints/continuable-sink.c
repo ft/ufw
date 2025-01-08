@@ -7,14 +7,10 @@
 /**
  * @addtogroup endpoints Endpoints
  * @{
- */
-
-/**
+ *
  * @file continuable-sink.c
  * @brief Implementation for continuable sinks
- */
-
-/**
+ *
  * @}
  */
 

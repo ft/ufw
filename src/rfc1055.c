@@ -7,16 +7,10 @@
 /**
  * @addtogroup protoslip Serial Line IP (SLIP)
  * @{
- */
-
-/**
+ *
  * @file rfc1055.c
  * @brief RFC1055: Transmission of IP Datagrams over Serial Lines: SLIP
  *
- * See https://www.rfc-editor.org/rfc/rfc1055.txt for details.
- */
-
-/**
  * @}
  */
 

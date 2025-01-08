@@ -7,14 +7,10 @@
 /**
  * @addtogroup registers Register Table
  * @{
- */
-
-/**
+ *
  * @file utilities.c
  * @brief Register Table Utilities implementation
- */
-
-/**
+ *
  * @}
  */
 

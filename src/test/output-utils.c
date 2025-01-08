@@ -7,14 +7,10 @@
 /**
  * @addtogroup testing Unit Testing Framework
  * @{
- */
-
-/**
+ *
  * @file output-utils.c
  * @brief Output utilities for testing framework
- */
-
-/**
+ *
  * @}
  */
 

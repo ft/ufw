@@ -13,14 +13,10 @@
  * Implementation of common checksum functions
  *
  * @{
- */
-
-/**
+ *
  * @file crc16-arc.h
  * @brief CRC16 ARC API
- */
-
-/**
+ *
  * @}
  */
 

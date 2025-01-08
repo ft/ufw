@@ -41,14 +41,10 @@
 /**
  * @addtogroup checksums Checksum Algorithms
  * @{
- */
-
-/**
+ *
  * @file crc-16-arc.c
  * @brief CRC16 ARC implementation
- */
-
-/**
+ *
  * @}
  */
 

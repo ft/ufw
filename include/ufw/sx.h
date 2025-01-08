@@ -22,14 +22,10 @@
  * `ufw-sx`, therefore.
  *
  * @{
- */
-
-/**
+ *
  * @file sx.h
  * @brief Simple S-Expression Parser API
- */
-
-/**
+ *
  * @}
  */
 

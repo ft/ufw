@@ -7,14 +7,10 @@
 /**
  * @addtogroup pstorage Persistent Storage
  * @{
- */
-
-/**
+ *
  * @file persistent-storage.c
  * @brief Persistent storage implementation
- */
-
-/**
+ *
  * @}
  */
 

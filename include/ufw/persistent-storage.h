@@ -15,14 +15,10 @@
  * not the contents of a field of data is valid.
  *
  * @{
- */
-
-/**
+ *
  * @file persistent-storage.h
  * @brief Persistent storage API
- */
-
-/**
+ *
  * @}
  */
 

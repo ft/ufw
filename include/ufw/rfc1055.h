@@ -12,15 +12,13 @@
  *
  * Implementation of the RFC1055 SLIP framing protocol
  *
+ * See https://www.rfc-editor.org/rfc/rfc1055.txt for details.
+ *
  * @{
- */
-
-/**
+ *
  * @file rfc1055.h
  * @brief RFC1055: Transmission of IP Datagrams over Serial Lines: SLIP
- */
-
-/**
+ *
  * @}
  */
 

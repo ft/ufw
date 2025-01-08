@@ -7,14 +7,10 @@
 /**
  * @addtogroup varint Variable Length Integers
  * @{
- */
-
-/**
+ *
  * @file variable-length-integer.c
  * @brief Variable Length Integers (Protobuf Style) Implementation
- */
-
-/**
+ *
  * @}
  */
 

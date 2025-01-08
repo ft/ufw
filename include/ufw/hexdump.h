@@ -10,14 +10,10 @@
  * Common useful output utilities
  *
  * @{
- */
-
-/**
+ *
  * @file hexdump.h
  * @brief Memory dumper in the style of the hexdump(1) utility
- */
-
-/**
+ *
  * @}
  */
 

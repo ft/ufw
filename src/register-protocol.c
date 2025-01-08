@@ -7,14 +7,10 @@
 /**
  * @addtogroup protoregp Simple Register Protocol
  * @{
- */
-
-/**
+ *
  * @file register-protocol.c
  * @brief Simple Register Protocol API
- */
-
-/**
+ *
  * @}
  */
 

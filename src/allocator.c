@@ -7,14 +7,10 @@
 /**
  * @addtogroup blockallocator Block Allocator Abstraction
  * @{
- */
-
-/**
+ *
  * @file allocator.c
  * @brief Common block-allocator implementations
- */
-
-/**
+ *
  * @}
  */
 

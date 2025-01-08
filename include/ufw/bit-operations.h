@@ -20,17 +20,13 @@
  * useful. See the documentation for `ufw/bit-operations.h` for details.
  *
  * @{
- */
-
-/**
+ *
  * @file bit-operations.h
  * @brief Macros implementing bit operations and related constants
  *
  * __cplusplus note: This file is macro-only, so we don't need the extern C
  * block in this header.
- */
-
-/**
+ *
  * @}
  */
 

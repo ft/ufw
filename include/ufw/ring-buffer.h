@@ -13,14 +13,10 @@
  * Macro-polymorphic ring-buffer implementation
  *
  * @{
- */
-
-/**
+ *
  * @file ring-buffer.h
  * @brief Polymorphic ring-buffer implementation
- */
-
-/**
+ *
  * @}
  */
 
