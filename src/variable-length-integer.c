@@ -14,6 +14,10 @@
  * @brief Variable Length Integers (Protobuf Style) Implementation
  */
 
+/**
+ * @}
+ */
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -298,7 +302,3 @@ varint_s32_length(int32_t n)
     data.s = n;
     return varint_u64_length((uint64_t)data.u);
 }
-
-/**
- * @}
- */

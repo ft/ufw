@@ -6,12 +6,23 @@
 
 /**
  * @addtogroup varint Variable Length Integers
+ *
+ * Google Profobuf-style varint implementation
+ *
+ * Google's protobuf system specifies a way to implement integers that only
+ * occupy as many bytes as their value's most-significant-bit demands. This is
+ * an implementation of this encoding.
+ *
  * @{
  */
 
 /**
  * @file variable-length-integer.h
  * @brief Variable Length Integers (Protobuf Style) API
+ */
+
+/**
+ * @}
  */
 
 #ifndef INC_UFW_VARIABLE_LENGTH_INTEGER_H
@@ -62,7 +73,3 @@ size_t varint_s64_length( int64_t);
 #endif /* __cplusplus */
 
 #endif /* INC_UFW_VARIABLE_LENGTH_INTEGER_H */
-
-/**
- * @}
- */
