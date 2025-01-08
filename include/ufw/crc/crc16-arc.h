@@ -9,7 +9,19 @@
 
 /**
  * @addtogroup checksums Checksum Algorithms
+ *
+ * Implementation of common checksum functions
+ *
  * @{
+ */
+
+/**
+ * @file crc16-arc.h
+ * @brief CRC16 ARC API
+ */
+
+/**
+ * @}
  */
 
 #include <stddef.h>
@@ -30,9 +42,5 @@ uint16_t ufw_buffer_crc16_arc_u16(const uint16_t*, size_t);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_CRC_CRC16_ARC_H_19c5e461 */

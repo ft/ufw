@@ -43,6 +43,15 @@
  * @{
  */
 
+/**
+ * @file crc-16-arc.c
+ * @brief CRC16 ARC implementation
+ */
+
+/**
+ * @}
+ */
+
 #include <limits.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -169,7 +178,3 @@ ufw_buffer_crc16_arc_u16(const uint16_t *buffer, size_t len)
 {
     return ufw_crc16_arc_u16(CRC16_ARC_INITIAL, buffer, len);
 }
-
-/**
- * @}
- */
