@@ -18,10 +18,11 @@
  *
  * While a common error number base is not the worst idea in the world, the
  * number and kind of available errors varies a lot from implementation to
- * implementation. The C standard only requires EDOM, EILSEQ and ERANGE.
+ * implementation. The C standard only requires `EDOM`, `EILSEQ` and `ERANGE`.
  *
  * This header tries to smooth over some differences. To use error handling
- * with ufw's API, include “ufw/compat/errno.h” instead of “errno.h”.
+ * with ufw's API, include `ufw/compat/errno.h` instead of `errno.h` from the
+ * toolchain's C library.
  *
  * __cplusplus note: This file is macro-only, so we don't need the extern C
  * block in this header.

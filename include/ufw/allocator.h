@@ -9,12 +9,31 @@
 
 /**
  * @addtogroup blockallocator Block Allocator Abstraction
+ *
+ * Constraint memory allocation for embedded systems
+ *
+ * In embedded systems, dynamic allocation is an issue, mostly because of the
+ * nondeterministic nature of time it takes to do allocation, as well as issues
+ * with memory fragmentation. However, some jobs do require the allocation of
+ * buffers. There are allocators that solve most of the issues, by being less
+ * general in operation. These are allocators that allow the allocation of a
+ * single buffer of fixed size. They are not a standard allocator in the C
+ * library, however. This is an abstraction of allocators of that type, so
+ * portable code can be written, using such allocators.
+ *
+ * For testing purposes, this module implements an allocator that satisfies the
+ * Allocator API based on the standard C library's `malloc()` allocator.
+ *
  * @{
  */
 
 /**
  * @file allocator.h
  * @brief Block Allocator API
+ */
+
+/**
+ * @}
  */
 
 #include <stdbool.h>
@@ -83,9 +102,5 @@ void block_free(BlockAllocator*, void*);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_ALLOCATOR_H_3ff7ef48 */
