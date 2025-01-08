@@ -20,7 +20,7 @@
  *
  * @{
  *
- * @file binary-format.h
+ * @file ufw/binary-format.h
  * @brief Binary format conversion API
  *
  * This module implements a number of functions that revolve around reading and

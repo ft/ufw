@@ -14,7 +14,7 @@
  *
  * @{
  *
- * @file convolution-low-pass.h
+ * @file ufw/convolution-low-pass.h
  * @brief Convolution Low Pass Filters
  *
  * @}

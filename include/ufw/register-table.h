@@ -14,7 +14,7 @@
  *
  * @{
  *
- * @file register-table.h
+ * @file ufw/register-table.h
  * @brief Register Table API
  *
  * @}

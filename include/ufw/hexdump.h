@@ -11,7 +11,7 @@
  *
  * @{
  *
- * @file hexdump.h
+ * @file ufw/hexdump.h
  * @brief Memory dumper in the style of the hexdump(1) utility
  *
  * @}

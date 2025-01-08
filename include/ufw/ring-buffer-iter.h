@@ -20,8 +20,8 @@ extern "C" {
  * @addtogroup ringbuffer Ringbuffer
  * @{
  *
- * @file ring-buffer-iter.h
- * @brief Interators for ringbuffers from `ring-buffer.h`.
+ * @file ufw/ring-buffer-iter.h
+ * @brief Interators for ringbuffers from `ufw/ring-buffer.h`.
  *
  * @}
  */

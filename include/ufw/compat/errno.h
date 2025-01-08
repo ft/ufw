@@ -11,7 +11,7 @@
  * @addtogroup compat Compatibility Layer
  * @{
  *
- * @file errno.h
+ * @file ufw/compat/errno.h
  * @brief Compatibility layer for POSIX error numbers
  *
  * While a common error number base is not the worst idea in the world, the

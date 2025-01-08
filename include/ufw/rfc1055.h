@@ -16,7 +16,7 @@
  *
  * @{
  *
- * @file rfc1055.h
+ * @file ufw/rfc1055.h
  * @brief RFC1055: Transmission of IP Datagrams over Serial Lines: SLIP
  *
  * @}

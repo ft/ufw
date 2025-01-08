@@ -26,7 +26,7 @@
  *
  * @{
  *
- * @file allocator.h
+ * @file ufw/allocator.h
  * @brief Block Allocator API
  *
  * @}

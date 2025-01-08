@@ -23,7 +23,7 @@
  *
  * @{
  *
- * @file sx.h
+ * @file ufw/sx.h
  * @brief Simple S-Expression Parser API
  *
  * @}

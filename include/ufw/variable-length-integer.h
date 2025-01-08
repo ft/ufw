@@ -15,7 +15,7 @@
  *
  * @{
  *
- * @file variable-length-integer.h
+ * @file ufw/variable-length-integer.h
  * @brief Variable Length Integers (Protobuf Style) API
  *
  * @}

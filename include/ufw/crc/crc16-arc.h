@@ -14,7 +14,7 @@
  *
  * @{
  *
- * @file crc16-arc.h
+ * @file ufw/crc/crc16-arc.h
  * @brief CRC16 ARC API
  *
  * @}

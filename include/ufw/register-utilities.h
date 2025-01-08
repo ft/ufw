@@ -11,7 +11,7 @@
  * @addtogroup registers Register Table
  * @{
  *
- * @file register-utilities.h
+ * @file ufw/register-utilities.h
  * @brief Register Table Utilities API
  *
  * @}

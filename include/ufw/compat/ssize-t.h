@@ -11,7 +11,7 @@
  * @addtogroup compat Compatibility Layer
  * @{
  *
- * @file ssize-t.h
+ * @file ufw/compat/ssize-t.h
  * @brief Compatibility layer for ssize_t
  *
  * Provide ssize_t for toolchains/targets that do not support it by

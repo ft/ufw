@@ -21,7 +21,7 @@
  *
  * @{
  *
- * @file bit-operations.h
+ * @file ufw/bit-operations.h
  * @brief Macros implementing bit operations and related constants
  *
  * __cplusplus note: This file is macro-only, so we don't need the extern C

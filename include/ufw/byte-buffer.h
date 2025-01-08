@@ -26,7 +26,7 @@
  *
  * @{
  *
- * @file byte-buffer.h
+ * @file ufw/byte-buffer.h
  * @brief Byte Buffer API
  *
  * @}

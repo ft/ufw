@@ -11,7 +11,7 @@
  * @addtogroup endpoints Endpoints
  * @{
  *
- * @file continuable-sink.h
+ * @file ufw/endpoints/continuable-sink.h
  * @brief API for continuable sinks
  *
  * A continuable sink is a type of Sink, interfacing a memory buffer, that

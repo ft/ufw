@@ -27,7 +27,7 @@
  *
  * @{
  *
- * @file tap.h
+ * @file ufw/test/tap.h
  * @brief API for a minimal TAP emitting testing module
  *
  * @}

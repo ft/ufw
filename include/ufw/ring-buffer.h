@@ -14,7 +14,7 @@
  *
  * @{
  *
- * @file ring-buffer.h
+ * @file ufw/ring-buffer.h
  * @brief Polymorphic ring-buffer implementation
  *
  * @}

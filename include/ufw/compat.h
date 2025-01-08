@@ -35,7 +35,7 @@
  *
  * @{
  *
- * @file compat.h
+ * @file ufw/compat.h
  * @brief Top level compatibility header
  *
  * This header includes all compatbility layers at once. It is mainly added for

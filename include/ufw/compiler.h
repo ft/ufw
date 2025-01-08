@@ -18,7 +18,7 @@
  * toolchain, that is currently active, and implements a number of helpers to
  * more succinctly use some of the detected extensions.
  *
- * The `toolchain.h` header (which is generated from `toolchain.h.in` at
+ * The `ufw/toolchain.h` header (which is generated from `toolchain.h.in` at
  * configuration time) defines a number of macros, that reflect the test
  * results for compiler command line options, all of which at the moment are
  * tests for for warning-options. These tests are run for the C and C++
@@ -43,13 +43,13 @@
  * - `WITH_UINT8_T`
  * - `UFW_HAVE_POSIX_READ`
  *
- * See the documentation for `toolchain.h` for all details.
+ * See the documentation for `ufw/toolchain.h` for all details.
  *
- * Additionally, `compiler.h` implements short-hands for `__attribute__((...))`
- * extensions of a compiler, like `packed` and others. Code (that is unportable
- * by definition) that depends on these attributes, can test for the
- * availability of the attribute in a toolchain by checking the according macro
- * from `toolchain.h`. Example:
+ * Additionally, `ufw/compiler.h` implements short-hands for
+ * `__attribute__((...))` extensions of a compiler, like `packed` and others.
+ * Code (that is unportable by definition) that depends on these attributes,
+ * can test for the availability of the attribute in a toolchain by checking
+ * the according macro from `ufw/toolchain.h`. Example:
  *
  * @code
  * #if UFW_CC_HAS_ATTRIBUTE_PACKED == 0
@@ -61,12 +61,12 @@
  * } PACKED;
  * @endcode
  *
- * See the documentation of `compiler.h` for all attributes, that are supported
- * in this way.
+ * See the documentation of `ufw/compiler.h` for all attributes, that are
+ * supported in this way.
  *
  * @{
  *
- * @file compiler.h
+ * @file ufw/compiler.h
  * @brief Short-hand macros for compiler features
  *
  * __cplusplus note: This file is macro-only, so we don't need the extern C

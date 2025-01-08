@@ -14,7 +14,7 @@
  * @{
  *
  * @file ring-buffer-iter.c
- * @brief Interators for ringbuffers from `ring-buffer.h`.
+ * @brief Interators for ringbuffers from `ufw/ring-buffer.h`.
  *
  * @}
  */

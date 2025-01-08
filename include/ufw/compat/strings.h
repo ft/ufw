@@ -11,7 +11,7 @@
  * @addtogroup compat Compatibility Layer
  * @{
  *
- * @file strings.h
+ * @file ufw/compat/strings.h
  * @brief Compatibility header for bsd-ish extensions to string library
  *
  * Declare OpenBSD style string operation if configuration couldn't find them

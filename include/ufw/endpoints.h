@@ -71,7 +71,7 @@
  *
  * @{
  *
- * @file endpoints.h
+ * @file ufw/endpoints.h
  * @brief Endpoints API
  *
  * @}

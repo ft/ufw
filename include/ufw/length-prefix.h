@@ -58,7 +58,7 @@
  *
  * @{
  *
- * @file length-prefix.h
+ * @file ufw/length-prefix.h
  * @brief Length prefix framing implementation
  *
  * @}

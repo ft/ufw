@@ -16,7 +16,7 @@
  *
  * @{
  *
- * @file persistent-storage.h
+ * @file ufw/persistent-storage.h
  * @brief Persistent storage API
  *
  * @}

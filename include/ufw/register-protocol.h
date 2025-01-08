@@ -14,7 +14,7 @@
  *
  * @{
  *
- * @file register-protocol.h
+ * @file ufw/register-protocol.h
  * @brief Simple Register Protocol API
  *
  * @}

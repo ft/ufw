@@ -11,7 +11,7 @@
  * @addtogroup compat Compatibility Layer
  * @{
  *
- * @file math-constants.h
+ * @file ufw/compat/math-constants.h
  * @brief Compatibility layer for math constants
  *
  * POSIX defines a couple of maths constants in math.h; however the C
