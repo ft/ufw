@@ -4,14 +4,6 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
-/**
- * @file compiler.h
- * @brief Short-hand macros for compiler features
- *
- * __cplusplus note: This file is macro-only, so we don't need the extern C
- * block in this header.
- */
-
 #ifndef INC_UFW_COMPILER_H
 #define INC_UFW_COMPILER_H
 
@@ -20,6 +12,14 @@
 /**
  * @addtogroup compiler Compiler Features
  * @{
+ */
+
+/**
+ * @file compiler.h
+ * @brief Short-hand macros for compiler features
+ *
+ * __cplusplus note: This file is macro-only, so we don't need the extern C
+ * block in this header.
  */
 
 /*

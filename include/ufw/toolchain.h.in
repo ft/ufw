@@ -4,6 +4,14 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
+#ifndef INC_UFW_TOOLCHAIN_H
+#define INC_UFW_TOOLCHAIN_H
+
+/**
+ * @addtogroup compiler Compiler Features
+ * @{
+ */
+
 /**
  * @file toolchain.h
  * @brief Toolchain introspection API
@@ -11,9 +19,6 @@
  * __cplusplus note: This file is macro-only, so we don't need the extern C
  * block in this header.
  */
-
-#ifndef INC_UFW_TOOLCHAIN_H
-#define INC_UFW_TOOLCHAIN_H
 
 /* Compiler Command Line API Identification */
 
@@ -376,5 +381,9 @@
  * space. This is still configurable at compile time, if needed.
  */
 #cmakedefine UFW_PRIVATE_ERRNO_OFFSET @UFW_PRIVATE_ERRNO_OFFSET@
+
+/**
+ * @}
+ */
 
 #endif /* INC_UFW_TOOLCHAIN_H */
