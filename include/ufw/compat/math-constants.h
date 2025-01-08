@@ -31,6 +31,10 @@
  * block in this header.
  */
 
+/**
+ * @}
+ */
+
 #ifndef M_E
 /** Euler's number (e) */
 #define M_E 2.7182818284590452354
@@ -95,9 +99,5 @@
 /** 1 / sqrt(2) */
 #define M_SQRT1_2 0.70710678118654752440
 #endif
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_UFW_MATH_CONSTANTS_H */

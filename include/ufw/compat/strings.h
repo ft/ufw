@@ -20,6 +20,10 @@
  * in the system's std-c lib.
  */
 
+/**
+ * @}
+ */
+
 #include <stddef.h>
 #include <string.h>
 #include <ufw/toolchain.h>
@@ -43,9 +47,5 @@ size_t strnlen(const char *, size_t);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_UFW_COMPAT_STRINGS_H */

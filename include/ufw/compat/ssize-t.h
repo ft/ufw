@@ -20,6 +20,10 @@
  * implementing <sys/types.h>.
  */
 
+/**
+ * @}
+ */
+
 #include <ufw/toolchain.h>
 
 #include <limits.h>
@@ -71,9 +75,5 @@ typedef long int ssize_t;
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_UFW_COMPAT_SSIZE_T_H */

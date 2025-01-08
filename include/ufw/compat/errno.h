@@ -27,6 +27,10 @@
  * block in this header.
  */
 
+/**
+ * @}
+ */
+
 #include <errno.h>
 
 #include <ufw/toolchain.h>
@@ -85,9 +89,5 @@
 #ifndef ERANGE
 #define ERANGE      (UFW_PRIVATE_ERRNO_OFFSET + 12)
 #endif /* ERANGE */
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_UFW_MATH_CONSTANTS_H */
