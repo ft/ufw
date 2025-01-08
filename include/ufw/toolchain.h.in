@@ -20,6 +20,10 @@
  * block in this header.
  */
 
+/**
+ * @}
+ */
+
 /* Compiler Command Line API Identification */
 
 /** Reflect C compiler's support for `-Wall` */
@@ -381,9 +385,5 @@
  * space. This is still configurable at compile time, if needed.
  */
 #cmakedefine UFW_PRIVATE_ERRNO_OFFSET @UFW_PRIVATE_ERRNO_OFFSET@
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_TOOLCHAIN_H */

@@ -75,6 +75,10 @@
  * block in this header.
  */
 
+/**
+ * @}
+ */
+
 /*
  * Annotation macros
  */
@@ -297,9 +301,5 @@
 #else
 #define DEPRECATED
 #endif /* HAVE_COMPILER_ATTRIBUTE_DEPRECATED */
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_COMPILER_H */
