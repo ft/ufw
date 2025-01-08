@@ -26,6 +26,10 @@ extern "C" {
  * @brief Interators for ringbuffers from `ring-buffer.h`.
  */
 
+/**
+ * @}
+ */
+
 typedef enum {
     RING_BUFFER_ITER_OLD_TO_NEW,
     RING_BUFFER_ITER_NEW_TO_OLD
@@ -89,10 +93,6 @@ size_t rb_iter_advance(rb_iter *);
     {                                                   \
         return c->data[iter->index];                    \
     }
-
-/**
- * @}
- */
 
 #ifdef __cplusplus
 }

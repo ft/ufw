@@ -9,12 +9,19 @@
 
 /**
  * @addtogroup ringbuffer Ringbuffer
+ *
+ * Macro-polymorphic ring-buffer implementation
+ *
  * @{
  */
 
 /**
  * @file ring-buffer.h
  * @brief Polymorphic ring-buffer implementation
+ */
+
+/**
+ * @}
  */
 
 /* __cplusplus note: This file is macro-only, so we don't need the extern C
@@ -189,9 +196,5 @@
     {                                           \
         c->override_if_full = state;            \
     }
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_RING_BUFFER_H */

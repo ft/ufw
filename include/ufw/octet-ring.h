@@ -18,6 +18,10 @@
  * octet-addressable.
  */
 
+/**
+ * @}
+ */
+
 #ifndef INC_UFW_OCTET_RING_H_ca6dbe81
 #define INC_UFW_OCTET_RING_H_ca6dbe81
 
@@ -36,9 +40,5 @@ RING_BUFFER_ITER_API(octet_ring, uint8_t)
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_OCTET_RING_H_ca6dbe81 */
