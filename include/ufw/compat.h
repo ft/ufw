@@ -12,8 +12,8 @@
  *
  * Ironing out incompatibilities in C standard libraries
  *
- * The header files in `ufw/compat/*.h` provide workarounds for some
- * compatibility issues between toolchains. These include:
+ * The header files in `ufw/compat/` provide workarounds for some compatibility
+ * issues between toolchains. These include:
  *
  * - `ufw/compat/errno.h` — Defines some `errno` values that are not found in
  *   the active toolchain's C library.
