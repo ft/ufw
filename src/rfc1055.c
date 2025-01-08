@@ -33,7 +33,7 @@
  * The End-of-Frame delimiter can also be used as a Start-of-Frame delimiter,
  * resulting in streams like this:
  *
- * ...<EOF>payload...<EOF><EOF>payload...<EOF><EOF>...
+ * ...[EOF]payload...[EOF][EOF]payload...[EOF][EOF]...
  *
  * This is what the RFC suggests as an extension, because it does not increase
  * the overhead cause by the octet-stuffing technique.

@@ -1625,6 +1625,7 @@ register_set_from_hexstr(RegisterTable *t, const RegisterAddress start,
  * destination area, depending on which of the two contains the least amount of
  * data.
  *
+ * @param  t       The register table to work within
  * @param  dst    Handle to destination area
  * @param  src    Handle to source area
  *

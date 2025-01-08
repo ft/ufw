@@ -31,7 +31,6 @@
  *
  * @param  b  The ByteBuffer instance to use
  *
- * @return void
  * @sideeffects Modifies byte buffer meta data.
  */
 void
@@ -279,7 +278,6 @@ byte_buffer_rewind(ByteBuffer *b)
  *
  * @param  b  The ByteBuffer instance to use.
  *
- * @return void
  * @sideeffects Modifies byte buffer meta data and memory.
  */
 void
@@ -297,7 +295,6 @@ byte_buffer_clear(ByteBuffer *b)
  *
  * @param  b  The ByteBuffer instance to use.
  *
- * @return void
  * @sideeffects Modifies byte buffer meta data.
  */
 void
@@ -313,7 +310,6 @@ byte_buffer_reset(ByteBuffer *b)
  *
  * @param  b  The ByteBuffer instance to use.
  *
- * @return void
  * @sideeffects Modifies byte buffer meta data.
  */
 void
@@ -331,7 +327,6 @@ byte_buffer_repeat(ByteBuffer *b)
  * @param  b      The ByteBuffer instance to use.
  * @param  datum  Datum to write to all bytes in memory.
  *
- * @return void
  * @sideeffects Modifies byte buffer meta data and memory
  */
 void
@@ -352,7 +347,6 @@ byte_buffer_fill(ByteBuffer *b, const unsigned char datum)
  * @param  init       Initially value at index zero.
  * @param  increment  Increment to apply at each iteration.
  *
- * @return void
  * @sideeffects Modifies byte buffer meta data and memory.
  */
 void
@@ -392,7 +386,6 @@ byte_buffer_fillx(ByteBuffer *b,
  * @param  offset  Index at which to start the initialisation process.
  * @param  cb      Function to call to produce initialisation values.
  *
- * @return void
  * @sideeffects Modifies byte buffer meta data and memory.
  */
 void

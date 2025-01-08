@@ -44,7 +44,6 @@
  * @param  source    ByteSource function that should drive the source
  * @param  driver    Pointer to arbitrary data handed to the driver function
  *
- * @return void
  * @sideeffects Modifies the instance pointer
  */
 void
@@ -66,7 +65,6 @@ octet_source_init(Source *instance, ByteSource source, void *driver)
  * @param  source    ChunkSource function that should drive the source
  * @param  driver    Pointer to arbitrary data handed to the driver function
  *
- * @return void
  * @sideeffects Modifies the instance pointer
  */
 void
@@ -88,7 +86,6 @@ chunk_source_init(Source *instance, ChunkSource source, void *driver)
  * @param  sink      ByteSink function that should drive the sink
  * @param  driver    Pointer to arbitrary data handed to the driver function
  *
- * @return void
  * @sideeffects Modifies the instance pointer
  */
 void
@@ -110,7 +107,6 @@ octet_sink_init(Sink *instance, ByteSink sink, void *driver)
  * @param  sink      ChunkSink function that should drive the sink
  * @param  driver    Pointer to arbitrary data handed to the driver function
  *
- * @return void
  * @sideeffects Modifies the instance pointer
  */
 void

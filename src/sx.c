@@ -20,7 +20,7 @@
  *
  *   - Lists              (exp exp exp ...)
  *   - Symbols            foobar
- *   - Unsigned Integers  decimal: 1234, hex: #x1234
+ *   - Unsigned Integers  decimal: `1234`, hex: `#x1234`
  *
  * That's it. Lists can be nested, so this allows for arbitrarily complex
  * structures.

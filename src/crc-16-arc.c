@@ -102,7 +102,7 @@ crc16_octet(uint16_t crc, const uint_least8_t data)
  *
  * @param  crc     Current CRC value
  * @param  buffer  Data pointer
- * @param  len     Number of bytes in the buffer
+ * @param  n       Number of bytes in the buffer
  *
  * @return Updated CRC value.
  */

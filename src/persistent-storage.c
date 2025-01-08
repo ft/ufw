@@ -61,7 +61,6 @@ checksum_size(const PersistentStorage *store)
  *
  * @param  store  Pointer to the instance to configure
  *
- * @return void
  * @sideeffects Modifies the storage instance as described.
  */
 static inline void
@@ -120,7 +119,6 @@ trivialsum(const unsigned char *data, size_t n, uint16_t init)
  * @param  f       Callback function that implements checksum algorithm
  * @param  init    Initial value to feed into the checksum algorithm
  *
- * @return void
  * @sideeffects store is mutated as advertised
  */
 void
@@ -140,7 +138,6 @@ persistent_sum16(PersistentStorage *store, PersistentChksum16 f, uint16_t init)
  * @param  f       Callback function that implements checksum algorithm
  * @param  init    Initial value to feed into the checksum algorithm
  *
- * @return void
  * @sideeffects store is mutated as advertised
  */
 void
@@ -165,7 +162,6 @@ persistent_sum32(PersistentStorage *store, PersistentChksum32 f, uint32_t init)
  * @param  rd      Callback function for block reads to medium
  * @param  wr      Callback function for block writes to medium
  *
- * @return void
  * @sideeffects store is mutated as advertised
  */
 void
@@ -242,7 +238,6 @@ persistent_checksum(const PersistentStorage *store, const void *src)
  * @param  store    Pointer to the instance to initialise
  * @param  address  Address to place instance in on target medium
  *
- * @return void
  * @sideeffects store is mutated as advertised
  */
 void
@@ -267,7 +262,6 @@ persistent_place(PersistentStorage *store, uint32_t address)
  * @param  buffer   Pointer to the buffer to assign to the instance
  * @param  n        Size of buffer
  *
- * @return void
  * @sideeffects store is mutated as advertised
  */
 void

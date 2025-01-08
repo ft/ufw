@@ -30,7 +30,6 @@
  * @param  fmt      printf-like format string to specifying output.
  * @param  ...      stdarg va_list of arguments.
  *
- * @return void
  * @sideeffects Print data to referenced shell instance.
  */
 void
@@ -58,7 +57,6 @@ static RegisterTable *table = NULL;
  *
  * @param  t        Pointer to the register table to use.
  *
- * @return void
  * @sideeffects Sets ‘table’ pointer to specified table.
  */
 void
@@ -187,7 +185,6 @@ regshow_usage(struct shell *shell)
  * @param  argc       Number of entries in the argv parameter.
  * @param  argv       List of command line arguments. argv[0] is "regshow".
  *
- * @return void
  * @sideeffects Reads and prints register table data as specified.
  */
 void
