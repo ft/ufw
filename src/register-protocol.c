@@ -14,6 +14,10 @@
  * @brief Simple Register Protocol API
  */
 
+/**
+ * @}
+ */
+
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>
@@ -1165,7 +1169,3 @@ regp_empty_intersection(const RPRange *intersect)
 {
     return (intersect->size > 0);
 }
-
-/**
- * @}
- */

@@ -9,12 +9,19 @@
 
 /**
  * @addtogroup protoregp Simple Register Protocol
+ *
+ * Implementation of a register protocol for embedded systems
+ *
  * @{
  */
 
 /**
  * @file register-protocol.h
  * @brief Simple Register Protocol API
+ */
+
+/**
+ * @}
  */
 
 #include <stdint.h>
@@ -278,7 +285,3 @@ regaccess2blockaccess(const RegisterAccess access)
 #endif /* __cplusplus */
 
 #endif /* INC_UFW_REGISTER_PROTOCOL_H_3d84e123 */
-
-/**
- * @}
- */
