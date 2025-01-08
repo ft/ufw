@@ -8,6 +8,16 @@
 
 /**
  * @addtogroup binformat Binary Format Conversion
+ *
+ * Read and write access to binary memory with type semantics
+ *
+ * The `ufw/binary-format.h` header file implements ways to access arbitrary
+ * binary data with a number of integer and floating point semantics. The
+ * accesses can be reading as well as writing. The API follows a mnemonic
+ * naming scheme. The header defines all its functions as `static inline` to
+ * minimise calling overhead. The documentation of `ufw/binary-format.h` for
+ * the full description and API.
+ *
  * @{
  */
 
@@ -99,6 +109,10 @@
  * common. This module implements all accesses on the architecture's native
  * representation. If your system does not use IEEE754 floating point
  * encoding, floating point semantics will not work as intended.
+ */
+
+/**
+ * @}
  */
 
 #ifndef INC_UFW_BINARY_FORMAT_H
@@ -2897,9 +2911,5 @@ bf_inrange_s56(const int64_t value)
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_BINARY_FORMAT_H */
