@@ -17,7 +17,7 @@
  * exist for virtually any and all programming languages. This makes it a very
  * promising mechanism for reporting test results even in large, very diverse
  * code bases. It being a protocol also allows it to directly transport test
- * results from one system to another, which makes it a candicate for running
+ * results from one system to another, which makes it a candidate for running
  * tests on embedded systems. This implementation of TAP is very portable, much
  * more portable than `libtap` for instance, making it suitable for expressing
  * test-suites in embedded systems.
