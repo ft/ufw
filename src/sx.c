@@ -28,6 +28,10 @@
  * structures.
  */
 
+/**
+ * @}
+ */
+
 #include <ctype.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -518,7 +522,3 @@ sx_cons(struct sx_node *car, struct sx_node *cdr)
     cons->data.pair->cdr = cdr;
     return cons;
 }
-
-/**
- * @}
- */

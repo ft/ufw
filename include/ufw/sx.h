@@ -10,12 +10,27 @@
 
 /**
  * @addtogroup protosexp Simple S-Expression Parser
+ *
+ * Parser for Scheme-style expressions
+ *
+ * Scheme-style expressions are flexible and expressive, next to trivial to
+ * generate, and have been used for instrumentation purposes in system tests.
+ * This is an implementation of a parser for a subset of these. It supports
+ * parsing arbitrarily deeply nested expressions and uses `malloc()` to allow
+ * for this. This feature is in the optional `ufw-sx` library, and not in the
+ * core `ufw` library. Test programs that elect to use it, must link to
+ * `ufw-sx`, therefore.
+ *
  * @{
  */
 
 /**
  * @file sx.h
  * @brief Simple S-Expression Parser API
+ */
+
+/**
+ * @}
  */
 
 #include <stdbool.h>
