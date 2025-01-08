@@ -9,7 +9,19 @@
 
 /**
  * @addtogroup clpfilter Convolution Low Pass Filters
+ *
+ * Macro-polymorphic low pass filters
+ *
  * @{
+ */
+
+/**
+ * @file convolution-low-pass.h
+ * @brief Convolution Low Pass Filters
+ */
+
+/**
+ * @}
  */
 
 /* __cplusplus note: This file is macro-only, so we don't need the extern C
@@ -131,9 +143,5 @@
         else                                                                  \
             return (tmp[in_use / 2] + tmp[(in_use / 2) - 1]) / 2;             \
     }
-
-/**
- * @}
- */
 
 #endif /* INC_UFW_CONVOLUTION_LOW_PASS_H */
