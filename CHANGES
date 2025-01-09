@@ -2,6 +2,118 @@
   User-visible changes in ufw
 -------------------------------
 
+* v6.0.0 → v6.0.1 (released 2025-01-09):
+
+** Bugfixes
+
+- alloc: Fix macro name for standard-heap implementation. The old name is kept
+  around for backward compatibility. It will be removed in the next major re-
+  lease.
+
+** Miscellaneous
+
+- Rework of documentation system. Doxygen is now the main destination for most
+  types of documentation. This includes a number of consistency updates to the
+  existing doxygen parts, and adds a number of new pieces. This also updates to
+  a modern doxygen setup: https://github.com/jothepro/doxygen-awesome-css
+- The documentation update makes the diff-stat a tad large.
+- Fixed an issue in default compat-build behaviour.
+- Improved release-test tooling.
+
+** Diffstat:
+
+    .dir-locals.el                                |    2 +-
+    cmake/README.toolchains                       |   30 -
+    doc/Doxyfile.in                               |  149 +-
+    doc/doxy-layout.xml                           |  271 ++
+    doc/doxy-mainpage.md                          |  108 +
+    doc/doxygen/custom/custom-alternative.css     |   54 +
+    doc/doxygen/custom/custom.css                 |  103 +
+    doc/doxygen/custom/header.html                |   70 +
+    .../custom/toggle-alternative-theme.js        |   12 +
+    .../doxygen-awesome-darkmode-toggle.js        |  157 +
+    .../doxygen-awesome-fragment-copy-button.js   |   85 +
+    .../doxygen-awesome-interactive-toc.js        |   91 +
+    doc/doxygen/doxygen-awesome-paragraph-link.js |   51 +
+    ...n-awesome-sidebar-only-darkmode-toggle.css |   40 +
+    doc/doxygen/doxygen-awesome-sidebar-only.css  |  116 +
+    doc/doxygen/doxygen-awesome-tabs.js           |   90 +
+    doc/doxygen/doxygen-awesome.css               | 2681 +++++++++++++++++
+    doc/fuzzing.txt                               |   85 -
+    doc/pages/cmake.md                            |  116 +
+    doc/pages/custom-target.md                    |    3 +
+    doc/pages/devel.md                            |  133 +
+    doc/pages/maintainer.md                       |  147 +
+    doc/pages/tap.md                              |    9 +
+    doc/pages/vcs.md                              |    3 +
+    doc/pages/zephyr.md                           |   19 +
+    include/ufw/allocator.h                       |   36 +-
+    include/ufw/binary-format.h                   |   17 +-
+    include/ufw/bit-operations.h                  |   35 +-
+    include/ufw/byte-buffer.h                     |   25 +
+    include/ufw/compat.h                          |   37 +-
+    include/ufw/compat/errno.h                    |   18 +-
+    include/ufw/compat/math-constants.h           |   13 +-
+    include/ufw/compat/ssize-t.h                  |   15 +-
+    include/ufw/compat/strings.h                  |   13 +-
+    include/ufw/compiler.h                        |   78 +-
+    include/ufw/convolution-low-pass.h            |   17 +-
+    include/ufw/crc/crc16-arc.h                   |   13 +
+    include/ufw/endpoints.h                       |   70 +
+    include/ufw/endpoints/continuable-sink.h      |   15 +-
+    include/ufw/hexdump.h                         |   10 +-
+    include/ufw/length-prefix.h                   |   57 +-
+    include/ufw/meta.h                            |   16 +-
+    include/ufw/octet-ring.h                      |   14 +
+    include/ufw/persistent-storage.h              |   14 +-
+    include/ufw/register-protocol.h               |   15 +-
+    include/ufw/register-table.h                  |   13 +
+    include/ufw/register-utilities.h              |   10 +
+    include/ufw/rfc1055.h                         |   15 +
+    include/ufw/ring-buffer-iter.h                |   14 +-
+    include/ufw/ring-buffer.h                     |   17 +-
+    include/ufw/sx.h                              |   21 +
+    include/ufw/test/tap.h                        |   29 +-
+    include/ufw/toolchain.h.in                    |   13 +-
+    include/ufw/variable-length-integer.h         |   17 +
+    src/allocator.c                               |   10 +
+    src/byte-buffer.c                             |   17 +-
+    src/crc-16-arc.c                              |   12 +-
+    src/endpoints/buffer.c                        |    5 +
+    src/endpoints/continuable-sink.c              |   12 +-
+    src/endpoints/core.c                          |   70 +-
+    src/endpoints/instrumentable.c                |    5 +
+    src/endpoints/posix.c                         |    5 +
+    src/endpoints/trivial.c                       |    5 +
+    src/hexdump.c                                 |    5 +
+    src/length-prefix.c                           |   50 +-
+    src/octet-ring.c                              |   14 +
+    src/persistent-storage.c                      |   13 +-
+    src/register-protocol.c                       |   14 +-
+    src/registers/core.c                          |   15 +
+    src/registers/internal.h                      |   10 +
+    src/registers/utilities.c                     |   10 +
+    src/rfc1055.c                                 |    7 +-
+    src/ring-buffer-iter.c                        |   14 +-
+    src/sx.c                                      |    9 +-
+    src/test/memdiff.c                            |    5 +
+    src/test/output-utils.c                       |   10 +
+    src/test/tap.c                                |    5 +
+    src/variable-length-integer.c                 |   10 +
+    src/z/shell-addons.c                          |    3 -
+    test/t-persistent-storage.c                   |    2 +-
+    test/t-register-protocol.c                    |    2 +-
+    test/t-register-table-persistent-storage.c    |    2 +-
+    tools/check-changes.sh                        |   14 +-
+    tools/check-copyright.sh                      |   16 +-
+    tools/check-meta-h.sh                         |   16 +-
+    tools/compat-build.sh                         |    2 +-
+    tools/generate-diffstat.sh                    |   64 +
+    tools/make-binary-format.scm                  |   40 +-
+    tools/release-tests.sh                        |   19 +-
+    89 files changed, 5314 insertions(+), 500 deletions(-)
+
+
 * v5.6.0 → v6.0.0 (released 2025-01-04):
 
 ** Deprecation:
@@ -940,13 +1052,11 @@ release, use with caution!
 
 - The logger API was removed.
 
-
 ** New Features
 
 - cmake: ufw-tap-nosan target added.
 - register-table: Allow adding per-register user-specified data.
 - register-table: Add user-specified initialisation API.
-
 
 ** Bugfixes
 
@@ -955,13 +1065,11 @@ release, use with caution!
 - register-table: Fix return code of functions encountering uninitialised
   register tables.
 
-
 ** Miscellaneous
 
 - CMake minimum version increased to ‘3.13.4’.
 - register-table: REG_* and REGx_* macros can now be generated.
 - Some code was re-indented for consistency.
-
 
 ** Diffstat:
 
