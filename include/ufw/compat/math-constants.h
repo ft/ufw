@@ -25,7 +25,7 @@
  *
  * If that is desired, first include math.h then ufw/compat/math-constants.h.
  *
- * __cplusplus note: This file is macro-only, so we don't need the extern C
+ * `__cplusplus` note: This file is macro-only, so we don't need the extern C
  * block in this header.
  *
  * @}

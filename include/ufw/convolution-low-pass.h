@@ -17,11 +17,12 @@
  * @file ufw/convolution-low-pass.h
  * @brief Convolution Low Pass Filters
  *
+ * `__cplusplus` note: This file is macro-only, so we don't need the extern C
+ * block in this header.
+ *
  * @}
  */
 
-/* __cplusplus note: This file is macro-only, so we don't need the extern C
- * block in this header. */
 
 #include <stdbool.h>
 #include <stddef.h>

@@ -17,11 +17,12 @@
  * @file ufw/ring-buffer.h
  * @brief Polymorphic ring-buffer implementation
  *
+ * `__cplusplus` note: This file is macro-only, so we don't need the extern C
+ * block in this header.
+ *
  * @}
  */
 
-/* __cplusplus note: This file is macro-only, so we don't need the extern C
- * block in this header. */
 
 #include <assert.h>
 #include <stdbool.h>

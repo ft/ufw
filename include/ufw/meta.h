@@ -18,7 +18,7 @@
  * @file ufw/meta.h
  * @brief Micro Framework Meta Information.
  *
- * __cplusplus note: This file is macro-only, so we don't need the extern C
+ * `__cplusplus` note: This file is macro-only, so we don't need the extern C
  * block in this header.
  *
  * @}
