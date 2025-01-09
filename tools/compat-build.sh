@@ -40,7 +40,7 @@ state_this=$(git describe --always --abbrev=16)
 if [ "$#" -eq 1 ]; then
     state_prev=$(git describe --always --abbrev=16 "$1")
 else
-    state_prev=$(git describe --always --abbrev=0)
+    state_prev=$(git describe --always --abbrev=0 'HEAD^')
 fi
 
 printf 'Comparing ABI/API of %s\n  from: %s\n    to: %s\n' \
