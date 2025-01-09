@@ -53,6 +53,9 @@ these tools.
   This report should be reviewed regularly and test coverage should be improved
   if possible.
 
+- `tools/generate-diffstat.sh`: This is a little helper to generate `diff-stat`
+  usable for updating the `CHANGES` file.
+
 - `tools/release-tests.sh`: Finally, this programs runs all sorts of tests and
   creates a report about any issues it encounters. If this tool is happy, a
   release can probably be pushed to public `git` repositories.
@@ -78,11 +81,6 @@ tags connected to it. Pre-Releases (`vX.Y.Z-preN`) and release-candidates
   made to `master` are much more open than with release candidates.
 
 With that being said, tasks for the maintainer before release:
-
-- `CHANGES` must be updated, keeping consistence with previous entries in the
-  file. The release date must match the according release-tag in `git`. The
-  previous release mentioned in the entry must match the release name of the
-  previous entry.
 
 - `include/ufw/meta.h` must be updated. It reflects the version of the library,
   and therefore the major/minor/patch macros defined in it must match the
@@ -126,6 +124,13 @@ With that being said, tasks for the maintainer before release:
 
 - The copyright notices must be up-to-date. This is most important to review
   with the first release of a year.
+
+- `CHANGES` must be updated, keeping consistence with previous entries in the
+  file. The release date must match the according release-tag in `git`. The
+  previous release mentioned in the entry must match the release name of the
+  previous entry. To update the `Diffstat` section, you can use the output of
+  the utility in `tools/generate-diffstat.sh`.
+
 
 - When every check is performed and passes adequately, a release can be carried
   out.
