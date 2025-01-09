@@ -169,6 +169,7 @@ check_prg mmh
 check_prg ninja
 check_prg perl
 check_prg prove
+check_prg qemu-mips
 check_prg qemu-system-arm
 check_prg sed
 check_prg tar
