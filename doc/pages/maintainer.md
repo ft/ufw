@@ -111,6 +111,8 @@ With that being said, tasks for the maintainer before release:
     of those. One quirk about this platform is that a byte on it is 16 bits
     wide. Keeping compatibility with plattforms like this is difficult.
 
+- This full release build must be completely warning free.
+
 - Since `ufw` can be a Zephyr module, a build using `ufw` in a Zephyr
   application build must by performed. This is available in `test/module`.
 
