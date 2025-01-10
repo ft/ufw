@@ -1,4 +1,4 @@
-# Overview
+# Overview {#overview}
 
 The library before you is called `micro-framework`; or `μfw` for short; or —
 more commonly and to avoid the requirement for characters beyond ASCII — `ufw`.
@@ -22,7 +22,7 @@ foreign architectures via [QEMU](https://www.qemu.org), using custom startup
 code in some cases (such as for the `cortex-m3` architecture).
 
 
-## Building the Library
+## Building the Library {#simplebuild}
 
 For convenient cross-compilation of the library, the use of its companion tool
 `mmh` (short for [MakeMeHappy](https://github.com/ft/makemehappy)) is advised.
