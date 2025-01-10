@@ -1,9 +1,9 @@
-# Test Anything Protocol Support
+# Test Anything Protocol Support {#ufwtap}
 
-## Portable C Testing Library
+## Portable C Testing Library {#ufwtapc}
 
 TBD.
 
-## Portable POSIX Shell Testing Library
+## Portable POSIX Shell Testing Library {#ufwtapsh}
 
 TBD.

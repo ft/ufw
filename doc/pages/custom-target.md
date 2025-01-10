@@ -1,3 +1,3 @@
-# Custom Target Support
+# Custom Target Support {#ufwcustomtargets}
 
 TBD.

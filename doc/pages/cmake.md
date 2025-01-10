@@ -70,8 +70,8 @@ builds it automatically sets up variables like:
 
 It is possible to do all of this setup without `mmh`. But it is recommended to
 use it, if only for convenience. Also note, that depending on the concrete
-scenario, it is possible to strip down this boilerplate a lot.
-
+scenario, it is possible to strip down this boilerplate a lot. For more
+information about `mmh` see @ref develmmh.
 
 ## CMake Modules {#cmakemodules}
 
