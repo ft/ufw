@@ -42,6 +42,7 @@ fi
 
 mkdir -p "$bd" || exit 1
 if ! [ -f "$bd"/build.ninja ]; then
+    printf 'Generating build environment in %s...\n' "$bd"
     cmake -GNinja -B "$bd" -S . -DGENERATE_API_DOCUMENTATION=True \
           2>&1 > "$log" || {
         printf 'CMake failed. Check %s.\n' "$log"
