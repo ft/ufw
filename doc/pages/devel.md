@@ -2,10 +2,12 @@
 
 ## MakeMeHappy Orchestration {#develmmh}
 
-The `mmh` build orchestration tool that uses some of `ufw`'s CMake modules to
-perform its job. In other words, if you would like to use `mmh` for build
-orchestration, you must depend on `ufw`. It is not required to link against any
-of the `ufw` libraries, but some of the CMake modules are non-optional.
+The `mmh` build orchestration tool, while not being strictly required, is
+recommended for more complex build tasks with `ufw` being involved. `mmh` uses
+some of `ufw`'s CMake modules to perform its job. In other words, if you would
+like to use `mmh` for build orchestration, you must depend on `ufw`. It is not
+required to link against any of the `ufw` libraries, but some of the CMake
+modules are non-optional.
 
 
 ### MakeMeHappy Module Support {#ufwmmhmodule}
