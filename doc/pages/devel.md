@@ -479,11 +479,10 @@ buildtools:
   - ninja
 ```
 
-The full example, where this is take from can be found here:
-
-- https://gitlab.com/ft/zephyr-sample-blinky
-
-Refer to it for details.
+The full example, where this is taken from
+[zephyr-sample-blinky](https://gitlab.com/ft/zephyr-sample-blinky), which is
+the `blinky` sample from Zephyr itself, formed into a standalone project, for
+`mmh` demonstration purpuses. Check it out for details.
 
 All `mmh` module features work with zephyr builds. Examples:
 
@@ -514,7 +513,7 @@ No compiler incidents found.
 
 ### MakeMeHappy System Builds {#mmhsystembuilds}
 
-ystem builds differ slightly from module build. Instead of asking `mmh` to
+System builds differ slightly from module builds. Instead of asking `mmh` to
 provide a system's dependencies automatically, in system builds this
 responsibility falls to the user — `mmh` fetches no code at all. Since systems
 builds are a little different in behaviour, almost all their functionality is
@@ -525,7 +524,7 @@ builds are intended to be carried out for a system.
 
 A minimal example can by found in `test/module` of the `ufw` library. A more
 complex example can be found in the `firmware` subdirectory of the
-[chip-remote](https://github.com/ft/chip-remote).
+[chip-remote](https://github.com/ft/chip-remote) project.
 
 
 ## Fuzz-Testing for ufw {#develfuzz}
