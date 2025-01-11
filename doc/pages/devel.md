@@ -300,7 +300,7 @@ firmware applications in general), you usually need to limit the build to the
 targets the application supports. Like the `posix/native` build we used earlier.
 
 `mmh` is most powerful when used with portable libraries, so their codebases
-can be exercised by as make toolchains, target, buildconfigs, and tools as
+can be exercised by as many toolchains, target, buildconfigs, and tools as
 possible. To take a look at this, we will create another tiny example. First
 our library code:
 
