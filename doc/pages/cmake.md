@@ -131,7 +131,7 @@ information about `mmh` see @ref develmmh.
 
 #### GenerateGraphics.cmake
 
-#### GitIntegration.cmake
+#### GitIntegration.cmake {#cmakegitint}
 
 #### pandocology.cmake
 
