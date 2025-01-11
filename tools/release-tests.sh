@@ -34,13 +34,19 @@ bad () {
 cleanup () {
     for file in test/module/build.log \
                 test/module/build     \
+                build-apidoc.log      \
+                build-apidoc          \
+                build-compat          \
+                build-coverage.log    \
+                build-coverage        \
                 release.log           \
-                release
+                release               \
+                api
     do
         if [ -d "$file" ]; then
             printf 'Removing directory %s...\n' "$file"
-            rm -r "$file" || fail rm-dir-"$file"
-        elif [ -f "$file" ]; then
+            rm -rf "$file" || fail rm-dir-"$file"
+        elif [ -f "$file" ] || [ -h "$file" ]; then
             printf 'Removing file %s...\n' "$file"
             rm "$file" || fail rm-file-"$file"
         fi
