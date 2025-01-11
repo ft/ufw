@@ -149,4 +149,9 @@ out.
 The next release-cycle can begin.
 
 Most of the release tests mentioned in here are automated by
-`tools/release-tests.sh`. Use it instead of doing things manually!
+`tools/release-tests.sh`. Use it instead of doing things manually! Indeed, use
+`./tools/release-tests.sh help` to see how to use the script. For a quick check
+with only the minimal set of important toolchains, `quick` is fine. When
+preparing a release, the first test (possibly untagged) may be run in `reduced`
+mode. The final test before publishing a release must run everything using the
+`run` subcommand.

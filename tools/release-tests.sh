@@ -58,6 +58,7 @@ COMMAND is one of:
   check     Run checks that "run" executes before it does its job.
   run       Run the test
   quick     Like run, but with a set of minimal builds.
+  reduced   Like run, with only ninja and debug builds.
 
 For releases, this should be run from a clean repository with
 the necessary setup being done. The run command will test the
@@ -75,7 +76,7 @@ top_level_command="$1"
 shift
 
 case "$top_level_command" in
-check|run|quick)
+check|run|quick|reduced)
     : "The rest of the script implements 'run'..."
     ;;
 help)  usage;   exit 0 ;;
@@ -100,6 +101,12 @@ cat <<EOF
 =================================
 
 EOF
+
+if [ "$top_level_command" = quick ]; then
+    label 'Running in quick mode...\n\n'
+elif [ "$top_level_command" = reduced ]; then
+    label 'Running in reduced mode...\n\n'
+fi
 
 missing_programs=''
 mmh_min_major='0'
@@ -291,6 +298,8 @@ set -- --directory release --log-to-file --show-phases --succeed
 
 if [ "$top_level_command" = quick ]; then
     set -- "$@" --config tools/quick.yaml
+elif [ "$top_level_command" = reduced ]; then
+    set -- "$@" --buildconfigs debug --buildtools ninja
 fi
 
 label '\nRelease build...\n'
