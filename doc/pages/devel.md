@@ -517,16 +517,23 @@ No compiler incidents found.
 
 System builds differ slightly from module builds. Instead of asking `mmh` to
 provide a system's dependencies automatically, in system builds this
-responsibility falls to the user — `mmh` fetches no code at all. Since systems
-builds are a little different in behaviour, almost all their functionality is
-contained in the `system` command of `mmh`. Still, when called without a
-command, `mmh` automatically defaults to `system build` if it finds a
-`system.yaml` file in the current working directory. This file specifies what
-builds are intended to be carried out for a system.
+responsibility falls to the user — `mmh` fetches no code at all. Indeed, in
+system mode `mmh` does not take the `module.yaml` files into account at all. It
+just assumes that the system provides all software in the correct version out
+of the box. Since systems builds are a little different in behaviour, almost
+all their functionality is contained in the `system` command of `mmh`. However,
+when called without a command, `mmh` automatically defaults to `system build`
+if it finds a `system.yaml` file in the current working directory. This file
+specifies what builds are intended to be carried out for a system.
 
 A minimal example can by found in `test/module` of the `ufw` library. A more
 complex example can be found in the `firmware` subdirectory of the
 [chip-remote](https://github.com/ft/chip-remote) project.
+
+Note that after having done an `mmh system build` run, subsequent invocations
+should possibly be triggered via `mmh system rebuild`, which skips the CMake
+configuration phase, and thus almost always needs way fewer recompilation
+subprocesses to run.
 
 
 ## Fuzz-Testing for ufw {#develfuzz}
