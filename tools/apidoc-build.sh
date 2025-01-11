@@ -5,7 +5,24 @@
 # Terms for redistribution and use can be found in LICENCE.
 
 bd='build-apidoc'
-log='build-apidoc.log'
+log="${bd}.log"
+
+usage () {
+    cat <<EOF
+
+usage:   ./tools/apidoc-build.sh [OPTION(s)...]
+
+Available options:
+
+  -h       Display this help text
+  -r       Only create $bd if it does not exist yet
+  -e       Enable WARN_AS_ERROR in doxygen execution
+  -o DIR   Use DIR instead of $bd for building documentation
+
+Use -r after initial builds for much increased generation speeds.
+
+EOF
+}
 
 esc=''
 
@@ -18,9 +35,10 @@ label () {
 rerun=0
 allow_warnings=1
 
-while getopts eo:r _opt; do
+while getopts eho:r _opt; do
     case "$_opt" in
     e) allow_warnings=0 ;;
+    h) usage; exit 0 ;;
     o) bd="$OPTARG" ;;
     r) rerun=1 ;;
     *) printf 'Unknown option "-%s".\n' "$_opt"
