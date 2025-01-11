@@ -317,6 +317,9 @@ label '\nABI/API compatibility test build...\n'
 }
 
 printf '\n'
+./tools/apidoc-build.sh || bad apidoc-build-failed
+
+printf '\n'
 ./tools/check-changes.sh || bad check-changes-file
 
 printf '\n'
@@ -340,6 +343,14 @@ if [ -n "$bad_stuff" ]; then
     The  release build  failed. This  absolutely cannot  happen. This  may also
     cause other  sub-tests to fail.  This can build  caused by build  errors or
     test suite failures. Fix this!
+
+EOF
+        ;;
+        apidoc-build-failed)
+            cat <<EOF
+
+    The system could not build the  library's API documentation. This is cannot
+    be the case for a release, obviously. Fix this!
 
 EOF
         ;;

@@ -50,10 +50,7 @@ if [ "$rerun" -eq 0 ]; then
     mmh -l -P -d "$out" prepare || fail prepare
     mmh -l -P -d "$out" run "$type"        \
         ++ -DUFW_ENABLE_COVERAGE=ON        \
-           -DGENERATE_API_DOCUMENTATION=ON \
         || fail build
-    ln -s "$out"/build/"$type"/code-under-test/doc/api-documentation/html api \
-       || fail link-api-docs
 else
     xninja all  || fail rebuild
     xninja test || fail retest

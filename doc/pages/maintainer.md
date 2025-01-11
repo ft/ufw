@@ -6,6 +6,9 @@ The library offers a number of tools aimed for use by the maintainer mostly.
 There is nothing wrong with anyone using them, though. This is a rundown of
 these tools.
 
+`tools/apidoc-build.sh`: Build the documentation of `ufw` and make it available
+as `api/index.html`.
+
 `tools/run`: Some of the tooling in `tools/` if written in GNU Guile Scheme.
 This is a wrapper for `guile`, that includes `scheme/` in the module search
 path, which these tools may be using. Any `*.scm` tool should be run through
@@ -109,6 +112,8 @@ toolchains:
   Keeping compatibility with plattforms like this is difficult.
 
 This full release build must be completely warning free.
+
+The API documentation must build correctly.
 
 Since `ufw` can be a Zephyr module, a build using `ufw` in a Zephyr application
 build must by performed. This is available in `test/module`.
