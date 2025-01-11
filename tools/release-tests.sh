@@ -317,7 +317,7 @@ label '\nABI/API compatibility test build...\n'
 }
 
 printf '\n'
-./tools/apidoc-build.sh || bad apidoc-build-failed
+./tools/apidoc-build.sh -e || bad apidoc-build-failed
 
 printf '\n'
 ./tools/check-changes.sh || bad check-changes-file
@@ -349,8 +349,10 @@ EOF
         apidoc-build-failed)
             cat <<EOF
 
-    The system could not build the  library's API documentation. This is cannot
-    be the case for a release, obviously. Fix this!
+    The system could not build the  library's API documentation. This test ena-
+    bles strict execution  of doxygen, which means that  any documentation war-
+    nings are  errors. For releases, this  cannot be allowed. So  fix this now,
+    rather than later!
 
 EOF
         ;;

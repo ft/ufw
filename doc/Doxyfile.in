@@ -753,11 +753,12 @@ WARN_IF_DOC_ERROR      = YES
 
 WARN_NO_PARAMDOC       = YES
 
-# If the WARN_AS_ERROR tag is set to YES then doxygen will immediately stop when
-# a warning is encountered.
+# If the WARN_AS_ERROR tag is set to YES then doxygen will immediately stop
+# when a warning is encountered. This uses the DOXYGEN_WARN_AS_ERROR
+# environment variable to possibly override the default.
 # The default value is: NO.
 
-WARN_AS_ERROR          = YES
+WARN_AS_ERROR          = $(DOXYGEN_WARN_AS_ERROR)
 
 # The WARN_FORMAT tag determines the format of the warning messages that doxygen
 # can produce. The string should contain the $file, $line, and $text tags, which

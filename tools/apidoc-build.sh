@@ -16,9 +16,11 @@ label () {
 }
 
 rerun=0
+allow_warnings=1
 
-while getopts o:r _opt; do
+while getopts eo:r _opt; do
     case "$_opt" in
+    e) allow_warnings=0 ;;
     o) bd="$OPTARG" ;;
     r) rerun=1 ;;
     *) printf 'Unknown option "-%s".\n' "$_opt"
@@ -49,6 +51,16 @@ if ! [ -f "$bd"/build.ninja ]; then
         exit 1
     }
 fi
+
+if [ "$allow_warnings" -ne 0 ]; then
+    DOXYGEN_WARN_AS_ERROR=NO
+else
+    DOXYGEN_WARN_AS_ERROR=YES
+fi
+export DOXYGEN_WARN_AS_ERROR
+printf 'Documentation warnings are treated as errors: %s\n' \
+       "$DOXYGEN_WARN_AS_ERROR"
+
 ninja -C "$bd" ufw-api-documentation || exit 1
 
 if [ -e api ] && (! [ -h api ] ); then
