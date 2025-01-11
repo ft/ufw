@@ -536,6 +536,15 @@ configuration phase, and thus almost always needs way fewer recompilation
 subprocesses to run.
 
 
+## Example Programs using the Library {#develexamples}
+
+The `example` directory contains a couple of example programs that use `ufw`.
+It may be useful for developers to take a look at these to see full examples
+instead of api-documentation and test-suite code only. Currently all of these
+examples read data from `stdin` and perform actions based on that. This is
+being use for @ref develfuzz.
+
+
 ## Fuzz-Testing for ufw {#develfuzz}
 
 ### Introduction
