@@ -91,7 +91,7 @@ issymch(const char c)
 static void NORETURN
 sxoom(const char *f, const int n)
 {
-    fprintf(stderr, "%s:%d: Could not allocate memory!\n", f, n);
+    (void)fprintf(stderr, "%s:%d: Could not allocate memory!\n", f, n);
     _Exit(1);
 }
 
