@@ -15,9 +15,11 @@ label () {
 output=''
 colour=0
 nolabel=0
-while getopts co:L _opt; do
+dofix=0
+while getopts cfo:L _opt; do
     case "$_opt" in
     c) colour=1 ;;
+    f) dofix=1 ;;
     o) output="$OPTARG" ;;
     L) nolabel=1 ;;
     *) printf 'Unknown option "-%s".\n' "$_opt"
@@ -51,10 +53,12 @@ zufw="$b"/modules/ufw/include
 
 xclangtidy () {
     if [ "$colour" -ne 0 ]; then
-        clang-tidy --use-color "$@"
-    else
-        clang-tidy "$@"
+        set -- --use-color "$@"
     fi
+    if [ "$dofix" -ne 0 ]; then
+        set -- --fix "$@"
+    fi
+    clang-tidy "$@"
 }
 
 tidy_clang_tidy () {
