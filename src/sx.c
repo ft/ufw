@@ -63,8 +63,9 @@ digit2int(const char c)
 {
     uint64_t rv = 0u;
     while (rv < 16) {
-        if (digits[rv] == c)
+        if (digits[rv] == c) {
             return rv;
+        }
         rv++;
     }
     return 0;
@@ -153,8 +154,9 @@ parse_symbol(const char *s, const size_t n, size_t *i)
     size_t j = *i;
 
     while (j < n) {
-        if (issymch(s[j]) == false)
+        if (issymch(s[j]) == false) {
             break;
+        }
         j++;
     }
 
@@ -176,8 +178,9 @@ parse_integer_(const char *s, const size_t n, size_t *i, size_t offset,
     size_t j = *i + offset;
 
     while (j < n) {
-        if (digitpredicate(s[j]) == false)
+        if (digitpredicate(s[j]) == false) {
             break;
+        }
         j++;
     }
 
@@ -193,8 +196,9 @@ parse_integer_(const char *s, const size_t n, size_t *i, size_t offset,
     while (j >= *i) {
         newi += mult * digit2int(s[j]);
         mult *= base;
-        if (j == 0u)
+        if (j == 0u) {
             break;
+        }
         j--;
     }
     *i = minu64(save, n);
@@ -254,8 +258,9 @@ void
 sx_destroy(struct sx_node **n)
 {
     struct sx_node *node = *n;
-    if (node == NULL)
+    if (node == NULL) {
         return;
+    }
 
     if (node->type == SXT_PAIR) {
         sx_destroy(&node->data.pair->car);
@@ -287,25 +292,28 @@ sx_parse_token(const char *s, const size_t n, const size_t i)
     struct sx_parse_result rv = SX_PARSE_RESULT_INIT;
     size_t j = skip_ws(s, n, i);
 
-    if (j == n)
+    if (j == n) {
         return rv;
-
+    }
 
     switch (looking_at(s, n, j)) {
     case LOOKING_AT_INT_DEC:
         rv.node = parse_integer(s, n, &j);
-        if (rv.node == NULL)
+        if (rv.node == NULL) {
             rv.status = SXS_BROKEN_INTEGER;
+        }
         break;
     case LOOKING_AT_INT_HEX:
         rv.node = parse_hinteger(s, n, &j);
-        if (rv.node == NULL)
+        if (rv.node == NULL) {
             rv.status = SXS_BROKEN_INTEGER;
+        }
         break;
     case LOOKING_AT_SYMBOL:
         rv.node = parse_symbol(s, n, &j);
-        if (rv.node == NULL)
+        if (rv.node == NULL) {
             rv.status = SXS_BROKEN_SYMBOL;
+        }
         break;
     case LOOKING_AT_PAREN_OPEN:
         rv.status = SXS_FOUND_LIST;
@@ -405,8 +413,9 @@ sx_cxr(struct sx_node *root, const char *addr)
 {
     struct sx_node *ptr = root;
     size_t i = strlen(addr);
-    if (i == 0)
+    if (i == 0) {
         return root;
+    }
 
     --i;
     for (;;) {
@@ -423,8 +432,9 @@ sx_cxr(struct sx_node *root, const char *addr)
         default:
             return NULL;
         }
-        if (i == 0u)
+        if (i == 0u) {
             break;
+        }
         --i;
     }
 
@@ -436,8 +446,9 @@ sx_pop(struct sx_node **root)
 {
     struct sx_node *node = *root;
 
-    if (node == NULL)
+    if (node == NULL) {
         return NULL;
+    }
 
     if (sx_is_pair(node) == false) {
         *root = NULL;
@@ -457,10 +468,12 @@ sx_is_list(struct sx_node *n)
 {
     struct sx_node *ptr = n;
     for (;;) {
-        if (sx_is_null(ptr))
+        if (sx_is_null(ptr)) {
             return true;
-        if (sx_is_pair(ptr) == false)
+        }
+        if (sx_is_pair(ptr) == false) {
             break;
+        }
         ptr = sx_cdr_unsafe(ptr);
     }
     return false;
@@ -469,8 +482,9 @@ sx_is_list(struct sx_node *n)
 struct sx_node *
 sx_append(struct sx_node *a, struct sx_node *b)
 {
-    if (a == NULL || b == NULL)
+    if (a == NULL || b == NULL) {
         return NULL;
+    }
 
     if (sx_is_null(a)) {
         sx_destroy(&a);
@@ -482,8 +496,9 @@ sx_append(struct sx_node *a, struct sx_node *b)
         return a;
     }
 
-    if ((sx_is_pair(a) && sx_is_pair(b)) == false)
+    if ((sx_is_pair(a) && sx_is_pair(b)) == false) {
         return NULL;
+    }
 
     struct sx_pair *ptr = a->data.pair;
     while (sx_is_pair(ptr->cdr)) {
@@ -501,8 +516,9 @@ sx_foreach(struct sx_node *node, sx_nodefnc f, void *arg)
 {
     struct sx_node *ptr = node;
 
-    if (sx_is_pair(ptr) == false)
+    if (sx_is_pair(ptr) == false) {
         return;
+    }
 
     while (sx_is_pair(ptr)) {
         f(ptr->data.pair->car, arg);
