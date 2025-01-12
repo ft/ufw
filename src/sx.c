@@ -28,6 +28,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <ctype.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -358,6 +359,7 @@ sx_parse_list(const char *s, const size_t n, const size_t i)
         return rv;
     }
     struct sx_parse_result carres = sx_parse_(s, n, i);
+    assert(carres.node != NULL);
     if (result_is_empty_listp(&carres) || result_is_error(&carres)) {
         return carres;
     }
