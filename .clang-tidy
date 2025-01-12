@@ -10,7 +10,6 @@
 #   I'm not particularly against this one. But it flags a couple of tricky
 #   positions at the moment, so it's disabled for now.
 #
-# readability-else-after-return
 # readability-function-cognitive-complexity
 # readability-magic-numbers
 # readability-named-parameter
