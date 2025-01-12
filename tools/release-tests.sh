@@ -39,6 +39,7 @@ cleanup () {
                 build-compat          \
                 build-coverage.log    \
                 build-coverage        \
+                clang-tidy.log        \
                 release.log           \
                 release               \
                 api
