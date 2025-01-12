@@ -36,74 +36,73 @@
  */
 
 /* Ser/Des */
-static bool rds_invalid_ser(RegisterValue, RegisterAtom*, bool);
-static bool rds_invalid_des(const RegisterAtom*, RegisterValue*, bool);
-static bool rds_u16_ser(RegisterValue, RegisterAtom*, bool);
-static bool rds_u16_des(const RegisterAtom*, RegisterValue*, bool);
-static bool rds_u32_ser(RegisterValue, RegisterAtom*, bool);
-static bool rds_u32_des(const RegisterAtom*, RegisterValue*, bool);
-static bool rds_u64_ser(RegisterValue, RegisterAtom*, bool);
-static bool rds_u64_des(const RegisterAtom*, RegisterValue*, bool);
-static bool rds_s16_ser(RegisterValue, RegisterAtom*, bool);
-static bool rds_s16_des(const RegisterAtom*, RegisterValue*, bool);
-static bool rds_s32_ser(RegisterValue, RegisterAtom*, bool);
-static bool rds_s32_des(const RegisterAtom*, RegisterValue*, bool);
-static bool rds_s64_ser(RegisterValue, RegisterAtom*, bool);
-static bool rds_s64_des(const RegisterAtom*, RegisterValue*, bool);
-static bool rds_f32_ser(RegisterValue, RegisterAtom*, bool);
-static bool rds_f32_des(const RegisterAtom*, RegisterValue*, bool);
-static bool rds_f64_ser(RegisterValue, RegisterAtom*, bool);
-static bool rds_f64_des(const RegisterAtom*, RegisterValue*, bool);
+static bool rds_invalid_ser(RegisterValue v, RegisterAtom *r, bool);
+static bool rds_invalid_des(const RegisterAtom *r, RegisterValue *v, bool);
+static bool rds_u16_ser(RegisterValue v, RegisterAtom *r, bool);
+static bool rds_u16_des(const RegisterAtom *r, RegisterValue *v, bool);
+static bool rds_u32_ser(RegisterValue v, RegisterAtom *r, bool);
+static bool rds_u32_des(const RegisterAtom *r, RegisterValue *v, bool);
+static bool rds_u64_ser(RegisterValue v, RegisterAtom *r, bool);
+static bool rds_u64_des(const RegisterAtom *r, RegisterValue *v, bool);
+static bool rds_s16_ser(RegisterValue v, RegisterAtom *r, bool);
+static bool rds_s16_des(const RegisterAtom *r, RegisterValue *v, bool);
+static bool rds_s32_ser(RegisterValue v, RegisterAtom *r, bool);
+static bool rds_s32_des(const RegisterAtom *r, RegisterValue *v, bool);
+static bool rds_s64_ser(RegisterValue v, RegisterAtom *r, bool);
+static bool rds_s64_des(const RegisterAtom *r, RegisterValue *v, bool);
+static bool rds_f32_ser(RegisterValue v, RegisterAtom *r, bool);
+static bool rds_f32_des(const RegisterAtom *r, RegisterValue *v, bool);
+static bool rds_f64_ser(RegisterValue v, RegisterAtom *r, bool);
+static bool rds_f64_des(const RegisterAtom *r, RegisterValue *v, bool);
 
 /* Validators */
-static inline bool rv_check_max_value(RegisterValueU, RegisterValue);
-static inline bool rv_check_min_value(RegisterValueU, RegisterValue);
-static inline bool rv_check_min(RegisterEntry*, RegisterValue);
-static inline bool rv_check_max(RegisterEntry*, RegisterValue);
-static inline bool rv_check_range(RegisterEntry*, RegisterValue);
-static inline bool rv_check_cb(RegisterEntry*, RegisterValue);
-static bool rv_validate(RegisterTable*, RegisterEntry*, RegisterValue);
+static inline bool rv_check_max_value(RegisterValueU limit, RegisterValue v);
+static inline bool rv_check_min_value(RegisterValueU limit, RegisterValue v);
+static inline bool rv_check_min(RegisterEntry *e, RegisterValue v);
+static inline bool rv_check_max(RegisterEntry *e, RegisterValue v);
+static inline bool rv_check_range(RegisterEntry *e, RegisterValue v);
+static inline bool rv_check_cb(RegisterEntry *e, RegisterValue v);
+static bool rv_validate(RegisterTable *t, RegisterEntry *e, RegisterValue v);
 
 /* Initialisation utilities */
-static AreaHandle reg_count_areas(RegisterArea*);
-static RegisterHandle reg_count_entries(RegisterEntry*);
-static RegisterHandle ra_first_entry_of_next(RegisterTable*,
-                                             RegisterArea*,
-                                             RegisterHandle);
+static AreaHandle reg_count_areas(RegisterArea *a);
+static RegisterHandle reg_count_entries(RegisterEntry *e);
+static RegisterHandle ra_first_entry_of_next(
+    RegisterTable *t, RegisterArea *a, RegisterHandle start);
 
 /* Area utilities */
-static inline bool register_area_can_write(const RegisterArea*);
-static inline bool register_area_is_writeable(const RegisterArea*);
-static inline bool register_area_is_readable(const RegisterArea*);
-static bool ra_addr_is_part_of(RegisterArea*, RegisterAddress);
-static inline bool ra_reg_is_part_of(RegisterArea*, RegisterEntry*);
-static bool ra_reg_fits_into(RegisterArea*, RegisterEntry*);
-static AreaHandle ra_find_area_by_addr(RegisterTable*, RegisterAddress);
-static inline int ra_range_touches(RegisterArea*,
-                                   RegisterAddress,
-                                   RegisterOffset);
+static inline bool register_area_can_write(const RegisterArea *a);
+static inline bool register_area_is_writeable(const RegisterArea *a);
+static inline bool register_area_is_readable(const RegisterArea *a);
+static bool ra_addr_is_part_of(RegisterArea *a, RegisterAddress addr);
+static inline bool ra_reg_is_part_of(RegisterArea *a, RegisterEntry *e);
+static bool ra_reg_fits_into(RegisterArea *a, RegisterEntry *e);
+static AreaHandle ra_find_area_by_addr(RegisterTable *t, RegisterAddress addr);
+static inline int ra_range_touches(
+    RegisterArea *a, RegisterAddress addr, RegisterOffset n);
 
 /* Entry utilities */
-static void reg_taint_in_range(RegisterTable*, RegisterAddress, RegisterOffset);
-static bool reg_entry_is_in_memory(RegisterTable*, RegisterEntry*);
-static inline RegisterAccess reg_read_entry(RegisterEntry*, RegisterAtom*);
-static inline int reg_range_touches(RegisterEntry*,
-                                    RegisterAddress,
-                                    RegisterOffset);
-static RegisterAccess reg_entry_sane(RegisterTable*, RegisterHandle);
-static RegisterAccess reg_entry_load_default(RegisterTable*, RegisterHandle);
-
-static RegisterAccess register_setx(RegisterTable*, RegisterHandle,
-                                    RegisterValue, bool);
+static void reg_taint_in_range(
+    RegisterTable *t, RegisterAddress addr, RegisterOffset n);
+static bool reg_entry_is_in_memory(
+    RegisterTable *t, RegisterEntry *e);
+static inline RegisterAccess reg_read_entry(
+    RegisterEntry *e, RegisterAtom *buf);
+static inline int reg_range_touches(
+    RegisterEntry *e, RegisterAddress addr, RegisterOffset n);
+static RegisterAccess reg_entry_sane(
+    RegisterTable *t, RegisterHandle reg);
+static RegisterAccess reg_entry_load_default(
+    RegisterTable *t, RegisterHandle reg);
+static RegisterAccess register_setx(
+    RegisterTable *t, RegisterHandle idx, RegisterValue v, bool);
 
 /* Block write utilities */
-static RegisterAccess ra_writeable(RegisterTable*,
-                                   RegisterAddress,
-                                   RegisterOffset);
-RegisterAccess ra_malformed_write(RegisterTable*,
-                                  RegisterAddress,
-                                  RegisterOffset,
-                                  RegisterAtom*);
+static RegisterAccess ra_writeable(
+    RegisterTable *t, RegisterAddress addr, RegisterOffset n);
+RegisterAccess ra_malformed_write(
+    RegisterTable *t, RegisterAddress addr, RegisterOffset n,
+    RegisterAtom *buf);
 
 /* Iteration */
 
@@ -117,21 +116,21 @@ struct maybe_register {
     RegisterHandle handle;
 };
 
-static struct maybe_area find_area(const RegisterTable*,
-                                   AreaHandle, AreaHandle,
-                                   RegisterAddress);
-static struct maybe_register find_reg(const RegisterTable*t,
-                                      RegisterHandle, RegisterHandle,
-                                      RegisterAddress);
-static RegisterAccess reg_iterate(RegisterTable*,
-                                  RegisterHandle, RegisterAddress,
-                                  registerCallback, void*);
+static struct maybe_area find_area(
+    const RegisterTable *t, AreaHandle first, AreaHandle last,
+    RegisterAddress addr);
+static struct maybe_register find_reg(
+    const RegisterTable *t, RegisterHandle first, RegisterHandle last,
+    RegisterAddress addr);
+static RegisterAccess reg_iterate(
+    RegisterTable *t, RegisterHandle start, RegisterAddress end,
+    registerCallback f, void *arg);
 
 /* Miscellaneous Utilities */
 
-static bool reg_is_hexstr(const char*, size_t);
-static RegisterAtom reg_c2a(int);
-static RegisterAtom reg_atom_from_hexstr(const char*, size_t);
+static bool reg_is_hexstr(const char *s, size_t n);
+static RegisterAtom reg_c2a(int c);
+static RegisterAtom reg_atom_from_hexstr(const char *s, size_t n);
 
 /*
  * Internal API implementation

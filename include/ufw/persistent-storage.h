@@ -142,33 +142,35 @@ typedef enum persistent_access {
  * Initialisation
  */
 
-void persistent_init(PersistentStorage*,
-                     size_t,
-                     PersistentBlockRead,
-                     PersistentBlockWrite);
-void persistent_sum16(PersistentStorage*, PersistentChksum16, uint16_t);
-void persistent_sum32(PersistentStorage*, PersistentChksum32, uint32_t);
-void persistent_place(PersistentStorage*, uint32_t);
-void persistent_buffer(PersistentStorage*, unsigned char*, size_t);
+void persistent_init(PersistentStorage *store, size_t size,
+                     PersistentBlockRead rd, PersistentBlockWrite wr);
+void persistent_sum16(PersistentStorage *store, PersistentChksum16 f,
+                      uint16_t init);
+void persistent_sum32(PersistentStorage *store, PersistentChksum32 f,
+                      uint32_t init);
+void persistent_place(PersistentStorage *store, uint32_t address);
+void persistent_buffer(PersistentStorage *store, unsigned char *buffer,
+                       size_t n);
 
 /*
  * Validation
  */
 
-PersistentAccess persistent_validate(PersistentStorage*);
+PersistentAccess persistent_validate(PersistentStorage *store);
 
 /*
  * Transfer
  */
 
-PersistentAccess persistent_fetch(void*, PersistentStorage*);
-PersistentAccess persistent_store(PersistentStorage*, const void*);
+PersistentAccess persistent_fetch(void *dst, PersistentStorage *store);
+PersistentAccess persistent_store(PersistentStorage *store, const void *src);
 
-PersistentAccess persistent_fetch_part(void*, PersistentStorage*,
-                                       size_t, size_t);
-PersistentAccess persistent_store_part(PersistentStorage*, const void*,
-                                       size_t, size_t);
-PersistentAccess persistent_reset(PersistentStorage*, unsigned char);
+PersistentAccess persistent_fetch_part(
+    void *dst, PersistentStorage *store, size_t offset, size_t n);
+PersistentAccess persistent_store_part(
+    PersistentStorage *store, const void *src, size_t offset, size_t n);
+PersistentAccess persistent_reset(
+    PersistentStorage *store, unsigned char item);
 
 #ifdef __cplusplus
 }

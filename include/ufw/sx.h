@@ -85,23 +85,23 @@ typedef struct sx_node *(*sx_nodefnc)(struct sx_node*, void*);
 
 #define SX_PARSER_INIT { .state = SXS_INIT, .error = SXE_NONE, .position = 0u }
 
-struct sx_parse_result sx_parse_string(const char*);
-struct sx_parse_result sx_parse_stringn(const char*, size_t);
-struct sx_parse_result sx_parse(const char*, size_t, size_t);
-struct sx_parse_result sx_parse_token(const char*, size_t, size_t);
-void sx_destroy(struct sx_node**);
+struct sx_parse_result sx_parse_string(const char *s);
+struct sx_parse_result sx_parse_stringn(const char *s, size_t n);
+struct sx_parse_result sx_parse(const char *s, size_t n, size_t i);
+struct sx_parse_result sx_parse_token(const char *s, size_t n, size_t i);
+void sx_destroy(struct sx_node **n);
 
-struct sx_node *sx_make_integer(uint64_t);
-struct sx_node *sx_make_symbol(const char*);
+struct sx_node *sx_make_integer(uint64_t n);
+struct sx_node *sx_make_symbol(const char *s);
 struct sx_node *sx_make_empty_list(void);
-struct sx_node *sx_cons(struct sx_node*, struct sx_node*);
+struct sx_node *sx_cons(struct sx_node *car, struct sx_node *cdr);
 
-struct sx_node *sx_cxr(struct sx_node*, const char*);
-struct sx_node *sx_pop(struct sx_node**);
-struct sx_node *sx_append(struct sx_node*, struct sx_node*);
-void sx_foreach(struct sx_node*, sx_nodefnc, void*);
+struct sx_node *sx_cxr(struct sx_node *root, const char *addr);
+struct sx_node *sx_pop(struct sx_node **root);
+struct sx_node *sx_append(struct sx_node *a, struct sx_node *b);
+void sx_foreach(struct sx_node *node, sx_nodefnc f, void *arg);
 
-bool sx_is_list(struct sx_node*);
+bool sx_is_list(struct sx_node *n);
 
 static inline bool
 sx_is_integer(const struct sx_node *node)

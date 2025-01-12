@@ -29,11 +29,11 @@
 extern "C" {
 #endif /* __cplusplus */
 
-uint16_t ufw_crc16_arc(uint16_t, const void*, size_t);
-uint16_t ufw_buffer_crc16_arc(const void*, size_t);
+uint16_t ufw_crc16_arc(uint16_t crc, const void *buffer, size_t n);
+uint16_t ufw_buffer_crc16_arc(const void *buffer, size_t len);
 
-uint16_t ufw_crc16_arc_u16(uint16_t, const uint16_t*, size_t);
-uint16_t ufw_buffer_crc16_arc_u16(const uint16_t*, size_t);
+uint16_t ufw_crc16_arc_u16(uint16_t crc, const uint16_t *buffer, size_t len);
+uint16_t ufw_buffer_crc16_arc_u16(const uint16_t *buffer, size_t len);
 
 #ifdef __cplusplus
 }

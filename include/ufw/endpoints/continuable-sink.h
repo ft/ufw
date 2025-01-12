@@ -102,7 +102,7 @@ typedef struct ContinuableSink {
         .error.id = 0,                      \
         .error.datacount = 0u               }
 
-void continuable_sink_init(Sink*, ContinuableSink*);
+void continuable_sink_init(Sink *instance, ContinuableSink *driver);
 
 #ifdef __cplusplus
 }

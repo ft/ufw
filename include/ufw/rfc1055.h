@@ -56,9 +56,9 @@ typedef struct rfc1055_context {
     { .state = RFC1055_SEARCH_FOR_START,       \
       .flags = RFC1055_WITH_SOF }
 
-void rfc1055_context_init(RFC1055Context*, uint32_t);
-int rfc1055_encode(const RFC1055Context*, Source*, Sink*);
-int rfc1055_decode(RFC1055Context*, Source*, Sink*);
+void rfc1055_context_init(RFC1055Context *ctx, uint32_t flags);
+int rfc1055_encode(const RFC1055Context *ctx, Source *source, Sink *sink);
+int rfc1055_decode(RFC1055Context *ctx, Source *source, Sink *sink);
 
 #ifdef __cplusplus
 }

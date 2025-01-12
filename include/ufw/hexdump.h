@@ -37,9 +37,10 @@ struct hexdump_cfg {
     size_t octets_per_chunk;
 };
 
-int hexdump(const struct hexdump_cfg*, const void*, size_t, size_t);
-int hexdump_stdout(const void*, size_t, size_t);
-int hexdump_stderr(const void*, size_t, size_t);
+int hexdump(const struct hexdump_cfg *cfg, const void *mem, size_t n,
+            size_t doffset);
+int hexdump_stdout(const void *mem, size_t n, size_t doffset);
+int hexdump_stderr(const void *mem, size_t n, size_t doffset);
 
 #ifdef __cplusplus
 }

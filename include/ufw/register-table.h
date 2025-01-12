@@ -439,55 +439,62 @@ typedef int(*registerCallback)(RegisterTable*, RegisterHandle, void*);
  * Public Functions
  */
 
-void register_make_bigendian(RegisterTable*, bool);
-RegisterInit register_init(RegisterTable*);
-RegisterAccess register_user_init(RegisterTable*, registerCallback);
+void register_make_bigendian(RegisterTable *t, bool bigendian);
+RegisterInit register_init(RegisterTable *t);
+RegisterAccess register_user_init(RegisterTable *t, registerCallback f);
 
-RegisterAccess reg_mem_read(const RegisterArea*, RegisterAtom*,
-                            RegisterOffset, RegisterOffset);
-RegisterAccess reg_mem_write(RegisterArea*, const RegisterAtom*,
-                             RegisterOffset, RegisterOffset);
+RegisterAccess reg_mem_read(const RegisterArea *a, RegisterAtom *dest,
+                            RegisterOffset offset, RegisterOffset n);
+RegisterAccess reg_mem_write(RegisterArea *a, const RegisterAtom *src,
+                             RegisterOffset offset, RegisterOffset n);
 
-RegisterAccess register_set(RegisterTable*, RegisterHandle,
-                            RegisterValue);
-RegisterAccess register_set_unsafe(RegisterTable*, RegisterHandle,
-                                   RegisterValue);
-RegisterAccess register_get(RegisterTable*, RegisterHandle,
-                            RegisterValue*);
+RegisterAccess register_set(RegisterTable *t, RegisterHandle idx,
+                            RegisterValue v);
+RegisterAccess register_set_unsafe(RegisterTable *t, RegisterHandle idx,
+                                   RegisterValue v);
+RegisterAccess register_get(RegisterTable *t, RegisterHandle idx,
+                            RegisterValue *v);
 
-RegisterAccess register_bit_set(RegisterTable*, RegisterHandle, RegisterValue);
-RegisterAccess register_bit_clear(RegisterTable*, RegisterHandle, RegisterValue);
+RegisterAccess register_bit_set(RegisterTable *t, RegisterHandle idx,
+                                RegisterValue v);
+RegisterAccess register_bit_clear(RegisterTable *t, RegisterHandle idx,
+                                  RegisterValue v);
 
-RegisterAccess register_default(RegisterTable*, RegisterHandle,
-                                RegisterValue*);
-RegisterAccess register_block_read(RegisterTable*, RegisterAddress,
-                                   RegisterOffset, RegisterAtom*);
-RegisterAccess register_block_write(RegisterTable*, RegisterAddress,
-                                    RegisterOffset, RegisterAtom*);
+RegisterAccess register_default(RegisterTable *t, RegisterHandle idx,
+                                RegisterValue *v);
+RegisterAccess register_block_read(RegisterTable *t, RegisterAddress addr,
+                                   RegisterOffset n, RegisterAtom *buf);
+RegisterAccess register_block_write(RegisterTable *t, RegisterAddress addr,
+                                    RegisterOffset n, RegisterAtom *buf);
 
-RegisterAccess register_block_read_unsafe(RegisterTable*, RegisterAddress,
-                                          RegisterOffset, RegisterAtom*);
-RegisterAccess register_block_write_unsafe(RegisterTable*, RegisterAddress,
-                                           RegisterOffset, RegisterAtom*);
+RegisterAccess register_block_read_unsafe(RegisterTable *t,
+                                          RegisterAddress addr,
+                                          RegisterOffset n,
+                                          RegisterAtom *buf);
+RegisterAccess register_block_write_unsafe(RegisterTable *t,
+                                           RegisterAddress addr,
+                                           RegisterOffset n,
+                                           RegisterAtom *buf);
 
-RegisterAccess register_block_touches_hole(RegisterTable*,
-                                           RegisterAddress,
-                                           RegisterOffset);
-RegisterAccess register_set_from_hexstr(RegisterTable*,
-                                        RegisterAddress,
-                                        const char*, size_t);
-RegisterAccess register_sanitise(RegisterTable*);
+RegisterAccess register_block_touches_hole(RegisterTable *t,
+                                           RegisterAddress addr,
+                                           RegisterOffset n);
+RegisterAccess register_set_from_hexstr(RegisterTable *t,
+                                        RegisterAddress start,
+                                        const char *str, size_t n);
+RegisterAccess register_sanitise(RegisterTable *t);
 
-RegisterEntry* register_get_entry(const RegisterTable*, RegisterHandle);
-size_t register_entry_size(const RegisterEntry*);
+RegisterEntry *register_get_entry(const RegisterTable *t, RegisterHandle r);
+size_t register_entry_size(const RegisterEntry *e);
 
-RegisterAccess register_mcopy(RegisterTable*, AreaHandle, AreaHandle);
-bool register_value_compare(const RegisterValue*, const RegisterValue*);
-RegisterAccess register_compare(RegisterTable*, RegisterHandle, RegisterHandle);
+RegisterAccess register_mcopy(RegisterTable *t, AreaHandle dst, AreaHandle src);
+bool register_value_compare(const RegisterValue *a, const RegisterValue *b);
+RegisterAccess register_compare(
+    RegisterTable *t, RegisterHandle a, RegisterHandle b);
 
-RegisterAccess register_foreach_in(RegisterTable*,
-                                   RegisterAddress, RegisterOffset,
-                                   registerCallback, void*);
+RegisterAccess register_foreach_in(RegisterTable *t, RegisterAddress addr,
+                                   RegisterOffset off, registerCallback f,
+                                   void *arg);
 
 static inline RegisterAddress
 register_address(RegisterTable *t, RegisterHandle reg)

@@ -40,8 +40,8 @@ typedef struct {
 
 /* _done and _advance are target type agnostic */
 
-bool rb_iter_done(const rb_iter *);
-size_t rb_iter_advance(rb_iter *);
+bool rb_iter_done(const rb_iter *iter);
+size_t rb_iter_advance(rb_iter *iter);
 
 /* Construction and inspection are not; polymorphic macros */
 

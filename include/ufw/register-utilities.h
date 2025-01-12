@@ -25,20 +25,24 @@ extern "C" {
 
 #include <ufw/register-table.h>
 
-void register_table_print(void*, const char*, const RegisterTable*);
-void register_area_print(void*, const char*, const RegisterArea*);
-void register_entry_print(void*, const char*, const RegisterEntry*);
+void register_table_print(
+    void *fh, const char *prefix, const RegisterTable *t);
+void register_area_print(
+    void *fh, const char *prefix, const RegisterArea *a);
+void register_entry_print(
+    void *fh, const char *prefix, const RegisterEntry *e);
 void register_entry_print_value(void *fh, const RegisterEntry *e);
-void register_value_print(void*, RegisterValue*);
-void register_validator_print(void*, RegisterType, const RegisterValidator*);
-void register_init_print(void*, const char*, RegisterInit);
-char *register_accesscode_to_string(RegisterAccessCode);
-char *register_initcode_to_string(RegisterInitCode);
-char *register_registertype_to_string(RegisterType);
-char *register_validatortype_to_string(RegisterValidatorType);
+void register_value_print(void *fh, RegisterValue *v);
+void register_validator_print(
+    void *h, RegisterType type, const RegisterValidator *v);
+void register_init_print(void *fh, const char *prefix, RegisterInit result);
+char *register_accesscode_to_string(RegisterAccessCode code);
+char *register_initcode_to_string(RegisterInitCode code);
+char *register_registertype_to_string(RegisterType type);
+char *register_validatortype_to_string(RegisterValidatorType type);
 
 typedef void (*fprintf_like)(void*, const char*, ...);
-void register_set_printer(fprintf_like);
+void register_set_printer(fprintf_like p);
 
 #ifdef __cplusplus
 }

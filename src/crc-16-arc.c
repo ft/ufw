@@ -54,8 +54,7 @@
 
 #include <ufw/crc/crc16-arc.h>
 
-static inline uint16_t
-crc16_octet(uint16_t, uint_least8_t);
+static inline uint16_t crc16_octet(uint16_t crc, uint_least8_t data);
 
 /** Table for CRC-16-ARC. The polynomial is 0x8005 (x^16 + x^15 + x^2 + 1). */
 static const uint16_t crc16_table[256] = {

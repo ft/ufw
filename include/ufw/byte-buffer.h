@@ -76,27 +76,31 @@ typedef struct ufw_byte_chunks {
         .active = 0u,                           \
         .chunk = (VAR)                          }
 
-int byte_buffer_set(ByteBuffer*, void*, size_t, size_t, size_t);
-void byte_buffer_null(ByteBuffer*);
+int byte_buffer_set(ByteBuffer *b, void *data, size_t size,
+                    size_t used, size_t offset);
+void byte_buffer_null(ByteBuffer *b);
 
-int byte_buffer_use(ByteBuffer*, void*, size_t);
-int byte_buffer_space(ByteBuffer*, void*, size_t);
+int byte_buffer_use(ByteBuffer *b, void *data, size_t size);
+int byte_buffer_space(ByteBuffer *b, void *data, size_t size);
 
-int byte_buffer_add(ByteBuffer*, const void*, size_t);
-int byte_buffer_consume(ByteBuffer*, void*, size_t);
-ssize_t byte_buffer_consume_at_most(ByteBuffer*, void*, size_t);
+int byte_buffer_add(ByteBuffer *b, const void *data, size_t size);
+int byte_buffer_consume(ByteBuffer *b, void *data, size_t size);
+ssize_t byte_buffer_consume_at_most(ByteBuffer *b, void *data,
+                            size_t size);
 
-int byte_buffer_rewind(ByteBuffer*);
-void byte_buffer_clear(ByteBuffer*);
-void byte_buffer_reset(ByteBuffer*);
-void byte_buffer_repeat(ByteBuffer*);
+int byte_buffer_rewind(ByteBuffer *b);
+void byte_buffer_clear(ByteBuffer *b);
+void byte_buffer_reset(ByteBuffer *b);
+void byte_buffer_repeat(ByteBuffer *b);
 
-void byte_buffer_fill(ByteBuffer*, unsigned char);
-void byte_buffer_fillx(ByteBuffer*, unsigned char, signed char);
-void byte_buffer_fill_cb(ByteBuffer*, size_t, int(*)(size_t, unsigned char*));
+void byte_buffer_fill(ByteBuffer *b, unsigned char datum);
+void byte_buffer_fillx(ByteBuffer *b, unsigned char init,
+                       signed char increment);
+void byte_buffer_fill_cb(ByteBuffer *b, size_t offset,
+                         int (*cb)(size_t, unsigned char *));
 
-size_t byte_buffer_avail(const ByteBuffer*);
-size_t byte_buffer_rest(const ByteBuffer*);
+size_t byte_buffer_avail(const ByteBuffer *b);
+size_t byte_buffer_rest(const ByteBuffer *b);
 
 #ifdef __cplusplus
 }

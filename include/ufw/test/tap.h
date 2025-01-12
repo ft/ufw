@@ -44,19 +44,16 @@ extern "C" {
 
 /* TAP worker API */
 
-bool ufw_test_ok(const char*, long unsigned int,
-                 bool, const char*,
-                 const char*, ...);
-bool ufw_test_cmp_mem(const char*, long unsigned int,
-                      const void*, const char*,
-                      const void*, const char*,
-                      size_t,
-                      const char*, ...);
+bool ufw_test_ok(const char *file, long unsigned int line, bool,
+                 const char *expr, const char *format, ...);
+bool ufw_test_cmp_mem(const char *file, long unsigned int line,
+                      const void *a, const char *an, const void *b,
+                      const char *bn, size_t n, const char *format, ...);
 
 /* TAP user API */
 
 void tap_init(void);
-void plan(long unsigned int);
+void plan(long unsigned int n);
 void noplan(void);
 
 #define ok(expr, ...)                           \
@@ -75,16 +72,18 @@ void noplan(void);
 
 /* Generic utilities for tests */
 
-size_t memdiff(const void*, const void*, size_t);
-void print_word_hex(const void*, size_t, size_t, size_t);
+size_t memdiff(const void *a, const void *b, size_t n);
+void print_word_hex(const void *memory, size_t offset, size_t bytes,
+                    size_t columns);
 
 #define unless(x) if (!(x))
 
 /* Output utilities */
 
-int ufw_tap_hexdump(const char*, unsigned long,
-                    const char*, const char*,
-                    const void*, size_t);
+int
+ufw_tap_hexdump(const char *file, unsigned long line,
+                const char *sdata, const char *ssize,
+                const void *data, size_t size);
 #define thexdump(data, size) ufw_tap_hexdump(__FILE__, __LINE__,        \
                                              #data, #size, data, size)
 

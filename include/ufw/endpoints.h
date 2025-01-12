@@ -201,21 +201,21 @@ struct ufw_sink {
         .retry = EP_RETRY_INIT,         \
         .ext.getbuffer = NULL }
 
-void octet_source_init(Source*, ByteSource, void*);
-void chunk_source_init(Source*, ChunkSource, void*);
-void octet_sink_init(Sink*, ByteSink, void*);
-void chunk_sink_init(Sink*, ChunkSink, void*);
+void octet_source_init(Source *instance, ByteSource source, void *driver);
+void chunk_source_init(Source *instance, ChunkSource source, void *driver);
+void octet_sink_init(Sink *instance, ByteSink sink, void *driver);
+void chunk_sink_init(Sink *instance, ChunkSink sink, void *driver);
 
-int source_get_octet(Source*, void*);
-int sink_put_octet(Sink*, unsigned char);
+int source_get_octet(Source *source, void *data);
+int sink_put_octet(Sink *sink, unsigned char data);
 
-ssize_t source_read(Source*, void*, size_t);
-ssize_t sink_write(Sink*, const void*, size_t);
+ssize_t source_read(Source *source, void *buf, size_t n);
+ssize_t sink_write(Sink *sink, const void *buf, size_t n);
 
-ssize_t source_get_chunk(Source*, void*, size_t);
-ssize_t source_get_chunk_atmost(Source*, void*, size_t);
-ssize_t sink_put_chunk(Sink*, const void*, size_t);
-ssize_t sink_put_chunk_atmost(Sink*, const void*, size_t);
+ssize_t source_get_chunk(Source *source, void *buf, size_t n);
+ssize_t source_get_chunk_atmost(Source *source, void *buf, size_t n);
+ssize_t sink_put_chunk(Sink *sink, const void *buf, size_t n);
+ssize_t sink_put_chunk_atmost(Sink *sink, const void *buf, size_t n);
 
 /*
  * Source to Sink Plumbing
@@ -223,23 +223,23 @@ ssize_t sink_put_chunk_atmost(Sink*, const void*, size_t);
 
 /* These makes sense in cases where either the source or the sink implements
  * the getbuffer extension. */
-ssize_t sts_some(Source*, Sink*);
-ssize_t sts_atmost(Source*, Sink*, size_t);
-ssize_t sts_n(Source*, Sink*, size_t);
-ssize_t sts_drain(Source*, Sink*);
+ssize_t sts_some(Source *source, Sink *sink);
+ssize_t sts_atmost(Source *source, Sink *sink, size_t n);
+ssize_t sts_n(Source *source, Sink *sink, size_t n);
+ssize_t sts_drain(Source *source, Sink *sink);
 
 /* These work for arbitrary sources and sinks, but requires extra copying to
  * and from the auxiliary buffer. */
-ssize_t sts_some_aux(Source*, Sink*, ByteBuffer*);
-ssize_t sts_atmost_aux(Source*, Sink*, ByteBuffer*, size_t);
-ssize_t sts_n_aux(Source*, Sink*, ByteBuffer*, size_t);
-ssize_t sts_drain_aux(Source*, Sink*, ByteBuffer*);
+ssize_t sts_some_aux(Source *source, Sink *sink, ByteBuffer *b);
+ssize_t sts_atmost_aux(Source *source, Sink *sink, ByteBuffer *b, size_t n);
+ssize_t sts_n_aux(Source *source, Sink *sink, ByteBuffer *b, size_t n);
+ssize_t sts_drain_aux(Source *source, Sink *sink, ByteBuffer *b);
 
 /* Character-by-Character Plumbing */
-ssize_t sts_cbc(Source*, Sink*);
-ssize_t sts_atmost_cbc(Source*, Sink*, size_t);
-ssize_t sts_n_cbc(Source*, Sink*, size_t);
-ssize_t sts_drain_cbc(Source*, Sink*);
+ssize_t sts_cbc(Source *source, Sink *sink);
+ssize_t sts_atmost_cbc(Source *source, Sink *sink, size_t n);
+ssize_t sts_n_cbc(Source *source, Sink *sink, size_t n);
+ssize_t sts_drain_cbc(Source *source, Sink *sink);
 
 /*
  * Generic Sources and Sinks
@@ -254,22 +254,22 @@ extern Sink sink_null;
  */
 
 #ifdef UFW_HAVE_POSIX_READ
-ssize_t run_read(void*, void*, size_t);
-void source_from_filedesc(Source*, int*);
+ssize_t run_read(void *driver, void *data, size_t n);
+void source_from_filedesc(Source *instance, int *fd);
 #endif /* UFW_HAVE_POSIX_READ */
 
 #ifdef UFW_HAVE_POSIX_WRITE
-ssize_t run_write(void*, const void*, size_t);
-void sink_to_filedesc(Sink*, int*);
+ssize_t run_write(void *driver, const void *data, size_t n);
+void sink_to_filedesc(Sink *instance, int *fd);
 #endif /* UFW_HAVE_POSIX_WRITE */
 
 /*
  * Buffer based Sources and Sinks
  */
 
-void source_from_buffer(Source*, ByteBuffer*);
-void source_from_chunks(Source*, ByteChunks*);
-void sink_to_buffer(Sink*, ByteBuffer*);
+void source_from_buffer(Source *instance, ByteBuffer *buffer);
+void source_from_chunks(Source *instance, ByteChunks *chunks);
+void sink_to_buffer(Sink *instance, ByteBuffer *buffer);
 
 /*
  * Instrumentable Sources and Sinks
@@ -328,13 +328,18 @@ typedef struct ufw_instrumentable_buffer {
         .buffer = BYTE_BUFFER_EMPTY(DATA, SIZE)         \
     }
 
-void instrumentable_set_trace(InstrumentableBuffer*, bool);
-void instrumentable_source(DataKind, Source*, InstrumentableBuffer*);
-void instrumentable_sink(DataKind, Sink*, InstrumentableBuffer*);
-void instrumentable_until_error_at(InstrumentableError*, size_t, int);
-void instrumentable_until_success_at(InstrumentableError*, size_t, int);
-void instrumentable_reset_error(InstrumentableError*);
-void instrumentable_reset_stats(InstrumentableAccessStats*);
+void instrumentable_set_trace(InstrumentableBuffer *b, bool value);
+void instrumentable_source(
+    DataKind kind, Source *instance, InstrumentableBuffer *buffer);
+void instrumentable_sink(
+    DataKind kind, Sink *instance, InstrumentableBuffer *buffer);
+void instrumentable_until_error_at(
+    InstrumentableError *e, size_t offset, int n);
+void instrumentable_until_success_at(
+    InstrumentableError *e, size_t offset, int n);
+void instrumentable_reset_error(InstrumentableError *e);
+void instrumentable_reset_stats(InstrumentableAccessStats *s);
+
 static inline void
 instrumentable_chunksize(InstrumentableBuffer *b, const size_t n)
 {

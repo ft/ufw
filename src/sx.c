@@ -347,8 +347,8 @@ result_is_error(const struct sx_parse_result *res)
     return (res->status != SXS_SUCCESS && res->status != SXS_FOUND_LIST);
 }
 
-static struct sx_parse_result sx_parse_(const char*, size_t, size_t);
-static struct sx_parse_result sx_parse_list(const char*, size_t, size_t);
+static struct sx_parse_result sx_parse_(const char *s, size_t n, size_t i);
+static struct sx_parse_result sx_parse_list(const char *s, size_t n, size_t i);
 
 static struct sx_parse_result
 sx_parse_list(const char *s, const size_t n, const size_t i)

@@ -198,64 +198,65 @@ typedef struct RPRange {
 } RPRange;
 
 /* Void Memory Implementation */
-RPBlockAccess regp_void_read16(uint32_t, size_t, uint16_t*);
-RPBlockAccess regp_void_write16(uint32_t, size_t, const uint16_t*);
+RPBlockAccess regp_void_read16(uint32_t address, size_t bsize, uint16_t *buf);
+RPBlockAccess regp_void_write16(uint32_t address, size_t bsize,
+                                const uint16_t *buf);
 
 /* Initialisation */
-void regp_init(RegP*);
+void regp_init(RegP *p);
 #ifdef WITH_UINT8_T
-void regp_use_memory8(RegP*, RPBlockRead8, RPBlockWrite8);
+void regp_use_memory8(RegP *p, RPBlockRead8 read, RPBlockWrite8 write);
 #endif /* WITH_UINT8_T */
-void regp_use_memory16(RegP*, RPBlockRead16, RPBlockWrite16);
-void regp_use_channel(RegP*, RPEndpointType, Source, Sink);
-void regp_use_allocator(RegP*, BlockAllocator*);
+void regp_use_memory16(RegP *p, RPBlockRead16 read, RPBlockWrite16 write);
+void regp_use_channel(RegP *p, RPEndpointType type, Source source, Sink sink);
+void regp_use_allocator(RegP *p, BlockAllocator *alloc);
 
 /* Request API */
-int regp_req_read8(RegP*, uint32_t, size_t);
-int regp_req_read16(RegP*, uint32_t, size_t);
+int regp_req_read8(RegP *p, uint32_t address, size_t n);
+int regp_req_read16(RegP *p, uint32_t address, size_t n);
 #ifdef WITH_UINT8_T
-int regp_req_write8(RegP*, uint32_t, size_t, const uint8_t*);
+int regp_req_write8(RegP *p, uint32_t address, size_t n, const uint8_t *buf);
 #endif /* WITH_UINT8_T */
-int regp_req_write16(RegP*, uint32_t, size_t, const uint16_t*);
+int regp_req_write16(RegP *p, uint32_t address, size_t n, const uint16_t *buf);
 
 /* Response API */
-int regp_resp_ack(RegP*, const RPFrame*, const void*, size_t);
-int regp_resp_ewordsize(RegP*, const RPFrame*);
-int regp_resp_epayloadcrc(RegP*, const RPFrame*);
-int regp_resp_epayloadsize(RegP*, const RPFrame*);
-int regp_resp_erxoverflow(RegP*, const RPFrame*, uint32_t);
-int regp_resp_etxoverflow(RegP*, const RPFrame*, uint32_t);
-int regp_resp_ebusy(RegP*, const RPFrame*);
-int regp_resp_eunmapped(RegP*, const RPFrame*, uint32_t);
-int regp_resp_eaccess(RegP*, const RPFrame*, uint32_t);
-int regp_resp_erange(RegP*, const RPFrame*, uint32_t);
-int regp_resp_einvalid(RegP*, const RPFrame*, uint32_t);
-int regp_resp_eio(RegP*, const RPFrame*);
-int regp_resp_meta(RegP*, uint_least8_t);
+int regp_resp_ack(RegP *p, const RPFrame *f, const void *pl, size_t n);
+int regp_resp_ewordsize(RegP *p, const RPFrame *f);
+int regp_resp_epayloadcrc(RegP *p, const RPFrame *f);
+int regp_resp_epayloadsize(RegP *p, const RPFrame *f);
+int regp_resp_erxoverflow(RegP *p, const RPFrame *f, uint32_t size);
+int regp_resp_etxoverflow(RegP *p, const RPFrame *f, uint32_t size);
+int regp_resp_ebusy(RegP *p, const RPFrame *f);
+int regp_resp_eunmapped(RegP *p, const RPFrame *f, uint32_t address);
+int regp_resp_eaccess(RegP *p, const RPFrame *f, uint32_t address);
+int regp_resp_erange(RegP *p, const RPFrame *f, uint32_t address);
+int regp_resp_einvalid(RegP *p, const RPFrame *f, uint32_t address);
+int regp_resp_eio(RegP *p, const RPFrame *f);
+int regp_resp_meta(RegP *p, uint_least8_t meta);
 
 /* Processing API */
-int regp_recv(RegP*, RPMaybeFrame*);
-int regp_process(RegP*, const RPMaybeFrame*);
+int regp_recv(RegP *p, RPMaybeFrame *mf);
+int regp_process(RegP *p, const RPMaybeFrame *mf);
 
 /* Matching API */
-bool regp_is_valid(const RPFrame*);
-bool regp_is_request(const RPFrame*);
-bool regp_is_response(const RPFrame*);
-bool regp_is_read_request(const RPFrame*);
-bool regp_is_write_request(const RPFrame*);
-bool regp_is_read_response(const RPFrame*);
-bool regp_is_write_response(const RPFrame*);
-bool regp_is_meta_message(const RPFrame*);
-bool regp_is_16bitsem(const RPFrame*);
-bool regp_has_hdcrc(const RPFrame*);
-bool regp_has_plcrc(const RPFrame*);
+bool regp_is_valid(const RPFrame *f);
+bool regp_is_request(const RPFrame *f);
+bool regp_is_response(const RPFrame *f);
+bool regp_is_read_request(const RPFrame *f);
+bool regp_is_write_request(const RPFrame *f);
+bool regp_is_read_response(const RPFrame *f);
+bool regp_is_write_response(const RPFrame *f);
+bool regp_is_meta_message(const RPFrame *f);
+bool regp_is_16bitsem(const RPFrame *f);
+bool regp_has_hdcrc(const RPFrame *f);
+bool regp_has_plcrc(const RPFrame *f);
 
 /* Miscellaneous API */
-void regp_free(RegP*, RPFrame*);
-void regp_reset_session(RegP*);
-bool regp_empty_intersection(const RPRange*);
-RPRange regp_range_intersection(const RPRange*, const RPRange*);
-RPRange regp_frame_intersection(const RPFrame*, const RPRange*);
+void regp_free(RegP *p, RPFrame *f);
+void regp_reset_session(RegP *p);
+bool regp_empty_intersection(const RPRange *intersect);
+RPRange regp_range_intersection(const RPRange *a, const RPRange *b);
+RPRange regp_frame_intersection(const RPFrame *f, const RPRange *r);
 
 static inline RPBlockAccess
 regaccess2blockaccess(const RegisterAccess access)

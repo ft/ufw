@@ -70,33 +70,44 @@ static const unsigned char digits[] = {
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
     'a', 'b', 'c', 'd', 'e', 'f' };
 
-static size_t bytes_to_print(struct diffstate*, size_t);
-static void difflines(struct diffstate*, struct difference*);
-static struct difference finddiff(struct diffstate*);
-static size_t lineoffset(size_t, size_t);
-static size_t nextline(size_t, size_t);
+static size_t bytes_to_print(struct diffstate *diff, size_t offset);
+static void difflines(struct diffstate *diff, struct difference *d);
+static struct difference finddiff(struct diffstate *diff);
+static size_t lineoffset(size_t byte, size_t columns);
+static size_t nextline(size_t position, size_t columns);
 
-static void diffpostcontext(struct diffstate*, struct difference*);
-static void diffprecontext(struct diffstate*, struct difference*);
-static void printline(struct diffstate*, size_t);
-static void printlines(struct diffstate*, size_t, size_t);
+static void diffpostcontext(struct diffstate *diff, struct difference *A);
+static void diffprecontext(struct diffstate *diff, struct difference *A);
+static void printline(struct diffstate *diff, size_t offset);
+static void printlines(struct diffstate *diff, size_t offset, size_t n);
 static void printskip(void);
-static bool rundiff(struct diffstate*, struct difference*, struct difference*);
+static bool rundiff(struct diffstate *diff, struct difference *A,
+                    struct difference *B);
 
-static size_t diffunderline(const void*, const void*, size_t, size_t, size_t);
-static void diffoverline(const void*, const void*, size_t, size_t, size_t);
+static size_t diffunderline(const void *a, const void *b, size_t offset,
+                            size_t n, size_t columns);
+static void diffoverline(const void *a, const void *b, size_t offset,
+                         size_t n, size_t columns);
 
-static size_t wprint_word_hex(const void*, const void*, size_t, size_t, size_t,
-                              hexdigitprinter, printableprinter);
+static size_t wprint_word_hex(const void *memory, const void *aux,
+                              size_t offset, size_t bytes, size_t columns,
+                              hexdigitprinter hexdigit,
+                              printableprinter printable);
 
-static size_t pp(const void*, const void*, size_t, unsigned char);
-static size_t px(const void*, const void*, size_t, unsigned char, size_t);
+static size_t pp(const void *a, const void *b, size_t offset,
+                 unsigned char ch);
+static size_t px(const void *a, const void *b, size_t offset,
+                 unsigned char ch, size_t idx);
 
-static size_t pp_above(const void*, const void*, size_t, unsigned char);
-static size_t px_above(const void*, const void*, size_t, unsigned char, size_t);
+static size_t pp_above(const void *a, const void *b, size_t offset,
+                       unsigned char ch);
+static size_t px_above(const void *a, const void *b, size_t offset,
+                       unsigned char ch, size_t idx);
 
-static size_t pp_below(const void*, const void*, size_t, unsigned char);
-static size_t px_below(const void*, const void*, size_t, unsigned char, size_t);
+static size_t pp_below(const void *a, const void *b, size_t offset,
+                       unsigned char ch);
+static size_t px_below(const void *a, const void *b, size_t offset,
+                       unsigned char ch, size_t idx);
 
 static size_t
 lineoffset(size_t byte, size_t columns)

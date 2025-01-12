@@ -39,30 +39,30 @@
 extern "C" {
 #endif /* __cplusplus */
 
-int varint_decode_u32(ByteBuffer*, uint32_t*);
-int varint_decode_s32(ByteBuffer*,  int32_t*);
-int varint_decode_u64(ByteBuffer*, uint64_t*);
-int varint_decode_s64(ByteBuffer*,  int64_t*);
+int varint_decode_u32(ByteBuffer *b, uint32_t *n);
+int varint_decode_s32(ByteBuffer *b, int32_t *n);
+int varint_decode_u64(ByteBuffer *b, uint64_t *n);
+int varint_decode_s64(ByteBuffer *b, int64_t *n);
 
-int varint_encode_u32(ByteBuffer*, uint32_t);
-int varint_encode_s32(ByteBuffer*,  int32_t);
-int varint_encode_u64(ByteBuffer*, uint64_t);
-int varint_encode_s64(ByteBuffer*,  int64_t);
+int varint_encode_u32(ByteBuffer *b, uint32_t n);
+int varint_encode_s32(ByteBuffer *b, int32_t n);
+int varint_encode_u64(ByteBuffer *b, uint64_t n);
+int varint_encode_s64(ByteBuffer *b, int64_t n);
 
-int varint_u32_from_source(Source*, uint32_t*);
-int varint_s32_from_source(Source*,  int32_t*);
-int varint_u64_from_source(Source*, uint64_t*);
-int varint_s64_from_source(Source*,  int64_t*);
+int varint_u32_from_source(Source *source, uint32_t *n);
+int varint_s32_from_source(Source *source, int32_t *n);
+int varint_u64_from_source(Source *source, uint64_t *n);
+int varint_s64_from_source(Source *source, int64_t *n);
 
-int varint_u32_to_sink(Sink*, uint32_t);
-int varint_s32_to_sink(Sink*,  int32_t);
-int varint_u64_to_sink(Sink*, uint64_t);
-int varint_s64_to_sink(Sink*,  int64_t);
+int varint_u32_to_sink(Sink *sink, uint32_t n);
+int varint_s32_to_sink(Sink *sink, int32_t n);
+int varint_u64_to_sink(Sink *sink, uint64_t n);
+int varint_s64_to_sink(Sink *sink, int64_t n);
 
-size_t varint_u32_length(uint32_t);
-size_t varint_s32_length( int32_t);
-size_t varint_u64_length(uint64_t);
-size_t varint_s64_length( int64_t);
+size_t varint_u32_length(uint32_t n);
+size_t varint_s32_length(int32_t n);
+size_t varint_u64_length(uint64_t n);
+size_t varint_s64_length(int64_t n);
 
 #ifdef __cplusplus
 }

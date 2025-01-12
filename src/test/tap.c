@@ -27,8 +27,9 @@
 
 static long unsigned int test_count = 0u;
 
-static void tap_result(
-    const bool, const char*, unsigned long, const char*, const char*, va_list);
+static void tap_result(bool result,
+                       const char *file, unsigned long line,
+                       const char *expr, const char *fmt, va_list ap);
 
 static void
 tap_result(const bool result,

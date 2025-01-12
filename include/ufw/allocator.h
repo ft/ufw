@@ -59,11 +59,11 @@ typedef struct BlockAllocator {
     GenericFree free;
 } BlockAllocator;
 
-int ufw_malloc(void*, void**, size_t);
-void ufw_mfree(void*, void*);
+int ufw_malloc(void *driver, void **m, size_t n);
+void ufw_mfree(void *driver, void *m);
 
-int block_alloc(BlockAllocator*, void**);
-void block_free(BlockAllocator*, void*);
+int block_alloc(BlockAllocator *ba, void **m);
+void block_free(BlockAllocator *ba, void *m);
 
 #define MAKE_GENERIC_BLOCKALLOC(_driver, _alloc, _free, _blocksize) \
     { .type = UFW_ALLOC_GENERIC,                                    \

@@ -98,21 +98,28 @@ typedef struct ufw_length_prefix_chunks {
     ByteChunks payload;
 } LengthPrefixChunks;
 
-int flenp_memory_encode(LengthPrefixKind, LengthPrefixBuffer*, void*, size_t);
-int flenp_buffer_encode(LengthPrefixKind, LengthPrefixBuffer*, ByteBuffer*);
-int flenp_buffer_encode_n(LengthPrefixKind, LengthPrefixBuffer*,
-                          ByteBuffer*, size_t);
-int flenp_chunks_use(LengthPrefixKind, LengthPrefixChunks*);
+int flenp_memory_encode(LengthPrefixKind k, LengthPrefixBuffer *lpb,
+                        void *buf, size_t n);
+int flenp_buffer_encode(LengthPrefixKind k, LengthPrefixBuffer *lpb,
+                        ByteBuffer *b);
+int flenp_buffer_encode_n(LengthPrefixKind k, LengthPrefixBuffer *lpb,
+                          ByteBuffer *b, size_t n);
+int flenp_chunks_use(LengthPrefixKind k, LengthPrefixChunks *lpc);
 
-ssize_t flenp_memory_to_sink(LengthPrefixKind, Sink*, void*, size_t);
-ssize_t flenp_buffer_to_sink(LengthPrefixKind, Sink*, ByteBuffer*);
-ssize_t flenp_buffer_to_sink_n(LengthPrefixKind, Sink*, ByteBuffer*, size_t);
-ssize_t flenp_chunks_to_sink(LengthPrefixKind, Sink*, ByteChunks*);
+ssize_t flenp_memory_to_sink(LengthPrefixKind k, Sink *sink,
+                             void *buf, size_t n);
+ssize_t flenp_buffer_to_sink(LengthPrefixKind k, Sink *sink, ByteBuffer *b);
+ssize_t flenp_buffer_to_sink_n(LengthPrefixKind k, Sink *sink, ByteBuffer *b,
+                               size_t n);
+ssize_t flenp_chunks_to_sink(LengthPrefixKind k, Sink *sink, ByteChunks *oc);
 
-ssize_t flenp_memory_from_source(LengthPrefixKind, Source*, void*, size_t);
-ssize_t flenp_buffer_from_source(LengthPrefixKind, Source*, ByteBuffer*);
+ssize_t flenp_memory_from_source(LengthPrefixKind k, Source *source,
+                                 void *mem, size_t size);
+ssize_t flenp_buffer_from_source(LengthPrefixKind k, Source *source,
+                                 ByteBuffer *b);
 
-ssize_t flenp_decode_source_to_sink(LengthPrefixKind, Source*, Sink*);
+ssize_t flenp_decode_source_to_sink(LengthPrefixKind k,
+                                    Source *source, Sink *sink);
 
 /*
  * For backward compatibility, we implement the lenp_* functions in terms of

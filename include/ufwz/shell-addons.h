@@ -11,7 +11,7 @@
 
 #include <ufw/register-table.h>
 
-void ufw_shell_fprintf(void*, const char*, ...);
-void ufw_shell_reg_init(RegisterTable*);
+void ufw_shell_fprintf(void *dst, const char *fmt, ...);
+void ufw_shell_reg_init(RegisterTable *t);
 
 #endif /* INC_UFWZ_SHELL_ADDONS_H */
