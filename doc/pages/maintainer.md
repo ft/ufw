@@ -14,6 +14,9 @@ as `api/index.html`.
 codebase. Use `-L` to suppress a label for this to be viable with `M-x compile`
 in emacs.
 
+`tools/clang-analyzer.sh`: This runs the
+[clang-analyzer](https://clang-analyzer.llvm.org) across the `ufw` codebase.
+
 `tools/run`: Some of the tooling in `tools/` if written in GNU Guile Scheme.
 This is a wrapper for `guile`, that includes `scheme/` in the module search
 path, which these tools may be using. Any `*.scm` tool should be run through
