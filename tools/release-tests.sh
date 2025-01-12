@@ -116,7 +116,7 @@ fi
 
 missing_programs=''
 mmh_min_major='0'
-mmh_min_minor='28'
+mmh_min_minor='29'
 mmh_mandatory_toolchains='gnu gnu-arm-none-eabi mips-linux-gnu'
 
 got_prg () {
