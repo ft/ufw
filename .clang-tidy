@@ -9,6 +9,10 @@
 # readability-named-parameter
 # readability-uppercase-literal-suffix
 #
+# clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
+#   This is unfortunate. If only I could disable the _s functions.
+#   The rest if fair game.
+#
 Checks: >
   *,
   -altera-id-dependent-backward-branch,
@@ -20,14 +24,18 @@ Checks: >
   -cert-err09-cpp,
   -cert-err61-cpp,
   -clang-analyzer-valist.Uninitialized,
+  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
   -cppcoreguidelines-*,
   -google-readability-braces-around-statements,
   -hicpp-*,
   -llvm-else-after-return,
   -llvm-header-guard,
   -llvmlibc-restrict-system-libc-headers,
+  -misc-include-cleaner,
+  -misc-no-recursion,
   -misc-throw-by-value-catch-by-reference,
   -modernize-*,
+  -readability-avoid-nested-conditional-operator,
   -readability-else-after-return,
   -readability-function-cognitive-complexity,
   -readability-identifier-length,
@@ -40,17 +48,6 @@ HeaderFilterRegex: .
 FormatStyle: file
 User: ft
 CheckOptions:
-  abseil-cleanup-ctad.IncludeStyle: llvm
-  abseil-string-find-startswith.AbseilStringsMatchHeader: 'absl/strings/match.h'
-  abseil-string-find-startswith.IncludeStyle: llvm
-  abseil-string-find-startswith.StringLikeClasses: '::std::basic_string'
-  abseil-string-find-str-contains.AbseilStringsMatchHeader: 'absl/strings/match.h'
-  abseil-string-find-str-contains.IncludeStyle: llvm
-  abseil-string-find-str-contains.StringLikeClasses: '::std::basic_string;::std::basic_string_view;::absl::string_view'
-  altera-single-work-item-barrier.AOCVersion: '1600'
-  altera-struct-pack-align.MaxConfiguredAlignment: '128'
-  altera-unroll-loops.MaxLoopIterations: '100'
-  android-comparison-in-temp-failure-retry.RetryMacros: TEMP_FAILURE_RETRY
   bugprone-argument-comment.CommentBoolLiterals: '0'
   bugprone-argument-comment.CommentCharacterLiterals: '0'
   bugprone-argument-comment.CommentFloatLiterals: '0'
@@ -139,44 +136,6 @@ CheckOptions:
   cert-str34-c.CharTypdefsToIgnore: ''
   cert-str34-c.DiagnoseSignedUnsignedCharComparisons: 'false'
   concurrency-mt-unsafe.FunctionSet: any
-  cppcoreguidelines-avoid-do-while.IgnoreMacros: 'false'
-  cppcoreguidelines-avoid-magic-numbers.IgnoreAllFloatingPointValues: 'false'
-  cppcoreguidelines-avoid-magic-numbers.IgnoreBitFieldsWidths: 'true'
-  cppcoreguidelines-avoid-magic-numbers.IgnorePowersOf2IntegerValues: 'false'
-  cppcoreguidelines-avoid-magic-numbers.IgnoredFloatingPointValues: '1.0;100.0;'
-  cppcoreguidelines-avoid-magic-numbers.IgnoredIntegerValues: '1;2;3;4;'
-  cppcoreguidelines-explicit-virtual-functions.AllowOverrideAndFinal: 'false'
-  cppcoreguidelines-explicit-virtual-functions.FinalSpelling: final
-  cppcoreguidelines-explicit-virtual-functions.IgnoreDestructors: 'false'
-  cppcoreguidelines-explicit-virtual-functions.OverrideSpelling: override
-  cppcoreguidelines-init-variables.IncludeStyle: llvm
-  cppcoreguidelines-init-variables.MathHeader: '<math.h>'
-  cppcoreguidelines-macro-usage.AllowedRegexp: '^DEBUG_*'
-  cppcoreguidelines-macro-usage.CheckCapsOnly: 'false'
-  cppcoreguidelines-macro-usage.IgnoreCommandLineMacros: 'true'
-  cppcoreguidelines-narrowing-conversions.IgnoreConversionFromTypes: ''
-  cppcoreguidelines-narrowing-conversions.PedanticMode: 'false'
-  cppcoreguidelines-narrowing-conversions.WarnOnEquivalentBitWidth: 'true'
-  cppcoreguidelines-narrowing-conversions.WarnOnFloatingPointNarrowingConversion: 'true'
-  cppcoreguidelines-narrowing-conversions.WarnOnIntegerNarrowingConversion: 'true'
-  cppcoreguidelines-narrowing-conversions.WarnOnIntegerToFloatingPointNarrowingConversion: 'true'
-  cppcoreguidelines-narrowing-conversions.WarnWithinTemplateInstantiation: 'false'
-  cppcoreguidelines-no-malloc.Allocations: '::malloc;::calloc'
-  cppcoreguidelines-no-malloc.Deallocations: '::free'
-  cppcoreguidelines-no-malloc.Reallocations: '::realloc'
-  cppcoreguidelines-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic: 'true'
-  cppcoreguidelines-non-private-member-variables-in-classes.IgnorePublicMemberVariables: 'false'
-  cppcoreguidelines-owning-memory.LegacyResourceConsumers: '::free;::realloc;::freopen;::fclose'
-  cppcoreguidelines-owning-memory.LegacyResourceProducers: '::malloc;::aligned_alloc;::realloc;::calloc;::fopen;::freopen;::tmpfile'
-  cppcoreguidelines-prefer-member-initializer.UseAssignment: 'false'
-  cppcoreguidelines-pro-bounds-constant-array-index.GslHeader: ''
-  cppcoreguidelines-pro-bounds-constant-array-index.IncludeStyle: llvm
-  cppcoreguidelines-pro-type-member-init.IgnoreArrays: 'false'
-  cppcoreguidelines-pro-type-member-init.UseAssignment: 'false'
-  cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions: 'false'
-  cppcoreguidelines-special-member-functions.AllowMissingMoveFunctionsWhenCopyIsDeleted: 'false'
-  cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor: 'false'
-  fuchsia-header-anon-namespaces.HeaderFileExtensions: ';h;hh;hpp;hxx'
   google-build-namespaces.HeaderFileExtensions: ';h;hh;hpp;hxx'
   google-global-names-in-headers.HeaderFileExtensions: ';h;hh;hpp;hxx'
   google-readability-braces-around-statements.ShortStatementLines: '1'
