@@ -91,10 +91,12 @@ clean) cleanup; exit 0 ;;
        usage;   exit 1 ;;
 esac
 
+runtidy=1
 previous_version=''
-while getopts p: _opt; do
+while getopts Tp: _opt; do
     case "$_opt" in
     p) previous_version="$OPTARG" ;;
+    T) runtidy=0 ;;
     *) printf 'Unknown option "-%s".\n' "$_opt"
        exit 1 ;;
     esac
@@ -171,6 +173,7 @@ check_prg abi-compliance-checker
 check_prg abi-dumper
 check_prg awk
 check_prg cmake
+check_prg clang-tidy
 check_prg ctags
 check_prg date
 check_prg doxygen
@@ -334,6 +337,11 @@ label '\nABI/API compatibility test build...\n'
 printf '\n'
 ./tools/apidoc-build.sh -e || bad apidoc-build-failed
 
+if [ "$runtidy" -ne 0 ]; then
+    printf '\n'
+    ./tools/clang-tidy.sh -c -o clang-tidy.log run || bad clang-tidy-unclean
+fi
+
 printf '\n'
 ./tools/check-changes.sh || bad check-changes-file
 
@@ -377,6 +385,16 @@ EOF
     MakeMeHappy detected compiler incidents (errors,  warnings, etc) in the log
     file of  the release build. The  library should be warning  free at release
     time. Fix this before continuing with the release process!
+
+EOF
+        ;;
+        clang-tidy-unclean)
+            cat <<EOF
+
+    ufw has a clang-tidy configuration and  should be clean from any clang-tidy
+    warnings and  errors. There might be  some latitude toward this  test. If a
+    maintainer decides it  is not worth satisfying at the  time, running it can
+    be disabled by passing "-T" to "release-test.sh".
 
 EOF
         ;;

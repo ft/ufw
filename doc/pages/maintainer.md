@@ -9,6 +9,11 @@ these tools.
 `tools/apidoc-build.sh`: Build the documentation of `ufw` and make it available
 as `api/index.html`.
 
+`tools/clang-tidy.sh`: This runs
+[clang-tidy](https://clang.llvm.org/extra/clang-tidy/) across the `ufw`
+codebase. Use `-L` to suppress a label for this to be viable with `M-x compile`
+in emacs.
+
 `tools/run`: Some of the tooling in `tools/` if written in GNU Guile Scheme.
 This is a wrapper for `guile`, that includes `scheme/` in the module search
 path, which these tools may be using. Any `*.scm` tool should be run through

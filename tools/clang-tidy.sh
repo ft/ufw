@@ -108,7 +108,7 @@ ensure () {
     done
     if [ "$erc" -eq 0 ]; then
         if [ "$nolabel" -eq 0 ]; then
-            label 'Running clang-tidy against codebase...\n'
+            label 'Running clang-tidy across the codebase...\n'
         fi
         if [ -n "$output" ]; then
             printf 'Output is logged to "%s".\n' "$output"
