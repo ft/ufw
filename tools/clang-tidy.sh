@@ -9,9 +9,13 @@ label () {
 }
 
 output=''
-while getopts o: _opt; do
+colour=0
+nolabel=0
+while getopts co:L _opt; do
     case "$_opt" in
+    c) colour=1 ;;
     o) output="$OPTARG" ;;
+    L) nolabel=1 ;;
     *) printf 'Unknown option "-%s".\n' "$_opt"
        exit 1 ;;
     esac
@@ -40,6 +44,14 @@ zsoc="$zephyr"/soc/native/inf_clock
 zboard="$zephyr"/boards/native/native_sim
 zgenerated="$b"/zephyr/include/generated
 zufw="$b"/modules/ufw/include
+
+xclangtidy () {
+    if [ "$colour" -ne 0 ]; then
+        clang-tidy --use-color "$@"
+    else
+        clang-tidy "$@"
+    fi
+}
 
 tidy_clang_tidy () {
     # Suppress processing messages
@@ -91,7 +103,9 @@ ensure () {
         esac
     done
     if [ "$erc" -eq 0 ]; then
-        label 'Running clang-tidy against codebase...\n'
+        if [ "$nolabel" -eq 0 ]; then
+            label 'Running clang-tidy against codebase...\n'
+        fi
         if [ -n "$output" ]; then
             printf 'Output is logged to "%s".\n' "$output"
         fi
@@ -102,7 +116,7 @@ ensure () {
 rc=0
 case "$mode" in
 run)
-    ensure && clang-tidy --use-color "$@" --                      \
+    ensure && xclangtidy "$@" --                                  \
                          -imacros "$zgenerated"/zephyr/autoconf.h \
                          -isystem "$zinclude"                     \
                          -isystem "$zgenerated"                   \
