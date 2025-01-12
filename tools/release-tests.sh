@@ -39,6 +39,8 @@ cleanup () {
                 build-compat          \
                 build-coverage.log    \
                 build-coverage        \
+                build-analyze.log     \
+                build-analyze         \
                 clang-tidy.log        \
                 release.log           \
                 release               \
@@ -93,10 +95,12 @@ clean) cleanup; exit 0 ;;
 esac
 
 runtidy=1
+runanalyzer=1
 previous_version=''
-while getopts Tp: _opt; do
+while getopts ATp: _opt; do
     case "$_opt" in
     p) previous_version="$OPTARG" ;;
+    A) runanalyzer=0 ;;
     T) runtidy=0 ;;
     *) printf 'Unknown option "-%s".\n' "$_opt"
        exit 1 ;;
@@ -172,6 +176,7 @@ zephyr_module_setup_ok () {
 
 check_prg abi-compliance-checker
 check_prg abi-dumper
+check_prg "${UFW_CLANG_ANALYZER:-analyze-build-19}"
 check_prg awk
 check_prg cmake
 check_prg clang-tidy
@@ -190,6 +195,7 @@ check_prg qemu-mips
 check_prg qemu-system-arm
 check_prg sed
 check_prg tar
+check_prg w3m
 
 if [ -n "$missing_programs" ]; then
     printf '\nRequired programs missing:\n\n'
@@ -343,6 +349,11 @@ if [ "$runtidy" -ne 0 ]; then
     ./tools/clang-tidy.sh -c -o clang-tidy.log run || bad clang-tidy-unclean
 fi
 
+if [ "$runanalyzer" -ne 0 ]; then
+    printf '\n'
+    ./tools/clang-analyzer.sh || bad clang-analyzer
+fi
+
 printf '\n'
 ./tools/check-changes.sh || bad check-changes-file
 
@@ -386,6 +397,17 @@ EOF
     MakeMeHappy detected compiler incidents (errors,  warnings, etc) in the log
     file of  the release build. The  library should be warning  free at release
     time. Fix this before continuing with the release process!
+
+EOF
+        ;;
+        clang-analyzer)
+            cat <<EOF
+
+    Clang's static code analyzer signaled  possible bugs. Please review and fix
+    those. If  a signaled  issue is indeed  a false-positive,  maintainers have
+    some latitude  to ignore this  warning. This  is unlikely, however.  Do not
+    just claim  false positives just  because you  do not understand  the issue
+    fully. Use "-A" to "release-test.sh" to turn this test off.
 
 EOF
         ;;
@@ -495,8 +517,13 @@ Reports and documentation for review:
   api/index.html
   build-coverage/index.html
   build-compat/report.html
-
 EOF
+
+if [ -e build-analyze/report ]; then
+    printf '  %s\n' build-analyze/report/index.html
+fi
+
+printf '\n'
 
 # Aaaand we are done... #######################################################
 
