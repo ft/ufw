@@ -20,6 +20,7 @@
  * @}
  */
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include <ufw/allocator.h>
