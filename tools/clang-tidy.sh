@@ -18,7 +18,19 @@ while getopts o: _opt; do
 done
 shift $(( OPTIND - 1 ))
 
-mode="${1:-run}"
+mode='run'
+if [ "$#" -gt 0 ]; then
+    mode="$1"
+    shift
+fi
+
+if [ "$#" -eq 0 ]; then
+    set --                 \
+        src/*/*.[ch]       \
+        src/*.[ch]         \
+        include/*/*/*.[ch] \
+        include/*/*.[ch]
+fi
 
 t="$PWD"/test/module
 b="$t"/build/zephyr/native-sim/mini-zephyr-fw/host/debug
@@ -52,11 +64,6 @@ make_error () {
         return "$?"
     fi
 }
-
-set -- src/*/*.[ch]          \
-       src/*.[ch]            \
-       include/*/*/*.[ch]    \
-       include/*/*.[ch]
 
 ensure () {
     set --                              \
