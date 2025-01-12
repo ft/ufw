@@ -27,7 +27,7 @@
  * If retval >= dsize, truncation occurred.
  */
 size_t
-strlcat(char *dst, const char *src, size_t dsize)
+strlcat(char *dst, const char *src, size_t dsize) /* NOLINT */
 {
 	const char *odst = dst;
 	const char *osrc = src;
