@@ -19,8 +19,8 @@
  */
 
 #include <ufw/octet-ring.h>
-#include <ufw/ring-buffer.h>
 #include <ufw/ring-buffer-iter.h>
+#include <ufw/ring-buffer.h>
 
 RING_BUFFER(octet_ring,      uint8_t)
 RING_BUFFER_ITER(octet_ring, uint8_t)

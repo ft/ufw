@@ -23,8 +23,8 @@
 
 #include <stdint.h>
 
-#include <ufw/ring-buffer.h>
 #include <ufw/ring-buffer-iter.h>
+#include <ufw/ring-buffer.h>
 
 #ifdef __cplusplus
 extern "C" {
