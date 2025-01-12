@@ -182,7 +182,7 @@ diffprecontext(struct diffstate *diff, struct difference *A)
         printlines(diff, 0u, A->lineoffset/diff->columns);
     } else {
         printskip();
-        printlines(diff, A->lineoffset - diff->context*diff->columns,
+        printlines(diff, A->lineoffset - (diff->context*diff->columns),
                    diff->context);
     }
 }
@@ -231,7 +231,8 @@ rundiff(struct diffstate *diff, struct difference *A, struct difference *B)
             printlines(diff, offset, lines);
         } else {
             const size_t postoffset = A->lineoffset+diff->columns;
-            const size_t preoffset = B->lineoffset-diff->columns*diff->context;
+            const size_t preoffset =
+                B->lineoffset - (diff->columns*diff->context);
             printlines(diff, postoffset, diff->context);
             printskip();
             printlines(diff, preoffset, diff->context);
