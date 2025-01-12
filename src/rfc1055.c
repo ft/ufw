@@ -183,6 +183,7 @@ transition(Source *source)
 }
 
 int
+/* NOLINTNEXTLINE(readability-function-cognitive-complexity) */
 rfc1055_decode(RFC1055Context *ctx, Source *source, Sink *sink)
 {
     unsigned char data = 0u;

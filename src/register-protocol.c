@@ -887,6 +887,7 @@ regp_recv(RegP *p, RPMaybeFrame *mf)
 }
 
 int
+/* NOLINTNEXTLINE(readability-function-cognitive-complexity) */
 regp_process(RegP *p, const RPMaybeFrame *mf)
 {
     /*

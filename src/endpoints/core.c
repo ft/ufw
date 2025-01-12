@@ -303,6 +303,7 @@ struct size_error {
  * differently. That's why this returns both the error condition and the,
  * possibly partial, read count. */
 static inline struct size_error
+/* NOLINTNEXTLINE(readability-function-cognitive-complexity) */
 source_read_multi(Source *source, void *buf, const size_t n)
 {
     trace();
@@ -478,6 +479,7 @@ sink_write(Sink *sink, const void *buf, const size_t n)
 /* Similar to source_read_multi(), this is the worker for sink_put_chunk() and
  * sink_put_chunk_atmost(). */
 static inline struct size_error
+/* NOLINTNEXTLINE(readability-function-cognitive-complexity) */
 sink_write_multi(Sink *sink, const void *buf, const size_t n)
 {
     trace();
