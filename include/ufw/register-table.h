@@ -162,7 +162,7 @@ typedef struct RegisterValidator {
 #define REGV_INIT { .type = REGV_TYPE_TRIVIAL }
 
 typedef enum RegisterEntryFlags {
-    REG_EF_TOUCHED = (1u << 0u)
+    REG_EF_TOUCHED = (1U << 0U)
 } RegisterEntryFlags;
 
 struct RegisterEntry {
@@ -184,9 +184,9 @@ struct RegisterEntry {
       .flags = 0, .user = NULL }
 
 typedef enum RegisterAreaFlags {
-    REG_AF_READABLE = (1u << 0u),
-    REG_AF_WRITEABLE = (1u << 1u),
-    REG_AF_SKIP_DEFAULTS = (1u << 2u)
+    REG_AF_READABLE      = (1U << 0U),
+    REG_AF_WRITEABLE     = (1U << 1U),
+    REG_AF_SKIP_DEFAULTS = (1U << 2U)
 } RegisterAreaFlags;
 
 #define REG_AF_RW (REG_AF_READABLE | REG_AF_WRITEABLE)
@@ -216,9 +216,9 @@ struct RegisterArea {
       .mem = NULL }
 
 typedef enum RegisterTableFlags {
-    REG_TF_INITIALISED = (1u << 0u),
-    REG_TF_DURING_INIT = (1u << 1u),
-    REG_TF_BIG_ENDIAN  = (1u << 2u)
+    REG_TF_INITIALISED = (1U << 0U),
+    REG_TF_DURING_INIT = (1U << 1U),
+    REG_TF_BIG_ENDIAN  = (1U << 2U)
 } RegisterTableFlags;
 
 typedef struct RegisterTable {

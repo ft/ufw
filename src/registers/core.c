@@ -310,7 +310,7 @@ static bool
 rds_f32_ser(const RegisterValue v, RegisterAtom *r, const bool bigendian)
 {
     assert(v.type == REG_TYPE_FLOAT32);
-    if ((v.value.f32 != 0.f) && (isnormal(v.value.f32) == false)) {
+    if ((v.value.f32 != 0.F) && (isnormal(v.value.f32) == false)) {
         return false;
     }
     if (bigendian) {
@@ -330,7 +330,7 @@ rds_f32_des(const RegisterAtom *r, RegisterValue *v, const bool bigendian)
         v->value.f32 = bf_ref_f32l(r);
     }
     v->type = REG_TYPE_FLOAT32;
-    return ((v->value.f32 == 0.f) || (isnormal(v->value.f32) == true));
+    return ((v->value.f32 == 0.F) || (isnormal(v->value.f32) == true));
 }
 
 static bool
@@ -525,7 +525,7 @@ reg_entry_sane(RegisterTable *t, RegisterHandle reg)
     /* Make sure the current value is fits into table constraints */
     if (rv_validate(t, t->entry + reg, current)) {
         rv.code = REG_ACCESS_SUCCESS;
-        rv.address = 0u;
+        rv.address = 0U;
     } else {
         rv.code = REG_ACCESS_RANGE;
         rv.address = reg;
@@ -545,7 +545,7 @@ reg_entry_load_default(RegisterTable *t, RegisterHandle reg)
 static void
 reg_taint_in_range(RegisterTable *t, RegisterAddress addr, RegisterOffset n)
 {
-    for (RegisterOffset i = 0ul; i < t->entries; ++i) {
+    for (RegisterOffset i = 0UL; i < t->entries; ++i) {
         int touch = reg_range_touches(&t->entry[i], addr, n);
         if (touch > 0) {
             return;
@@ -560,7 +560,7 @@ reg_taint_in_range(RegisterTable *t, RegisterAddress addr, RegisterOffset n)
 static AreaHandle
 reg_count_areas(RegisterArea *a)
 {
-    AreaHandle n = 0ull;
+    AreaHandle n = 0ULL;
     while ((n < AREA_HANDLE_MAX) && (is_end_of_areas(a) == false)) {
         n++;
         a++;
@@ -571,7 +571,7 @@ reg_count_areas(RegisterArea *a)
 static RegisterHandle
 reg_count_entries(RegisterEntry *e)
 {
-    RegisterHandle n = 0ull;
+    RegisterHandle n = 0ULL;
     while ((n < REGISTER_HANDLE_MAX) && (is_end_of_entries(e) == false)) {
         n++;
         e++;
@@ -627,7 +627,7 @@ static AreaHandle
 ra_find_area_by_addr(RegisterTable *t, RegisterAddress addr)
 {
     AreaHandle n;
-    for (n = 0ull; n < t->areas; ++n) {
+    for (n = 0ULL; n < t->areas; ++n) {
         if (ra_addr_is_part_of(&t->area[n], addr)) {
             break;
         }
@@ -639,7 +639,7 @@ ra_find_area_by_addr(RegisterTable *t, RegisterAddress addr)
 static bool
 reg_entry_is_in_memory(RegisterTable *t, RegisterEntry *e)
 {
-    for (AreaHandle an = 0ul; an < t->areas; ++an) {
+    for (AreaHandle an = 0UL; an < t->areas; ++an) {
         RegisterArea *area = &t->area[an];
         if (ra_reg_is_part_of(area, e)) {
             if (ra_reg_fits_into(area, e) == false) {
@@ -699,7 +699,7 @@ ra_writeable(RegisterTable *t, RegisterAddress addr, RegisterOffset n)
      *   at all possible for the register abstraction to modify the range of
      *   memory in question.
      */
-    for (AreaHandle i = 0ul; i < t->areas; ++i) {
+    for (AreaHandle i = 0UL; i < t->areas; ++i) {
         int touch = ra_range_touches(&t->area[i], addr, n);
         if (touch < 0) {
             continue;
@@ -724,7 +724,7 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr,
     RegisterAccess rv = REG_ACCESS_RESULT_INIT;
     RegisterAddress last = addr + n - 1;
 
-    for (RegisterHandle i = 0ul; i < t->entries; ++i) {
+    for (RegisterHandle i = 0UL; i < t->entries; ++i) {
         RegisterEntry *e = &t->entry[i];
         RegisterValue datum;
         RegisterAtom raw[REG_SIZEOF_LARGEST_DATUM];
@@ -782,12 +782,12 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr,
         rlen = size;
         if (addr > e->address) {
             /* This can only happen with the first entry the block touches. */
-            bs = 0ull;
+            bs = 0ULL;
             rs = addr - e->address;
             rlen -= rs - 1;
         } else {
             bs = e->address - addr;
-            rs = 0ull;
+            rs = 0ULL;
         }
 
         if (end > last) {
@@ -823,7 +823,7 @@ ra_malformed_write(RegisterTable *t, RegisterAddress addr,
 static bool
 reg_is_hexstr(const char *s, const size_t n)
 {
-    for (size_t idx = 0u; idx < n; ++idx) {
+    for (size_t idx = 0U; idx < n; ++idx) {
         if (isxdigit((int)s[idx]) == false) {
             return false;
         }
@@ -836,34 +836,34 @@ static RegisterAtom
 reg_c2a(int c)
 {
     switch (c) {
-    case '1': return 1u;
-    case '2': return 2u;
-    case '3': return 3u;
-    case '4': return 4u;
-    case '5': return 5u;
-    case '6': return 6u;
-    case '7': return 7u;
-    case '8': return 8u;
-    case '9': return 9u;
-    case 'a': return 10u;
-    case 'b': return 11u;
-    case 'c': return 12u;
-    case 'd': return 13u;
-    case 'e': return 14u;
-    case 'f': return 15u;
-    default: return 0u;
+    case '1': return  1U;
+    case '2': return  2U;
+    case '3': return  3U;
+    case '4': return  4U;
+    case '5': return  5U;
+    case '6': return  6U;
+    case '7': return  7U;
+    case '8': return  8U;
+    case '9': return  9U;
+    case 'a': return 10U;
+    case 'b': return 11U;
+    case 'c': return 12U;
+    case 'd': return 13U;
+    case 'e': return 14U;
+    case 'f': return 15U;
+    default:  return 0U;
     }
 }
 
 static RegisterAtom
 reg_atom_from_hexstr(const char *s, const size_t n)
 {
-    RegisterAtom rv = 0u;
+    RegisterAtom rv = 0U;
 
-    for (size_t idx = 0u; idx < n; ++idx) {
-        const size_t shift = (n-idx-1) * 4u;
+    for (size_t idx = 0U; idx < n; ++idx) {
+        const size_t shift = (n - idx - 1) * 4U;
         const RegisterAtom v = reg_c2a(tolower((int)s[idx]));
-        rv |= (v & 0x0fu) << shift;
+        rv |= (v & 0x0fU) << shift;
     }
 
     return rv;
@@ -940,7 +940,7 @@ register_init(RegisterTable *t) /* NOLINT */
         return rv;
     }
 
-    if (t->areas == 0ul) {
+    if (t->areas == 0UL) {
         rv.code = REG_INIT_NO_AREAS;
         rv.pos.area = 0;
         BIT_CLEAR(t->flags, REG_TF_DURING_INIT);
@@ -948,7 +948,7 @@ register_init(RegisterTable *t) /* NOLINT */
     }
 
     previous = t->area[0].base;
-    for (AreaHandle i = 1ul; i < t->areas; ++i) {
+    for (AreaHandle i = 1UL; i < t->areas; ++i) {
         const RegisterAddress current = t->area[i].base;
         if (current < previous) {
             rv.code = REG_INIT_AREA_INVALID_ORDER;
@@ -966,7 +966,7 @@ register_init(RegisterTable *t) /* NOLINT */
     }
 
     previous = t->entry[0].address;
-    for (RegisterHandle i = 1ul; i < t->entries; ++i) {
+    for (RegisterHandle i = 1UL; i < t->entries; ++i) {
         const RegisterAddress current = t->entry[i].address;
         if (t->entry[i].address < previous) {
             rv.code = REG_INIT_ENTRY_INVALID_ORDER;
@@ -992,14 +992,14 @@ register_init(RegisterTable *t) /* NOLINT */
      * correctly. Only initialising the first item of the array. Initialise all
      * memory to zero upon boot then...
      */
-    for (AreaHandle i = 0ul; i < t->areas; ++i) {
+    for (AreaHandle i = 0UL; i < t->areas; ++i) {
         if (t->area[i].mem != NULL) {
             memset(t->area[i].mem, 0, t->area[i].size * sizeof(RegisterAtom));
         }
     }
 
     BIT_SET(t->flags, REG_TF_INITIALISED);
-    for (RegisterHandle i = 0ul; i < t->entries; ++i) {
+    for (RegisterHandle i = 0UL; i < t->entries; ++i) {
         RegisterEntry *e = &t->entry[i];
         /* Link into register table memory */
         bool success = reg_entry_is_in_memory(t, e);
@@ -1029,8 +1029,8 @@ register_init(RegisterTable *t) /* NOLINT */
     }
 
     /* Now link entries back into their area (first and last) */
-    RegisterHandle entry = 0ul;
-    for (AreaHandle i = 0ul; i < t->areas; ++i) {
+    RegisterHandle entry = 0UL;
+    for (AreaHandle i = 0UL; i < t->areas; ++i) {
         RegisterArea *a = &t->area[i];
         RegisterEntry *e = &t->entry[entry];
         /* The area and entry lists of a table are sorted by address and all
@@ -1039,7 +1039,7 @@ register_init(RegisterTable *t) /* NOLINT */
          * empty and does not contain any entry at all. */
         if (entry < t->entries && ra_addr_is_part_of(a, e->address)) {
             a->entry.first = entry;
-            entry = ra_first_entry_of_next(t, a, entry + 1u);
+            entry = ra_first_entry_of_next(t, a, entry + 1U);
             a->entry.last = entry - 1;
             a->entry.count = entry - a->entry.first;
         } else {
@@ -1093,7 +1093,7 @@ register_user_init(RegisterTable *t, registerCallback f)
         return rv;
     }
 
-    for (RegisterHandle i = 0ul; i < t->entries; ++i) {
+    for (RegisterHandle i = 0UL; i < t->entries; ++i) {
         const int code = f(t, i, t->entry[i].user);
         if (code < 0) {
             rv.code = REG_ACCESS_FAILURE;
@@ -1401,7 +1401,7 @@ register_block_read_unsafe(RegisterTable *t, RegisterAddress addr,
 {
     RegisterAccess rv;
     RegisterOffset rest = n;
-    while (rest > 0ull) {
+    while (rest > 0ULL) {
         AreaHandle an = ra_find_area_by_addr(t, addr);
         RegisterOffset offset, readn;
         RegisterArea *a;
@@ -1435,7 +1435,7 @@ register_block_write_unsafe(RegisterTable *t, RegisterAddress addr,
 {
     RegisterAccess rv;
     RegisterOffset rest = n;
-    while (rest > 0ull) {
+    while (rest > 0ULL) {
         AreaHandle an = ra_find_area_by_addr(t, addr);
         RegisterOffset offset, writen;
         RegisterArea *a;
@@ -1468,7 +1468,7 @@ register_block_read(RegisterTable *t, RegisterAddress addr,
         return rv;
     }
 
-    if (n == 0ull) {
+    if (n == 0ULL) {
         return rv;
     }
 
@@ -1493,7 +1493,7 @@ register_block_write(RegisterTable *t, RegisterAddress addr,
     }
 
     /* Zero-length writes finish trivially. */
-    if (n == 0ull) {
+    if (n == 0ULL) {
         return rv;
     }
 
@@ -1576,10 +1576,10 @@ register_set_from_hexstr(RegisterTable *t, const RegisterAddress start,
 {
     RegisterAccess rv = REG_ACCESS_RESULT_INIT;
 
-    for (size_t idx = 0; idx < n; idx += 4u) {
+    for (size_t idx = 0; idx < n; idx += 4U) {
         const char *cur = str+idx;
         const size_t cn = reg_min(4, n - idx);
-        const RegisterAddress ca = start + (idx/4u);
+        const RegisterAddress ca = start + (idx / 4U);
 
         const AreaHandle ah = ra_find_area_by_addr(t, ca);
         if (ah >= t->areas) {
@@ -1650,10 +1650,10 @@ register_mcopy(RegisterTable *t, AreaHandle dst, AreaHandle src)
         return rv;
     } else if (t->area[dst].mem == NULL) {
         /* Destination buffer has to be accessed via its block-write API */
-        return da->write(da, sa->mem, 0u, n);
+        return da->write(da, sa->mem, 0U, n);
     } else {
         /* Source buffer has to be accessed via its block-read API */
-        return sa->read(sa, da->mem, 0u, n);
+        return sa->read(sa, da->mem, 0U, n);
     }
 }
 
@@ -1712,14 +1712,14 @@ register_compare(RegisterTable *t, RegisterHandle a, RegisterHandle b)
 RegisterAccess
 register_sanitise(RegisterTable *t)
 {
-    RegisterAccess rv = { .code = REG_ACCESS_SUCCESS, .address = 0u };
+    RegisterAccess rv = { .code = REG_ACCESS_SUCCESS, .address = 0U };
 
     if (BIT_ISSET(t->flags, REG_TF_INITIALISED) == false) {
         rv.code = REG_ACCESS_UNINITIALISED;
         return rv;
     }
 
-    for (RegisterOffset i = 0ul; i < t->entries; ++i) {
+    for (RegisterOffset i = 0UL; i < t->entries; ++i) {
         RegisterAccess access;
         access = reg_entry_sane(t, i);
         switch (access.code) {
@@ -1772,7 +1772,7 @@ find_reg(const RegisterTable *t,
     struct maybe_register rv = { .valid = true, .handle = 0 };
 
     for (RegisterHandle i = first; i <= last; i++) {
-        if (reg_range_touches(t->entry + i, addr, 1u) == 0) {
+        if (reg_range_touches(t->entry + i, addr, 1U) == 0) {
             rv.handle = i;
             return rv;
         }
@@ -1787,8 +1787,8 @@ reg_iterate(RegisterTable *t,
             RegisterHandle start, RegisterAddress end,
             registerCallback f, void *arg)
 {
-    RegisterAccess rv = { .code = REG_ACCESS_SUCCESS, .address = 0u };
-    RegisterHandle last = t->entries - 1u;
+    RegisterAccess rv = { .code = REG_ACCESS_SUCCESS, .address = 0U };
+    RegisterHandle last = t->entries - 1U;
 
     while (start <= last && t->entry[start].address <= end) {
         int iret = f(t, start, arg);
@@ -1841,13 +1841,13 @@ register_foreach_in(RegisterTable *t,
                     RegisterAddress addr, RegisterOffset off,
                     registerCallback f, void *arg)
 {
-    RegisterAccess rv = { .code = REG_ACCESS_SUCCESS, .address = 0u };
+    RegisterAccess rv = { .code = REG_ACCESS_SUCCESS, .address = 0U };
 
     if (BIT_ISSET(t->flags, REG_TF_INITIALISED) == false) {
         /* Can't do anything with a table that's not initialised. */
         rv.code = REG_ACCESS_UNINITIALISED;
         return rv;
-    } else if (off == 0u || t->entries == 0u) {
+    } else if (off == 0U || t->entries == 0U) {
         /* If the table has no entries, we're done with no work. */
         return rv;
     }
@@ -1859,7 +1859,7 @@ register_foreach_in(RegisterTable *t,
      * area works with the least amount of operations. If addr is not mapped,
      * we're performing the look-up over all entries within the table.
      */
-    struct maybe_area startarea = find_area(t, 0, t->areas - 1u, addr);
+    struct maybe_area startarea = find_area(t, 0, t->areas - 1U, addr);
     struct maybe_register startreg;
 
     if (startarea.valid) {
@@ -1867,14 +1867,14 @@ register_foreach_in(RegisterTable *t,
         const RegisterHandle last = t->area[startarea.handle].entry.last;
         startreg = find_reg(t, first, last, addr);
     } else {
-        startreg = find_reg(t, 0, t->entries - 1u, addr);
+        startreg = find_reg(t, 0, t->entries - 1U, addr);
     }
 
     if (startreg.valid == false) {
         return rv;
     }
 
-    return reg_iterate(t, startreg.handle, addr + off - 1u, f, arg);
+    return reg_iterate(t, startreg.handle, addr + off - 1U, f, arg);
 }
 
 RegisterEntry *

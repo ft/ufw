@@ -36,7 +36,7 @@ union varint64 {
 static inline bool
 varint_done(const unsigned char octet)
 {
-    return ((octet & VARINT_CONTINUATION_MASK) == 0u);
+    return ((octet & VARINT_CONTINUATION_MASK) == 0U);
 }
 
 static int
@@ -47,7 +47,7 @@ varint_encode(uint64_t n, ByteBuffer *b)
         *buf = n & VARINT_DATA_MASK;
         n >>= VARINT_DATA_BITS;
         if (n == 0) {
-            b->used = buf - b->data + 1u;
+            b->used = buf - b->data + 1U;
             return i;
         }
         *buf |= VARINT_CONTINUATION_MASK;
@@ -59,13 +59,13 @@ static int
 varint_decode(ByteBuffer *b, const size_t maxoctets, union varint64 *n)
 {
     const unsigned char *buf = b->data + b->offset;
-    n->u = 0u;
+    n->u = 0U;
 
-    for (size_t i = 0u; i < maxoctets; ++i) {
+    for (size_t i = 0U; i < maxoctets; ++i) {
         const unsigned char datum = buf[i];
         n->u |= (uint64_t)(datum & VARINT_DATA_MASK) << (i * VARINT_DATA_BITS);
         if (varint_done(datum)) {
-            const size_t rc = i + 1u;
+            const size_t rc = i + 1U;
             b->offset += rc;
             return (int)rc;
         }
@@ -77,9 +77,9 @@ varint_decode(ByteBuffer *b, const size_t maxoctets, union varint64 *n)
 static int
 varint_from_source(Source *source, const size_t maxoctets, union varint64 *n)
 {
-    n->u = 0u;
+    n->u = 0U;
 
-    for (size_t i = 0u; i < maxoctets; ++i) {
+    for (size_t i = 0U; i < maxoctets; ++i) {
         unsigned char data;
         const int rc = source_get_octet(source, &data);
         const unsigned char bits = data & VARINT_DATA_MASK;
@@ -269,7 +269,7 @@ varint_s64_to_sink(Sink *sink, const int64_t n)
 size_t
 varint_u64_length(uint64_t n)
 {
-    for (size_t octets = 1u; /*forever*/; ++octets) {
+    for (size_t octets = 1U; /*forever*/; ++octets) {
         n >>= VARINT_DATA_BITS;
         if (n == 0) {
             return octets;

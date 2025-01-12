@@ -113,8 +113,8 @@ print_with_current(struct shell *shell, long int reg)
 static int
 print_range(struct shell *shell, const char *s, const char *e)
 {
-    long int start = strtol(s, NULL, 10u);
-    long int end   = strtol(e, NULL, 10u);
+    long int start = strtol(s, NULL, 10U);
+    long int end   = strtol(e, NULL, 10U);
 
     if (start < 0) {
         outofrange(shell, start);
@@ -138,7 +138,7 @@ print_range(struct shell *shell, const char *s, const char *e)
 static bool
 want_help(size_t argc, const char *arg)
 {
-    return ((argc == 2u)
+    return ((argc == 2U)
             && (   (strcmp(arg, "--usage") == 0)
                 || (strcmp(arg, "-u")      == 0)));
 }
@@ -214,11 +214,11 @@ ufw_shell_regshow(const struct shell *s, size_t argc, char **argv)
         return;
     }
 
-    if (argc == 1u) {
+    if (argc == 1U) {
         register_table_print(shell, "", table);
-    } else if (argc == 2u) {
+    } else if (argc == 2U) {
         print_range(shell, argv[1], argv[1]);
-    } else if (argc == 3u) {
+    } else if (argc == 3U) {
         print_range(shell, argv[1], argv[2]);
     } else {
         regshow_usage(shell);

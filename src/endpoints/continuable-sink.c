@@ -82,7 +82,7 @@ run_continuable_sink(void *driver, const void *data, size_t n)
         ? cs->buffer.used
         : (cs->fallback != NULL
            ? cs->fallback->used
-           : 0u);
+           : 0U);
     const int rc = cs_add(cs, data, n);
 
     if (rc < 0) {
@@ -97,10 +97,10 @@ void
 continuable_sink_init(Sink *instance, ContinuableSink *driver)
 {
     driver->buffer.data = NULL;
-    driver->buffer.size = 0u;
-    driver->buffer.offset = 0u;
-    driver->buffer.used = 0u;
-    driver->error.id = 0u;
-    driver->error.datacount = 0u;
+    driver->buffer.size = 0U;
+    driver->buffer.offset = 0U;
+    driver->buffer.used = 0U;
+    driver->error.id = 0U;
+    driver->error.datacount = 0U;
     chunk_sink_init(instance, run_continuable_sink, driver);
 }

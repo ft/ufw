@@ -143,7 +143,7 @@ source_get_octet(Source *source, void *data)
     trace();
     return source->kind == DATA_KIND_OCTET
         ? source->source.octet(source->driver, data)
-        : source->source.chunk(source->driver, data, 1u);
+        : source->source.chunk(source->driver, data, 1U);
 }
 
 /**
@@ -168,7 +168,7 @@ sink_put_octet(Sink *sink, const unsigned char data)
     trace();
     return sink->kind == DATA_KIND_OCTET
         ? sink->sink.octet(sink->driver, data)
-        : sink->sink.chunk(sink->driver, &data, 1u);
+        : sink->sink.chunk(sink->driver, &data, 1U);
 }
 
 /**
@@ -307,7 +307,7 @@ static inline struct size_error
 source_read_multi(Source *source, void *buf, const size_t n)
 {
     trace();
-    struct size_error rc = { 0, 0u };
+    struct size_error rc = { 0, 0U };
     size_t rest = n;
 
     if (n == 0 || n > SSIZE_MAX) {
@@ -483,7 +483,7 @@ static inline struct size_error
 sink_write_multi(Sink *sink, const void *buf, const size_t n)
 {
     trace();
-    struct size_error rc = { 0, 0u };
+    struct size_error rc = { 0, 0U };
     size_t rest = n;
 
     if (n == 0 || n > SSIZE_MAX) {
@@ -752,7 +752,7 @@ sts_atmost(Source *source, Sink *sink, size_t n)
     if (sink_has_buffer_ext(sink)) {
         return sts_atmost_via_sink(source, sink, n);
     }
-    return (n == 0u)
+    return (n == 0U)
         ? sts_cbc(source, sink)
         : sts_atmost_cbc(source, sink, n);
 }
@@ -777,7 +777,7 @@ ssize_t
 sts_some(Source *source, Sink *sink)
 {
     trace();
-    return sts_atmost(source, sink, 0u);
+    return sts_atmost(source, sink, 0U);
 }
 
 /**
@@ -845,8 +845,8 @@ sts_drain(Source *source, Sink *sink)
 
     for (;;) {
         rc = shortcut
-            ? sts_atmost_via_source(source, sink, 0u)
-            : sts_atmost(source, sink, 0u);
+            ? sts_atmost_via_source(source, sink, 0U)
+            : sts_atmost(source, sink, 0U);
         if (rc == -ENOMEM) {
             /* This means that the sink buffer is out of memory. If the source
              * can provide a buffer in the next iteration, we can go on,
@@ -1052,7 +1052,7 @@ ssize_t
 sts_n_cbc(Source *source, Sink *sink, const size_t n)
 {
     trace();
-    for (size_t i = 0u; i < n; ++i) {
+    for (size_t i = 0U; i < n; ++i) {
         const ssize_t rc = sts_cbc(source, sink);
         if (rc < 0) {
             return rc;
@@ -1082,7 +1082,7 @@ ssize_t
 sts_atmost_cbc(Source *source, Sink *sink, const size_t n)
 {
     trace();
-    for (size_t i = 0u; i < n; ++i) {
+    for (size_t i = 0U; i < n; ++i) {
         const ssize_t rc = sts_cbc(source, sink);
         if (rc <= 0) {
             return (i == 0) ? rc : (ssize_t)i;

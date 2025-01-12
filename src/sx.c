@@ -62,7 +62,7 @@ minu64(const uint64_t a, const uint64_t b)
 static inline uint64_t
 digit2int(const char c)
 {
-    uint64_t rv = 0u;
+    uint64_t rv = 0U;
     while (rv < 16) {
         if (digits[rv] == c) {
             return rv;
@@ -190,14 +190,14 @@ parse_integer_(const char *s, const size_t n, size_t *i, size_t offset,
         return NULL;
     }
 
-    uint64_t newi = 0u;
-    size_t mult = 1u;
+    uint64_t newi = 0U;
+    size_t mult = 1U;
     size_t save = j;
     j--;
     while (j >= *i) {
         newi += mult * digit2int(s[j]);
         mult *= base;
-        if (j == 0u) {
+        if (j == 0U) {
             break;
         }
         j--;
@@ -210,13 +210,13 @@ parse_integer_(const char *s, const size_t n, size_t *i, size_t offset,
 static inline struct sx_node *
 parse_integer(const char *s, const size_t n, size_t *i)
 {
-    return parse_integer_(s, n, i, 0u, isdigit, 10u);
+    return parse_integer_(s, n, i, 0U, isdigit, 10U);
 }
 
 static inline struct sx_node *
 parse_hinteger(const char *s, const size_t n, size_t *i)
 {
-    return parse_integer_(s, n, i, 2u, isxdigit, 16u);
+    return parse_integer_(s, n, i, 2U, isxdigit, 16U);
 }
 
 static struct sx_node *
@@ -224,7 +224,7 @@ make_pair(void)
 {
     struct sx_node *rv = make_node();
 
-    rv->data.pair = calloc(1u, sizeof *rv->data.pair);
+    rv->data.pair = calloc(1U, sizeof *rv->data.pair);
     if (rv->data.pair == NULL) {
         sxoom(__FILE__, __LINE__);
     }
@@ -434,7 +434,7 @@ sx_cxr(struct sx_node *root, const char *addr)
         default:
             return NULL;
         }
-        if (i == 0u) {
+        if (i == 0U) {
             break;
         }
         --i;

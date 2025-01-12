@@ -72,22 +72,22 @@ hexdump(const struct hexdump_cfg *cfg, const void *mem,
     if (cfg->octets_per_line < cfg->octets_per_chunk) {
         return -EINVAL;
     }
-    if ((cfg->octets_per_line == 0u) || (cfg->octets_per_chunk == 0u)) {
+    if ((cfg->octets_per_line == 0U) || (cfg->octets_per_chunk == 0U)) {
         return -EINVAL;
     }
 
     const unsigned char *data = mem;
     const size_t lastn = n % cfg->octets_per_line;
-    const size_t pad = lastn > 0 ? cfg->octets_per_line - lastn : 0u;
+    const size_t pad = lastn > 0 ? cfg->octets_per_line - lastn : 0U;
 
     if (cfg->per_line_prefix != NULL) {
         printf("%s", cfg->per_line_prefix);
     }
 
-    size_t bol = 0u;
-    for (size_t i = 0u; i < (n + pad); ++i) {
+    size_t bol = 0U;
+    for (size_t i = 0U; i < (n + pad); ++i) {
         if ((i % cfg->octets_per_line) == 0) {
-            if (i > 0u) {
+            if (i > 0U) {
                 hexdump_ascii(cfg, mem, bol, i - bol);
                 if (cfg->per_line_prefix != NULL) {
                     printf("%s", cfg->per_line_prefix);

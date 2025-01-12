@@ -132,7 +132,7 @@ rfc1055_decode_octet(Source *source, unsigned char *data)
      * EILSEQ return code, which this SLIP decoder uses. While unlikely that
      * the source returns that particular error code, it is not impossible.
      * Modern compilers even warn about this. */
-    *data = 0u;
+    *data = 0U;
     MAYBE_RETURN(source_get_octet(source, &first));
     switch (first) {
     case RAW_ESC:
@@ -186,7 +186,7 @@ int
 /* NOLINTNEXTLINE(readability-function-cognitive-complexity) */
 rfc1055_decode(RFC1055Context *ctx, Source *source, Sink *sink)
 {
-    unsigned char data = 0u;
+    unsigned char data = 0U;
 
     for (;;) {
         switch (ctx->state) {

@@ -49,13 +49,13 @@
 static inline bool
 raw_with_hdcrc(const uint16_t motv)
 {
-    return BIT_ISSET(motv, RP_OPT_WITH_HEADER_CRC << 8u);
+    return BIT_ISSET(motv, RP_OPT_WITH_HEADER_CRC << 8U);
 }
 
 static inline bool
 raw_with_plcrc(const uint16_t motv)
 {
-    return BIT_ISSET(motv, RP_OPT_WITH_PAYLOAD_CRC << 8u);
+    return BIT_ISSET(motv, RP_OPT_WITH_PAYLOAD_CRC << 8U);
 }
 
 static inline uint16_t
@@ -63,22 +63,22 @@ make_motv(const RegP *p, const unsigned int msem,
           const uint_least8_t meta,
           const RPFrameType type, const size_t n)
 {
-    uint16_t rv = RP_IMPLEMENTATION_VERSION & 0x0fu;
-    rv |= (type & 0x0fu) << 4u;
+    uint16_t rv = RP_IMPLEMENTATION_VERSION & 0x0fU;
+    rv |= (type & 0x0fU) << 4U;
     rv |= ( (((msem == MSEM_AUTO && p->memory.type == RP_MEMTYPE_16)
               || msem == MSEM_16BIT)
              ? RP_OPT_WORD_SIZE_16
-             : 0u)
+             : 0U)
           | (p->ep.type == RP_EP_SERIAL
              ? RP_OPT_WITH_HEADER_CRC
-             : 0u)
+             : 0U)
           | ((p->ep.type == RP_EP_SERIAL
               && n > 0
               && type != RP_FRAME_READ_REQUEST)
              ? RP_OPT_WITH_PAYLOAD_CRC
-             : 0u))
-        << 8u;
-    rv |= meta << 12u;
+             : 0U))
+        << 8U;
+    rv |= meta << 12U;
     return rv;
 }
 
@@ -96,7 +96,7 @@ populate_header(uint16_t *buf, RegP *p,
     bf_set_u16b(buf + 1, seqno);
     bf_set_u32b(buf + 2, address);
     bf_set_u32b(buf + 4, n);
-    buf[6] = 0u;
+    buf[6] = 0U;
     bf_set_u16b(buf + 7, plcrc);
 }
 
@@ -115,12 +115,12 @@ encode_header(uint16_t *buf, RegP *p,
     const bool with_hdcrc = raw_with_hdcrc(motv);
     const bool with_plcrc = raw_with_plcrc(motv);
     size_t size = RP_HEADER_MIN_SIZE_16;
-    uint16_t crc = 0u;
+    uint16_t crc = 0U;
 
     if (with_hdcrc) {
         crc = ufw_buffer_crc16_arc_u16(buf, RP_HEADER_MIN_SIZE_16);
         if (with_plcrc) {
-            crc = ufw_crc16_arc_u16(crc, buf + RP_HEADER_SIZE_16 - 1u, 1u);
+            crc = ufw_crc16_arc_u16(crc, buf + RP_HEADER_SIZE_16 - 1U, 1U);
         }
         bf_set_u16b(buf + RP_HEADER_MIN_SIZE_16, crc);
         size++;
@@ -143,23 +143,23 @@ parse_header(RPFrame *frame, void *buf, size_t n)
     uint16_t *raw = buf;
     uint16_t motv = bf_ref_u16b(raw);
 
-    frame->header.version = BIT_GET(motv, 4u, 0u);
+    frame->header.version = BIT_GET(motv, 4U, 0U);
     if (frame->header.version != RP_IMPLEMENTATION_VERSION) {
         return -EBADMSG;
     }
 
-    frame->header.type = (RPFrameType)BIT_GET(motv, 4u, 4u);
-    frame->header.options = BIT_GET(motv, 4u, 8u);
-    if ((frame->header.options & 0x8u) != 0u) {
+    frame->header.type = (RPFrameType)BIT_GET(motv, 4U, 4U);
+    frame->header.options = BIT_GET(motv, 4U, 8U);
+    if ((frame->header.options & 0x8U) != 0U) {
         return -EBADMSG;
     }
 
-    frame->header.meta.raw = BIT_GET(motv, 4u, 12u);
+    frame->header.meta.raw = BIT_GET(motv, 4U, 12U);
     switch (frame->header.type) {
     case RP_FRAME_READ_REQUEST:
         /* FALLTHROUGH */
     case RP_FRAME_WRITE_REQUEST:
-        if (frame->header.meta.raw != 0u) {
+        if (frame->header.meta.raw != 0U) {
             return -EBADMSG;
         }
         break;
@@ -187,8 +187,8 @@ parse_header(RPFrame *frame, void *buf, size_t n)
 
     const bool with_hdcrc = raw_with_hdcrc(motv);
     const bool with_plcrc = raw_with_plcrc(motv);
-    unsigned int offset = 6u;
-    uint16_t crc = 0u;
+    unsigned int offset = 6U;
+    uint16_t crc = 0U;
 
     if (with_hdcrc && with_plcrc && n < RP_HEADER_SIZE) {
         return -EBADMSG;
@@ -203,7 +203,7 @@ parse_header(RPFrame *frame, void *buf, size_t n)
         frame->header.hdcrc = bf_ref_u16b(raw + offset);
         crc = ufw_buffer_crc16_arc_u16(raw, offset);
         if (with_plcrc) {
-            crc = ufw_crc16_arc_u16(crc, raw + RP_HEADER_SIZE_16 - 1u, 1u);
+            crc = ufw_crc16_arc_u16(crc, raw + RP_HEADER_SIZE_16 - 1U, 1U);
         }
         offset++;
     }
@@ -218,11 +218,11 @@ parse_header(RPFrame *frame, void *buf, size_t n)
 static int
 check_payload(const RPFrame *f)
 {
-    if (regp_has_hdcrc(f) == false || f->payload.size == 0u) {
+    if (regp_has_hdcrc(f) == false || f->payload.size == 0U) {
         return 0;
     }
 
-    uint16_t crc = 0u;
+    uint16_t crc = 0U;
 
     if (BIT_ISSET(f->header.options, RP_OPT_WORD_SIZE_16)) {
         crc = ufw_buffer_crc16_arc_u16(f->payload.data, f->header.blocksize);
@@ -302,7 +302,7 @@ send_memory(RegP *p, void *hdr, size_t hs, void *pl, size_t ps)
     };
     ByteChunks data = BYTE_CHUNKS(chunks);
     if (pl == NULL) {
-        data.chunks = 1u;
+        data.chunks = 1U;
     }
 
     /* Apply the correct framing here. */
@@ -337,10 +337,11 @@ send_resp_0(RegP *p, const RPFrame *frame, const RPResponse code,
             const unsigned int msem)
 {
     uint16_t header[RP_HEADER_SIZE_16];
-    const size_t size = sizeof(uint16_t) *
+    const size_t size =
+        sizeof(uint16_t) *
         encode_header(header, p, msem, req2resp(frame->header.type), code,
-                      frame->header.sequence, frame->header.address, 0u, 0u);
-    return send_memory(p, header, size, NULL, 0u);
+                      frame->header.sequence, frame->header.address, 0U, 0U);
+    return send_memory(p, header, size, NULL, 0U);
 }
 
 static inline size_t
@@ -348,8 +349,8 @@ msem_size(RegP *p, const unsigned int msem, const size_t n)
 {
     switch (msem) {
     case MSEM_16BIT: return n;
-    case MSEM_8BIT:  return n * 2u;
-    default:         return n * (p->memory.type == RP_MEMTYPE_16 ? 1u : 2u);
+    case MSEM_8BIT:  return n * 2U;
+    default:         return n * (p->memory.type == RP_MEMTYPE_16 ? 1U : 2U);
     }
 }
 
@@ -360,7 +361,7 @@ send_resp_32(RegP *p, const RPFrame *frame, RPResponse code, const uint32_t pl,
     uint16_t header[RP_HEADER_SIZE_16 + 2];
     uint16_t *plbuf = header + RP_HEADER_SIZE_16;
     bf_set_u32b(plbuf, pl);
-    const uint16_t plcrc = ufw_buffer_crc16_arc_u16(plbuf, 2u);
+    const uint16_t plcrc = ufw_buffer_crc16_arc_u16(plbuf, 2U);
     const size_t size = sizeof(uint16_t) *
         encode_header(header, p, msem, req2resp(frame->header.type), code,
                       frame->header.sequence, frame->header.address,
@@ -498,7 +499,7 @@ regp_init(RegP *p)
     p->memory.type = RP_MEMTYPE_16;
     p->memory.access.m16.read = regp_void_read16;
     p->memory.access.m16.write = regp_void_write16;
-    p->session.sequence = 0u;
+    p->session.sequence = 0U;
     p->ep.type = RP_EP_TCP;
     p->ep.source = source_empty;
     p->ep.sink = sink_null;
@@ -550,10 +551,10 @@ regp_req_read8(RegP *p, uint32_t address, size_t n)
     uint16_t header[RP_HEADER_SIZE_16];
     const size_t size = sizeof(uint16_t) *
         encode_header(header, p, MSEM_8BIT,
-                      RP_FRAME_READ_REQUEST, 0u, p->session.sequence,
-                      address, n, 0u);
+                      RP_FRAME_READ_REQUEST, 0U, p->session.sequence,
+                      address, n, 0U);
     p->session.sequence++;
-    return send_memory(p, header, size, NULL, 0u);
+    return send_memory(p, header, size, NULL, 0U);
 }
 
 int
@@ -562,10 +563,10 @@ regp_req_read16(RegP *p, uint32_t address, size_t n)
     uint16_t header[RP_HEADER_SIZE_16];
     const size_t size = sizeof(uint16_t) *
         encode_header(header, p, MSEM_16BIT,
-                      RP_FRAME_READ_REQUEST, 0u, p->session.sequence,
-                      address, n, 0u);
+                      RP_FRAME_READ_REQUEST, 0U, p->session.sequence,
+                      address, n, 0U);
     p->session.sequence++;
-    return send_memory(p, header, size, NULL, 0u);
+    return send_memory(p, header, size, NULL, 0U);
 }
 
 #ifdef WITH_UINT8_T
@@ -577,7 +578,7 @@ regp_req_write8(RegP *p, const uint32_t address, const size_t n,
     const uint16_t plcrc = ufw_buffer_crc16_arc(buf, n);
     const size_t size = sizeof(uint16_t) *
         encode_header(header, p, MSEM_8BIT,
-                      RP_FRAME_WRITE_REQUEST, 0u, p->session.sequence,
+                      RP_FRAME_WRITE_REQUEST, 0U, p->session.sequence,
                       address, n, plcrc);
     p->session.sequence++;
     return send_memory(p, header, size, (void*)buf, n * sizeof(*buf));
@@ -592,7 +593,7 @@ regp_req_write16(RegP *p, const uint32_t address, const size_t n,
     const uint16_t plcrc = ufw_buffer_crc16_arc_u16(buf, n);
     const size_t size = sizeof(uint16_t) *
         encode_header(header, p, MSEM_16BIT,
-                      RP_FRAME_WRITE_REQUEST, 0u, p->session.sequence,
+                      RP_FRAME_WRITE_REQUEST, 0U, p->session.sequence,
                       address, n, plcrc);
     p->session.sequence++;
     return send_memory(p, header, size, (void*)buf, n * sizeof(*buf));
@@ -612,15 +613,15 @@ int
 regp_resp_ack(RegP *p, const RPFrame *f, const void *pl, const size_t n)
 {
     uint16_t header[RP_HEADER_SIZE_16];
-    uint16_t plcrc = 0u;
-    size_t plsize = 0u;
+    uint16_t plcrc = 0U;
+    size_t plsize = 0U;
 
     if (p->memory.type == RP_MEMTYPE_16) {
-        plcrc = pl != NULL ? ufw_buffer_crc16_arc_u16(pl, n) : 0u;
+        plcrc = pl != NULL ? ufw_buffer_crc16_arc_u16(pl, n) : 0U;
         plsize = n * sizeof(uint16_t);
     } else {
 #ifdef WITH_UINT8_T
-        plcrc = pl != NULL ? ufw_buffer_crc16_arc(pl, n) : 0u;
+        plcrc = pl != NULL ? ufw_buffer_crc16_arc(pl, n) : 0U;
         plsize = n;
 #else
         return -EINVAL;
@@ -628,7 +629,7 @@ regp_resp_ack(RegP *p, const RPFrame *f, const void *pl, const size_t n)
     }
     const size_t size = sizeof(uint16_t) *
         encode_header(header, p, MSEM_AUTO,
-                      req2resp(f->header.type), 0u, f->header.sequence,
+                      req2resp(f->header.type), 0U, f->header.sequence,
                       f->header.address, n, plcrc);
     return send_memory(p, header, size, (void*)pl, plsize);
 }
@@ -705,8 +706,8 @@ regp_resp_meta(RegP *p,const uint_least8_t meta)
     uint16_t header[RP_HEADER_SIZE_16];
     const size_t size = sizeof(uint16_t) *
         encode_header(header, p, MSEM_8BIT,
-                      RP_FRAME_META, meta, 0u, 0u, 0u, 0u);
-    return send_memory(p, header, size, NULL, 0u);
+                      RP_FRAME_META, meta, 0U, 0U, 0U, 0U);
+    return send_memory(p, header, size, NULL, 0U);
 }
 
 /*
@@ -819,7 +820,7 @@ regp_recv(RegP *p, RPMaybeFrame *mf)
      */
     mf->frame = NULL;
     mf->error.id = 0;
-    mf->error.framesize = 0u;
+    mf->error.framesize = 0U;
     uint16_t fallback[RP_HEADER_SIZE_16];
     ByteBuffer fb = BYTE_BUFFER_EMPTY((void*)fallback, sizeof(fallback));
     Sink recv;
@@ -1006,7 +1007,7 @@ regp_process(RegP *p, const RPMaybeFrame *mf)
 
     switch (ba.status) {
     case RP_RESP_ACK:
-        return regp_resp_ack(p, mf->frame, buf, buf == NULL ? 0u : blocksize);
+        return regp_resp_ack(p, mf->frame, buf, buf == NULL ? 0U : blocksize);
     case RP_RESP_EWORDSIZE:
         return regp_resp_ewordsize(p, mf->frame);
     case RP_RESP_EPAYLOADCRC:
@@ -1124,7 +1125,7 @@ regp_has_plcrc(const RPFrame *f)
 void
 regp_reset_session(RegP *p)
 {
-    p->session.sequence = 0u;
+    p->session.sequence = 0U;
 }
 
 void
@@ -1138,7 +1139,7 @@ regp_free(RegP *p, RPFrame *f)
 RPRange
 regp_range_intersection(const RPRange *a, const RPRange *b)
 {
-    RPRange rv = { .address = 0u, .size = 0u };
+    RPRange rv = { .address = 0U, .size = 0U };
     const uint32_t start = address_max(range_start(a), range_start(b));
     const uint32_t end   = address_min(range_end(a),   range_end(b));
 

@@ -42,7 +42,7 @@ next:
         source->chunk + source->active, data, n);
 
     if (rc == -ENODATA) {
-        source->active += 1u;
+        source->active += 1U;
         goto next;
     }
 

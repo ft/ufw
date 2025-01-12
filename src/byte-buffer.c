@@ -37,7 +37,7 @@ void
 byte_buffer_null(ByteBuffer *b)
 {
     b->data = NULL;
-    b->size = b->used = b->offset = 0u;
+    b->size = b->used = b->offset = 0U;
 }
 
 /**
@@ -63,7 +63,7 @@ int
 byte_buffer_set(ByteBuffer *b, void *data,
                 size_t size, size_t used, size_t offset)
 {
-    if (data == NULL || size == 0u || used > size || offset > used) {
+    if (data == NULL || size == 0U || used > size || offset > used) {
         return -EINVAL;
     }
 
@@ -127,7 +127,7 @@ byte_buffer_rest(const ByteBuffer *b)
 int
 byte_buffer_use(ByteBuffer *b, void *data, size_t size)
 {
-    return byte_buffer_set(b, data, size, size, 0u);
+    return byte_buffer_set(b, data, size, size, 0U);
 }
 
 /**
@@ -147,7 +147,7 @@ byte_buffer_use(ByteBuffer *b, void *data, size_t size)
 int
 byte_buffer_space(ByteBuffer *b, void *data, size_t size)
 {
-    return byte_buffer_set(b, data, size, 0u, 0u);
+    return byte_buffer_set(b, data, size, 0U, 0U);
 }
 
 /**
@@ -228,7 +228,7 @@ ssize_t
 byte_buffer_consume_at_most(ByteBuffer *b, void *data, size_t size)
 {
     const size_t rest = b->used - b->offset;
-    if (rest == 0u) {
+    if (rest == 0U) {
         return -ENODATA;
     }
 
@@ -257,7 +257,7 @@ byte_buffer_rewind(ByteBuffer *b)
         return -EINVAL;
     }
 
-    if (b->offset == 0u) {
+    if (b->offset == 0U) {
         /* Already rewound */
         return 0;
     }
@@ -265,7 +265,7 @@ byte_buffer_rewind(ByteBuffer *b)
     const size_t rest = b->used - b->offset;
     memmove(b->data, b->data + b->offset, rest);
     b->used = rest;
-    b->offset = 0u;
+    b->offset = 0U;
 
     return 0;
 }
@@ -283,7 +283,7 @@ byte_buffer_rewind(ByteBuffer *b)
 void
 byte_buffer_clear(ByteBuffer *b)
 {
-    b->offset = b->used = 0u;
+    b->offset = b->used = 0U;
     memset(b->data, 0, b->size);
 }
 
@@ -300,7 +300,7 @@ byte_buffer_clear(ByteBuffer *b)
 void
 byte_buffer_reset(ByteBuffer *b)
 {
-    b->offset = b->used = 0u;
+    b->offset = b->used = 0U;
 }
 
 /**
@@ -315,7 +315,7 @@ byte_buffer_reset(ByteBuffer *b)
 void
 byte_buffer_repeat(ByteBuffer *b)
 {
-    b->offset = 0u;
+    b->offset = 0U;
 }
 
 /**
@@ -355,7 +355,7 @@ byte_buffer_fillx(ByteBuffer *b,
                   const signed char increment)
 {
     unsigned char datum = init;
-    for (size_t i = 0u; i < b->size; ++i) {
+    for (size_t i = 0U; i < b->size; ++i) {
         b->data[i] = datum;
         datum += increment;
     }

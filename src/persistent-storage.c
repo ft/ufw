@@ -88,7 +88,7 @@ set_data_address(PersistentStorage *store)
 static uint16_t
 trivialsum(const unsigned char *data, size_t n, uint16_t init)
 {
-    for (size_t i = 0u; i < n; ++i) {
+    for (size_t i = 0U; i < n; ++i) {
         /*
          * Clang14's undefined behaviour sanitiser complains about this:
          *
@@ -105,7 +105,7 @@ trivialsum(const unsigned char *data, size_t n, uint16_t init)
          * anything in production anyway. It's main job is to never leave a
          * PersistentStorage object in an invalid state.
          */
-        init = (init + data[i]) & 0xffffu;
+        init = (init + data[i]) & 0xffffU;
     }
 
     return init;
@@ -172,8 +172,8 @@ persistent_init(PersistentStorage *store,
 {
     /* Initialise checksum first; data init needs address and type of it. The
      * initialisation order of the rest doesn't really matter. */
-    store->checksum.address = 0u;
-    persistent_sum16(store, trivialsum, 0u);
+    store->checksum.address = 0U;
+    persistent_sum16(store, trivialsum, 0U);
 
     set_data_address(store);
     store->data.size = size;
@@ -304,13 +304,13 @@ persistent_calculate_checksum(PersistentStorage *store)
         bsize = store->buffer.size;
     } else {
         data = &buf;
-        bsize = 1u;
+        bsize = 1U;
     }
 
     size_t rest = store->data.size;
     uint32_t address = store->data.address;
 
-    while (rest > 0u) {
+    while (rest > 0U) {
         const size_t toget = (rest > bsize) ? bsize : rest;
         const size_t n = store->block.read(data, address, toget);
 
@@ -581,13 +581,13 @@ persistent_writen(PersistentStorage *store,
         bsize = store->buffer.size;
     } else {
         data = &buf;
-        bsize = 1u;
+        bsize = 1U;
     }
 
     memset(data, item, bsize);
     size_t rest = k;
 
-    while (rest > 0u) {
+    while (rest > 0U) {
         const size_t toput = (rest > bsize) ? bsize : rest;
         const size_t n = store->block.write(address, data, toput);
 

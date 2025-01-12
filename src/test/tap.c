@@ -25,7 +25,7 @@
 
 #include <ufw/test/tap.h>
 
-static long unsigned int test_count = 0u;
+static long unsigned int test_count = 0U;
 
 static void tap_result(bool result,
                        const char *file, unsigned long line,
@@ -62,7 +62,7 @@ tap_result(const bool result,
 void
 tap_init(void)
 {
-    test_count = 0u;
+    test_count = 0U;
 }
 
 void

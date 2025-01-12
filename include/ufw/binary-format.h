@@ -173,8 +173,8 @@ bf_swap16(const uint16_t value)
 #if defined(HAVE_COMPILER_BUILTIN_BSWAP16) && defined(UFW_USE_BUILTIN_SWAP)
     return __builtin_bswap16(value);
 #else
-    return ( ((value & 0xff00u) >> 8u)
-           | ((value & 0x00ffu) << 8u));
+    return ( ((value & 0xff00U) >> 8U)
+           | ((value & 0x00ffU) << 8U));
 #endif /* HAVE_COMPILER_BUILTIN_BSWAP16 */
 }
 
@@ -191,9 +191,9 @@ bf_swap16(const uint16_t value)
 static inline uint32_t
 bf_swap24(const uint32_t value)
 {
-    return ( ((value & 0xff0000ul) >> 16u)
-           | ((value & 0x00ff00ul))
-           | ((value & 0x0000fful) << 16u));
+    return ( ((value & 0xff0000UL) >> 16U)
+           | ((value & 0x00ff00UL))
+           | ((value & 0x0000ffUL) << 16U));
 }
 
 /**
@@ -212,10 +212,10 @@ bf_swap32(const uint32_t value)
 #if defined(HAVE_COMPILER_BUILTIN_BSWAP32) && defined(UFW_USE_BUILTIN_SWAP)
     return __builtin_bswap32(value);
 #else
-    return ( ((value & 0xff000000ul) >> 24u)
-           | ((value & 0x00ff0000ul) >>  8u)
-           | ((value & 0x0000ff00ul) <<  8u)
-           | ((value & 0x000000fful) << 24u));
+    return ( ((value & 0xff000000UL) >> 24U)
+           | ((value & 0x00ff0000UL) >>  8U)
+           | ((value & 0x0000ff00UL) <<  8U)
+           | ((value & 0x000000ffUL) << 24U));
 #endif /* HAVE_COMPILER_BUILTIN_BSWAP32 */
 }
 
@@ -232,11 +232,11 @@ bf_swap32(const uint32_t value)
 static inline uint64_t
 bf_swap40(const uint64_t value)
 {
-    return ( ((value & 0xff00000000ull) >> 32u)
-           | ((value & 0x00ff000000ull) >> 16u)
-           | ((value & 0x0000ff0000ull))
-           | ((value & 0x000000ff00ull) << 16u)
-           | ((value & 0x00000000ffull) << 32u));
+    return ( ((value & 0xff00000000ULL) >> 32U)
+           | ((value & 0x00ff000000ULL) >> 16U)
+           | ((value & 0x0000ff0000ULL))
+           | ((value & 0x000000ff00ULL) << 16U)
+           | ((value & 0x00000000ffULL) << 32U));
 }
 
 /**
@@ -252,12 +252,12 @@ bf_swap40(const uint64_t value)
 static inline uint64_t
 bf_swap48(const uint64_t value)
 {
-    return ( ((value & 0xff0000000000ull) >> 40u)
-           | ((value & 0x00ff00000000ull) >> 24u)
-           | ((value & 0x0000ff000000ull) >>  8u)
-           | ((value & 0x000000ff0000ull) <<  8u)
-           | ((value & 0x00000000ff00ull) << 24u)
-           | ((value & 0x0000000000ffull) << 40u));
+    return ( ((value & 0xff0000000000ULL) >> 40U)
+           | ((value & 0x00ff00000000ULL) >> 24U)
+           | ((value & 0x0000ff000000ULL) >>  8U)
+           | ((value & 0x000000ff0000ULL) <<  8U)
+           | ((value & 0x00000000ff00ULL) << 24U)
+           | ((value & 0x0000000000ffULL) << 40U));
 }
 
 /**
@@ -273,13 +273,13 @@ bf_swap48(const uint64_t value)
 static inline uint64_t
 bf_swap56(const uint64_t value)
 {
-    return ( ((value & 0xff000000000000ull) >> 48u)
-           | ((value & 0x00ff0000000000ull) >> 32u)
-           | ((value & 0x0000ff00000000ull) >> 16u)
-           | ((value & 0x000000ff000000ull))
-           | ((value & 0x00000000ff0000ull) << 16u)
-           | ((value & 0x0000000000ff00ull) << 32u)
-           | ((value & 0x000000000000ffull) << 48u));
+    return ( ((value & 0xff000000000000ULL) >> 48U)
+           | ((value & 0x00ff0000000000ULL) >> 32U)
+           | ((value & 0x0000ff00000000ULL) >> 16U)
+           | ((value & 0x000000ff000000ULL))
+           | ((value & 0x00000000ff0000ULL) << 16U)
+           | ((value & 0x0000000000ff00ULL) << 32U)
+           | ((value & 0x000000000000ffULL) << 48U));
 }
 
 /**
@@ -298,14 +298,14 @@ bf_swap64(const uint64_t value)
 #if defined(HAVE_COMPILER_BUILTIN_BSWAP64) && defined(UFW_USE_BUILTIN_SWAP)
     return __builtin_bswap64(value);
 #else
-    return ( ((value & 0xff00000000000000ull) >> 56u)
-           | ((value & 0x00ff000000000000ull) >> 40u)
-           | ((value & 0x0000ff0000000000ull) >> 24u)
-           | ((value & 0x000000ff00000000ull) >>  8u)
-           | ((value & 0x00000000ff000000ull) <<  8u)
-           | ((value & 0x0000000000ff0000ull) << 24u)
-           | ((value & 0x000000000000ff00ull) << 40u)
-           | ((value & 0x00000000000000ffull) << 56u));
+    return ( ((value & 0xff00000000000000ULL) >> 56U)
+           | ((value & 0x00ff000000000000ULL) >> 40U)
+           | ((value & 0x0000ff0000000000ULL) >> 24U)
+           | ((value & 0x000000ff00000000ULL) >>  8U)
+           | ((value & 0x00000000ff000000ULL) <<  8U)
+           | ((value & 0x0000000000ff0000ULL) << 24U)
+           | ((value & 0x000000000000ff00ULL) << 40U)
+           | ((value & 0x00000000000000ffULL) << 56U));
 #endif /* HAVE_COMPILER_BUILTIN_BSWAP64 */
 }
 
@@ -324,15 +324,15 @@ bf_swap64(const uint64_t value)
 static inline uint16_t
 bf_ref_u16n(const void *ptr)
 {
-    uint16_t buffer = 0u;
+    uint16_t buffer = 0U;
     const unsigned char *src = ptr;
     unsigned char *dst = (unsigned char*)&buffer;
 #if UFW_BITS_PER_BYTE == 8
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
 #endif /* UFW_BITS_PER_BYTE == 8 */
 #if UFW_BITS_PER_BYTE == 16
-    dst[0u] = src[0u];
+    dst[0U] = src[0U];
 #endif /* UFW_BITS_PER_BYTE == 16 */
     return buffer;
 }
@@ -353,17 +353,17 @@ bf_ref_u16n(const void *ptr)
 static inline uint32_t
 bf_ref_u24n(const void *ptr)
 {
-    uint32_t buffer = 0ul;
+    uint32_t buffer = 0UL;
     const unsigned char *src = ptr;
     unsigned char *dst = (unsigned char*)&buffer;
 #if defined(SYSTEM_ENDIANNESS_BIG)
-    dst[1u] = src[0u];
-    dst[2u] = src[1u];
-    dst[3u] = src[2u];
+    dst[1U] = src[0U];
+    dst[2U] = src[1U];
+    dst[3U] = src[2U];
 #elif defined(SYSTEM_ENDIANNESS_LITTLE)
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
-    dst[2u] = src[2u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
+    dst[2U] = src[2U];
 #else
     /* Top of file makes sure this can't happen. */
 #endif /* SYSTEM_ENDIANNESS_* */
@@ -386,18 +386,18 @@ bf_ref_u24n(const void *ptr)
 static inline uint32_t
 bf_ref_u32n(const void *ptr)
 {
-    uint32_t buffer = 0ul;
+    uint32_t buffer = 0UL;
     const unsigned char *src = ptr;
     unsigned char *dst = (unsigned char*)&buffer;
 #if UFW_BITS_PER_BYTE == 8
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
-    dst[2u] = src[2u];
-    dst[3u] = src[3u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
+    dst[2U] = src[2U];
+    dst[3U] = src[3U];
 #endif /* UFW_BITS_PER_BYTE == 8 */
 #if UFW_BITS_PER_BYTE == 16
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
 #endif /* UFW_BITS_PER_BYTE == 16 */
     return buffer;
 }
@@ -418,21 +418,21 @@ bf_ref_u32n(const void *ptr)
 static inline uint64_t
 bf_ref_u40n(const void *ptr)
 {
-    uint64_t buffer = 0ull;
+    uint64_t buffer = 0ULL;
     const unsigned char *src = ptr;
     unsigned char *dst = (unsigned char*)&buffer;
 #if defined(SYSTEM_ENDIANNESS_BIG)
-    dst[3u] = src[0u];
-    dst[4u] = src[1u];
-    dst[5u] = src[2u];
-    dst[6u] = src[3u];
-    dst[7u] = src[4u];
+    dst[3U] = src[0U];
+    dst[4U] = src[1U];
+    dst[5U] = src[2U];
+    dst[6U] = src[3U];
+    dst[7U] = src[4U];
 #elif defined(SYSTEM_ENDIANNESS_LITTLE)
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
-    dst[2u] = src[2u];
-    dst[3u] = src[3u];
-    dst[4u] = src[4u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
+    dst[2U] = src[2U];
+    dst[3U] = src[3U];
+    dst[4U] = src[4U];
 #else
     /* Top of file makes sure this can't happen. */
 #endif /* SYSTEM_ENDIANNESS_* */
@@ -456,23 +456,23 @@ bf_ref_u40n(const void *ptr)
 static inline uint64_t
 bf_ref_u48n(const void *ptr)
 {
-    uint64_t buffer = 0ull;
+    uint64_t buffer = 0ULL;
     const unsigned char *src = ptr;
     unsigned char *dst = (unsigned char*)&buffer;
 #if defined(SYSTEM_ENDIANNESS_BIG)
-    dst[2u] = src[0u];
-    dst[3u] = src[1u];
-    dst[4u] = src[2u];
-    dst[5u] = src[3u];
-    dst[6u] = src[4u];
-    dst[7u] = src[5u];
+    dst[2U] = src[0U];
+    dst[3U] = src[1U];
+    dst[4U] = src[2U];
+    dst[5U] = src[3U];
+    dst[6U] = src[4U];
+    dst[7U] = src[5U];
 #elif defined(SYSTEM_ENDIANNESS_LITTLE)
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
-    dst[2u] = src[2u];
-    dst[3u] = src[3u];
-    dst[4u] = src[4u];
-    dst[5u] = src[5u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
+    dst[2U] = src[2U];
+    dst[3U] = src[3U];
+    dst[4U] = src[4U];
+    dst[5U] = src[5U];
 #else
     /* Top of file makes sure this can't happen. */
 #endif /* SYSTEM_ENDIANNESS_* */
@@ -496,25 +496,25 @@ bf_ref_u48n(const void *ptr)
 static inline uint64_t
 bf_ref_u56n(const void *ptr)
 {
-    uint64_t buffer = 0ull;
+    uint64_t buffer = 0ULL;
     const unsigned char *src = ptr;
     unsigned char *dst = (unsigned char*)&buffer;
 #if defined(SYSTEM_ENDIANNESS_BIG)
-    dst[1u] = src[0u];
-    dst[2u] = src[1u];
-    dst[3u] = src[2u];
-    dst[4u] = src[3u];
-    dst[5u] = src[4u];
-    dst[6u] = src[5u];
-    dst[7u] = src[6u];
+    dst[1U] = src[0U];
+    dst[2U] = src[1U];
+    dst[3U] = src[2U];
+    dst[4U] = src[3U];
+    dst[5U] = src[4U];
+    dst[6U] = src[5U];
+    dst[7U] = src[6U];
 #elif defined(SYSTEM_ENDIANNESS_LITTLE)
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
-    dst[2u] = src[2u];
-    dst[3u] = src[3u];
-    dst[4u] = src[4u];
-    dst[5u] = src[5u];
-    dst[6u] = src[6u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
+    dst[2U] = src[2U];
+    dst[3U] = src[3U];
+    dst[4U] = src[4U];
+    dst[5U] = src[5U];
+    dst[6U] = src[6U];
 #else
     /* Top of file makes sure this can't happen. */
 #endif /* SYSTEM_ENDIANNESS_* */
@@ -537,24 +537,24 @@ bf_ref_u56n(const void *ptr)
 static inline uint64_t
 bf_ref_u64n(const void *ptr)
 {
-    uint64_t buffer = 0ull;
+    uint64_t buffer = 0ULL;
     const unsigned char *src = ptr;
     unsigned char *dst = (unsigned char*)&buffer;
 #if UFW_BITS_PER_BYTE == 8
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
-    dst[2u] = src[2u];
-    dst[3u] = src[3u];
-    dst[4u] = src[4u];
-    dst[5u] = src[5u];
-    dst[6u] = src[6u];
-    dst[7u] = src[7u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
+    dst[2U] = src[2U];
+    dst[3U] = src[3U];
+    dst[4U] = src[4U];
+    dst[5U] = src[5U];
+    dst[6U] = src[6U];
+    dst[7U] = src[7U];
 #endif /* UFW_BITS_PER_BYTE == 8 */
 #if UFW_BITS_PER_BYTE == 16
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
-    dst[2u] = src[2u];
-    dst[3u] = src[3u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
+    dst[2U] = src[2U];
+    dst[3U] = src[3U];
 #endif /* UFW_BITS_PER_BYTE == 16 */
     return buffer;
 }
@@ -1503,11 +1503,11 @@ bf_set_u16n(void *ptr, const uint16_t value)
     const unsigned char *src = (const unsigned char*)&value;
     unsigned char *dst = ptr;
 #if UFW_BITS_PER_BYTE == 8
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
 #endif /* UFW_BITS_PER_BYTE == 8 */
 #if UFW_BITS_PER_BYTE == 16
-    dst[0u] = src[0u];
+    dst[0U] = src[0U];
 #endif /* UFW_BITS_PER_BYTE == 16 */
     return dst + sizeof(value);
 }
@@ -1537,17 +1537,17 @@ bf_set_u24n(void *ptr, const uint32_t value)
     const unsigned char *src = (const unsigned char*)&value;
     unsigned char *dst = ptr;
 #if defined(SYSTEM_ENDIANNESS_BIG)
-    dst[0u] = src[1u];
-    dst[1u] = src[2u];
-    dst[2u] = src[3u];
+    dst[0U] = src[1U];
+    dst[1U] = src[2U];
+    dst[2U] = src[3U];
 #elif defined(SYSTEM_ENDIANNESS_LITTLE)
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
-    dst[2u] = src[2u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
+    dst[2U] = src[2U];
 #else
     /* Top of file makes sure this can't happen. */
 #endif /* SYSTEM_ENDIANNESS_* */
-    return dst + 3u;
+    return dst + 3U;
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -1570,14 +1570,14 @@ bf_set_u32n(void *ptr, const uint32_t value)
     const unsigned char *src = (const unsigned char*)&value;
     unsigned char *dst = ptr;
 #if UFW_BITS_PER_BYTE == 8
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
-    dst[2u] = src[2u];
-    dst[3u] = src[3u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
+    dst[2U] = src[2U];
+    dst[3U] = src[3U];
 #endif /* UFW_BITS_PER_BYTE == 8 */
 #if UFW_BITS_PER_BYTE == 16
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
 #endif /* UFW_BITS_PER_BYTE == 16 */
     return dst + sizeof(value);
 }
@@ -1607,21 +1607,21 @@ bf_set_u40n(void *ptr, const uint64_t value)
     const unsigned char *src = (const unsigned char*)&value;
     unsigned char *dst = ptr;
 #if defined(SYSTEM_ENDIANNESS_BIG)
-    dst[0u] = src[3u];
-    dst[1u] = src[4u];
-    dst[2u] = src[5u];
-    dst[3u] = src[6u];
-    dst[4u] = src[7u];
+    dst[0U] = src[3U];
+    dst[1U] = src[4U];
+    dst[2U] = src[5U];
+    dst[3U] = src[6U];
+    dst[4U] = src[7U];
 #elif defined(SYSTEM_ENDIANNESS_LITTLE)
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
-    dst[2u] = src[2u];
-    dst[3u] = src[3u];
-    dst[4u] = src[4u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
+    dst[2U] = src[2U];
+    dst[3U] = src[3U];
+    dst[4U] = src[4U];
 #else
     /* Top of file makes sure this can't happen. */
 #endif /* SYSTEM_ENDIANNESS_* */
-    return dst + 5u;
+    return dst + 5U;
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -1650,23 +1650,23 @@ bf_set_u48n(void *ptr, const uint64_t value)
     const unsigned char *src = (const unsigned char*)&value;
     unsigned char *dst = ptr;
 #if defined(SYSTEM_ENDIANNESS_BIG)
-    dst[0u] = src[2u];
-    dst[1u] = src[3u];
-    dst[2u] = src[4u];
-    dst[3u] = src[5u];
-    dst[4u] = src[6u];
-    dst[5u] = src[7u];
+    dst[0U] = src[2U];
+    dst[1U] = src[3U];
+    dst[2U] = src[4U];
+    dst[3U] = src[5U];
+    dst[4U] = src[6U];
+    dst[5U] = src[7U];
 #elif defined(SYSTEM_ENDIANNESS_LITTLE)
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
-    dst[2u] = src[2u];
-    dst[3u] = src[3u];
-    dst[4u] = src[4u];
-    dst[5u] = src[5u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
+    dst[2U] = src[2U];
+    dst[3U] = src[3U];
+    dst[4U] = src[4U];
+    dst[5U] = src[5U];
 #else
     /* Top of file makes sure this can't happen. */
 #endif /* SYSTEM_ENDIANNESS_* */
-    return dst + 6u;
+    return dst + 6U;
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -1695,25 +1695,25 @@ bf_set_u56n(void *ptr, const uint64_t value)
     const unsigned char *src = (const unsigned char*)&value;
     unsigned char *dst = ptr;
 #if defined(SYSTEM_ENDIANNESS_BIG)
-    dst[0u] = src[1u];
-    dst[1u] = src[2u];
-    dst[2u] = src[3u];
-    dst[3u] = src[4u];
-    dst[4u] = src[5u];
-    dst[5u] = src[6u];
-    dst[6u] = src[7u];
+    dst[0U] = src[1U];
+    dst[1U] = src[2U];
+    dst[2U] = src[3U];
+    dst[3U] = src[4U];
+    dst[4U] = src[5U];
+    dst[5U] = src[6U];
+    dst[6U] = src[7U];
 #elif defined(SYSTEM_ENDIANNESS_LITTLE)
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
-    dst[2u] = src[2u];
-    dst[3u] = src[3u];
-    dst[4u] = src[4u];
-    dst[5u] = src[5u];
-    dst[6u] = src[6u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
+    dst[2U] = src[2U];
+    dst[3U] = src[3U];
+    dst[4U] = src[4U];
+    dst[5U] = src[5U];
+    dst[6U] = src[6U];
 #else
     /* Top of file makes sure this can't happen. */
 #endif /* SYSTEM_ENDIANNESS_* */
-    return dst + 7u;
+    return dst + 7U;
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -1736,20 +1736,20 @@ bf_set_u64n(void *ptr, const uint64_t value)
     const unsigned char *src = (const unsigned char*)&value;
     unsigned char *dst = ptr;
 #if UFW_BITS_PER_BYTE == 8
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
-    dst[2u] = src[2u];
-    dst[3u] = src[3u];
-    dst[4u] = src[4u];
-    dst[5u] = src[5u];
-    dst[6u] = src[6u];
-    dst[7u] = src[7u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
+    dst[2U] = src[2U];
+    dst[3U] = src[3U];
+    dst[4U] = src[4U];
+    dst[5U] = src[5U];
+    dst[6U] = src[6U];
+    dst[7U] = src[7U];
 #endif /* UFW_BITS_PER_BYTE == 8 */
 #if UFW_BITS_PER_BYTE == 16
-    dst[0u] = src[0u];
-    dst[1u] = src[1u];
-    dst[2u] = src[2u];
-    dst[3u] = src[3u];
+    dst[0U] = src[0U];
+    dst[1U] = src[1U];
+    dst[2U] = src[2U];
+    dst[3U] = src[3U];
 #endif /* UFW_BITS_PER_BYTE == 16 */
     return dst + sizeof(value);
 }
@@ -2797,7 +2797,7 @@ bf_set_f64b(void *ptr, const double value)
 static inline bool
 bf_inrange_u24(const uint32_t value)
 {
-    return (value < (1ul << 24u));
+    return (value < (1UL << 24U));
 }
 
 /**
@@ -2811,7 +2811,7 @@ bf_inrange_u24(const uint32_t value)
 static inline bool
 bf_inrange_s24(const int32_t value)
 {
-    const int32_t a = (1ul << 23u);
+    const int32_t a = (1UL << 23U);
     return ((value >= (-1 * a)) && (value < a));
 }
 
@@ -2826,7 +2826,7 @@ bf_inrange_s24(const int32_t value)
 static inline bool
 bf_inrange_u40(const uint64_t value)
 {
-    return (value < (1ull << 40u));
+    return (value < (1ULL << 40U));
 }
 
 /**
@@ -2840,7 +2840,7 @@ bf_inrange_u40(const uint64_t value)
 static inline bool
 bf_inrange_s40(const int64_t value)
 {
-    const int64_t a = (1ull << 39u);
+    const int64_t a = (1ULL << 39U);
     return ((value >= (-1 * a)) && (value < a));
 }
 
@@ -2855,7 +2855,7 @@ bf_inrange_s40(const int64_t value)
 static inline bool
 bf_inrange_u48(const uint64_t value)
 {
-    return (value < (1ull << 48u));
+    return (value < (1ULL << 48U));
 }
 
 /**
@@ -2869,7 +2869,7 @@ bf_inrange_u48(const uint64_t value)
 static inline bool
 bf_inrange_s48(const int64_t value)
 {
-    const int64_t a = (1ull << 47u);
+    const int64_t a = (1ULL << 47U);
     return ((value >= (-1 * a)) && (value < a));
 }
 
@@ -2884,7 +2884,7 @@ bf_inrange_s48(const int64_t value)
 static inline bool
 bf_inrange_u56(const uint64_t value)
 {
-    return (value < (1ull << 56u));
+    return (value < (1ULL << 56U));
 }
 
 /**
@@ -2898,7 +2898,7 @@ bf_inrange_u56(const uint64_t value)
 static inline bool
 bf_inrange_s56(const int64_t value)
 {
-    const int64_t a = (1ull << 55u);
+    const int64_t a = (1ULL << 55U);
     return ((value >= (-1 * a)) && (value < a));
 }
 

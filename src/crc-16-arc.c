@@ -92,7 +92,7 @@ static const uint16_t crc16_table[256] = {
 static inline uint16_t
 crc16_octet(uint16_t crc, const uint_least8_t data)
 {
-    return (crc >> 8u) ^ crc16_table[(crc ^ (data & 0xffu)) & 0xffu];
+    return (crc >> 8U) ^ crc16_table[(crc ^ (data & 0xffU)) & 0xffU];
 }
 
 #if (CHAR_BIT == 8u)
@@ -149,8 +149,8 @@ ufw_crc16_arc_u16(uint16_t crc, const uint16_t *buffer, size_t len)
         crc = crc16_octet(crc, (*buffer >> 8u) & 0xffu);
         crc = crc16_octet(crc, (*buffer) & 0xffu);
 #elif defined(SYSTEM_ENDIANNESS_LITTLE)
-        crc = crc16_octet(crc, (*buffer) & 0xffu);
-        crc = crc16_octet(crc, (*buffer >> 8u) & 0xffu);
+        crc = crc16_octet(crc, (*buffer) & 0xffU);
+        crc = crc16_octet(crc, (*buffer >> 8U) & 0xffU);
 #else
 #error "Unsupported endianness"
 #endif /* SYSTEM_ENDIANNESS_* */

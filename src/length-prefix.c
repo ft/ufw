@@ -41,7 +41,7 @@ set_u8(void *buf, const unsigned char value)
 {
     unsigned char *data = buf;
     *data = value;
-    return data + 1u;
+    return data + 1U;
 }
 
 typedef uint16_t (*u16_parse)(const void*);
@@ -82,13 +82,12 @@ struct flenp_serdes {
         .maximum = (M) }
 
 static struct flenp_serdes kind[] = {
-    KIND(VARIABLE, 0u,  u8, NULL,        NULL,        0u),
-    KIND(OCTET,    1u,  u8, ref_u8,      set_u8,      255u),
-    KIND(LE_16BIT, 2u, u16, bf_ref_u16l, bf_set_u16l, UINT16_MAX),
-    KIND(LE_32BIT, 4u, u32, bf_ref_u32l, bf_set_u32l, UINT32_MAX),
-    KIND(BE_16BIT, 2u, u16, bf_ref_u16b, bf_set_u16b, UINT16_MAX),
-    KIND(BE_32BIT, 4u, u32, bf_ref_u32b, bf_set_u32b, UINT32_MAX)
-};
+    KIND(VARIABLE, 0U, u8,  NULL,        NULL,        0U),
+    KIND(OCTET,    1U, u8,  ref_u8,      set_u8,      255U),
+    KIND(LE_16BIT, 2U, u16, bf_ref_u16l, bf_set_u16l, UINT16_MAX),
+    KIND(LE_32BIT, 4U, u32, bf_ref_u32l, bf_set_u32l, UINT32_MAX),
+    KIND(BE_16BIT, 2U, u16, bf_ref_u16b, bf_set_u16b, UINT16_MAX),
+    KIND(BE_32BIT, 4U, u32, bf_ref_u32b, bf_set_u32b, UINT32_MAX)};
 
 static int
 encode_prefix(const LengthPrefixKind k, ByteBuffer *b,
@@ -157,7 +156,7 @@ flenp_buffer_encode_n(const LengthPrefixKind k,
 int
 flenp_chunks_use(const LengthPrefixKind k, LengthPrefixChunks *lpc)
 {
-    size_t size = 0u;
+    size_t size = 0U;
     for (size_t i = lpc->payload.active; i < lpc->payload.chunks; ++i) {
         size += byte_buffer_rest(lpc->payload.chunk + i);
     }
@@ -233,7 +232,7 @@ flenp_buffer_to_sink_n(const LengthPrefixKind k,
 ssize_t
 flenp_chunks_to_sink(const LengthPrefixKind k, Sink *sink, ByteChunks *oc)
 {
-    size_t size = 0u;
+    size_t size = 0U;
     for (size_t i = oc->active; i < oc->chunks; ++i) {
         size += byte_buffer_rest(oc->chunk + i);
     }
@@ -306,7 +305,7 @@ ssize_t
 flenp_memory_from_source(const LengthPrefixKind k,
                          Source *source, void *mem, size_t size)
 {
-    uint64_t len = 0u;
+    uint64_t len = 0U;
     {
         const ssize_t rc = decode_prefix(k, source, &len);
         if (rc < 0) {
@@ -338,7 +337,7 @@ ssize_t
 flenp_decode_source_to_sink(const LengthPrefixKind k,
                             Source *source, Sink *sink)
 {
-    uint64_t len = 0u;
+    uint64_t len = 0U;
     {
         const ssize_t rc = decode_prefix(k, source, &len);
         if (rc < 0) {

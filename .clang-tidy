@@ -15,8 +15,6 @@
 #   use integer literals. Sometimes really legitimately. So this stays off.
 #   I am not NOLINTing all the legitimate places.
 #
-# readability-uppercase-literal-suffix
-#
 # clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
 #   This is unfortunate. If only I could disable the _s functions.
 #   The rest if fair game.
@@ -47,8 +45,7 @@ Checks: >
   -readability-else-after-return,
   -readability-identifier-length,
   -readability-isolate-declaration,
-  -readability-magic-numbers,
-  -readability-uppercase-literal-suffix
+  -readability-magic-numbers
 WarningsAsErrors: ''
 HeaderFilterRegex: .
 FormatStyle: file

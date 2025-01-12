@@ -38,8 +38,8 @@
 static void
 init_ibuf(InstrumentableBuffer *b)
 {
-    b->chunksize = 0u;
-    b->flags = 0u;
+    b->chunksize = 0U;
+    b->flags = 0U;
     instrumentable_reset_error(&b->read.error);
     instrumentable_reset_stats(&b->read.stat);
     instrumentable_reset_error(&b->write.error);
@@ -167,7 +167,7 @@ run_instrumentable_chunk_source(void *driver, void *data, size_t n)
     }
 
     if (BIT_ISSET(b->flags, INSTRUMENTABLE_COMMON_ENABLE_TRACE)) {
-        for (size_t i = 0u; i < n; ++i) {
+        for (size_t i = 0U; i < n; ++i) {
             debug_trace(false, driver, *b->buffer.data);
         }
     }
@@ -201,7 +201,7 @@ run_instrumentable_chunk_sink(void *driver, const void *data, size_t n)
     }
 
     if (BIT_ISSET(b->flags, INSTRUMENTABLE_COMMON_ENABLE_TRACE)) {
-        for (size_t i = 0u; i < n; ++i) {
+        for (size_t i = 0U; i < n; ++i) {
             const unsigned char *ptr = data;
             debug_trace(true, driver, *ptr);
         }
@@ -282,14 +282,14 @@ instrumentable_until_success_at(InstrumentableError *e,
 void
 instrumentable_reset_error(InstrumentableError *e)
 {
-    e->at = 0u;
-    e->flags = 0u;
+    e->at = 0U;
+    e->flags = 0U;
     e->number = 0;
 }
 
 void
 instrumentable_reset_stats(InstrumentableAccessStats *s)
 {
-    s->accesses = 0u;
-    s->bytes= 0u;
+    s->accesses = 0U;
+    s->bytes = 0U;
 }

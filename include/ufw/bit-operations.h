@@ -73,7 +73,7 @@
  * @return Unsigned integer as described.
  * @sideeffects None
  */
-#define BIT(n) (1u << (n))
+#define BIT(n) (1U << (n))
 
 /**
  * Unsigned integer where n consecutive bits are set, starting at offset o
@@ -150,7 +150,7 @@
  * @return Unsigned long integer as described.
  * @sideeffects None
  */
-#define BITL(n) (1ul << (n))
+#define BITL(n) (1UL << (n))
 
 /**
  * Unsigned long integer where n consecutive bits are set, starting at offset o
@@ -223,7 +223,7 @@
  * @return Unsigned long long integer as described.
  * @sideeffects None
  */
-#define BITLL(n) (1ull << (n))
+#define BITLL(n) (1ULL << (n))
 
 /**
  * Unsigned long long integer where n consecutive bits are set, starting at

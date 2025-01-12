@@ -49,7 +49,7 @@ ufw_tap_hexdump(const char *file, const unsigned long line,
     };
     printf("# %s:%lu:\n", file, line);
     printf("#     thexdump(%s, %s): <%zu>\n#\n", sdata, ssize, size);
-    const int rc = hexdump(&hd, data, size, 0u);
+    const int rc = hexdump(&hd, data, size, 0U);
     printf("#\n");
     return rc;
 }

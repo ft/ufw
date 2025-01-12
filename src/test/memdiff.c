@@ -180,7 +180,7 @@ printline(struct diffstate *diff, size_t offset)
 static void
 printlines(struct diffstate *diff, size_t offset, size_t n)
 {
-    for (size_t i = 0u; i < n; ++i) {
+    for (size_t i = 0U; i < n; ++i) {
         printline(diff, offset);
         offset = nextline(offset, diff->columns);
     }
@@ -190,7 +190,7 @@ static void
 diffprecontext(struct diffstate *diff, struct difference *A)
 {
     if (A->lineoffset <= (diff->context+1)*diff->columns) {
-        printlines(diff, 0u, A->lineoffset/diff->columns);
+        printlines(diff, 0U, A->lineoffset / diff->columns);
     } else {
         printskip();
         printlines(diff, A->lineoffset - (diff->context*diff->columns),
@@ -257,11 +257,11 @@ static size_t
 px(UNUSED const void *a, UNUSED const void *b, UNUSED size_t offset,
    const unsigned char ch, const size_t idx)
 {
-    const size_t bits_per_digit = 4u;
+    const size_t bits_per_digit = 4U;
     const size_t bitoffset = (idx-1) * bits_per_digit;
     const unsigned int digit = BIT_GET(ch, bits_per_digit, bitoffset);
     (void)putchar(digits[digit]);
-    return 0u;
+    return 0U;
 }
 
 static size_t
@@ -272,10 +272,10 @@ pr_if_diff(const void *a, const void *b, const size_t offset,
     const unsigned char *bptr = b;
     if (aptr[offset] == bptr[offset]) {
         (void)putchar(' ');
-        return 0u;
+        return 0U;
     } else {
         (void)putchar(ch);
-        return 1u;
+        return 1U;
     }
 }
 
@@ -284,7 +284,7 @@ px_above(const void *a, const void *b, const size_t offset,
          UNUSED const unsigned char ch, UNUSED const size_t idx)
 {
     (void)pr_if_diff(a, b, offset, 'v');
-    return 0u;
+    return 0U;
 }
 
 static size_t
@@ -292,7 +292,7 @@ px_below(const void *a, const void *b, size_t offset,
          UNUSED const unsigned char ch, UNUSED const size_t idx)
 {
     (void)pr_if_diff(a, b, offset, '^');
-    return 0u;
+    return 0U;
 }
 
 static size_t
@@ -304,7 +304,7 @@ pp(UNUSED const void *a, UNUSED const void *b, UNUSED size_t offset,
     } else {
         (void)putchar('.');
     }
-    return 0u;
+    return 0U;
 }
 
 static size_t
@@ -312,7 +312,7 @@ pp_above(const void *a, const void *b, size_t offset,
          UNUSED const unsigned char ch)
 {
     (void)pr_if_diff(a, b, offset, 'v');
-    return 0u;
+    return 0U;
 }
 
 static size_t
@@ -341,12 +341,12 @@ wprint_word_hex(const void *memory, const void *aux, const size_t offset, /* NOL
                 const size_t bytes, size_t columns,
                 hexdigitprinter hexdigit, printableprinter printable)
 {
-    const size_t bits_per_digit = 4u;
+    const size_t bits_per_digit = 4U;
     const size_t bits_per_byte = (size_t)UFW_BITS_PER_BYTE;
     const size_t bits_per_word = bits_per_byte * bytes;
     const size_t digitsteps = bits_per_byte / bits_per_digit;
     const size_t steps = bits_per_word / bits_per_byte;
-    size_t count = 0u;
+    size_t count = 0U;
     size_t step, pad;
 
     if (bytes > columns) {
@@ -356,7 +356,7 @@ wprint_word_hex(const void *memory, const void *aux, const size_t offset, /* NOL
     const unsigned char *ptr = memory;
     ptr += offset;
     /* Print hexadecimal data dump */
-    for (step = 0u; step < steps; ++step) {
+    for (step = 0U; step < steps; ++step) {
         if (step > 0 && (step % 8) == 0) {
             (void)putchar(' ');
         }
@@ -385,7 +385,7 @@ wprint_word_hex(const void *memory, const void *aux, const size_t offset, /* NOL
     (void)fputs(" | ", stdout);
     ptr = memory;
     ptr += offset;
-    for (step = 0u; step < bytes; ++step) {
+    for (step = 0U; step < bytes; ++step) {
         if (step > 0 && (step % 8) == 0) {
             (void)putchar(' ');
         }
@@ -419,11 +419,11 @@ memdiff(const void *a, const void *b, size_t n)
     struct difference A, B;
     struct diffstate diff = {
         .a = a, .b = b, .size = n,
-        .columns = 16u, .context = 2u,
-        .position = 0u, .count = 0u };
+        .columns = 16U, .context = 2U,
+        .position = 0U, .count = 0U };
 
     A.valid = false;
-    A.lineoffset = 0u;
+    A.lineoffset = 0U;
     for (;;) {
         B = finddiff(&diff);
         if (rundiff(&diff, &A, &B) == false) {

@@ -96,11 +96,11 @@ typedef struct ContinuableSink {
 
 #define CONTINUABLE_SINK(ALLOC,FB,CB) {     \
         .alloc = (ALLOC),                   \
-        .buffer = BYTE_BUFFER(NULL, 0u),    \
+        .buffer = BYTE_BUFFER(NULL, 0U),    \
         .fallback = (FB),                   \
         .postalloc = (CB),                  \
         .error.id = 0,                      \
-        .error.datacount = 0u               }
+        .error.datacount = 0U               }
 
 void continuable_sink_init(Sink *instance, ContinuableSink *driver);
 

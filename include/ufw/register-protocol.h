@@ -37,7 +37,7 @@ extern BlockAllocator rp_default_allocator;
 
 #define RP_IMPLEMENTATION_VERSION 0u
 
-#define RP_DEFAULT_BUFFER_SIZE 128ull
+#define RP_DEFAULT_BUFFER_SIZE 128ULL
 
 #define RP_OPT_WORD_SIZE_16     BIT(0)
 #define RP_OPT_WITH_HEADER_CRC  BIT(1)

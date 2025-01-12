@@ -226,9 +226,9 @@ union bf_convert64 {
 (define *end-expr* ");")
 
 (define (literal-suffix n)
-  (cond ((> n 32) 'ull)
-        ((> n 16) 'ul)
-        (else 'u)))
+  (cond ((> n 32) 'ULL)
+        ((> n 16) 'UL)
+        (else 'U)))
 
 (define (next-power-of-2 n)
   (let loop ((k 16))
@@ -258,7 +258,7 @@ The tabular alignment is handed in as arguments to the generator function."
   (lambda (mask op shift)
     (if (zero? shift)
         (format #f "((~a & 0x~v,'0x~a))" sym (bits->digits bits) mask suffix)
-        (format #f "((~a & 0x~v,'0x~a) ~a ~vdu)"
+        (format #f "((~a & 0x~v,'0x~a) ~a ~vdU)"
                 sym (bits->digits bits) mask suffix op shift-align shift))))
 
 (define (make-swap-down-shifts n)
@@ -343,7 +343,7 @@ The tabular alignment is handed in as arguments to the generator function."
 
 (define (make-word-copy-expression dst src)
   (lambda* (idx doffset soffset)
-    (format #f "~a[~du] = ~a[~du];" dst (+ doffset idx) src (+ soffset idx))))
+    (format #f "~a[~dU] = ~a[~dU];" dst (+ doffset idx) src (+ soffset idx))))
 
 (define (indent)
   (display "    "))
@@ -498,7 +498,7 @@ The tabular alignment is handed in as arguments to the generator function."
     (format #t "return dst + ~a;~%"
             (if precise?
                 "sizeof(value)"
-                (format #f "~au" (/ width *bits-per-octet*))))
+                (format #f "~aU" (/ width *bits-per-octet*))))
     (format #t "}~%")
     (unless precise?
       (format #t "#endif /* UFW_BITS_PER_BYTE == 8 */~%"))))
@@ -687,7 +687,7 @@ bf_set_~a~d~a(void *ptr, const ~a value)
     (format #t "static inline bool
 bf_inrange_u~d(const uint~d_t value)
 {
-    return (value < (1~a << ~du));
+    return (value < (1~a << ~dU));
 }
 "
             n typewidth (literal-suffix n) n)
@@ -695,7 +695,7 @@ bf_inrange_u~d(const uint~d_t value)
     (format #t "static inline bool
 bf_inrange_s~d(const int~d_t value)
 {
-    const int~d_t a = (1~a << ~du);
+    const int~d_t a = (1~a << ~dU);
     return ((value >= (-1 * a)) && (value < a));
 }
 "
