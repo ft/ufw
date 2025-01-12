@@ -2,6 +2,97 @@
   User-visible changes in ufw
 -------------------------------
 
+* v6.0.1 → v6.0.2 (released 2025-01-12):
+
+** Bugfixes
+
+- sx: Fix for a possible NULL pointer dereference.
+- clp: Workaround for a possible division-by-zero.
+
+** Miscellaneous
+
+- Various tooling fixes.
+- Various documentation improvements.
+- clang-tidy support updated and extended.
+- Added clang-analyzer support.
+- Doxygen is now warning free.
+- Doxygen warnings are now a release blocker.
+- zephyr,fake-drivers: Be more unused-clean.
+- Various cleanups triggered by clang-tidy.
+
+** Diffstat:
+
+    .clang-tidy                              | 120 +----
+    doc/Doxyfile.in                          |   7 +-
+    doc/doxy-mainpage.md                     |   4 +-
+    doc/pages/cmake.md                       |  83 +++-
+    doc/pages/custom-target.md               | 104 ++++-
+    doc/pages/devel.md                       | 549 ++++++++++++++++++++++-
+    doc/pages/maintainer.md                  |  20 +-
+    doc/pages/tap.md                         | 138 +++++-
+    doc/pages/vcs.md                         |  42 +-
+    include/ufw/allocator.h                  |   8 +-
+    include/ufw/binary-format.h              | 360 +++++++--------
+    include/ufw/bit-operations.h             |   8 +-
+    include/ufw/byte-buffer.h                |  46 +-
+    include/ufw/compat.h                     |   1 +
+    include/ufw/compat/errno.h               |   2 +-
+    include/ufw/compat/math-constants.h      |   2 +-
+    include/ufw/compiler.h                   |   2 +-
+    include/ufw/convolution-low-pass.h       |  16 +-
+    include/ufw/crc/crc16-arc.h              |   8 +-
+    include/ufw/endpoints.h                  |  81 ++--
+    include/ufw/endpoints/continuable-sink.h |   6 +-
+    include/ufw/hexdump.h                    |   7 +-
+    include/ufw/length-prefix.h              |  37 +-
+    include/ufw/meta.h                       |   4 +-
+    include/ufw/octet-ring.h                 |   2 +-
+    include/ufw/persistent-storage.h         |  34 +-
+    include/ufw/register-protocol.h          | 100 +++--
+    include/ufw/register-table.h             | 119 ++---
+    include/ufw/register-utilities.h         |  26 +-
+    include/ufw/rfc1055.h                    |   6 +-
+    include/ufw/ring-buffer-iter.h           |   4 +-
+    include/ufw/ring-buffer.h                |  14 +-
+    include/ufw/sx.h                         |  28 +-
+    include/ufw/test/tap.h                   |  27 +-
+    include/ufw/toolchain.h.in               |   2 +-
+    include/ufw/variable-length-integer.h    |  40 +-
+    include/ufwz/endpoint-uart-fifo.h        |   2 +-
+    include/ufwz/endpoint-uart-poll.h        |   4 +-
+    include/ufwz/shell-addons.h              |   4 +-
+    src/byte-buffer.c                        |  22 +-
+    src/compat/strlcat.c                     |   3 +-
+    src/compat/strlcpy.c                     |   2 +-
+    src/crc-16-arc.c                         |   9 +-
+    src/endpoints/buffer.c                   |   2 +-
+    src/endpoints/continuable-sink.c         |  12 +-
+    src/endpoints/core.c                     |  22 +-
+    src/endpoints/instrumentable.c           |  16 +-
+    src/hexdump.c                            |  10 +-
+    src/length-prefix.c                      |  31 +-
+    src/octet-ring.c                         |   2 +-
+    src/persistent-storage.c                 |  16 +-
+    src/register-protocol.c                  | 102 ++---
+    src/registers/core.c                     | 259 ++++++-----
+    src/rfc1055.c                            |   5 +-
+    src/sx.c                                 |  74 +--
+    src/test/memdiff.c                       | 128 +++---
+    src/test/output-utils.c                  |   2 +-
+    src/test/tap.c                           |  11 +-
+    src/variable-length-integer.c            |  16 +-
+    src/z/driver-i2c-text.c                  |  11 +-
+    src/z/driver-spi-text.c                  |  28 +-
+    src/z/shell-addons.c                     |  12 +-
+    tools/apidoc-build.sh                    |  92 ++++
+    tools/clang-analyzer.sh                  |  78 ++++
+    tools/clang-tidy.sh                      | 152 +++++++
+    tools/coverage-build.sh                  |   3 -
+    tools/make-binary-format.scm             |  16 +-
+    tools/release-tests.sh                   |  88 +++-
+    68 files changed, 2288 insertions(+), 1003 deletions(-)
+
+
 * v6.0.0 → v6.0.1 (released 2025-01-09):
 
 ** Bugfixes
