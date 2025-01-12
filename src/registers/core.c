@@ -1580,7 +1580,7 @@ register_set_from_hexstr(RegisterTable *t, const RegisterAddress start,
     for (size_t idx = 0; idx < n; idx += 4u) {
         const char *cur = str+idx;
         const size_t cn = reg_min(4, n - idx);
-        const RegisterAddress ca = start + idx/4u;
+        const RegisterAddress ca = start + (idx/4u);
 
         const AreaHandle ah = ra_find_area_by_addr(t, ca);
         if (ah >= t->areas) {
