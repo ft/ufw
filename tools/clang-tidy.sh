@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Copyright (c) 2025 ufw workers, All rights reserved.
+#
+# Terms for redistribution and use can be found in LICENCE.
+
 esc=''
 
 label () {
