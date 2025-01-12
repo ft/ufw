@@ -29,6 +29,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*
+ * We need to disable this clang-tidy test in here. It does not play well with
+ * types in polymorphic macros, and we're not marking all places manually.
+ *
+ * NOLINTBEGIN(bugprone-macro-parentheses)
+ */
+
 /**
  * Implement sliding-window convolution filters.
  *
@@ -140,5 +147,7 @@
         else                                                                  \
             return (tmp[in_use / 2] + tmp[(in_use / 2) - 1]) / 2;             \
     }
+
+/* NOLINTEND(bugprone-macro-parentheses) */
 
 #endif /* INC_UFW_CONVOLUTION_LOW_PASS_H */

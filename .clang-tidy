@@ -2,6 +2,10 @@
 # Stuff we may want to enable again later:
 #
 # bugprone-macro-parentheses
+#   I agree with this one. But currently, we're including Zephyr's autoconf.h
+#   via "-imacros", which marks it for the linter to lint. We can't change that
+#   file and some of the macros (negative integers) are not in parentheses.
+#
 # bugprone-narrowing-conversions
 # readability-else-after-return
 # readability-function-cognitive-complexity

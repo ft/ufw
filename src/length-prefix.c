@@ -76,10 +76,10 @@ struct flenp_serdes {
 
 #define KIND(K,S,T,P,G,M)      \
     [LENP_ ## K] = {           \
-        .size = S,             \
-        .cb.T.parse = P,       \
-        .cb.T.generate = G,    \
-        .maximum = M }
+        .size = (S),           \
+        .cb.T.parse = (P),     \
+        .cb.T.generate = (G),  \
+        .maximum = (M) }
 
 static struct flenp_serdes kind[] = {
     KIND(VARIABLE, 0u,  u8, NULL,        NULL,        0u),

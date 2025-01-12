@@ -28,6 +28,13 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+/*
+ * We need to disable this clang-tidy test in here. It does not play well with
+ * types in polymorphic macros, and we're not marking all places manually.
+ *
+ * NOLINTBEGIN(bugprone-macro-parentheses)
+ */
+
 /* Polymorphic ring-buffer implementation */
 
 #define RING_BUFFER_API(NAME,TYPE)              \
@@ -193,5 +200,7 @@
     {                                           \
         c->override_if_full = state;            \
     }
+
+/* NOLINTEND(bugprone-macro-parentheses) */
 
 #endif /* INC_UFW_RING_BUFFER_H */

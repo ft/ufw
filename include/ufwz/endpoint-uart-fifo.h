@@ -26,7 +26,7 @@ int ufwz_uart_fifo_source_init(const struct device *dev,
 #define DEFINE_UART_FIFO_SOURCE_DATA(NAME, SIZE)        \
     struct ufwz_uart_fifo_source_data NAME = {          \
         .buffer = (uint8_t[SIZE]) { 0u },               \
-        .buffer_size = SIZE,                            \
+        .buffer_size = (SIZE),                          \
     }
 
 #define UFWZ_UART_FIFO_SOURCE(DRIVER)                   \
