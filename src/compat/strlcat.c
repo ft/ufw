@@ -18,7 +18,6 @@
  */
 
 #include <ufw/compat/strings.h>
-size_t strlen (const char *);
 
 /*
  * Appends src to string dst of size dsize (unlike strncat, dsize is the
