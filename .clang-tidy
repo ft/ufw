@@ -32,14 +32,12 @@ Checks: >
   -clang-analyzer-valist.Uninitialized,
   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
   -cppcoreguidelines-*,
-  -google-readability-braces-around-statements,
   -hicpp-*,
   -llvm-else-after-return,
   -llvm-header-guard,
   -llvmlibc-restrict-system-libc-headers,
   -misc-include-cleaner,
   -misc-no-recursion,
-  -misc-throw-by-value-catch-by-reference,
   -modernize-*,
   -readability-avoid-nested-conditional-operator,
   -readability-else-after-return,
@@ -153,47 +151,6 @@ CheckOptions:
   google-runtime-int.SignedTypePrefix: int
   google-runtime-int.TypeSuffix: ''
   google-runtime-int.UnsignedTypePrefix: uint
-  hicpp-braces-around-statements.ShortStatementLines: '0'
-  hicpp-deprecated-headers.CheckHeaderFile: 'false'
-  hicpp-function-size.BranchThreshold: '4294967295'
-  hicpp-function-size.LineThreshold: '4294967295'
-  hicpp-function-size.NestingThreshold: '4294967295'
-  hicpp-function-size.ParameterThreshold: '4294967295'
-  hicpp-function-size.StatementThreshold: '800'
-  hicpp-function-size.VariableThreshold: '4294967295'
-  hicpp-member-init.IgnoreArrays: 'false'
-  hicpp-member-init.UseAssignment: 'false'
-  hicpp-move-const-arg.CheckMoveToConstRef: 'true'
-  hicpp-move-const-arg.CheckTriviallyCopyableMove: 'true'
-  hicpp-multiway-paths-covered.WarnOnMissingElse: 'false'
-  hicpp-no-malloc.Allocations: '::malloc;::calloc'
-  hicpp-no-malloc.Deallocations: '::free'
-  hicpp-no-malloc.Reallocations: '::realloc'
-  hicpp-signed-bitwise.IgnorePositiveIntegerLiterals: 'false'
-  hicpp-special-member-functions.AllowMissingMoveFunctions: 'false'
-  hicpp-special-member-functions.AllowMissingMoveFunctionsWhenCopyIsDeleted: 'false'
-  hicpp-special-member-functions.AllowSoleDefaultDtor: 'false'
-  hicpp-uppercase-literal-suffix.IgnoreMacros: 'true'
-  hicpp-uppercase-literal-suffix.NewSuffixes: ''
-  hicpp-use-auto.MinTypeNameLength: '5'
-  hicpp-use-auto.RemoveStars: 'false'
-  hicpp-use-emplace.ContainersWithPush: '::std::stack;::std::queue;::std::priority_queue'
-  hicpp-use-emplace.ContainersWithPushBack: '::std::vector;::std::list;::std::deque'
-  hicpp-use-emplace.ContainersWithPushFront: '::std::forward_list;::std::list;::std::deque'
-  hicpp-use-emplace.EmplacyFunctions: 'vector::emplace_back;vector::emplace;deque::emplace;deque::emplace_front;deque::emplace_back;forward_list::emplace_after;forward_list::emplace_front;list::emplace;list::emplace_back;list::emplace_front;set::emplace;set::emplace_hint;map::emplace;map::emplace_hint;multiset::emplace;multiset::emplace_hint;multimap::emplace;multimap::emplace_hint;unordered_set::emplace;unordered_set::emplace_hint;unordered_map::emplace;unordered_map::emplace_hint;unordered_multiset::emplace;unordered_multiset::emplace_hint;unordered_multimap::emplace;unordered_multimap::emplace_hint;stack::emplace;queue::emplace;priority_queue::emplace'
-  hicpp-use-emplace.IgnoreImplicitConstructors: 'false'
-  hicpp-use-emplace.SmartPointers: '::std::shared_ptr;::std::unique_ptr;::std::auto_ptr;::std::weak_ptr'
-  hicpp-use-emplace.TupleMakeFunctions: '::std::make_pair;::std::make_tuple'
-  hicpp-use-emplace.TupleTypes: '::std::pair;::std::tuple'
-  hicpp-use-equals-default.IgnoreMacros: 'true'
-  hicpp-use-equals-delete.IgnoreMacros: 'true'
-  hicpp-use-noexcept.ReplacementString: ''
-  hicpp-use-noexcept.UseNoexceptFalse: 'true'
-  hicpp-use-nullptr.NullMacros: ''
-  hicpp-use-override.AllowOverrideAndFinal: 'false'
-  hicpp-use-override.FinalSpelling: final
-  hicpp-use-override.IgnoreDestructors: 'false'
-  hicpp-use-override.OverrideSpelling: override
   llvm-else-after-return.WarnOnConditionVariables: 'false'
   llvm-else-after-return.WarnOnUnfixable: 'false'
   llvm-header-guard.HeaderFileExtensions: ';h;hh;hpp;hxx'
