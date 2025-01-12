@@ -109,7 +109,7 @@
         for (unsigned int i = 0; i < div; ++i)                                \
             sum += w->win[i];                                                 \
                                                                               \
-        w->avg = (TYPE)(sum / (TYPE)div);                                     \
+        w->avg = (TYPE)(sum / (TYPE)(div == 0 ? 1 : div));                    \
     }
 
 
