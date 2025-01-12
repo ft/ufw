@@ -44,12 +44,12 @@ extern BlockAllocator rp_default_allocator;
 #define RP_OPT_WITH_PAYLOAD_CRC BIT(2)
 
 typedef enum RPFrameType {
-    RP_FRAME_INVALID = -1,
-    RP_FRAME_READ_REQUEST,
-    RP_FRAME_READ_RESPONSE,
-    RP_FRAME_WRITE_REQUEST,
-    RP_FRAME_WRITE_RESPONSE,
-    RP_FRAME_META = 15
+    RP_FRAME_INVALID        = -1,
+    RP_FRAME_READ_REQUEST   =  0,
+    RP_FRAME_READ_RESPONSE  =  1,
+    RP_FRAME_WRITE_REQUEST  =  2,
+    RP_FRAME_WRITE_RESPONSE =  3,
+    RP_FRAME_META           = 15
 } RPFrameType;
 
 typedef enum RPResponse {
