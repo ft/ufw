@@ -7,6 +7,9 @@
 #   file and some of the macros (negative integers) are not in parentheses.
 #
 # bugprone-narrowing-conversions
+#   I'm not particularly against this one. But it flags a couple of tricky
+#   positions at the moment, so it's disabled for now.
+#
 # readability-else-after-return
 # readability-function-cognitive-complexity
 # readability-magic-numbers
