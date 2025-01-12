@@ -4,8 +4,10 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
-#include <zephyr/kernel.h>
 #include <zephyr/drivers/i2c.h>
+#include <zephyr/kernel.h>
+
+#include <ufw/compiler.h>
 
 #define DT_DRV_COMPAT ufw_i2c_text
 
@@ -17,15 +19,16 @@ ufw_i2c_text_init(const struct device *dev)
 }
 
 static int ufw_i2c_text_configure(const struct device *dev,
-                                  uint32_t dev_config)
+                                  UNUSED uint32_t dev_config)
 {
     printk("text-i2c: Configuring %s...\n", dev->name);
     return -ENOTSUP;
 }
 
 static int ufw_i2c_text_transfer(const struct device *dev,
-                                 struct i2c_msg *msgs,
-                                 uint8_t num_msgs, uint16_t addr)
+                                 UNUSED struct i2c_msg *msgs,
+                                 UNUSED uint8_t num_msgs,
+                                 UNUSED uint16_t addr)
 {
     printk("text-i2c: Transmitting with %s...\n", dev->name);
     return -ENOTSUP;

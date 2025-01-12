@@ -4,8 +4,10 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
-#include <zephyr/kernel.h>
 #include <zephyr/drivers/spi.h>
+#include <zephyr/kernel.h>
+
+#include <ufw/compiler.h>
 
 #define DT_DRV_COMPAT ufw_spi_text
 
@@ -17,10 +19,10 @@ ufw_spi_text_init(const struct device *dev)
 }
 
 static int
-ufw_spi_text_transceive(const struct device *dev,
-                        const struct spi_config *spi_cfg,
-                        const struct spi_buf_set *tx_bufs,
-                        const struct spi_buf_set *rx_bufs)
+ufw_spi_text_transceive(UNUSED const struct device *dev,
+                        UNUSED const struct spi_config *spi_cfg,
+                        UNUSED const struct spi_buf_set *tx_bufs,
+                        UNUSED const struct spi_buf_set *rx_bufs)
 {
     printk("text-spi: In there!\n");
     return -ENOTSUP;
@@ -28,20 +30,20 @@ ufw_spi_text_transceive(const struct device *dev,
 
 #ifdef CONFIG_SPI_ASYNC
 static int
-ufw_spi_text_transceive_async(const struct device *dev,
-                              const struct spi_config *spi_cfg,
-                              const struct spi_buf_set *tx_bufs,
-                              const struct spi_buf_set *rx_bufs,
-                              spi_callback_t cb,
-                              void *userdata)
+ufw_spi_text_transceive_async(UNUSED const struct device *dev,
+                              UNUSED const struct spi_config *spi_cfg,
+                              UNUSED const struct spi_buf_set *tx_bufs,
+                              UNUSED const struct spi_buf_set *rx_bufs,
+                              UNUSED spi_callback_t cb,
+                              UNUSED void *userdata)
 {
     return -ENOTSUP;
 }
 #endif
 
 static int
-ufw_spi_text_release(const struct device *dev,
-                     const struct spi_config *spi_cfg)
+ufw_spi_text_release(UNUSED const struct device *dev,
+                     UNUSED const struct spi_config *spi_cfg)
 {
     return -ENOTSUP;
 }
