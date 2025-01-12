@@ -249,7 +249,7 @@ px(UNUSED const void *a, UNUSED const void *b, UNUSED size_t offset,
     const size_t bits_per_digit = 4u;
     const size_t bitoffset = (idx-1) * bits_per_digit;
     const unsigned int digit = BIT_GET(ch, bits_per_digit, bitoffset);
-    putchar(digits[digit]);
+    (void)putchar(digits[digit]);
     return 0u;
 }
 
@@ -260,10 +260,10 @@ pr_if_diff(const void *a, const void *b, const size_t offset,
     const unsigned char *aptr = a;
     const unsigned char *bptr = b;
     if (aptr[offset] == bptr[offset]) {
-        putchar(' ');
+        (void)putchar(' ');
         return 0u;
     } else {
-        putchar(ch);
+        (void)putchar(ch);
         return 1u;
     }
 }
@@ -289,9 +289,9 @@ pp(UNUSED const void *a, UNUSED const void *b, UNUSED size_t offset,
    unsigned char ch)
 {
     if (isprint(ch) && (isspace(ch) == false)) {
-        putchar(ch);
+        (void)putchar(ch);
     } else {
-        putchar('.');
+        (void)putchar('.');
     }
     return 0u;
 }
@@ -347,13 +347,13 @@ wprint_word_hex(const void *memory, const void *aux, const size_t offset, /* NOL
     /* Print hexadecimal data dump */
     for (step = 0u; step < steps; ++step) {
         if (step > 0 && (step % 8) == 0) {
-            putchar(' ');
+            (void)putchar(' ');
         }
         for (size_t j = digitsteps; j > 0; --j) {
             count += hexdigit(memory, aux, offset + step, *ptr, j);
         }
         ptr++;
-        putchar(' ');
+        (void)putchar(' ');
     }
     /* Pad to a given column width */
     if (bytes < columns) {
@@ -361,13 +361,13 @@ wprint_word_hex(const void *memory, const void *aux, const size_t offset, /* NOL
         size_t spaces = step + rest;
         for (pad = step; pad < spaces; ++pad) {
             if (pad > 0 && (pad % 8) == 0) {
-                putchar(' ');
+                (void)putchar(' ');
             }
             for (size_t j = digitsteps; j > 0; --j) {
-                putchar(' ');
+                (void)putchar(' ');
             }
             ptr++;
-            putchar(' ');
+            (void)putchar(' ');
         }
     }
     /* Print printable-characters after data dump, similar to hexdump */
@@ -376,7 +376,7 @@ wprint_word_hex(const void *memory, const void *aux, const size_t offset, /* NOL
     ptr += offset;
     for (step = 0u; step < bytes; ++step) {
         if (step > 0 && (step % 8) == 0) {
-            putchar(' ');
+            (void)putchar(' ');
         }
         count += printable(memory, aux, offset + step, *ptr);
         ptr++;
@@ -386,9 +386,9 @@ wprint_word_hex(const void *memory, const void *aux, const size_t offset, /* NOL
         size_t rest = step + columns - bytes;
         for (pad = step; pad < rest; ++pad) {
             if (pad > 0 && (pad % 8) == 0) {
-                putchar(' ');
+                (void)putchar(' ');
             }
-            putchar(' ');
+            (void)putchar(' ');
         }
     }
     (void)fputs(" |\n", stdout);

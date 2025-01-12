@@ -49,7 +49,7 @@ tap_result(const bool result,
     } else {
         vprintf(fmt, ap);
     }
-    putchar('\n');
+    (void)putchar('\n');
 
     if (result == false) {
         printf("#\n# failed test at:\n");
