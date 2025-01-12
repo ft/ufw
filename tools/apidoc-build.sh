@@ -10,6 +10,10 @@ log="${bd}.log"
 usage () {
     cat <<EOF
 
+This is a helper that runs ufw's documentation generation process. The
+main target is HTML. For best experience, it should be viewed inside
+of a browser that is capable of running JavaScript.
+
 usage:   ./tools/apidoc-build.sh [OPTION(s)...]
 
 Available options:

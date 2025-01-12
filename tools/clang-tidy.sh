@@ -12,16 +12,42 @@ label () {
     printf '%s' "${esc}[39m"
 }
 
+usage () {
+    cat <<EOF
+
+This tool helps running clang-tidy for ufw. Because it tries to cover
+the Zephyr part of the library as well, it requires a working Zephyr
+build tree to work. For this the tool reuses the build-tree of the
+Zephyr module buile test in "test/module". Without running it, this
+program will not work.
+
+usage:   ./tools/clang-tidy.sh [OPTION(s)...]
+
+Available options:
+
+  -h       Display this help text
+  -c       Enable colouration of clang-tidy output
+  -f       Enable automatic fix-application in clang-tidy
+  -o FILE  Use FILE to log clang-tidy output into. By default
+           output is delivered to stdout.
+  -L       Enable output of a coloured label before execution
+
+The output of the program is viable for "M-x compile" in emacs.
+
+EOF
+}
+
 output=''
 colour=0
-nolabel=0
+nolabel=1
 dofix=0
-while getopts cfo:L _opt; do
+while getopts cfho:L _opt; do
     case "$_opt" in
     c) colour=1 ;;
     f) dofix=1 ;;
+    h) usage(); exit 0 ;;
     o) output="$OPTARG" ;;
-    L) nolabel=1 ;;
+    L) nolabel=0 ;;
     *) printf 'Unknown option "-%s".\n' "$_opt"
        exit 1 ;;
     esac

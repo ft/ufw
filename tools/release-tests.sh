@@ -346,7 +346,7 @@ printf '\n'
 
 if [ "$runtidy" -ne 0 ]; then
     printf '\n'
-    ./tools/clang-tidy.sh -c -o clang-tidy.log run || bad clang-tidy-unclean
+    ./tools/clang-tidy.sh -L -c -o clang-tidy.log run || bad clang-tidy-unclean
 fi
 
 if [ "$runanalyzer" -ne 0 ]; then

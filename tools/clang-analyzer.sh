@@ -13,10 +13,32 @@ label () {
 }
 
 bd='build-analyze'
+
+usage () {
+    cat <<EOF
+
+This is a helper for clang's static analyzer on ufw's codebase.
+
+usage:   ./tools/clang-tidy.sh [OPTION(s)...]
+
+Available options:
+
+  -h       Display this help text
+  -r       Only create $bd if it does not exist yet
+  -o DIR   Use DIR instead of $bd for running the analyzer
+
+It is recommended to use "-r" for subsequent runs, to cut down on
+execution time. By default the whole process always runs completely
+fresh.
+
+EOF
+}
+
 rerun=0
 allow_warnings=1
-while getopts o:r _opt; do
+while getopts ho:r _opt; do
     case "$_opt" in
+    h) usage(); exit 0 ;;
     o) bd="$OPTARG" ;;
     r) rerun=1 ;;
     *) printf 'Unknown option "-%s".\n' "$_opt"
