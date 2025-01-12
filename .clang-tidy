@@ -11,6 +11,10 @@
 #   positions at the moment, so it's disabled for now.
 #
 # readability-magic-numbers
+#   This one sounds useful. But it's interesting just in how many places you
+#   use integer literals. Sometimes really legitimately. So this stays off.
+#   I am not NOLINTing all the legitimate places.
+#
 # readability-named-parameter
 # readability-uppercase-literal-suffix
 #
