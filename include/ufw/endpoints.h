@@ -133,6 +133,7 @@ typedef ByteBuffer (*SourceGetBuffer)(Source*);
 struct ufw_ep_retry;
 typedef void (*EndpointRetryInit)(struct ufw_ep_retry*);
 typedef ssize_t (*EndpointRetry)(void*, void*, ssize_t);
+typedef int (*EndpointSeek)(void*, size_t);
 
 struct ufw_ep_retry {
     EndpointRetryInit init;
@@ -157,6 +158,7 @@ struct ufw_source {
     struct ufw_ep_retry retry;
     struct {
         SourceGetBuffer getbuffer;
+        EndpointSeek seek;
     } ext;
 };
 
@@ -170,6 +172,7 @@ struct ufw_sink {
     struct ufw_ep_retry retry;
     struct {
         SinkGetBuffer getbuffer;
+        EndpointSeek seek;
     } ext;
 };
 
@@ -178,28 +181,32 @@ struct ufw_sink {
         .driver = (DRIVER),             \
         .source.octet = (CB),           \
         .retry = EP_RETRY_INIT,         \
-        .ext.getbuffer = NULL }
+        .ext.getbuffer = NULL,          \
+        .ext.seek = NULL }
 
 #define CHUNK_SOURCE_INIT(CB, DRIVER) { \
         .kind = DATA_KIND_CHUNK,        \
         .driver = (DRIVER),             \
         .source.chunk = (CB),           \
         .retry = EP_RETRY_INIT,         \
-        .ext.getbuffer = NULL }
+        .ext.getbuffer = NULL,          \
+        .ext.seek = NULL }
 
 #define OCTET_SINK_INIT(CB, DRIVER) {   \
         .kind = DATA_KIND_OCTET,        \
         .driver = (DRIVER),             \
         .sink.octet = (CB),             \
         .retry = EP_RETRY_INIT,         \
-        .ext.getbuffer = NULL }
+        .ext.getbuffer = NULL,          \
+        .ext.seek = NULL }
 
 #define CHUNK_SINK_INIT(CB, DRIVER) {   \
         .kind = DATA_KIND_CHUNK,        \
         .driver = (DRIVER),             \
         .sink.chunk = (CB),             \
         .retry = EP_RETRY_INIT,         \
-        .ext.getbuffer = NULL }
+        .ext.getbuffer = NULL,          \
+        .ext.seek = NULL }
 
 void octet_source_init(Source *instance, ByteSource source, void *driver);
 void chunk_source_init(Source *instance, ChunkSource source, void *driver);
@@ -216,6 +223,9 @@ ssize_t source_get_chunk(Source *source, void *buf, size_t n);
 ssize_t source_get_chunk_atmost(Source *source, void *buf, size_t n);
 ssize_t sink_put_chunk(Sink *sink, const void *buf, size_t n);
 ssize_t sink_put_chunk_atmost(Sink *sink, const void *buf, size_t n);
+
+int source_seek(Source *source, size_t offset);
+int sink_seek(Sink *sink, size_t offset);
 
 /*
  * Source to Sink Plumbing

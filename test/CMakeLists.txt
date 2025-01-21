@@ -35,7 +35,8 @@ list(APPEND test_names
   t-rfc1055
   t-ring-buffer
   t-sx-parser
-  t-varint)
+  t-varint
+  t-versioned-persistence)
 
 set(test_prgs)
 foreach (tst ${test_names})

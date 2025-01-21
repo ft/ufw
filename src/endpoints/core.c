@@ -641,6 +641,26 @@ channel_has_buffer_ext(const Source *source, const Sink *sink)
     return (source_has_buffer_ext(source) || sink_has_buffer_ext(sink));
 }
 
+int
+source_seek(Source *source, size_t offset)
+{
+    if (source->ext.seek == NULL) {
+        return -ENOTSUP;
+    }
+
+    return source->ext.seek(source->driver, offset);
+}
+
+int
+sink_seek(Sink *sink, size_t offset)
+{
+    if (sink->ext.seek == NULL) {
+        return -ENOTSUP;
+    }
+
+    return sink->ext.seek(sink->driver, offset);
+}
+
 /*
  * Plumbing API, Source-to-Sink (sts_)
  *
