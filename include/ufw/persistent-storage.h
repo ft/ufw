@@ -138,6 +138,58 @@ typedef enum persistent_access {
     PERSISTENT_ACCESS_ADDRESS_OUT_OF_RANGE
 } PersistentAccess;
 
+/**
+ * Variant of PersistentStorage that adds content versioning
+ *
+ * PersistentStorage offers a low-level abstraction, that allows to store data
+ * in persistent memory, so it can be accessed across many system starts, while
+ * ensuring that the data retrieved is consistent with regard to a checksum
+ * algorithm.
+ *
+ * What PersistentStorage does not allow is to tell if the data stored is
+ * compatible with the active application: The software accessing the
+ * persistent memory may change in the course of time. From version to version,
+ * data that needs to be stored across system starts may change content and
+ * semantics. Extending PersistentStorage with versioning information is this
+ * type's job.
+ *
+ * In persistent memory, this can be thought of as this:
+ *
+ * @code
+ * struct {
+ *     Checksum chksum;   // 16 or 32 bits.
+ *     uint16_t size;     // Size of data section.
+ *     uint16_t version;  // Number identifying the version of data section.
+ *     unsigned char data[size];
+ * };
+ * @endcode
+ *
+ * This type is implemented on top of PersistentStorage, and can be accessed
+ * through it, even if compatibility cannot be ensured, but consistency can.
+ *
+ * Consistency is established by PersistentStorage. Compatibility is assumed if
+ * `version.expected` equals `version.stored`.
+ */
+typedef struct versioned_persistence {
+    /** Underlying PersistentStorage instance */
+    PersistentStorage ps;
+    struct {
+        /** This is specifies the version the software is compatible with. */
+        uint16_t expected
+        /** This is the version retrieved from the persistent memory. */
+        uint16_t stored;
+    } version;
+    struct {
+        /** Calculated size of the data section in memory */
+        size_t size;
+        /**
+         * Offset of data section from the start of the memory the
+         * PersistentStorage instance accesses.
+         */
+        off_t offset;
+    } data;
+} VersionedPersistence;
+
 /*
  * Initialisation
  */
