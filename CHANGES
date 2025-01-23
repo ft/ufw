@@ -2,6 +2,18 @@
   User-visible changes in ufw
 -------------------------------
 
+* v6.0.2 → v6.0.3 (released 2025-01-23):
+
+** Bugfixes
+
+- cmake,zephyr: Fix installation routines that use UFW_INSTALL_COMPONENT
+
+** Diffstat:
+
+    zephyr/cmake-cache.cmake | 8 +++-----
+    1 file changed, 3 insertions(+), 5 deletions(-)
+
+
 * v6.0.1 → v6.0.2 (released 2025-01-12):
 
 ** Bugfixes
