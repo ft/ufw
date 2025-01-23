@@ -21,6 +21,9 @@
 extern "C" {
 #endif /* __cplusplus */
 
+typedef uint16_t vp_chksum;
+typedef vp_chksum (*vp_chksum_fnc)(vp_chksum, const void*, size_t);
+
 struct vp_access {
     Source fetch;
     Sink store;
@@ -33,16 +36,13 @@ struct vp_meta {
 };
 
 struct vp_checksum {
-    PersistentChecksumType type;
-    PersistentChecksum initial;
-    union {
-        PersistentChksum16 c16;
-        PersistentChksum32 c32;
-    } process;
+    vp_chksum initial;
+    vp_chksum_fnc process;
 };
 
-#define VP_STATE_CONSISTENT BIT(0)
-#define VP_STATE_COMPATIBLE BIT(1)
+#define VP_STATE_META_CONSISTENT    BIT(0)
+#define VP_STATE_PAYLOAD_CONSISTENT BIT(1)
+#define VP_STATE_PAYLOAD_COMPATIBLE BIT(2)
 
 typedef struct versioned_persistence {
     uint16_t state;
@@ -59,9 +59,8 @@ typedef struct versioned_persistence {
         .meta.version = (VERSION),                                  \
         .data.fetch = (FETCH),                                      \
         .data.store = (STORE),                                      \
-        .chksum.type = PERSISTENT_CHECKSUM_16BIT,                   \
-        .chksum.initial.sum16 = (INIT),                             \
-        .chksum.process.c16 = (CHKSUM),                             \
+        .chksum.initial= (INIT),                                    \
+        .chksum.process= (CHKSUM),                                  \
         .buffer = NULL }
 
 #if 0

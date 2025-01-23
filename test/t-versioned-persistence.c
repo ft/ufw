@@ -22,8 +22,22 @@
 
 #define STORAGE_SIZE 1024
 
+struct info_data {
+    uint32_t a;
+    uint32_t b;
+    uint16_t c;
+    uint16_t d;
+    uint32_t e;
+    uint16_t f;
+    uint32_t g;
+    uint32_t h;
+    uint16_t i;
+    uint32_t j;
+};
+
+#define INFO_DATA_DEFAULT { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+#define INFO_SIZE    (sizeof(struct info_data))
 #define INFO_ADDRESS 24u
-#define INFO_SIZE    32u
 #define INFO_VERSION  5u
 
 static unsigned char storage[STORAGE_SIZE];
@@ -32,17 +46,6 @@ static void
 t_reset(void)
 {
     memset(storage, UCHAR_MAX, STORAGE_SIZE);
-}
-
-/*
- * CRC Adaptation. The standard crc API does not match PersistentChecksum.
- * Maybe add more variants.
- */
-
-static uint16_t
-crc16(const unsigned char *buffer, const size_t n, const uint16_t init)
-{
-    return ufw_crc16_arc(init, buffer, n);
 }
 
 /*
@@ -115,7 +118,7 @@ main(UNUSED int argc, UNUSED char *argv[])
     VersionedPersistence vp =
         VP16_INIT(INFO_ADDRESS, INFO_SIZE, INFO_VERSION,
                   storage_fetch, storage_store,
-                  crc16, CRC16_ARC_INITIAL);
+                  ufw_crc16_arc, CRC16_ARC_INITIAL);
 
 
 
