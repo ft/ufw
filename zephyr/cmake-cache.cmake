@@ -46,13 +46,11 @@ if (ZEPHYR_CURRENT_MODULE_NAME AND ("${ZEPHYR_CURRENT_MODULE_NAME}" STREQUAL "uf
     CACHE BOOL "Enable coverage tracking in toolchain" FORCE)
 
   # UFW_INSTALL_COMPONENT
-  set(_tmp OFF)
   if (CONFIG_UFW_INSTALL_COMPONENT)
-    set(_tmp ON)
+    set(UFW_INSTALL_COMPONENT "${CONFIG_UFW_INSTALL_COMPONENT}"
+      CACHE STRING "CMake Installation Component name for ufw installation items."
+      FORCE)
   endif()
-  set(UFW_INSTALL_COMPONENT "${_tmp}"
-    CACHE BOOL "CMake Installation Component name for ufw installation items."
-    FORCE)
 
   # GENERATE_API_DOCUMENTATION
   set(_tmp OFF)
