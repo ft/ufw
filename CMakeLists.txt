@@ -86,6 +86,7 @@ configure_file("${PROJECT_SOURCE_DIR}/include/ufw/toolchain.h.in"
 
 set(__ufw_sources src/allocator.c
                   src/crc-16-arc.c
+                  src/endpoints/addressable.c
                   src/endpoints/buffer.c
                   src/endpoints/continuable-sink.c
                   src/endpoints/core.c
@@ -101,7 +102,8 @@ set(__ufw_sources src/allocator.c
                   src/register-protocol.c
                   src/rfc1055.c
                   src/ring-buffer-iter.c
-                  src/variable-length-integer.c)
+                  src/variable-length-integer.c
+                  src/versioned-persistence.c)
 
 if (WITH_UINT8_T)
   list(APPEND __ufw_sources src/octet-ring.c)

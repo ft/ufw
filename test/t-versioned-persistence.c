@@ -4,16 +4,18 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
-#include <asm-generic/errno.h>
 #include <limits.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <ufw/compiler.h>
 #include <ufw/test/tap.h>
 
-#include <ufw/crc/crc16-arc.h>
+#include <ufw/compat/errno.h>
 #include <ufw/compat/ssize-t.h>
+#include <ufw/crc/crc16-arc.h>
+#include <ufw/endpoints.h>
 #include <ufw/versioned-persistence.h>
 
 /*
@@ -43,9 +45,13 @@ struct info_data {
 static unsigned char storage[STORAGE_SIZE];
 
 static void
-t_reset(void)
+t_reset(VersionedPersistence *vp)
 {
     memset(storage, UCHAR_MAX, STORAGE_SIZE);
+    vp_invalidate(vp, VP_DATA_META | VP_DATA_PAYLOAD);
+#ifdef TEST_DEBUG
+    thexdump(storage, STORAGE_SIZE);
+#endif /* TEST_DEBUG */
 }
 
 /*
@@ -53,10 +59,10 @@ t_reset(void)
  */
 
 static ssize_t
-buffer_read(uint32_t addr, void *buf, size_t n)
+buffer_read(UNUSED void *data, uint32_t addr, void *buf, size_t n)
 {
+    printf("# DEBUG: read()\n");
     if ((addr + n) > STORAGE_SIZE) {
-        return 0;
         return -ENOBUFS;
     }
 
@@ -65,7 +71,7 @@ buffer_read(uint32_t addr, void *buf, size_t n)
 }
 
 static ssize_t
-buffer_write(uint32_t addr, const void *buf, size_t n)
+buffer_write(UNUSED void *data, uint32_t addr, const void *buf, size_t n)
 {
     if ((addr + n) > STORAGE_SIZE) {
         return -ENOBUFS;
@@ -75,57 +81,27 @@ buffer_write(uint32_t addr, const void *buf, size_t n)
     return n;
 }
 
-/*
- * Endpoints with addressable memory
- */
-
-struct addressable_source {
-    uint32_t address;
-    ssize_t (*run)(uint32_t, void*, size_t);
-    void *data;
-};
-
-static ssize_t
-run_addressable_source(void *driver, void *buffer, const size_t n)
-{
-    struct addressable_source *cfg = driver;
-    return cfg->run(cfg->address, buffer, n);
-}
-
-struct addressable_sink {
-    uint32_t address;
-    ssize_t (*run)(uint32_t, const void*, size_t);
-    void *data;
-};
-
-static ssize_t
-run_addressable_sink(void *driver, const void *buffer, const size_t n)
-{
-    struct addressable_sink *cfg = driver;
-    return cfg->run(cfg->address, buffer, n);
-}
-
 /* Tests */
 
 int
 main(UNUSED int argc, UNUSED char *argv[])
 {
-    struct addressable_source src = { .address = 0u, .run = buffer_read, .data = NULL };
+    struct addressable_source src = { .address = 0U, .run = buffer_read, .data = NULL };
     Source storage_fetch = CHUNK_SOURCE_INIT(run_addressable_source, &src);
-    struct addressable_sink snk = { .address = 0u, .run = buffer_write, .data = NULL };
+    struct addressable_sink snk = { .address = 0U, .run = buffer_write, .data = NULL };
     Sink storage_store = CHUNK_SINK_INIT(run_addressable_sink, &snk);
 
     VersionedPersistence vp =
-        VP16_INIT(INFO_ADDRESS, INFO_SIZE, INFO_VERSION,
-                  storage_fetch, storage_store,
-                  ufw_crc16_arc, CRC16_ARC_INITIAL);
-
+        VP_SIMPLE_INIT(INFO_ADDRESS, INFO_SIZE, INFO_VERSION,
+                       storage_fetch, storage_store);
 
 
     plan(1);
 
-    t_reset();
-    ok((1 + 2) == 3, "math works");
+    t_reset(&vp);
+
+    const int openrc = vp_open(&vp);
+    ok(openrc == -EBADF, "After t_reset, vp cannot be opened: Meta data error.");
 
     return EXIT_SUCCESS;
 }

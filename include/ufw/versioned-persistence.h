@@ -23,6 +23,7 @@ extern "C" {
 
 typedef uint16_t vp_chksum;
 typedef vp_chksum (*vp_chksum_fnc)(vp_chksum, const void*, size_t);
+#define vp_ref_chksum bf_ref_u16n
 
 struct vp_access {
     Source fetch;
@@ -35,88 +36,69 @@ struct vp_meta {
     uint16_t version;
 };
 
+struct vp_cache {
+    uint16_t size;
+    uint16_t version;
+};
+
 struct vp_checksum {
     vp_chksum initial;
     vp_chksum_fnc process;
+    vp_chksum meta_read;
+    vp_chksum meta_calculated;
+    vp_chksum payload_read;
+    vp_chksum payload_calculated;
 };
 
 #define VP_STATE_META_CONSISTENT    BIT(0)
 #define VP_STATE_PAYLOAD_CONSISTENT BIT(1)
 #define VP_STATE_PAYLOAD_COMPATIBLE BIT(2)
 
+#define VP_SIZE_META ( (2*sizeof(vp_chksum)) + (2*sizeof(uint16_t)) )
+
+#define VP_DATA_META    BIT(0)
+#define VP_DATA_PAYLOAD BIT(1)
+
 typedef struct versioned_persistence {
     uint16_t state;
     struct vp_meta meta;
+    struct vp_cache cache;
     struct vp_access data;
     struct vp_checksum chksum;
     ByteBuffer *buffer;
 } VersionedPersistence;
 
-#define VP16_INIT(ADDR, SIZE, VERSION, FETCH, STORE, CHKSUM, INIT)  \
-    {   .state = 0u,                                                \
-        .meta.address = (ADDR),                                     \
-        .meta.size = (SIZE),                                        \
-        .meta.version = (VERSION),                                  \
-        .data.fetch = (FETCH),                                      \
-        .data.store = (STORE),                                      \
-        .chksum.initial= (INIT),                                    \
-        .chksum.process= (CHKSUM),                                  \
-        .buffer = NULL }
+#define VP_SECTION_SIZE(n) ((n) + VP_SIZE_META)
+#define VP_FULL_INIT(ADDR, SIZE, VERSION, BUF, FETCH, STORE, CHKSUM, INIT) \
+    {   .state = 0u,                                                       \
+        .meta.address = (ADDR),                                            \
+        .meta.size = VP_SECTION_SIZE(SIZE),                                \
+        .meta.version = (VERSION),                                         \
+        .data.fetch = (FETCH),                                             \
+        .data.store = (STORE),                                             \
+        .chksum.initial= (INIT),                                           \
+        .chksum.process= (CHKSUM),                                         \
+        .buffer = (BUF) }
 
-#if 0
-/**
- * Variant of PersistentStorage that adds content versioning
- *
- * PersistentStorage offers a low-level abstraction, that allows to store data
- * in persistent memory, so it can be accessed across many system starts, while
- * ensuring that the data retrieved is consistent with regard to a checksum
- * algorithm.
- *
- * What PersistentStorage does not allow is to tell if the data stored is
- * compatible with the active application: The software accessing the
- * persistent memory may change in the course of time. From version to version,
- * data that needs to be stored across system starts may change content and
- * semantics. Extending PersistentStorage with versioning information is this
- * type's job.
- *
- * In persistent memory, this can be thought of as this:
- *
- * @code
- * struct {
- *     Checksum chksum;   // 16 or 32 bits.
- *     uint16_t size;     // Size of data section.
- *     uint16_t version;  // Number identifying the version of data section.
- *     unsigned char data[size];
- * };
- * @endcode
- *
- * This type is implemented on top of PersistentStorage, and can be accessed
- * through it, even if compatibility cannot be ensured, but consistency can.
- *
- * Consistency is established by PersistentStorage. Compatibility is assumed if
- * `version.expected` equals `version.stored`.
- */
-typedef struct versioned_persistence_old {
-    /** Underlying PersistentStorage instance */
-    PersistentStorage ps;
-    struct {
-        /** This is specifies the version the software is compatible with. */
-        uint16_t expected
-        /** This is the version retrieved from the persistent memory. */
-        uint16_t stored;
-    } version;
-    struct {
-        /** Calculated size of the data section in memory */
-        size_t size;
-        /**
-         * Offset of data section from the start of the memory the
-         * PersistentStorage instance accesses.
-         */
-        off_t offset;
-    } data;
-} VersionedPersistenceOld;
-#endif
+#define VP_INIT(ADDR, SIZE, VERSION, BUF, FETCH, STORE) \
+    VP_FULL_INIT(                                       \
+        ADDR, SIZE, VERSION, BUF, FETCH, STORE,         \
+        ufw_crc16_arc, CRC16_ARC_INITIAL)
 
+#define VP_SIMPLE_INIT(ADDR, SIZE, VERSION, FETCH, STORE)       \
+    VP_INIT(ADDR, SIZE, VERSION, NULL, FETCH, STORE)
+
+int vp_open(VersionedPersistence *vp);
+int vp_invalidate(VersionedPersistence *vp, unsigned int parts);
+
+int vp_store_meta(VersionedPersistence *vp);
+int vp_memset(VersionedPersistence *vp, unsigned char c);
+
+int vp_fetch_part(void *dst, VersionedPersistence *vp, size_t offset, size_t n);
+int vp_store_part(VersionedPersistence *vp, const void *src, size_t offset, size_t n);
+
+int vp_fetch(void *dst, VersionedPersistence *vp);
+int vp_store(VersionedPersistence *vp, const void *src);
 
 #ifdef __cplusplus
 }

@@ -272,6 +272,25 @@ void source_from_chunks(Source *instance, ByteChunks *chunks);
 void sink_to_buffer(Sink *instance, ByteBuffer *buffer);
 
 /*
+ * Addressable Endpoints
+ */
+
+typedef struct addressable_source {
+    uint32_t address;
+    ssize_t (*run)(void*, uint32_t, void*, size_t);
+    void *data;
+} AddressableSource;
+
+typedef struct addressable_sink {
+    uint32_t address;
+    ssize_t (*run)(void*, uint32_t, const void*, size_t);
+    void *data;
+} AddressableSink;
+
+ssize_t run_addressable_source(void *driver, void *buffer, size_t n);
+ssize_t run_addressable_sink(void *driver, const void *buffer, size_t n);
+
+/*
  * Instrumentable Sources and Sinks
  */
 
