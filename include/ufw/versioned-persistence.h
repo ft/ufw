@@ -26,8 +26,8 @@ typedef vp_chksum (*vp_chksum_fnc)(vp_chksum, const void*, size_t);
 #define vp_ref_chksum bf_ref_u16n
 
 struct vp_access {
-    Source fetch;
-    Sink store;
+    Source source;
+    Sink sink;
 };
 
 struct vp_meta {
@@ -50,15 +50,6 @@ struct vp_checksum {
     vp_chksum payload_calculated;
 };
 
-#define VP_STATE_META_CONSISTENT    BIT(0)
-#define VP_STATE_PAYLOAD_CONSISTENT BIT(1)
-#define VP_STATE_PAYLOAD_COMPATIBLE BIT(2)
-
-#define VP_SIZE_META ( (2*sizeof(vp_chksum)) + (2*sizeof(uint16_t)) )
-
-#define VP_DATA_META    BIT(0)
-#define VP_DATA_PAYLOAD BIT(1)
-
 typedef struct versioned_persistence {
     uint16_t state;
     struct vp_meta meta;
@@ -68,25 +59,60 @@ typedef struct versioned_persistence {
     ByteBuffer *buffer;
 } VersionedPersistence;
 
+/*
+ * The VP_STATE_* macros are bits in the state member of VersionedPersistence.
+ * They are set by vp_open(). META_CONSISTENT reflects is the meta data section
+ * of a block could be verified by its checksum.
+ *
+ * LENGTH_COMPATIBLE is set if the length meta field in persistent memory
+ * matches the length field in the VersionedPersistence instance.
+ * VERSION_COMPATIBLE is like LENGTH_COMPATIBLE, but for the version field.
+ *
+ * PAYLOAD_CONSISTENT is like META_CONSISTENT, just for the payload section. It
+ * can only be set if LENGTH_COMPATIBLE is set.
+ *
+ * PAYLOAD_COMPATIBLE is set if both LENGTH_COMPATIBLE and VERSION_COMPATIBLE
+ * are set, as a convenience to the user.
+ */
+
+/** Indicate that a block's meta field could be verified */
+#define VP_STATE_META_CONSISTENT    BIT(0)
+/** Indicate that a block's payload field could be verified */
+#define VP_STATE_PAYLOAD_CONSISTENT BIT(1)
+/** A block's payload is compatible in length and version */
+#define VP_STATE_PAYLOAD_COMPATIBLE BIT(2)
+/** A block's payload is compatible in length */
+#define VP_STATE_LENGTH_COMPATIBLE  BIT(3)
+/** A block's payload is compatible in version */
+#define VP_STATE_VERSION_COMPATIBLE BIT(4)
+
+/** Size of the meta field of a block in bytes */
+#define VP_SIZE_META ( (2*sizeof(vp_chksum)) + (2*sizeof(uint16_t)) )
+
+/** Bit mask to address the meta field of a block */
+#define VP_DATA_META    BIT(0)
+/** Bit mask to address the payload field of a block */
+#define VP_DATA_PAYLOAD BIT(1)
+
 #define VP_SECTION_SIZE(n) ((n) + VP_SIZE_META)
-#define VP_FULL_INIT(ADDR, SIZE, VERSION, BUF, FETCH, STORE, CHKSUM, INIT) \
+#define VP_FULL_INIT(ADDR, SIZE, VERSION, BUF, SOURCE, SINK, CHKSUM, INIT) \
     {   .state = 0u,                                                       \
         .meta.address = (ADDR),                                            \
         .meta.size = VP_SECTION_SIZE(SIZE),                                \
         .meta.version = (VERSION),                                         \
-        .data.fetch = (FETCH),                                             \
-        .data.store = (STORE),                                             \
+        .data.source = (SOURCE),                                           \
+        .data.sink = (SINK),                                               \
         .chksum.initial= (INIT),                                           \
         .chksum.process= (CHKSUM),                                         \
         .buffer = (BUF) }
 
-#define VP_INIT(ADDR, SIZE, VERSION, BUF, FETCH, STORE) \
+#define VP_INIT(ADDR, SIZE, VERSION, BUF, SOURCE, SINK) \
     VP_FULL_INIT(                                       \
-        ADDR, SIZE, VERSION, BUF, FETCH, STORE,         \
+        ADDR, SIZE, VERSION, BUF, SOURCE, SINK,         \
         ufw_crc16_arc, CRC16_ARC_INITIAL)
 
-#define VP_SIMPLE_INIT(ADDR, SIZE, VERSION, FETCH, STORE)       \
-    VP_INIT(ADDR, SIZE, VERSION, NULL, FETCH, STORE)
+#define VP_SIMPLE_INIT(ADDR, SIZE, VERSION, SOURCE, SINK)       \
+    VP_INIT(ADDR, SIZE, VERSION, NULL, SOURCE, SINK)
 
 int vp_open(VersionedPersistence *vp);
 int vp_format(VersionedPersistence *vp, unsigned char c);

@@ -26,21 +26,18 @@
         }                                       \
     } while (0)
 
-#define new_offset(vp__, off__)                                 \
+#define new_offset(vp__, s, off__)                              \
     do {                                                        \
-    struct addressable_source *cfg__ = vp__->data.fetch.driver; \
-    cfg__->address = vp__->meta.address + off__;                \
+    struct addressable_source *cfg__ = (vp__)->data.s.driver;   \
+    cfg__->address = (vp__)->meta.address + (off__);            \
     } while (0)
 
 static int
 read_meta(VersionedPersistence *vp)
 {
     unsigned char buf[VP_SIZE_META];
-    new_offset(vp, 0);
-    const ssize_t rc = source_get_chunk(&vp->data.fetch, buf, VP_SIZE_META);
-    if (rc < 0) {
-        return (int)rc;
-    }
+    new_offset(vp, source, 0);
+    maybe(source_get_chunk(&vp->data.source, buf, VP_SIZE_META));
 
     vp->chksum.meta_read = vp_ref_chksum(buf);
     vp->chksum.meta_calculated =
@@ -51,6 +48,12 @@ read_meta(VersionedPersistence *vp)
         return -EBADFD;
     }
 
+    return 0;
+}
+
+static int
+verify_payload(VersionedPersistence *vp)
+{
     return 0;
 }
 
@@ -69,15 +72,10 @@ store_header(VersionedPersistence *vp)
 int
 vp_open(VersionedPersistence *vp)
 {
-    Source *src = &vp->data.fetch;
-    Sink *snk = &vp->data.store;
-    AddressableSource *srcdrv = src->driver;
-    AddressableSink *snkdrv = snk->driver;
-    srcdrv->address = snkdrv->address = vp->meta.address;
-    const int metarc = read_meta(vp);
-    if (metarc < 0) {
-        return metarc;
-    }
+    vp->state = 0U;
+    maybe(read_meta(vp));
+    BIT_SET(vp->state, VP_STATE_META_CONSISTENT);
+    maybe(verify_payload(vp));
     return 0;
 }
 
