@@ -40,18 +40,6 @@ read_meta(VersionedPersistence *vp)
 }
 
 int
-vp_memset(VersionedPersistence *vp, const unsigned char c)
-{
-    return 0;
-}
-
-int
-vp_store_meta(VersionedPersistence *vp)
-{
-    return 0;
-}
-
-int
 vp_open(VersionedPersistence *vp)
 {
     Source *src = &vp->data.fetch;
@@ -67,7 +55,25 @@ vp_open(VersionedPersistence *vp)
 }
 
 int
+vp_format(VersionedPersistence *vp, const unsigned int parts)
+{
+    return 0;
+}
+
+int
 vp_invalidate(VersionedPersistence *vp, const unsigned int parts)
+{
+    return 0;
+}
+
+int
+vp_store_meta(VersionedPersistence *vp)
+{
+    return 0;
+}
+
+int
+vp_memset(VersionedPersistence *vp, const unsigned char c)
 {
     return 0;
 }
