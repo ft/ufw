@@ -89,7 +89,7 @@ typedef struct versioned_persistence {
     VP_INIT(ADDR, SIZE, VERSION, NULL, FETCH, STORE)
 
 int vp_open(VersionedPersistence *vp);
-int vp_format(VersionedPersistence *vp, unsigned int parts);
+int vp_format(VersionedPersistence *vp, unsigned char c);
 int vp_invalidate(VersionedPersistence *vp, unsigned int parts);
 
 int vp_store_meta(VersionedPersistence *vp);

@@ -18,7 +18,16 @@
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic push
 
-#define new_offset(vp__, off__) do {                            \
+#define maybe(expr)                             \
+    do {                                        \
+        const int vp_retval_ = (expr);          \
+        if (vp_retval_ < 0) {                   \
+            return vp_retval_;                  \
+        }                                       \
+    } while (0)
+
+#define new_offset(vp__, off__)                                 \
+    do {                                                        \
     struct addressable_source *cfg__ = vp__->data.fetch.driver; \
     cfg__->address = vp__->meta.address + off__;                \
     } while (0)
@@ -45,6 +54,18 @@ read_meta(VersionedPersistence *vp)
     return 0;
 }
 
+static int
+update_checksums(VersionedPersistence *vp)
+{
+    return 0;
+}
+
+static int
+store_header(VersionedPersistence *vp)
+{
+    return 0;
+}
+
 int
 vp_open(VersionedPersistence *vp)
 {
@@ -61,8 +82,10 @@ vp_open(VersionedPersistence *vp)
 }
 
 int
-vp_format(VersionedPersistence *vp, const unsigned int parts)
+vp_format(VersionedPersistence *vp, const unsigned char c)
 {
+    maybe(vp_memset(vp, c));
+    maybe(vp_store_meta(vp));
     return 0;
 }
 
@@ -75,6 +98,8 @@ vp_invalidate(VersionedPersistence *vp, const unsigned int parts)
 int
 vp_store_meta(VersionedPersistence *vp)
 {
+    maybe(store_header(vp));
+    maybe(update_checksums(vp));
     return 0;
 }
 
