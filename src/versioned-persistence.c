@@ -18,10 +18,16 @@
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic push
 
+#define new_offset(vp__, off__) do {                            \
+    struct addressable_source *cfg__ = vp__->data.fetch.driver; \
+    cfg__->address = vp__->meta.address + off__;                \
+    } while (0)
+
 static int
 read_meta(VersionedPersistence *vp)
 {
     unsigned char buf[VP_SIZE_META];
+    new_offset(vp, 0);
     const ssize_t rc = source_get_chunk(&vp->data.fetch, buf, VP_SIZE_META);
     if (rc < 0) {
         return (int)rc;

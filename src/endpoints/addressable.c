@@ -15,14 +15,22 @@ ssize_t
 run_addressable_source(void *driver, void *buffer, const size_t n)
 {
     struct addressable_source *cfg = driver;
-    return cfg->run(cfg->data, cfg->address, buffer, n);
+    const ssize_t rc =  cfg->run(cfg->data, cfg->address, buffer, n);
+    if (rc > 0) {
+        cfg->address += rc;
+    }
+    return rc;
 }
 
 ssize_t
 run_addressable_sink(void *driver, const void *buffer, const size_t n)
 {
     struct addressable_sink *cfg = driver;
-    return cfg->run(cfg->data, cfg->address, buffer, n);
+    const ssize_t rc = cfg->run(cfg->data, cfg->address, buffer, n);
+    if (rc > 0) {
+        cfg->address += rc;
+    }
+    return rc;
 }
 
 #if 0

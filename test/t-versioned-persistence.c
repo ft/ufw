@@ -5,6 +5,7 @@
  */
 
 #include <limits.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -61,9 +62,13 @@ t_reset(VersionedPersistence *vp)
 static ssize_t
 buffer_read(UNUSED void *data, uint32_t addr, void *buf, size_t n)
 {
-    printf("# DEBUG: read()\n");
+    printf("# DEBUG: read(0x%08"PRIx32", buf, %zu)\n", addr, n);
     if ((addr + n) > STORAGE_SIZE) {
         return -ENOBUFS;
+    }
+
+    if (n > 6) {
+        n = 6;
     }
 
     memcpy(buf, storage + addr, n);
@@ -73,8 +78,13 @@ buffer_read(UNUSED void *data, uint32_t addr, void *buf, size_t n)
 static ssize_t
 buffer_write(UNUSED void *data, uint32_t addr, const void *buf, size_t n)
 {
+    printf("# DEBUG: write(0x%08"PRIx32", buf, %zu)\n", addr, n);
     if ((addr + n) > STORAGE_SIZE) {
         return -ENOBUFS;
+    }
+
+    if (n > 5) {
+        n = 5;
     }
 
     memcpy(storage + addr, buf, n);
