@@ -23,7 +23,10 @@ extern "C" {
 
 typedef uint16_t vp_chksum;
 typedef vp_chksum (*vp_chksum_fnc)(vp_chksum, const void*, size_t);
+
 #define vp_ref_chksum bf_ref_u16n
+#define vp_ref_length bf_ref_u16n
+#define vp_ref_version bf_ref_u16n
 
 struct vp_access {
     Source source;
@@ -44,10 +47,6 @@ struct vp_cache {
 struct vp_checksum {
     vp_chksum initial;
     vp_chksum_fnc process;
-    vp_chksum meta_read;
-    vp_chksum meta_calculated;
-    vp_chksum payload_read;
-    vp_chksum payload_calculated;
 };
 
 typedef struct versioned_persistence {
@@ -58,6 +57,13 @@ typedef struct versioned_persistence {
     struct vp_checksum chksum;
     ByteBuffer *buffer;
 } VersionedPersistence;
+
+typedef struct vp_checksums {
+    vp_chksum from_store;
+    vp_chksum calculated;
+} VersionedPersistenceChecksums;
+
+#define VP_CHECKSUMS_INIT { 0U, 0U }
 
 /*
  * The VP_STATE_* macros are bits in the state member of VersionedPersistence.

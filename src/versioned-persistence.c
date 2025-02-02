@@ -9,6 +9,8 @@
  * @brief Persistence storage with version information
  */
 
+#include <string.h>
+
 #include <ufw/binary-format.h>
 #include <ufw/compat/errno.h>
 #include <ufw/compat/ssize-t.h>
@@ -32,27 +34,29 @@
     cfg__->address = (vp__)->meta.address + (off__);            \
     } while (0)
 
+static inline bool
+checksum_matches(const VersionedPersistenceChecksums *p)
+{
+    return (p->from_store == p->calculated);
+}
+
 static int
-read_meta(VersionedPersistence *vp)
+read_meta(VersionedPersistence *vp, VersionedPersistenceChecksums *cs)
 {
     unsigned char buf[VP_SIZE_META];
     new_offset(vp, source, 0);
     maybe(source_get_chunk(&vp->data.source, buf, VP_SIZE_META));
 
-    vp->chksum.meta_read = vp_ref_chksum(buf);
-    vp->chksum.meta_calculated =
+    cs->from_store = vp_ref_chksum(buf);
+    cs->calculated =
         vp->chksum.process(vp->chksum.initial, buf+sizeof(vp_chksum),
                            VP_SIZE_META-sizeof(vp_chksum));
 
-    if (vp->chksum.meta_read != vp->chksum.meta_calculated) {
-        return -EBADFD;
-    }
-
-    return 0;
+    return checksum_matches(cs) ? 0 : -EBADFD;
 }
 
 static int
-verify_payload(VersionedPersistence *vp)
+verify_payload(VersionedPersistence *vp, VersionedPersistenceChecksums *cs)
 {
     return 0;
 }
@@ -73,9 +77,13 @@ int
 vp_open(VersionedPersistence *vp)
 {
     vp->state = 0U;
-    maybe(read_meta(vp));
+    VersionedPersistenceChecksums cs = VP_CHECKSUMS_INIT;
+    maybe(read_meta(vp, &cs));
     BIT_SET(vp->state, VP_STATE_META_CONSISTENT);
-    maybe(verify_payload(vp));
+    const uint16_t read_version = vp_ref_version(
+    cs = (VersionedPersistenceChecksums)VP_CHECKSUMS_INIT;
+    maybe(verify_payload(vp, &cs));
+    BIT_SET(vp->state, VP_STATE_PAYLOAD_CONSISTENT);
     return 0;
 }
 
