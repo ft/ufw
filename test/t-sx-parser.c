@@ -185,7 +185,7 @@ t_sx_parse_incomplete_list(void)
     ok(p.status == SXS_UNEXPECTED_END, "( signals unexpected end");
     ok(p.node == NULL, "( returns NULL");
 
-    p = sx_parse_string("(1 2");
+    p = sx_parse_string("(1 2\n");
     ok(p.status == SXS_UNEXPECTED_END, "(1 2 signals unexpected end");
     ok(p.node == NULL, "(1 2 returns NULL");
 

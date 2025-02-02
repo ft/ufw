@@ -293,6 +293,7 @@ sx_parse_token(const char *s, const size_t n, const size_t i)
     size_t j = skip_ws(s, n, i);
 
     if (j == n) {
+        rv.position = j;
         return rv;
     }
 
