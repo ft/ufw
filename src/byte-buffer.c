@@ -178,6 +178,51 @@ byte_buffer_add(ByteBuffer *b, const void *data, size_t size)
 }
 
 /**
+ * Store the position information of a buffer
+ *
+ * This function stores a buffer's positional information in separate
+ * parameter. This position can be applied using byte_buffer_setpos() later on.
+ *
+ * @param  b    The ByteBuffer to get the position information from
+ * @param  pos  A ByteBufferPos datum to store the infommation in
+ *
+ * @sideeffects Modifies pos parameter
+ */
+void
+byte_buffer_getpos(const ByteBuffer *b, ByteBufferPos *pos)
+{
+    pos->offset = b->offset;
+    pos->used = b->used;
+}
+
+
+/**
+ * Apply positional information to a buffer
+ *
+ * This function applies the previously acquired positional information of a
+ * buffer to a buffer. parameter. Positional information like this can be
+ * obtained by using byte_buffer_getpos().
+ *
+ * @param  b    The ByteBuffer to set the position information in
+ * @param  pos  A ByteBufferPos datum holding the desired positional
+ *              information
+ *
+ * @return -EINVAL if the position does not fit with the buffer. 0 otherwise.
+ * @sideeffects Modifies pos parameter
+ */
+int
+byte_buffer_setpos(ByteBuffer *b, const ByteBufferPos *pos)
+{
+    if (pos->offset >= b->size || pos->used > b->size) {
+        return -EINVAL;
+    }
+    b->offset = pos->offset;
+    b->used = pos->used;
+
+    return 0;
+}
+
+/**
  * Extract data from ByteBuffer using its process mark
  *
  * The ByteBuffer abstraction has a process mark called offset. This function

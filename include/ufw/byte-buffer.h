@@ -47,6 +47,11 @@ typedef struct ufw_byte_buffer {
     size_t offset;
 } ByteBuffer;
 
+typedef struct ufw_byte_buffer_position {
+    size_t used;
+    size_t offset;
+} ByteBufferPos;
+
 typedef struct ufw_byte_chunks {
     size_t chunks;
     size_t active;
@@ -92,6 +97,8 @@ int byte_buffer_rewind(ByteBuffer *b);
 void byte_buffer_clear(ByteBuffer *b);
 void byte_buffer_reset(ByteBuffer *b);
 void byte_buffer_repeat(ByteBuffer *b);
+void byte_buffer_getpos(const ByteBuffer *b, ByteBufferPos *pos);
+int byte_buffer_setpos(ByteBuffer *b, const ByteBufferPos *pos);
 
 void byte_buffer_fill(ByteBuffer *b, unsigned char datum);
 void byte_buffer_fillx(ByteBuffer *b, unsigned char init,
