@@ -223,6 +223,52 @@ byte_buffer_setpos(ByteBuffer *b, const ByteBufferPos *pos)
 }
 
 /**
+ * Return a pointer at the current read-position of a buffer
+ *
+ * With some low-level operations it may be useful to get a pointer into the
+ * ByteBuffer instance at the position of the read-mark (offset). It is usually
+ * a good idea to also query the amount of date left for reading as well (via
+ * byte_buffer_rest()).
+ *
+ * @param  b  The ByteBuffer instance to query.
+ *
+ * @return A pointer at the read position of the buffer; NULL if no memory is
+ *         left to read in the buffer.
+ * @sideeffects None
+ */
+unsigned char*
+byte_buffer_readptr(ByteBuffer *b)
+{
+    if (b->offset >= b->size) {
+        return NULL;
+    }
+    return b->data + b->offset;
+}
+
+/**
+ * Return a pointer at the current write-position of a buffer
+ *
+ * With some low-level operations it may be useful to get a pointer into the
+ * ByteBuffer instance at the position of the write-mark (used). It is usually
+ * a good idea to also query the space left available for writing as well (via
+ * byte_buffer_avail()).
+ *
+ * @param  b  The ByteBuffer instance to query.
+ *
+ * @return A pointer at the write position of the buffer; NULL if no memory is
+ *         left to use in the buffer.
+ * @sideeffects None
+ */
+unsigned char*
+byte_buffer_writeptr(ByteBuffer *b)
+{
+    if (b->used >= b->size) {
+        return NULL;
+    }
+    return b->data + b->used;
+}
+
+/**
  * Extract data from ByteBuffer using its process mark
  *
  * The ByteBuffer abstraction has a process mark called offset. This function
@@ -251,7 +297,6 @@ byte_buffer_consume(ByteBuffer *b, void *data, size_t size)
 
     return 0;
 }
-
 
 /**
  * Extract some data from ByteBuffer using its process mark

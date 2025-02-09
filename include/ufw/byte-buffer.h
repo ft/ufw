@@ -93,6 +93,9 @@ int byte_buffer_consume(ByteBuffer *b, void *data, size_t size);
 ssize_t byte_buffer_consume_at_most(ByteBuffer *b, void *data,
                             size_t size);
 
+unsigned char* byte_buffer_readptr(ByteBuffer *b);
+unsigned char* byte_buffer_writeptr(ByteBuffer *b);
+
 int byte_buffer_rewind(ByteBuffer *b);
 void byte_buffer_clear(ByteBuffer *b);
 void byte_buffer_reset(ByteBuffer *b);
