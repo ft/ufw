@@ -100,6 +100,7 @@ int byte_buffer_rewind(ByteBuffer *b);
 void byte_buffer_clear(ByteBuffer *b);
 void byte_buffer_reset(ByteBuffer *b);
 void byte_buffer_repeat(ByteBuffer *b);
+int byte_buffer_markread(ByteBuffer *b, size_t size);
 void byte_buffer_getpos(const ByteBuffer *b, ByteBufferPos *pos);
 int byte_buffer_setpos(ByteBuffer *b, const ByteBufferPos *pos);
 

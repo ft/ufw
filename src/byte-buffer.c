@@ -269,6 +269,34 @@ byte_buffer_writeptr(ByteBuffer *b)
 }
 
 /**
+ * Mark a chunk of bytes as read
+ *
+ * This moves the read-mark (offset) forward by SIZE bytes. If that would
+ * exceed the limits of the buffer, -ENODATA is returned.
+ *
+ * The function is similar to byte_buffer_consume(), but without the actual
+ * copying of data. This function only modifies the meta-data, concerning the
+ * read-position into the buffer.
+ *
+ * @param  b     The ByteBuffer instance to use.
+ * @param  size  The number of bytes to mark as read.
+ *
+ * @return 0 on success; -ENODATA if the operation would exceed the size of the
+ *         ByteBuffer instance.
+ * @sideeffects Modifies the instances read-mark.
+ */
+int
+byte_buffer_markread(ByteBuffer *b, size_t size)
+{
+    if (size > (b->used - b->offset)) {
+        return -ENOMEM;
+    }
+
+    b->offset += size;
+    return 0;
+}
+
+/**
  * Extract data from ByteBuffer using its process mark
  *
  * The ByteBuffer abstraction has a process mark called offset. This function
