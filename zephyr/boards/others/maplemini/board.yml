@@ -1,0 +1,6 @@
+board:
+  name: maplemini
+  full_name: MapleMini F1 Evaluation Board
+  vendor: others
+  socs:
+    - name: stm32f103xb

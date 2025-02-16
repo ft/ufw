@@ -1,0 +1,4 @@
+# MapleMini F1 Evaluation Board
+
+config BOARD_MAPLEMINI
+	select SOC_STM32F103XB

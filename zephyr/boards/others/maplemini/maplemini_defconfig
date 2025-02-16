@@ -1,0 +1,6 @@
+# MapleMini F1 Evaluation Board
+
+CONFIG_SERIAL=y
+CONFIG_CONSOLE=y
+CONFIG_UART_CONSOLE=y
+CONFIG_GPIO=y
