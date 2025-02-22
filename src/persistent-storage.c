@@ -566,8 +566,8 @@ persistent_store(PersistentStorage *store, const void *src)
  * @sideeffects Data storage medium is written to as described.
  */
 static PersistentAccess
-persistent_writen(PersistentStorage *store,
-                  uint32_t address, unsigned char item, size_t k)
+persistent_written(PersistentStorage *store,
+                   uint32_t address, unsigned char item, size_t k)
 {
     PersistentAccess rv;
     unsigned char buf;
@@ -619,10 +619,11 @@ PersistentAccess
 persistent_reset(PersistentStorage *store, unsigned char item)
 {
     const PersistentAccess rv =
-        persistent_writen(store, store->checksum.address,
-                          item, store->checksum.size);
+        persistent_written(store, store->checksum.address,
+                           item, store->checksum.size);
     if (rv != PERSISTENT_ACCESS_SUCCESS) {
         return rv;
     }
-    return persistent_writen(store, store->data.address, item, store->data.size);
+    return persistent_written(store, store->data.address,
+                              item, store->data.size);
 }
