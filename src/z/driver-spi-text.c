@@ -8,8 +8,14 @@
 #include <zephyr/kernel.h>
 
 #include <ufw/compiler.h>
+#include <ufw/sx.h>
 
 #define DT_DRV_COMPAT ufw_spi_text
+
+struct ufw_spi_text_pdata {
+    uint64_t fallback;
+    struct sx_node *rxring;
+};
 
 static int
 ufw_spi_text_init(const struct device *dev)
@@ -19,13 +25,29 @@ ufw_spi_text_init(const struct device *dev)
 }
 
 static int
-ufw_spi_text_transceive(UNUSED const struct device *dev,
+ufw_spi_text_transceive(UNUSED const struct device *spi,
                         UNUSED const struct spi_config *spi_cfg,
                         UNUSED const struct spi_buf_set *tx_bufs,
                         UNUSED const struct spi_buf_set *rx_bufs)
 {
-    printk("text-spi: In there!\n");
-    return -ENOTSUP;
+    const size_t tx = tx_bufs->count;
+    const size_t rx = rx_bufs->count;
+    const size_t n = (tx > rx) ? tx : rx;
+    struct ufw_spi_text_pdata *data = spi->data;
+
+    printk("# DEBUG trx: %zu %zu %zu\n", tx, rx, n);
+    for (size_t i = 0; i <= n; ++i) {
+        if (i < tx) {
+        }
+        if (i < rx) {
+            unsigned char *datum = tx_bufs[i].buffers[0].buf;
+            *datum = data->fallback & UCHAR_MAX;
+            data->fallback++;
+            printk("# DEBUG: %lu %02x\n", (long unsigned)data->fallback, *datum);
+        }
+    }
+
+    return 0;
 }
 
 #ifdef CONFIG_SPI_ASYNC
@@ -56,8 +78,25 @@ static const struct spi_driver_api ufw_spi_text_api = {
     .release = ufw_spi_text_release,
 };
 
+void
+ufw_spi_text_loadrx(struct device *spi, struct sx_node *node)
+{
+    struct ufw_spi_text_pdata *data = spi->data;
+
+    if (data->rxring == NULL) {
+        data->rxring = node;
+    } else {
+        data->rxring = sx_append(data->rxring, node);
+    }
+}
+
 #define UFW_SPI_TEXT_INIT(n)                                            \
-    DEVICE_DT_INST_DEFINE(n, ufw_spi_text_init, NULL, NULL, NULL,       \
+    static struct ufw_spi_text_pdata ufw_spi_text_pdata_##n = {         \
+        .fallback = 0u,                                                 \
+        .rxring = NULL                                                  \
+    };                                                                  \
+    DEVICE_DT_INST_DEFINE(n, ufw_spi_text_init, NULL,                   \
+                          &ufw_spi_text_pdata_##n, NULL,                \
                           POST_KERNEL,                                  \
                           CONFIG_UFW_SPI_TEXT_INIT_PRIORITY,            \
                           &ufw_spi_text_api);
