@@ -18,35 +18,36 @@ ufwz_uart_fifo_source_cb(const struct device *dev, void *user_data)
         return;
     }
 
-    struct ufwz_uart_fifo_source_data *drv = user_data;
+    struct k_pipe *pipe = user_data;
+    unsigned char buf[16];
 
-    uint8_t c;
-    while (uart_fifo_read(dev, &c, 1) == 1) {
-        octet_ring_put(&drv->ring, c);
+    while (uart_irq_update(dev) && uart_irq_rx_ready(dev)) {
+        const int rc = uart_fifo_read(dev, buf, 16);
+        if (rc <= 0) {
+            continue;
+        }
+        size_t done;
+        k_pipe_put(pipe, buf, rc, &done, 1u, K_NO_WAIT);
     }
 }
 
 int
 ufwz_uart_fifo_source(void *driver, void *value)
 {
-    struct ufwz_uart_fifo_source_data *drv = driver;
+    struct k_pipe *pipe = driver;
 
-    if (octet_ring_empty(&drv->ring)) {
-        return -EAGAIN;
+    size_t done = 0u;
+    while (done == 0u) {
+        k_pipe_get(pipe, value, 1u, &done, 1u, K_FOREVER);
     }
-
-    unsigned char *v = value;
-    *v = octet_ring_get(&drv->ring);
     return 1;
 }
 
 int
-ufwz_uart_fifo_source_init(const struct device *dev,
-                           struct ufwz_uart_fifo_source_data *data)
+ufwz_uart_fifo_source_init(const struct device *dev, struct k_pipe *pipe)
 {
-    octet_ring_init(&data->ring, data->buffer, data->buffer_size);
     const int rc =
-        uart_irq_callback_user_data_set(dev, ufwz_uart_fifo_source_cb, data);
+        uart_irq_callback_user_data_set(dev, ufwz_uart_fifo_source_cb, pipe);
 
     if (rc < 0) {
         return 0;

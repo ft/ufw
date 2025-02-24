@@ -123,7 +123,7 @@ config UFW_ENDPOINT_UART_POLL
 config UFW_ENDPOINT_UART_FIFO
 	bool "Implementing endpoints with zephyr's uart-fifo API"
 	default n
-	depends on SERIAL && UART_INTERRUPT_DRIVEN
+	depends on SERIAL && UART_INTERRUPT_DRIVEN && PIPES
 	help
 	  The ufw library's endpoint API is an abstraction for sources and sinks
 	  of data. The UART fifo driver can serve as a backend for this abstrac-
