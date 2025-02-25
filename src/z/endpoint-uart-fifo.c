@@ -14,10 +14,6 @@
 static void
 ufwz_uart_fifo_source_cb(const struct device *dev, void *user_data)
 {
-    if (uart_irq_update(dev) == false || uart_irq_rx_ready(dev) == false) {
-        return;
-    }
-
     struct k_pipe *pipe = user_data;
     unsigned char buf[16];
 
