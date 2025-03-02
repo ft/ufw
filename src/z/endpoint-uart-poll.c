@@ -35,10 +35,12 @@ ufwz_uart_octet_source(void *driver, void *value)
 {
     struct ufwz_uart_poll_thread_data *data = driver;
     struct k_pipe *p = data->pipe;
+#ifdef CONFIG_PIPES
     size_t done = 0u;
-    while (done == 0u) {
-        k_pipe_get(p, value, 1u, &done, 1u, K_FOREVER);
-    }
+    k_pipe_get(p, value, 1u, &done, 1u, K_FOREVER);
+#else
+    k_pipe_read(p, value, 1u, K_FOREVER);
+#endif /* CONFIG_PIPES */
     return 1;
 }
 
@@ -53,10 +55,12 @@ ufwz_uart_poll_thread_cb(void *data, UNUSED void *a, UNUSED void *b)
     for (;;) {
         unsigned char value = 0u;
         while (uart_poll_in(cfg->ifc, &value) == 0) {
+#ifdef CONFIG_PIPES
             size_t done = 0;
-            while (done == 0) {
-                k_pipe_put(cfg->pipe, &value, 1u, &done, 1u, K_FOREVER);
-            }
+            k_pipe_put(cfg->pipe, &value, 1u, &done, 1u, K_FOREVER);
+#else
+            k_pipe_write(cfg->pipe, &value, 1u, K_FOREVER);
+#endif /* CONFIG_PIPES */
         }
         if (cfg->yieldtime > 0) {
             k_msleep(cfg->yieldtime);
