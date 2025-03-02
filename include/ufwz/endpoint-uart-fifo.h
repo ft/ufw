@@ -16,12 +16,12 @@ struct ufwz_uart_fifo_data {
     k_timeout_t timeout;
 };
 
-int ufwz_uart_fifo_source(void *driver, void *value);
+int ufwz_uart_fifo_source(void *driver, void *buffer, size_t n);
 int ufwz_uart_fifo_source_init(const struct device *dev,
                                struct ufwz_uart_fifo_data *data);
 
 #define UFWZ_UART_FIFO_SOURCE(DRIVER)                   \
-    OCTET_SOURCE_INIT(ufwz_uart_fifo_source, DRIVER)
+    CHUNK_SOURCE_INIT(ufwz_uart_fifo_source, DRIVER)
 
 #define UFWZ_DEFINE_UART_FIFO_DATA(name_, size_, timeout_)      \
     K_PIPE_DEFINE(name_##_pipe, (size_), 4);                    \
