@@ -2,6 +2,30 @@
   User-visible changes in ufw
 -------------------------------
 
+* v6.0.3 → v6.1.0 (unreleased):
+
+** New Features
+
+- Extensions to byte-buffer API.
+
+** Bugfixes
+
+- sx: Fix possible infinite recursion.
+
+** Miscellaneous
+
+- There have been changes to the Zephyr related parts of ufw. This part is
+  still to be considered experimental. Changes (even compatibility breaking)
+  have to be expected.
+- Zephyr integration changed source endpoint implementations to use k_pipe to
+  allow users to conveniently pend for input.
+- Zephyr board spec for the maplemini evaluation board was added.
+
+** Diffstat:
+
+    TBD.
+
+
 * v6.0.2 → v6.0.3 (released 2025-01-23):
 
 ** Bugfixes
