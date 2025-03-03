@@ -7,6 +7,8 @@
 #ifndef INC_INCLUDE_UFWZ_ENDPOINT_UART_POLL_H_0c903589
 #define INC_INCLUDE_UFWZ_ENDPOINT_UART_POLL_H_0c903589
 
+#include <stdint.h>
+
 int ufwz_uart_octet_sink(void *driver, unsigned char value);
 int ufwz_uart_octet_source(void *driver, void *value);
 

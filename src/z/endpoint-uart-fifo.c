@@ -42,9 +42,9 @@ ufwz_uart_fifo_source(void *driver, void *buffer, const size_t n)
     struct ufwz_uart_fifo_data *data = driver;
 
 #ifdef CONFIG_PIPES
-    size_t done = 0u;
+    size_t done = 0U;
     const int rc = k_pipe_get(data->pipe, buffer, n,
-                              &done, 1u, data->timeout);
+                              &done, 1U, data->timeout);
 #else
     const int rc = k_pipe_read(data->pipe, buffer, n, data->timeout);
 #endif /* CONFIG_PIPES */
