@@ -29,6 +29,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <ufw/compat/errno.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -171,6 +173,35 @@ PersistentAccess persistent_store_part(
     PersistentStorage *store, const void *src, size_t offset, size_t n);
 PersistentAccess persistent_reset(
     PersistentStorage *store, unsigned char item);
+
+/*
+ * Helper
+ */
+
+/**
+ * Convert the PersistentAccess to errno.
+ *
+ * @param  pa   PersistentAccess to convert to errno
+ *
+ * @return 0 for PERSISTENT_ACCESS_SUCCESS. Otherwise corresponding errno for
+ * the PersistentAccess type.
+ */
+static inline int
+persistent_access_to_errno(PersistentAccess pa)
+{
+	switch(pa) {
+	case PERSISTENT_ACCESS_SUCCESS:
+		return 0;
+	case PERSISTENT_ACCESS_INVALID_DATA:
+		return -EINVAL;
+	case PERSISTENT_ACCESS_IO_ERROR:
+		return -EIO;
+	case PERSISTENT_ACCESS_ADDRESS_OUT_OF_RANGE:
+		return -ERANGE;
+	default:
+		return -EBADF;
+	}
+}
 
 #ifdef __cplusplus
 }
