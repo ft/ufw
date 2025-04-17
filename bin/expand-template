@@ -158,7 +158,7 @@ expand_tag () {
         eval "REPLY=${quote}${dollar}${parameter}${quote}"
     fi
     if boolean_tag "$tag"; then
-        if [ "$tag" = 0 ]; then
+        if [ "$REPLY" = 0 ]; then
             REPLY='false'
         else
             REPLY='true'
