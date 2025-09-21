@@ -59,6 +59,21 @@ macro(ufw_toplevel)
     # This is, so Zephyr's CMake magic doesn't pick up other zephyr
     # kernels from other prefixes such as ~/src.
     set(ZEPHYR_BASE "${UFW_ZEPHYR_KERNEL}")
+    # There is some code in Zephyr (in samples, for instance), that uses
+    # ZEPHYR_BASE from the execution environment to address some source files,
+    # and if it is not set, that'll break, obviously. Personally, I think they
+    # should be using ${ZEPHYR_BASE} everywhere to figure out file names. But
+    # there is zephyr-env.sh in the repository root that would set this envi-
+    # ronment variable, so maybe that's intentional. At any rate, it is easy to
+    # set the environment variable here as well. But keep in mind, that in
+    # CMake setting $ENV{...} is only active in the configure phase. It does
+    # not affect later compilation, testing, or installation invocations. We
+    # are also only doing this if the value is not set yet, so the impact
+    # should be minimal.
+    if (NOT DEFINED ENV{ZEPHYR_BASE})
+      message(STATUS "ufw: Setting \$ENV{ZEPHYR_BASE} to match \${ZEPHYR_BASE}")
+      set(ENV{ZEPHYR_BASE} ${ZEPHYR_BASE})
+    endif()
     find_package(Zephyr REQUIRED)
   endif()
 endmacro()
