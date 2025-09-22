@@ -2,15 +2,19 @@
   User-visible changes in ufw
 -------------------------------
 
-* v6.0.3 → v6.1.0 (unreleased):
+* v6.0.3 → v6.1.0 (released 2025-09-22):
 
 ** New Features
 
 - Extensions to byte-buffer API.
+- Convertion of PersistentAccess to errno.
+- cmake,zephyr: Improve support for $ENV{ZEPHYYR_BASE}.
 
 ** Bugfixes
 
 - sx: Fix possible infinite recursion.
+- expand-template: Fix conversion of integers into booleans.
+- ufwtest: Do not error out of harness variable is unset.
 
 ** Miscellaneous
 
@@ -23,7 +27,30 @@
 
 ** Diffstat:
 
-    TBD.
+    bin/expand-template                           |   2 +-
+    cmake/modules/SetupUFW.cmake                  |  15 ++
+    cmake/modules/UFWTest.cmake                   |   2 +-
+    include/ufw/byte-buffer.h                     |  11 ++
+    include/ufw/meta.h                            |   4 +-
+    include/ufw/persistent-storage.h              |  31 +++++
+    include/ufwz/endpoint-uart-fifo.h             |  32 ++---
+    include/ufwz/endpoint-uart-poll.h             |  55 +++++++-
+    include/ufwz/spi-text.h                       |  21 +++
+    src/byte-buffer.c                             | 120 +++++++++++++++-
+    src/persistent-storage.c                      |  11 +-
+    src/sx.c                                      |   1 +
+    src/z/driver-spi-text.c                       |  47 ++++++-
+    src/z/endpoint-uart-fifo.c                    |  56 +++++---
+    src/z/endpoint-uart-poll.c                    |  58 +++++++-
+    test/module/src/prj.conf                      |   5 +
+    test/t-sx-parser.c                            |   2 +-
+    zephyr/Kconfig                                |   2 +
+    .../boards/others/maplemini/Kconfig.maplemini |   8 ++
+    zephyr/boards/others/maplemini/board.yml      |   9 ++
+    zephyr/boards/others/maplemini/maplemini.dts  | 131 ++++++++++++++++++
+    .../others/maplemini/maplemini_defconfig      |  10 ++
+    zephyr/module.yml                             |   1 +
+    23 files changed, 578 insertions(+), 56 deletions(-)
 
 
 * v6.0.2 → v6.0.3 (released 2025-01-23):
