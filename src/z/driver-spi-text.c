@@ -12,6 +12,8 @@
 
 #define DT_DRV_COMPAT ufw_spi_text
 
+#define print(fmt, ...) printk("\x1b[0mspi-text: " fmt, __VA_ARGS__)
+
 struct ufw_spi_text_pdata {
     uint64_t fallback;
     struct sx_node *rxring;
@@ -35,15 +37,16 @@ ufw_spi_text_transceive(UNUSED const struct device *spi,
     const size_t n = (tx > rx) ? tx : rx;
     struct ufw_spi_text_pdata *data = spi->data;
 
-    printk("# DEBUG trx: %zu %zu %zu\n", tx, rx, n);
     for (size_t i = 0; i <= n; ++i) {
         if (i < tx) {
+            unsigned char *datum = tx_bufs[i].buffers[0].buf;
+            print("(spi-tx %lu)\n", *datum);
         }
         if (i < rx) {
-            unsigned char *datum = tx_bufs[i].buffers[0].buf;
+            unsigned char *datum = rx_bufs[i].buffers[0].buf;
             *datum = data->fallback & UCHAR_MAX;
             data->fallback++;
-            printk("# DEBUG: %lu %02x\n", (long unsigned)data->fallback, *datum);
+            print("(spi-rx %lu)\n", *datum);
         }
     }
 
