@@ -161,6 +161,12 @@ config UFW_SPI_TEXT_INIT_PRIORITY
 	  plementation enabled via CONFIG_UFW_SPI_TEXT.
 	  See its documentation for details.
 
+config UFW_SPI_TEXT_DEBUG
+	bool "Enable low-level output in spi-text driver"
+	default n
+	help
+	  This flag enables output useful for debugging internals of the driver.
+
 config UFW_I2C_TEXT
 	bool "Enable ufw-zephyr's text based I2C controller"
 	def_bool   DT_HAS_UFW_I2C_TEXT_ENABLED
