@@ -484,9 +484,13 @@ sink_write_multi(Sink *sink, const void *buf, const size_t n)
 {
     trace();
     struct size_error rc = { 0, 0U };
-    size_t rest = n;
 
-    if (n == 0 || n > SSIZE_MAX) {
+    if (n == 0) {
+        /* Can we write a buffer of zero size? Already done. */
+        return rc;
+    }
+
+    if (n > SSIZE_MAX) {
         rc.error = -EINVAL;
         goto done;
     }
@@ -495,6 +499,7 @@ sink_write_multi(Sink *sink, const void *buf, const size_t n)
         sink->retry.init(&sink->retry);
     }
 
+    size_t rest = n;
     while (rest > 0) {
         const unsigned char *src = buf;
         const size_t done = n - rest;
