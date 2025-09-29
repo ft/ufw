@@ -11,18 +11,20 @@
 
 #define DT_DRV_COMPAT ufw_i2c_text
 
+#define print(fmt, ...) printk("\x1b[0mi2c-text: " fmt, __VA_ARGS__)
+
 static int
 ufw_i2c_text_init(const struct device *dev)
 {
-    printk("text-i2c: Initialising %s...\n", dev->name);
+    printk("i2c-text: Initialising %s...\n", dev->name);
     return 0;
 }
 
 static int ufw_i2c_text_configure(const struct device *dev,
                                   UNUSED uint32_t dev_config)
 {
-    printk("text-i2c: Configuring %s...\n", dev->name);
-    return -ENOTSUP;
+    printk("i2c-text: Configuring %s...\n", dev->name);
+    return 0;
 }
 
 static int ufw_i2c_text_transfer(const struct device *dev,
@@ -30,8 +32,43 @@ static int ufw_i2c_text_transfer(const struct device *dev,
                                  UNUSED uint8_t num_msgs,
                                  UNUSED uint16_t addr)
 {
-    printk("text-i2c: Transmitting with %s...\n", dev->name);
-    return -ENOTSUP;
+#if CONFIG_UFW_I2C_TEXT_DEBUG
+    printk("i2c-text: Transmitting with %s...\n", dev->name);
+    printk("  num_msgs: %u\n", num_msgs);
+#endif /* CONFIG_UFW_I2C_TEXT_DEBUG */
+    for (size_t i = 0; i < num_msgs; ++i) {
+        const uint32_t len = msgs[i].len;
+        const uint8_t flags = msgs[i].flags;
+        const uint8_t *data = msgs[i].buf;
+        char *type = (flags & I2C_MSG_READ) ? "read" : "write";
+
+#if CONFIG_UFW_I2C_TEXT_DEBUG
+        printk("    msg[%zu].len   = %u\n",  i, len);
+        printk("    msg[%zu].flags = %lu\n", i, flags);
+
+        if (flags & I2C_MSG_READ) {
+            printk("      | msg-read\n");
+        } else {
+            printk("      | msg-write\n");
+        }
+        if (flags & I2C_MSG_STOP) {
+            printk("      | msg-stop\n");
+        }
+        if (flags & I2C_MSG_RESTART) {
+            printk("      | msg-restart\n");
+        }
+        if (flags & I2C_MSG_ADDR_10_BITS) {
+            printk("      | msg-addr10\n");
+        }
+#endif /* CONFIG_UFW_I2C_TEXT_DEBUG */
+
+        print("(i2c-%s #x%04x", type, addr);
+        for (size_t j = 0; j < len; ++j) {
+            printk(" #x%02x", data[j]);
+        }
+        printk(")\n");
+    }
+    return 0;
 }
 
 static const struct i2c_driver_api ufw_i2c_text_api = {
