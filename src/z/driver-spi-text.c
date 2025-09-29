@@ -26,6 +26,26 @@ ufw_spi_text_init(const struct device *dev)
     return 0;
 }
 
+static void
+ufw_spi_text_io(struct ufw_spi_text_pdata *driver,
+                const char *symbol,
+                const struct spi_buf_set *sbs)
+{
+    for (size_t j = 0; j < sbs->count; ++j) {
+        print("(%s", symbol);
+        unsigned char *data = sbs->buffers[0].buf;
+        for (size_t k = 0; k < sbs->buffers[j].len; ++k) {
+            if (driver != NULL) {
+                /* TODO: Add support for driver->rxring. */
+                data[k] = driver->fallback & UCHAR_MAX;
+                driver->fallback++;
+            }
+            printk(" %u", data[k]);
+        }
+        printk(")\n");
+    }
+}
+
 static int
 ufw_spi_text_transceive(UNUSED const struct device *spi,
                         UNUSED const struct spi_config *spi_cfg,
@@ -37,16 +57,12 @@ ufw_spi_text_transceive(UNUSED const struct device *spi,
     const size_t n = (tx > rx) ? tx : rx;
     struct ufw_spi_text_pdata *data = spi->data;
 
-    for (size_t i = 0; i <= n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
         if (i < tx) {
-            unsigned char *datum = tx_bufs[i].buffers[0].buf;
-            print("(spi-tx %lu)\n", *datum);
+            ufw_spi_text_io(NULL, "spi-tx", tx_bufs + i);
         }
         if (i < rx) {
-            unsigned char *datum = rx_bufs[i].buffers[0].buf;
-            *datum = data->fallback & UCHAR_MAX;
-            data->fallback++;
-            print("(spi-rx %lu)\n", *datum);
+            ufw_spi_text_io(data, "spi-rx", rx_bufs + i);
         }
     }
 
