@@ -22,7 +22,7 @@ struct ufw_spi_text_pdata {
 static int
 ufw_spi_text_init(const struct device *dev)
 {
-    printk("text-spi: Initialising %s...\n", dev->name);
+    printk("spi-text: Initialising %s...\n", dev->name);
     return 0;
 }
 
