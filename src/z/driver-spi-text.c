@@ -47,10 +47,10 @@ ufw_spi_text_io(struct ufw_spi_text_pdata *driver,
 }
 
 static int
-ufw_spi_text_transceive(UNUSED const struct device *spi,
+ufw_spi_text_transceive(const struct device *spi,
                         UNUSED const struct spi_config *spi_cfg,
-                        UNUSED const struct spi_buf_set *tx_bufs,
-                        UNUSED const struct spi_buf_set *rx_bufs)
+                        const struct spi_buf_set *tx_bufs,
+                        const struct spi_buf_set *rx_bufs)
 {
     const size_t tx = tx_bufs->count;
     const size_t rx = rx_bufs->count;

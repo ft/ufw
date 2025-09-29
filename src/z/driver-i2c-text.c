@@ -28,9 +28,9 @@ static int ufw_i2c_text_configure(const struct device *dev,
 }
 
 static int ufw_i2c_text_transfer(const struct device *dev,
-                                 UNUSED struct i2c_msg *msgs,
-                                 UNUSED uint8_t num_msgs,
-                                 UNUSED uint16_t addr)
+                                 struct i2c_msg *msgs,
+                                 uint8_t num_msgs,
+                                 uint16_t addr)
 {
 #if CONFIG_UFW_I2C_TEXT_DEBUG
     printk("i2c-text: Transmitting with %s...\n", dev->name);
