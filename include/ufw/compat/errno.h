@@ -87,4 +87,8 @@
 #define ERANGE      (UFW_PRIVATE_ERRNO_OFFSET + 12)
 #endif /* ERANGE */
 
+#ifndef EBADFD
+#define EBADFD      (UFW_PRIVATE_ERRNO_OFFSET + 13)
+#endif /* EBADFD */
+
 #endif /* INC_UFW_UFW_MATH_CONSTANTS_H */
