@@ -492,7 +492,7 @@ sink_write_multi(Sink *sink, const void *buf, const size_t n)
 
     if (n > SSIZE_MAX) {
         rc.error = -EINVAL;
-        goto done;
+        return rc;
     }
 
     if (sink->retry.init != NULL) {
@@ -511,7 +511,7 @@ sink_write_multi(Sink *sink, const void *buf, const size_t n)
                 } else if (get < 0) {
                     rc.error = (int)get;
                     rc.size = done;
-                    goto done;
+                    return rc;
                 }
             } else {
                 const ssize_t retried =
@@ -521,20 +521,18 @@ sink_write_multi(Sink *sink, const void *buf, const size_t n)
                 } else if (retried == 0) {
                     rc.error = -ENODATA;
                     rc.size = done;
-                    goto done;
+                    return rc;
                 }
                 /* negative */
                 rc.error = (int)retried;
                 rc.size = done;
-                goto done;
+                return rc;
             }
         }
         assert((size_t)get <= rest);
         rest -= get;
     }
     rc.size = n;
-
-done:
     return rc;
 }
 
