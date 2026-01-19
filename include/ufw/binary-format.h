@@ -1520,7 +1520,7 @@ bf_set_u16n(void *ptr, const uint16_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u24()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u24() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -1590,7 +1590,7 @@ bf_set_u32n(void *ptr, const uint32_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u40()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u40() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -1633,7 +1633,7 @@ bf_set_u40n(void *ptr, const uint64_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u48()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u48() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -1678,7 +1678,7 @@ bf_set_u48n(void *ptr, const uint64_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u56()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u56() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -1787,7 +1787,7 @@ bf_set_u16b(void *ptr, const uint16_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u24()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u24() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -1844,7 +1844,7 @@ bf_set_u32b(void *ptr, const uint32_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u40()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u40() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -1876,7 +1876,7 @@ bf_set_u40b(void *ptr, const uint64_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u48()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u48() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -1908,7 +1908,7 @@ bf_set_u48b(void *ptr, const uint64_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u56()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u56() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -1990,7 +1990,7 @@ bf_set_u16l(void *ptr, const uint16_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u24()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u24() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -2047,7 +2047,7 @@ bf_set_u32l(void *ptr, const uint32_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u40()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u40() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -2079,7 +2079,7 @@ bf_set_u40l(void *ptr, const uint64_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u48()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u48() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -2111,7 +2111,7 @@ bf_set_u48l(void *ptr, const uint64_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u56()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u56() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -2188,7 +2188,7 @@ bf_set_s16n(void *ptr, const int16_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u24()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u24() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -2235,7 +2235,7 @@ bf_set_s32n(void *ptr, const int32_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u40()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u40() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -2262,7 +2262,7 @@ bf_set_s40n(void *ptr, const int64_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u48()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u48() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -2289,7 +2289,7 @@ bf_set_s48n(void *ptr, const int64_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u56()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u56() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -2356,7 +2356,7 @@ bf_set_s16l(void *ptr, const int16_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u24()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u24() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -2403,7 +2403,7 @@ bf_set_s32l(void *ptr, const int32_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u40()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u40() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -2430,7 +2430,7 @@ bf_set_s40l(void *ptr, const int64_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u48()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u48() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -2457,7 +2457,7 @@ bf_set_s48l(void *ptr, const int64_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u56()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u56() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -2524,7 +2524,7 @@ bf_set_s16b(void *ptr, const int16_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u24()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u24() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -2571,7 +2571,7 @@ bf_set_s32b(void *ptr, const int32_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u40()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u40() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -2598,7 +2598,7 @@ bf_set_s40b(void *ptr, const int64_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u48()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u48() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.
@@ -2625,7 +2625,7 @@ bf_set_s48b(void *ptr, const int64_t value)
  *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_u56()' to
+ * the value fits into the valid range. Use \ref bf_inrange_u56() to
  * perform this test manually if required.
  *
  * @param  ptr    Pointer to memory in which to store data.

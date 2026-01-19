@@ -388,7 +388,7 @@ The tabular alignment is handed in as arguments to the generator function."
       (format #t " *
  * Note that this function's argument is able to store values that are
  * beyond the indicated word width, and the function does not check if
- * the value fits into the valid range. Use `bf_inrange_~a~d()' to
+ * the value fits into the valid range. Use \\ref bf_inrange_~a~d() to
  * perform this test manually if required.
 "
               (if (is-signed-type? type) 's 'u) width))

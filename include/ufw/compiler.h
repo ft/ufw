@@ -250,7 +250,7 @@
 /**
  * Tell the compiler to warn if the return value of a function is ignored.
  *
- * That would make sense for `malloc(3)' etc.
+ * That would make sense for `malloc(3)` etc.
  *
  * @code
  * WARN_UNUSED_RESULT struct foo *new_foo(char *bar);
