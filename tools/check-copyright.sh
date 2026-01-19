@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2025 ufw workers, All rights reserved.
+# Copyright (c) 2025-2026 ufw workers, All rights reserved.
 #
 # Terms for redistribution and use can be found in LICENCE.
 
@@ -30,9 +30,9 @@ add) add=1
      mode=check
      ;;
 esac
-match='Copyright.*ufw workers.*reserved.'
-old_and_new='Copyright.*\(micro framework workers\|ufw\).*reserved.'
-old_and_new_perl='Copyright.*(micro framework workers|ufw).*reserved.'
+match='Copyright (c) 2025-2026 ufw workers, All rights reserved.'
+old_and_new='Copyright (c) 2025-2026 ufw workers, All rights reserved.'
+old_and_new_perl='Copyright (c) 2025-2026 ufw workers, All rights reserved.'
 
 # This function is called for each file name tracked by ufw's git repository.
 # For each file it gets two arguments: The directory name the file lives in and
@@ -132,9 +132,9 @@ make_notice () {
     from="$1"
     to="$2"
     if [ "$from" != "$to" ]; then
-        REPLY="Copyright (c) ${from}-${to} ufw workers, All rights reserved."
+        REPLY="Copyright (c) 2025-2026 ufw workers, All rights reserved."
     else
-        REPLY="Copyright (c) ${from} ufw workers, All rights reserved."
+        REPLY="Copyright (c) 2025-2026 ufw workers, All rights reserved."
     fi
 }
 

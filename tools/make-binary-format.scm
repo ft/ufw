@@ -1,4 +1,4 @@
-;; Copyright (c) 2023-2025 ufw workers, All rights reserved.
+;; Copyright (c) 2023-2026 ufw workers, All rights reserved.
 ;;
 ;; Terms for redistribution and use can be found in LICENCE.
 
@@ -47,7 +47,7 @@ extern \"C\" {
 (define (make-copyright)
   (let ((start-year 2019))
     (format #t "/*
- * Copyright (c) ~d-~d ufw workers, All rights reserved.
+ * Copyright (c) 2023-2026 ufw workers, All rights reserved.
  *
  * Terms for redistribution and use can be found in LICENCE.
  *
