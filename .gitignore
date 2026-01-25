@@ -33,8 +33,8 @@ fuzz/afl-runner
 fuzz/ex-*/out
 config/*.mk
 config/*.h
-test/module/ufw
-test/module/zephyr
+test/z/ufw
+test/z/zephyr
 test/vcs/specimen
 !test/vcs/catalogue/*.tar.*
 build-*/

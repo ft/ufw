@@ -32,8 +32,8 @@ bad () {
 }
 
 cleanup () {
-    for file in test/module/build.log \
-                test/module/build     \
+    for file in test/z/build.log      \
+                test/z/build          \
                 build-apidoc.log      \
                 build-apidoc          \
                 build-compat          \
@@ -167,8 +167,8 @@ mmh_has_toolchain () {
 }
 
 zephyr_module_setup_ok () {
-    test -e test/module/zephyr || return 1
-    test -e test/module/ufw    || return 1
+    test -e test/z/zephyr || return 1
+    test -e test/z/ufw    || return 1
     return 0
 }
 
@@ -294,8 +294,8 @@ else
     printf ' BROKEN\n'
     cat <<EOF
 
-Please run the setup script in test/module to enable the zephyr
-module build test-suite.
+Please run the setup script in test/z to enable the zephyr
+module test-suite.
 
 EOF
     fail zephyr-module-test-setup
@@ -323,7 +323,7 @@ mmh "$@"
 mmh --quiet result --short release.log  || bad mmh-release-build
 mmh --quiet result --report release.log || bad mmh-release-warnings
 label '\nZephyr module build...\n'
-(cd test/module && prove -v -c run)     || bad zephyr-module-build
+(cd test/z && prove -v -c run)     || bad zephyr-module-build
 label '\nVCS integration tests...\n'
 (cd test/vcs    && prove -c t/*.t)      || bad vcs-integration
 label '\nTest coverage build...\n'
@@ -425,7 +425,7 @@ EOF
             cat <<EOF
 
     Where was  an issue in  the zephyr module build  type test. This  cannot be
-    allowed in a release. Check test/module/build.log and fix the issue!
+    allowed in a release. Check test/z/build.log and fix the issue!
 
 EOF
         ;;
