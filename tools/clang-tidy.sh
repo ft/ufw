@@ -42,7 +42,7 @@ if [ "$#" -eq 0 ]; then
         include/*/*.[ch]
 fi
 
-t="$PWD"/test/module
+t="$PWD"/test/z
 b="$t"/build/zephyr/native-sim/mini-zephyr-fw/host/debug
 zephyr="$t"/zephyr
 zinclude="$zephyr"/include
