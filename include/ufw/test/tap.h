@@ -73,8 +73,8 @@ void noplan(void);
 /* Generic utilities for tests */
 
 size_t memdiff(const void *a, const void *b, size_t n);
-void print_word_hex(const void *memory, size_t offset, size_t bytes,
-                    size_t columns);
+void print_chunk_hex(const void *memory, size_t offset,
+                     size_t bytes, size_t columns);
 
 #define unless(x) if (!(x))
 

@@ -67,9 +67,9 @@ ufw_tap_hexdump(const char *file, const unsigned long line,
     printf("#   oct:  a: o%0"  #No Po "\n", ls);                \
     printf("#         b: o%0"  #No Po "\n", rs);                \
     printf("#   mem:  a: ");                                    \
-    print_word_hex(&ls, 0u, sizeof(ls), sizeof(ls));            \
+    print_chunk_hex(&ls, 0u, sizeof(ls), sizeof(ls));           \
     printf("#         b: ");                                    \
-    print_word_hex(&rs, 0u, sizeof(rs), sizeof(rs));            \
+    print_chunk_hex(&rs, 0u, sizeof(rs), sizeof(rs));           \
     printf("#\n");
 
 #define printer_body_simple(P,T)                                \
@@ -77,9 +77,9 @@ ufw_tap_hexdump(const char *file, const unsigned long line,
     printf("#   dec:  a: %"        P  "\n", (T)ls);             \
     printf("#         b: %"        P  "\n", (T)rs);             \
     printf("#   mem:  a: ");                                    \
-    print_word_hex(&ls, 0u, sizeof(ls), sizeof(ls));            \
+    print_chunk_hex(&ls, 0u, sizeof(ls), sizeof(ls));           \
     printf("#         b: ");                                    \
-    print_word_hex(&rs, 0u, sizeof(rs), sizeof(rs));            \
+    print_chunk_hex(&rs, 0u, sizeof(rs), sizeof(rs));           \
     printf("#\n");
 
 #define unsupported(N,T)                                                \
@@ -91,9 +91,9 @@ ufw_tap_hexdump(const char *file, const unsigned long line,
     printf("# Expressions: a: (%s) b: (%s)\n#\n", nls, nrs);            \
     printf("#   test/tap: Unsupported data-type: " #T  "\n#\n");        \
     printf("#   mem:  a: ");                                            \
-    print_word_hex(&ls, 0u, sizeof(ls), sizeof(ls));                    \
+    print_chunk_hex(&ls, 0u, sizeof(ls), sizeof(ls));                   \
     printf("#         b: ");                                            \
-    print_word_hex(&rs, 0u, sizeof(rs), sizeof(rs));                    \
+    print_chunk_hex(&rs, 0u, sizeof(rs), sizeof(rs));                   \
     printf("#\n");
 
 
