@@ -14,6 +14,8 @@ function(gitint_options prefix outvar)
 
   if (DEFINED ${prefix}BUILD_VARIANT)
     list(APPEND GENERATE_OPTIONS -b "${${prefix}BUILD_VARIANT}")
+  elseif (DEFINED UFW_ZEPHYR_APPVARIANT)
+    list(APPEND GENERATE_OPTIONS -b "${UFW_ZEPHYR_APPVARIANT}")
   endif()
 
   if (DEFINED ${prefix}TARGET_MCU)
@@ -22,6 +24,14 @@ function(gitint_options prefix outvar)
 
   if (DEFINED ${prefix}NAME)
     list(APPEND GENERATE_OPTIONS -n "${${prefix}NAME}")
+  elseif(DEFINED UFW_ZEPHYR_APPBASENAME)
+    list(APPEND GENERATE_OPTIONS -n "${UFW_ZEPHYR_APPBASENAME}")
+  elseif(DEFINED UFW_ZEPHYR_APPNAME)
+    # This is for support for very specific versions of mmh. Normally, both
+    # APPBASENAME and APPNAME exist always, and they are the same of APPVARIANT
+    # is empty. But there are some development versions in which APPBASENAME
+    # does not exist.
+    list(APPEND GENERATE_OPTIONS -n "${UFW_ZEPHYR_APPNAME}")
   else()
     list(APPEND GENERATE_OPTIONS -n "${PROJECT_NAME}")
   endif()
