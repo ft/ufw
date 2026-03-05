@@ -156,7 +156,7 @@
  *   "generic"
  *   "minimal-current"
  */
-#define BUILD_VARIANT @@BUILD_VARIANT@@
+#define BUILD_VARIANT @@{BUILD_VARIANT:-standard}@@
 
 /**
  * This reflects the build-profile that was active during the build process.
