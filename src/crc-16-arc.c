@@ -145,15 +145,17 @@ uint16_t
 ufw_crc16_arc_u16(uint16_t crc, const uint16_t *buffer, size_t len)
 {
     while (len > 0) {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
         crc = crc16_octet(crc, (*buffer >> 8u) & 0xffu);
         crc = crc16_octet(crc, (*buffer) & 0xffu);
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
         crc = crc16_octet(crc, (*buffer) & 0xffU);
         crc = crc16_octet(crc, (*buffer >> 8U) & 0xffU);
 #else
 #error "Unsupported endianness"
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
         buffer++;
         len--;
     }
