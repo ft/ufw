@@ -26,8 +26,9 @@
  * The choice of 16 bits for specifying payload size, means that the system is
  * limited to memory blocks of 64KiB. For use in current micro-controller based
  * applications, that is more than enough, and should be enough for the
- * foreseeable future. If this should ever be a limitation, the system is built
- * in a way to switch this type to a wider data type.
+ * foreseeable future. Since the size of the section large determines how
+ * expensive a block-write operation into the section is (each store has to
+ * update the payload checksum), this should be a reasonable range to offer.
  *
  * The system tries to establish two properties between data stored in a memory
  * device and the idea that an accessing system has about this memory:
@@ -52,13 +53,11 @@
  *
  * The most important parts of the API are these:
  *
- * - vp_init() — Initialise an instance with its specification in storage
- * - vp_format() — Format an instance with constant data
- * - vp_refresh() — Refresh meta data information of an instance
+ * - vp_load() — Load an instance from storage
  * - vp_usable() — Check if a stored datum is exactly usable with an instance
- * - vp_fetch_part() — Block read for memory associated with an instance
- * - vp_store_part() — Block read for memory associated with an instance
- * - vp_save() — High level storage procedure ignoring current data format
+ * - vp_format() — Initially format an instance in storage
+ * - vp_fetch() — Block read for memory associated with an instance
+ * - vp_store() — Block read for memory associated with an instance
  *
  * Let's assume that an instance `vp` of `VersionedPersistence` is associated
  * to some EEPROM peripheral to store a firmware system's configuration data.
@@ -70,7 +69,9 @@
  * When starting out, the EEPROM memory will have some value. This can be
  * completely random, but with EEPROM it often is the case that all bits in the
  * memory will be set to one. Let `struct config` be the type of data that can
- * carry a system's configuration.
+ * carry a system's configuration. Note that this first example uses vp_save()
+ * which is a shorthand for vp_format(), vp_store(), and vp_load(), to force a
+ * certain datum in a given specification into storage.
  *
  * @code
  *  #include <ufw/versioned-persistence.h>
@@ -84,7 +85,7 @@
  *                     eeprom_read, eeprom_write);
  *  // …
  *  struct config cfg = DEFAULT_CONFIGURATION;
- *  const int saverc = vp_save(&vp, &def);
+ *  const int saverc = vp_save(&vp, &cfg, sizeof(cfg));
  *  // error handling…
  * @endcode
  *
@@ -107,14 +108,14 @@
  *                     eeprom_read, eeprom_write);
  *  // …
  *  struct config cfg;
- *  const int refreshrc = vp_refresh(&vp);
+ *  const int loadrc = vp_load(&vp);
  *  // error handling…
  *  if (vp_usable(&vp) == false) {
  *      struct config def = DEFAULT_CONFIGURATION;
  *      const int saverc = vp_save(&vp, &def);
  *      // error handling…
  *  }
- *  const int fetchrc = vp_fetch(&vp, &cfg);
+ *  const int fetchrc = vp_fetch(&vp, &cfg, 0U, sizeof(cfg));
  *  // error handling…
  * @endcode
  *
@@ -168,17 +169,9 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define vp_ref_chksum bf_ref_u16n
-#define vp_set_chksum bf_set_u16n
 #define VP_CHKSUM_MAX UINT16_MAX
 typedef uint16_t vp_chksum;
-
-#define vp_ref_length bf_ref_u16n
-#define vp_set_length bf_set_u16n
 typedef uint16_t vp_length;
-
-#define vp_ref_version bf_ref_u16n
-#define vp_set_version bf_set_u16n
 typedef uint16_t vp_version;
 typedef vp_chksum (*vp_chksum_fnc)(vp_chksum, const void*, size_t);
 
@@ -201,7 +194,7 @@ struct vp_meta {
     vp_version version;
 };
 
-struct vp_cache {
+struct vp_checksum_results {
     vp_chksum header;
     vp_chksum payload;
 };
@@ -234,16 +227,16 @@ typedef struct versioned_persistence {
     struct vp_meta spec;
     /** Checksum implementation */
     struct vp_checksum chksum;
-    /** Header checksum, actual and expected */
-    struct vp_cache cache;
+    /** Checksum results: Header and payload */
+    struct vp_checksum_results result;
     /** Optional utility buffer for section */
     ByteBuffer *buffer;
 } VersionedPersistence;
 
 /*
  * The VP_STATE_* macros are bits in the state member of VersionedPersistence.
- * They are set by vp_refresh(). META_CONSISTENT reflects is the meta data
- * section of a block could be verified by its checksum.
+ * They are set by vp_load(). META_CONSISTENT reflects is the meta data section
+ * of a block could be verified by its checksum.
  *
  * LENGTH_COMPATIBLE is set if the length meta field in persistent memory
  * matches the length field in the VersionedPersistence instance.
@@ -254,18 +247,26 @@ typedef struct versioned_persistence {
  *
  * PAYLOAD_COMPATIBLE is set if both LENGTH_COMPATIBLE and VERSION_COMPATIBLE
  * are set, as a convenience to the user.
+ *
+ * META_CACHE_ACTIVE is set if version and length in "metablock" is loaded from
+ * something useful. META_CACHE_FROM_STORAGE is set if META_CACHE_ACTIVE was
+ * set because of reading header information from storage.
  */
 
+/** Indicate that instance's specification is in meta-data cache */
+#define VP_STATE_META_CACHE_ACTIVE        BIT(0)
+/** Indicate if meta-data cache was loaded from storage, rather than spec */
+#define VP_STATE_META_CACHE_FROM_STORAGE  BIT(1)
 /** Indicate that a block's meta field could be verified */
-#define VP_STATE_META_CONSISTENT    BIT(0)
+#define VP_STATE_META_CONSISTENT          BIT(2)
 /** Indicate that a block's payload field could be verified */
-#define VP_STATE_PAYLOAD_CONSISTENT BIT(1)
+#define VP_STATE_PAYLOAD_CONSISTENT       BIT(3)
 /** A block's payload is compatible in length and version */
-#define VP_STATE_PAYLOAD_COMPATIBLE BIT(2)
+#define VP_STATE_PAYLOAD_COMPATIBLE       BIT(4)
 /** A block's payload is compatible in length */
-#define VP_STATE_LENGTH_COMPATIBLE  BIT(3)
+#define VP_STATE_LENGTH_COMPATIBLE        BIT(5)
 /** A block's payload is compatible in version */
-#define VP_STATE_VERSION_COMPATIBLE BIT(4)
+#define VP_STATE_VERSION_COMPATIBLE       BIT(6)
 
 /** Bit mask to address the meta field of a block */
 #define VP_DATA_META    BIT(0)
@@ -297,128 +298,24 @@ typedef struct versioned_persistence {
 #define VP_SIMPLE_INIT(ADDR, SIZE, VERSION, SOURCE, SINK)       \
     VP_INIT(ADDR, SIZE, VERSION, NULL, SOURCE, SINK)
 
+/* Query sizes of VersionedPersistence instances */
 size_t vp_section_size(const VersionedPersistence *vp);
 size_t vp_spec_size(const VersionedPersistence *vp);
-int vp_init(VersionedPersistence *vp);
-int vp_refresh(VersionedPersistence *vp);
-int vp_format(VersionedPersistence *vp, unsigned char c);
-int vp_invalidate(VersionedPersistence *vp, unsigned int parts);
 
-int vp_update_meta(VersionedPersistence *vp);
+/* Storage initialisation */
+int vp_format(VersionedPersistence *vp);
 int vp_memset(VersionedPersistence *vp, unsigned char c,
               size_t offset, size_t n);
 
-ssize_t vp_fetch_part(VersionedPersistence *vp,
-                      void *dst, size_t offset, size_t n);
-ssize_t vp_store_part(VersionedPersistence *vp,
-                      const void *src, size_t offset, size_t n);
+/* Block transfer */
+ssize_t vp_fetch(VersionedPersistence *vp, void *dst, size_t offset, size_t n);
+ssize_t vp_store(VersionedPersistence *vp,
+                 const void *src, size_t offset, size_t n);
 
-ssize_t vp_fetch(VersionedPersistence *vp, void *dst);
-ssize_t vp_store(VersionedPersistence *vp, const void *src);
-ssize_t vp_save(VersionedPersistence *vp, const void *src);
-
-/**
- * Read header checksum from local meta data header
- *
- * This reads data from the local copy of the meta data header, and does not
- * communicate with the associated memory. Therefore this should only be used
- * when this data was updated, for instance via vp_refresh().
- *
- * @param  vp  VersionedPersistence instance to query
- *
- * @return Header data checksum
- * @sideeffects None
- */
-static inline vp_chksum
-vp_get_header_chksum(const VersionedPersistence *vp)
-{
-    return vp_ref_chksum(vp->metablock + VP_OFFSET_HEADER_CHKSUM);
-}
-
-/**
- * Read payload checksum from local meta data header
- *
- * This is like vp_get_header_chksum() but for the payload checksum field.
- *
- * @param  vp  VersionedPersistence instance to query
- *
- * @return Payload data checksum
- * @sideeffects None
- */
-static inline vp_chksum
-vp_get_payload_chksum(const VersionedPersistence *vp)
-{
-    return vp_ref_chksum(vp->metablock + VP_OFFSET_PAYLOAD_CHKSUM);
-}
-
-/**
- * Read specification version from local meta data header
- *
- * This is like vp_get_header_chksum() but for the specification version
- * field.
- *
- * @param  vp  VersionedPersistence instance to query
- *
- * @return Specification version
- * @sideeffects None
- */
-static inline vp_version
-vp_get_version(const VersionedPersistence *vp)
-{
-    return vp_ref_version(vp->metablock + VP_OFFSET_VERSION);
-}
-
-/**
- * Read specification length from local meta data header
- *
- * This is like vp_get_header_chksum() but for the specification length
- * field.
- *
- * @param  vp  VersionedPersistence instance to query
- *
- * @return Specification length
- * @sideeffects None
- */
-static inline vp_length
-vp_get_length(const VersionedPersistence *vp)
-{
-    return vp_ref_version(vp->metablock + VP_OFFSET_LENGTH);
-}
-
-/**
- * Change specification version from local meta data header
- *
- * This works on the local copy of the meta data header. In most cases, you
- * probably want to use vp_init() or similar instead of using this function
- * directly.
- *
- * @param  vp       VersionedPersistence instance to query
- * @param  version  Version value to be stored
- *
- * @sideeffects Modifies local meta data header copy
- */
-static inline void
-vp_put_version(VersionedPersistence *vp, const vp_version version)
-{
-    (void)vp_set_version(vp->metablock + VP_OFFSET_VERSION, version);
-}
-
-/**
- * Change specification version from local meta data header
- *
- * This is like vp_put_version() but for the specification length field in
- * the local copy of the meta data header.
- *
- * @param  vp      VersionedPersistence instance to query
- * @param  length  Length value to be stored
- *
- * @sideeffects Modifies local meta data header copy
- */
-static inline void
-vp_put_length(VersionedPersistence *vp, const vp_length length)
-{
-    (void)vp_set_length(vp->metablock + VP_OFFSET_LENGTH, length);
-}
+/* Load/save and manual invalidation */
+int vp_load(VersionedPersistence *vp);
+ssize_t vp_save(VersionedPersistence *vp, const void *src, size_t n);
+int vp_invalidate(VersionedPersistence *vp, unsigned int parts);
 
 /**
  * Determine if an instance is usable with its associated memory

@@ -102,7 +102,8 @@ set(__ufw_sources src/allocator.c
                   src/rfc1055.c
                   src/ring-buffer-iter.c
                   src/variable-length-integer.c
-                  src/versioned-persistence.c)
+                  src/vp/core.c
+                  src/vp/internal.c)
 
 if (WITH_UINT8_T)
   list(APPEND __ufw_sources src/octet-ring.c)
