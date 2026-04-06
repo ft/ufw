@@ -26,7 +26,7 @@ done
 shift $(( OPTIND - 1 ))
 log="$bd".log
 
-UFW_CLANG_ANALYZER="${UFW_CLANG_ANALYZER:-analyze-build-19}"
+UFW_CLANG_ANALYZER="${UFW_CLANG_ANALYZER:-analyze-build-21}"
 
 label 'Running clang'\''s static analyzer...\n'
 
