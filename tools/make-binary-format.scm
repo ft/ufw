@@ -47,7 +47,7 @@ extern \"C\" {
 (define (make-copyright)
   (let ((start-year 2019))
     (format #t "/*
- * Copyright (c) 2023-2026 ufw workers, All rights reserved.
+ * Copyright (c) ~a-~a ufw workers, All rights reserved.
  *
  * Terms for redistribution and use can be found in LICENCE.
  *
@@ -402,6 +402,22 @@ The tabular alignment is handed in as arguments to the generator function."
  */
 ")))
 
+(define* (with-endian #:key big little)
+  (unless (and big little)
+    (format (current-error-port)
+            "You must specify both #:big and #:little callbacks!~%")
+    (exit 1))
+  (format #t "#ifdef SYSTEM_ENDIANNESS_BIG~%")
+  (big)
+  (format #t "#else~%")
+  (format #t "#ifdef SYSTEM_ENDIANNESS_LITTLE~%")
+  (little)
+  (format #t "#else~%")
+  (indent)
+  (format #t "/* Top of file makes sure this can't happen. */~%")
+  (format #t "#endif /* SYSTEM_ENDIANNESS_LITTLE */~%")
+  (format #t "#endif /* SYSTEM_ENDIANNESS_BIG */~%"))
+
 (define (make-reference-native width)
   (let* ((typewidth (next-power-of-2 width))
          (precise? (= typewidth width)))
@@ -431,15 +447,9 @@ The tabular alignment is handed in as arguments to the generator function."
                           (be-offset (/ (- typewidth width) *bits-per-octet*)))
                   (if precise?
                       (pexprs width 0 0)
-                      (begin
-                        (format #t "#if defined(SYSTEM_ENDIANNESS_BIG)~%")
-                        (pexprs width 0 be-offset)
-                        (format #t "#elif defined(SYSTEM_ENDIANNESS_LITTLE)~%")
-                        (pexprs width 0 0)
-                        (format #t "#else~%")
-                        (indent)
-                        (format #t "/* Top of file makes sure this can't happen. */~%")
-                        (format #t "#endif /* SYSTEM_ENDIANNESS_* */~%"))))
+                      (with-endian
+                       #:big    (lambda () (pexprs width 0 be-offset))
+                       #:little (lambda () (pexprs width 0 0)))))
                 (when precise?
                   (format #t "#endif /* UFW_BITS_PER_BYTE == ~d */~%" step)))
               (if precise? steps (list *bits-per-octet*)))
@@ -481,15 +491,9 @@ The tabular alignment is handed in as arguments to the generator function."
                           (be-offset (/ (- typewidth width) *bits-per-octet*)))
                   (if precise?
                       (pexprs width 0 0)
-                      (begin
-                        (format #t "#if defined(SYSTEM_ENDIANNESS_BIG)~%")
-                        (pexprs width 0 be-offset)
-                        (format #t "#elif defined(SYSTEM_ENDIANNESS_LITTLE)~%")
-                        (pexprs width 0 0)
-                        (format #t "#else~%")
-                        (indent)
-                        (format #t "/* Top of file makes sure this can't happen. */~%")
-                        (format #t "#endif /* SYSTEM_ENDIANNESS_* */~%"))))
+                      (with-endian
+                       #:big    (lambda () (pexprs width 0 be-offset))
+                       #:little (lambda () (pexprs width 0 0)))))
                 (when precise?
                   (format #t "#endif /* UFW_BITS_PER_BYTE == ~d */~%" step)))
               (if precise? steps (list *bits-per-octet*)))
@@ -520,16 +524,12 @@ The tabular alignment is handed in as arguments to the generator function."
     (unless precise?
       (format #t "#if UFW_BITS_PER_BYTE == 8~%"))
     (make-reference-prototype width typewidth 'u (if big? 'b 'l))
-    (format #t "#if defined(SYSTEM_ENDIANNESS_BIG)~%")
-    (indent)
-    (make-ref-return width (not big?))
-    (format #t "#elif defined(SYSTEM_ENDIANNESS_LITTLE)~%")
-    (indent)
-    (make-ref-return width big?)
-    (format #t "#else~%")
-    (indent)
-    (format #t "/* Top of file makes sure this can't happen. */~%")
-    (format #t "#endif /* SYSTEM_ENDIANNESS_* */~%")
+    (with-endian #:big    (lambda ()
+                            (indent)
+                            (make-ref-return width (not big?)))
+                 #:little (lambda ()
+                            (indent)
+                            (make-ref-return width big?)))
     (format #t "}~%")
     (unless precise?
       (format #t "#endif /* UFW_BITS_PER_BYTE == 8 */~%"))))
@@ -550,16 +550,12 @@ The tabular alignment is handed in as arguments to the generator function."
     (unless precise?
       (format #t "#if UFW_BITS_PER_BYTE == 8~%"))
     (make-set!-prototype width typewidth 'u (if big? 'b 'l))
-    (format #t "#if defined(SYSTEM_ENDIANNESS_BIG)~%")
-    (indent)
-    (make-set!-return width (not big?))
-    (format #t "#elif defined(SYSTEM_ENDIANNESS_LITTLE)~%")
-    (indent)
-    (make-set!-return width big?)
-    (format #t "#else~%")
-    (indent)
-    (format #t "/* Top of file makes sure this can't happen. */~%")
-    (format #t "#endif /* SYSTEM_ENDIANNESS_* */~%")
+    (with-endian #:big    (lambda ()
+                            (indent)
+                            (make-set!-return width (not big?)))
+                 #:little (lambda ()
+                            (indent)
+                            (make-set!-return width big?)))
     (format #t "}~%")
     (unless precise?
       (format #t "#endif /* UFW_BITS_PER_BYTE == 8 */~%"))))

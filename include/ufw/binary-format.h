@@ -356,17 +356,19 @@ bf_ref_u24n(const void *ptr)
     uint32_t buffer = 0UL;
     const unsigned char *src = ptr;
     unsigned char *dst = (unsigned char*)&buffer;
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     dst[1U] = src[0U];
     dst[2U] = src[1U];
     dst[3U] = src[2U];
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     dst[0U] = src[0U];
     dst[1U] = src[1U];
     dst[2U] = src[2U];
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
     return buffer;
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
@@ -421,13 +423,14 @@ bf_ref_u40n(const void *ptr)
     uint64_t buffer = 0ULL;
     const unsigned char *src = ptr;
     unsigned char *dst = (unsigned char*)&buffer;
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     dst[3U] = src[0U];
     dst[4U] = src[1U];
     dst[5U] = src[2U];
     dst[6U] = src[3U];
     dst[7U] = src[4U];
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     dst[0U] = src[0U];
     dst[1U] = src[1U];
     dst[2U] = src[2U];
@@ -435,7 +438,8 @@ bf_ref_u40n(const void *ptr)
     dst[4U] = src[4U];
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
     return buffer;
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
@@ -459,14 +463,15 @@ bf_ref_u48n(const void *ptr)
     uint64_t buffer = 0ULL;
     const unsigned char *src = ptr;
     unsigned char *dst = (unsigned char*)&buffer;
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     dst[2U] = src[0U];
     dst[3U] = src[1U];
     dst[4U] = src[2U];
     dst[5U] = src[3U];
     dst[6U] = src[4U];
     dst[7U] = src[5U];
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     dst[0U] = src[0U];
     dst[1U] = src[1U];
     dst[2U] = src[2U];
@@ -475,7 +480,8 @@ bf_ref_u48n(const void *ptr)
     dst[5U] = src[5U];
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
     return buffer;
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
@@ -499,7 +505,7 @@ bf_ref_u56n(const void *ptr)
     uint64_t buffer = 0ULL;
     const unsigned char *src = ptr;
     unsigned char *dst = (unsigned char*)&buffer;
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     dst[1U] = src[0U];
     dst[2U] = src[1U];
     dst[3U] = src[2U];
@@ -507,7 +513,8 @@ bf_ref_u56n(const void *ptr)
     dst[5U] = src[4U];
     dst[6U] = src[5U];
     dst[7U] = src[6U];
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     dst[0U] = src[0U];
     dst[1U] = src[1U];
     dst[2U] = src[2U];
@@ -517,7 +524,8 @@ bf_ref_u56n(const void *ptr)
     dst[6U] = src[6U];
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
     return buffer;
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
@@ -574,13 +582,15 @@ bf_ref_u64n(const void *ptr)
 static inline uint16_t
 bf_ref_u16b(const void *ptr)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_ref_u16n(ptr);
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_swap16(bf_ref_u16n(ptr));
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 
 /**
@@ -599,13 +609,15 @@ bf_ref_u16b(const void *ptr)
 static inline uint32_t
 bf_ref_u24b(const void *ptr)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_ref_u24n(ptr);
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_swap24(bf_ref_u24n(ptr));
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -624,13 +636,15 @@ bf_ref_u24b(const void *ptr)
 static inline uint32_t
 bf_ref_u32b(const void *ptr)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_ref_u32n(ptr);
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_swap32(bf_ref_u32n(ptr));
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 
 /**
@@ -649,13 +663,15 @@ bf_ref_u32b(const void *ptr)
 static inline uint64_t
 bf_ref_u40b(const void *ptr)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_ref_u40n(ptr);
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_swap40(bf_ref_u40n(ptr));
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -675,13 +691,15 @@ bf_ref_u40b(const void *ptr)
 static inline uint64_t
 bf_ref_u48b(const void *ptr)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_ref_u48n(ptr);
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_swap48(bf_ref_u48n(ptr));
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -701,13 +719,15 @@ bf_ref_u48b(const void *ptr)
 static inline uint64_t
 bf_ref_u56b(const void *ptr)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_ref_u56n(ptr);
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_swap56(bf_ref_u56n(ptr));
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -726,13 +746,15 @@ bf_ref_u56b(const void *ptr)
 static inline uint64_t
 bf_ref_u64b(const void *ptr)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_ref_u64n(ptr);
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_swap64(bf_ref_u64n(ptr));
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 
 /**
@@ -750,13 +772,15 @@ bf_ref_u64b(const void *ptr)
 static inline uint16_t
 bf_ref_u16l(const void *ptr)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_swap16(bf_ref_u16n(ptr));
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_ref_u16n(ptr);
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 
 /**
@@ -775,13 +799,15 @@ bf_ref_u16l(const void *ptr)
 static inline uint32_t
 bf_ref_u24l(const void *ptr)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_swap24(bf_ref_u24n(ptr));
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_ref_u24n(ptr);
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -800,13 +826,15 @@ bf_ref_u24l(const void *ptr)
 static inline uint32_t
 bf_ref_u32l(const void *ptr)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_swap32(bf_ref_u32n(ptr));
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_ref_u32n(ptr);
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 
 /**
@@ -825,13 +853,15 @@ bf_ref_u32l(const void *ptr)
 static inline uint64_t
 bf_ref_u40l(const void *ptr)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_swap40(bf_ref_u40n(ptr));
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_ref_u40n(ptr);
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -851,13 +881,15 @@ bf_ref_u40l(const void *ptr)
 static inline uint64_t
 bf_ref_u48l(const void *ptr)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_swap48(bf_ref_u48n(ptr));
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_ref_u48n(ptr);
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -877,13 +909,15 @@ bf_ref_u48l(const void *ptr)
 static inline uint64_t
 bf_ref_u56l(const void *ptr)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_swap56(bf_ref_u56n(ptr));
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_ref_u56n(ptr);
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -902,13 +936,15 @@ bf_ref_u56l(const void *ptr)
 static inline uint64_t
 bf_ref_u64l(const void *ptr)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_swap64(bf_ref_u64n(ptr));
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_ref_u64n(ptr);
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 
 /**
@@ -1536,17 +1572,19 @@ bf_set_u24n(void *ptr, const uint32_t value)
 {
     const unsigned char *src = (const unsigned char*)&value;
     unsigned char *dst = ptr;
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     dst[0U] = src[1U];
     dst[1U] = src[2U];
     dst[2U] = src[3U];
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     dst[0U] = src[0U];
     dst[1U] = src[1U];
     dst[2U] = src[2U];
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
     return dst + 3U;
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
@@ -1606,13 +1644,14 @@ bf_set_u40n(void *ptr, const uint64_t value)
 {
     const unsigned char *src = (const unsigned char*)&value;
     unsigned char *dst = ptr;
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     dst[0U] = src[3U];
     dst[1U] = src[4U];
     dst[2U] = src[5U];
     dst[3U] = src[6U];
     dst[4U] = src[7U];
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     dst[0U] = src[0U];
     dst[1U] = src[1U];
     dst[2U] = src[2U];
@@ -1620,7 +1659,8 @@ bf_set_u40n(void *ptr, const uint64_t value)
     dst[4U] = src[4U];
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
     return dst + 5U;
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
@@ -1649,14 +1689,15 @@ bf_set_u48n(void *ptr, const uint64_t value)
 {
     const unsigned char *src = (const unsigned char*)&value;
     unsigned char *dst = ptr;
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     dst[0U] = src[2U];
     dst[1U] = src[3U];
     dst[2U] = src[4U];
     dst[3U] = src[5U];
     dst[4U] = src[6U];
     dst[5U] = src[7U];
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     dst[0U] = src[0U];
     dst[1U] = src[1U];
     dst[2U] = src[2U];
@@ -1665,7 +1706,8 @@ bf_set_u48n(void *ptr, const uint64_t value)
     dst[5U] = src[5U];
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
     return dst + 6U;
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
@@ -1694,7 +1736,7 @@ bf_set_u56n(void *ptr, const uint64_t value)
 {
     const unsigned char *src = (const unsigned char*)&value;
     unsigned char *dst = ptr;
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     dst[0U] = src[1U];
     dst[1U] = src[2U];
     dst[2U] = src[3U];
@@ -1702,7 +1744,8 @@ bf_set_u56n(void *ptr, const uint64_t value)
     dst[4U] = src[5U];
     dst[5U] = src[6U];
     dst[6U] = src[7U];
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     dst[0U] = src[0U];
     dst[1U] = src[1U];
     dst[2U] = src[2U];
@@ -1712,7 +1755,8 @@ bf_set_u56n(void *ptr, const uint64_t value)
     dst[6U] = src[6U];
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
     return dst + 7U;
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
@@ -1770,13 +1814,15 @@ bf_set_u64n(void *ptr, const uint64_t value)
 static inline void*
 bf_set_u16b(void *ptr, const uint16_t value)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_set_u16n(ptr, value);
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_set_u16n(ptr, bf_swap16(value));
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 
 /**
@@ -1801,13 +1847,15 @@ bf_set_u16b(void *ptr, const uint16_t value)
 static inline void*
 bf_set_u24b(void *ptr, const uint32_t value)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_set_u24n(ptr, value);
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_set_u24n(ptr, bf_swap24(value));
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -1827,13 +1875,15 @@ bf_set_u24b(void *ptr, const uint32_t value)
 static inline void*
 bf_set_u32b(void *ptr, const uint32_t value)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_set_u32n(ptr, value);
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_set_u32n(ptr, bf_swap32(value));
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 
 /**
@@ -1858,13 +1908,15 @@ bf_set_u32b(void *ptr, const uint32_t value)
 static inline void*
 bf_set_u40b(void *ptr, const uint64_t value)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_set_u40n(ptr, value);
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_set_u40n(ptr, bf_swap40(value));
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -1890,13 +1942,15 @@ bf_set_u40b(void *ptr, const uint64_t value)
 static inline void*
 bf_set_u48b(void *ptr, const uint64_t value)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_set_u48n(ptr, value);
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_set_u48n(ptr, bf_swap48(value));
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -1922,13 +1976,15 @@ bf_set_u48b(void *ptr, const uint64_t value)
 static inline void*
 bf_set_u56b(void *ptr, const uint64_t value)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_set_u56n(ptr, value);
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_set_u56n(ptr, bf_swap56(value));
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -1948,13 +2004,15 @@ bf_set_u56b(void *ptr, const uint64_t value)
 static inline void*
 bf_set_u64b(void *ptr, const uint64_t value)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_set_u64n(ptr, value);
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_set_u64n(ptr, bf_swap64(value));
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 
 /**
@@ -1973,13 +2031,15 @@ bf_set_u64b(void *ptr, const uint64_t value)
 static inline void*
 bf_set_u16l(void *ptr, const uint16_t value)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_set_u16n(ptr, bf_swap16(value));
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_set_u16n(ptr, value);
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 
 /**
@@ -2004,13 +2064,15 @@ bf_set_u16l(void *ptr, const uint16_t value)
 static inline void*
 bf_set_u24l(void *ptr, const uint32_t value)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_set_u24n(ptr, bf_swap24(value));
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_set_u24n(ptr, value);
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -2030,13 +2092,15 @@ bf_set_u24l(void *ptr, const uint32_t value)
 static inline void*
 bf_set_u32l(void *ptr, const uint32_t value)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_set_u32n(ptr, bf_swap32(value));
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_set_u32n(ptr, value);
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 
 /**
@@ -2061,13 +2125,15 @@ bf_set_u32l(void *ptr, const uint32_t value)
 static inline void*
 bf_set_u40l(void *ptr, const uint64_t value)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_set_u40n(ptr, bf_swap40(value));
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_set_u40n(ptr, value);
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -2093,13 +2159,15 @@ bf_set_u40l(void *ptr, const uint64_t value)
 static inline void*
 bf_set_u48l(void *ptr, const uint64_t value)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_set_u48n(ptr, bf_swap48(value));
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_set_u48n(ptr, value);
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -2125,13 +2193,15 @@ bf_set_u48l(void *ptr, const uint64_t value)
 static inline void*
 bf_set_u56l(void *ptr, const uint64_t value)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_set_u56n(ptr, bf_swap56(value));
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_set_u56n(ptr, value);
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 #endif /* UFW_BITS_PER_BYTE == 8 */
 
@@ -2151,13 +2221,15 @@ bf_set_u56l(void *ptr, const uint64_t value)
 static inline void*
 bf_set_u64l(void *ptr, const uint64_t value)
 {
-#if defined(SYSTEM_ENDIANNESS_BIG)
+#ifdef SYSTEM_ENDIANNESS_BIG
     return bf_set_u64n(ptr, bf_swap64(value));
-#elif defined(SYSTEM_ENDIANNESS_LITTLE)
+#else
+#ifdef SYSTEM_ENDIANNESS_LITTLE
     return bf_set_u64n(ptr, value);
 #else
     /* Top of file makes sure this can't happen. */
-#endif /* SYSTEM_ENDIANNESS_* */
+#endif /* SYSTEM_ENDIANNESS_LITTLE */
+#endif /* SYSTEM_ENDIANNESS_BIG */
 }
 
 /**
