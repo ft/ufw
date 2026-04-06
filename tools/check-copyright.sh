@@ -132,9 +132,9 @@ make_notice () {
     from="$1"
     to="$2"
     if [ "$from" != "$to" ]; then
-        REPLY="Copyright (c) 2025-2026 ufw workers, All rights reserved."
+        REPLY="Copyright (c) ${from}-${to} ufw workers, All rights reserved."
     else
-        REPLY="Copyright (c) 2025-2026 ufw workers, All rights reserved."
+        REPLY="Copyright (c) ${from} ufw workers, All rights reserved."
     fi
 }
 
@@ -214,6 +214,10 @@ $REPLY"
     perl -i -pe 'print "'"$REPLY"'" if $. == '"$_offset" "$_file"
 }
 
+doityourself () {
+    printf 'check-copyright.sh: Not touching %s, do it manually!\n' "$1"
+}
+
 check_file () {
     _end="$1"
     _file="$2"
@@ -269,7 +273,11 @@ check_file () {
         make_notice "$_start" "$_end"
         new_notice="$REPLY"
         if [ "$update" -ne 0 ]; then
-            update_file "$_file" "$new_notice"
+            case "$_file" in
+            (tools/check-copyright.sh)      doityourself "$_file" ;;
+            (tools/make-binary-format.scm)  doityourself "$_file" ;;
+            (*) update_file "$_file" "$new_notice" ;;
+            esac
         fi
         _rc=1
     fi
