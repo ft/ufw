@@ -1180,6 +1180,10 @@ register_get(RegisterTable *t, RegisterHandle idx, RegisterValue *v)
     RegisterArea *a;
     bool success;
 
+    /* Invalidate value to start with. The deserialiser that is ultimately
+     * called later in this function will set the correct type. */
+    v->type = REG_TYPE_INVALID;
+
     if (BIT_ISSET(t->flags, REG_TF_INITIALISED) == false) {
         rv.code = REG_ACCESS_UNINITIALISED;
         rv.address = idx;
