@@ -105,8 +105,6 @@ information about `mmh` see @ref develmmh.
 
 #### TICompilerWarnings.cmake
 
-#### XilinxISEToolchain.cmake
-
 ### Third-Party Support
 
 #### AddNanoPB.cmake
