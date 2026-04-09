@@ -2,6 +2,258 @@
   User-visible changes in ufw
 -------------------------------
 
+* v6.1.0 → v7.0.0 (released 2026-04-09):
+
+** Breaking compatibility
+
+- FPGA build integration for CMake was removed entirely, after being deprecated
+  in 6.0.0:
+  - The xilinx-ise.cmake toolchain file was removed.
+  - The XilinxISEToolchain.cmake support module was removed.
+  - All referenced in documentation were removed.
+- Some logic in the determination of build-variants has changed, which can lead
+  to different results in this parameter in certain situations.
+
+** New Features
+
+- ep: New seek extension for endpoints.
+- compat,errno: Add EBADFD compatibility
+- New VersionedPersistence API for better persistent storage.
+- Support for CMake variables UFW_ZEPHYR_APPNAME, UFW_ZEPHYR_APPVARIANT, and
+  UFW_ZEPHYR_APPBASENAME was added. Upcoming MakeMeHappy (v0.36+) will support
+  these.
+
+** Bugfixes
+
+- reg: Fix a possible, but very improbable uninitialised access.
+
+** Miscellaneous
+
+- Small but important fixes in maintenance tooling.
+- Various smaller changes to satisfy newer clang-tidy versions.
+- Documentation for memdiff internals.
+- zephyr,spi-text: Various improvements.
+- zephyr,i2c-text: Various improvements.
+- Copyright years were updated.
+
+** Diffstat
+
+    .gitignore                                    |   5 +-
+    CMakeLists.txt                                |   6 +-
+    LICENCE                                       |   2 +-
+    bin/expand-template                           |   2 +-
+    bin/generate-artifacts                        |   2 +-
+    bin/generate-metadata-yaml                    |   2 +-
+    bin/generate-version-h                        |   2 +-
+    bin/print-commitdate                          |   2 +-
+    bin/print-version                             |   2 +-
+    bin/tap.sh                                    |   2 +-
+    bin/utils.sh                                  |   2 +-
+    cmake/kconfig/debug.conf                      |   2 +-
+    cmake/kconfig/minsizerel.conf                 |   2 +-
+    cmake/kconfig/release.conf                    |   2 +-
+    cmake/kconfig/relwithdebinfo.conf             |   2 +-
+    cmake/modules/AddNanoPB.cmake                 |   2 +-
+    cmake/modules/ArmCmsis.cmake                  |   2 +-
+    cmake/modules/BuildArtifacts.cmake            |   2 +-
+    cmake/modules/FakeTimeSupport.cmake           |   2 +-
+    cmake/modules/FreeRTOS.cmake                  |   2 +-
+    cmake/modules/GNUAttributes.cmake             |   2 +-
+    cmake/modules/GNUBuiltins.cmake               |   2 +-
+    cmake/modules/GNUCompilerWarnings.cmake       |   2 +-
+    cmake/modules/GenerateGraphics.cmake          |   2 +-
+    cmake/modules/GitIntegration.cmake            |  12 +-
+    cmake/modules/HardwareAbstraction.cmake       |   2 +-
+    cmake/modules/InitialiseToolchain.cmake       |   2 +-
+    cmake/modules/Libtap.cmake                    |   2 +-
+    cmake/modules/Newlib.cmake                    |   2 +-
+    cmake/modules/STCmsis.cmake                   |   2 +-
+    cmake/modules/STM32HAL.cmake                  |   2 +-
+    cmake/modules/STM32HAL_f0.cmake               |   2 +-
+    cmake/modules/STM32HAL_f1.cmake               |   2 +-
+    cmake/modules/STM32HAL_f2.cmake               |   2 +-
+    cmake/modules/STM32HAL_f3.cmake               |   2 +-
+    cmake/modules/STM32HAL_f4.cmake               |   2 +-
+    cmake/modules/STM32HAL_f7.cmake               |   2 +-
+    cmake/modules/STM32HAL_g0.cmake               |   2 +-
+    cmake/modules/STM32HAL_g4.cmake               |   2 +-
+    cmake/modules/STM32HAL_h7.cmake               |   2 +-
+    cmake/modules/STM32HAL_l0.cmake               |   2 +-
+    cmake/modules/STM32HAL_l1.cmake               |   2 +-
+    cmake/modules/STM32HAL_l4.cmake               |   2 +-
+    cmake/modules/STM32HAL_l5.cmake               |   2 +-
+    cmake/modules/STM32HAL_wb.cmake               |   2 +-
+    cmake/modules/SetupTargetCPU.cmake            |   2 +-
+    cmake/modules/SetupUFW.cmake                  |   2 +-
+    cmake/modules/TICompilerWarnings.cmake        |   2 +-
+    cmake/modules/ToolchainFeatures.cmake         |   2 +-
+    cmake/modules/UFWCompiler.cmake               |   2 +-
+    cmake/modules/UFWTest.cmake                   |   2 +-
+    cmake/modules/UFWTools.cmake                  |   2 +-
+    cmake/modules/XilinxISEToolchain.cmake        | 409 ---------------
+    cmake/toolchains/afl++.cmake                  |   2 +-
+    cmake/toolchains/arm-zephyr-eabi.cmake        |   2 +-
+    cmake/toolchains/clang-arm-none-eabi.cmake    |   2 +-
+    cmake/toolchains/clang.cmake                  |   2 +-
+    cmake/toolchains/gnu-arm-none-eabi.cmake      |   2 +-
+    cmake/toolchains/gnu.cmake                    |   2 +-
+    cmake/toolchains/mips-linux-gnu.cmake         |   2 +-
+    cmake/toolchains/ti-arm-clang.cmake           |   2 +-
+    cmake/toolchains/ti-arm.cmake                 |   2 +-
+    cmake/toolchains/ti-c2000.cmake               |   2 +-
+    cmake/toolchains/xilinx-ise.cmake             |  35 --
+    doc/CMakeLists.txt                            |   2 +-
+    doc/pages/cmake.md                            |   2 -
+    examples/CMakeLists.txt                       |   2 +-
+    examples/ex-regp-parse-frame.c                |   2 +-
+    examples/ex-rfc1055-parse-frame.c             |   2 +-
+    fuzz/afl++.yaml                               |   2 +-
+    fuzz/run                                      |   2 +-
+    include/ufw/allocator.h                       |   2 +-
+    include/ufw/binary-format.h                   | 338 +++++++-----
+    include/ufw/bit-operations.h                  |   2 +-
+    include/ufw/byte-buffer.h                     |   2 +-
+    include/ufw/compat.h                          |   2 +-
+    include/ufw/compat/errno.h                    |   6 +-
+    include/ufw/compat/math-constants.h           |   2 +-
+    include/ufw/compat/ssize-t.h                  |   2 +-
+    include/ufw/compat/strings.h                  |   2 +-
+    include/ufw/compiler.h                        |   4 +-
+    include/ufw/convolution-low-pass.h            |   2 +-
+    include/ufw/crc/crc16-arc.h                   |   2 +-
+    include/ufw/endpoints.h                       |  20 +-
+    include/ufw/endpoints/continuable-sink.h      |   2 +-
+    include/ufw/hexdump.h                         |   2 +-
+    include/ufw/length-prefix.h                   |   2 +-
+    include/ufw/meta.h                            |   2 +-
+    include/ufw/octet-ring.h                      |   2 +-
+    include/ufw/persistent-storage.h              |   2 +-
+    include/ufw/register-protocol.h               |   2 +-
+    include/ufw/register-table.h                  |   2 +-
+    include/ufw/register-utilities.h              |   2 +-
+    include/ufw/rfc1055.h                         |   2 +-
+    include/ufw/ring-buffer-iter.h                |   2 +-
+    include/ufw/ring-buffer.h                     |   2 +-
+    include/ufw/sx.h                              |   2 +-
+    include/ufw/test/tap.h                        |   6 +-
+    include/ufw/toolchain.h.in                    |   2 +-
+    include/ufw/variable-length-integer.h         |   2 +-
+    include/ufw/versioned-persistence.h           | 354 +++++++++++++
+    include/ufwz/endpoint-uart-fifo.h             |   2 +-
+    include/ufwz/endpoint-uart-poll.h             |   2 +-
+    include/ufwz/shell-addons.h                   |   2 +-
+    include/ufwz/slab-allocator.h                 |   2 +-
+    include/ufwz/spi-text.h                       |   2 +-
+    module.yaml                                   |   2 +-
+    scheme/ufw/register-table.scm                 |   2 +-
+    scheme/ufw/utilities.scm                      |   2 +-
+    src/allocator.c                               |   2 +-
+    src/byte-buffer.c                             |   2 +-
+    src/compat/strlcat.c                          |   2 +-
+    src/compat/strlcpy.c                          |   2 +-
+    src/compat/strnlen.c                          |   2 +-
+    src/crc-16-arc.c                              |  10 +-
+    src/endpoints/buffer.c                        |   2 +-
+    src/endpoints/continuable-sink.c              |   2 +-
+    src/endpoints/core.c                          |  41 +-
+    src/endpoints/instrumentable.c                |   2 +-
+    src/endpoints/posix.c                         |   2 +-
+    src/endpoints/trivial.c                       |   2 +-
+    src/hexdump.c                                 |   2 +-
+    src/length-prefix.c                           |   2 +-
+    src/octet-ring.c                              |   2 +-
+    src/persistent-storage.c                      |   2 +-
+    src/register-protocol.c                       |   2 +-
+    src/registers/core.c                          |   6 +-
+    src/registers/internal.h                      |   2 +-
+    src/registers/utilities.c                     |   2 +-
+    src/rfc1055.c                                 |   2 +-
+    src/ring-buffer-iter.c                        |   2 +-
+    src/sx.c                                      |   2 +-
+    src/test/memdiff.c                            | 463 ++++++++++++++--
+    src/test/output-utils.c                       |  14 +-
+    src/test/tap.c                                |   2 +-
+    src/variable-length-integer.c                 |   2 +-
+    src/vp/core.c                                 | 348 +++++++++++++
+    src/vp/internal.c                             | 198 +++++++
+    src/vp/internal.h                             | 243 +++++++++
+    src/z/CMakeLists.txt                          |   2 +-
+    src/z/driver-i2c-text.c                       |  62 ++-
+    src/z/driver-spi-text.c                       |  41 +-
+    src/z/endpoint-uart-fifo.c                    |   2 +-
+    src/z/endpoint-uart-poll.c                    |   2 +-
+    src/z/shell-addons.c                          |   2 +-
+    src/z/slab-allocator.c                        |   2 +-
+    target/cortex-m3/bin/run                      |   2 +-
+    target/cortex-m3/init/startup.c               |   2 +-
+    target/cortex-m3/ld/arm-cortex-qemu.ld        |   2 +-
+    target/mips/bin/run                           |   2 +-
+    test/CMakeLists.txt                           |   5 +-
+    test/t-binary-format.c                        |   2 +-
+    test/t-byte-buffer.c                          |   2 +-
+    test/t-convolution-low-pass.c                 |   2 +-
+    test/t-endpoints.c                            |   2 +-
+    test/t-ep-retry-ctrl.c                        |   2 +-
+    test/t-hexdump.c                              |   2 +-
+    test/t-length-prefix.c                        |   2 +-
+    test/t-persistent-storage.c                   |   2 +-
+    test/t-register-protocol.c                    |   2 +-
+    test/t-register-table-persistent-storage.c    |   2 +-
+    test/t-register-table.c                       |   2 +-
+    test/t-rfc1055.c                              |   2 +-
+    test/t-ring-buffer.c                          |   2 +-
+    test/t-sx-parser.c                            |   2 +-
+    test/t-varint.c                               |   2 +-
+    test/t-versioned-persistence.c                | 493 ++++++++++++++++++
+    test/vcs/sh/epilogue.sh                       |   2 +-
+    test/vcs/sh/generate-states.sh                |   2 +-
+    test/vcs/sh/prologue.sh                       |   2 +-
+    test/vcs/t/0001-specimen-notags.t             |   2 +-
+    test/vcs/t/0002-specimen-single-top-vtag.t    |   2 +-
+    test/vcs/t/0003-specimen-single-nontop-vtag.t |   2 +-
+    test/vcs/t/0004-specimen-multi-mixed.t        |   2 +-
+    test/vcs/t/0005-specimen-pre-release.t        |   2 +-
+    test/vcs/t/0006-specimen-release-candidate.t  |   2 +-
+    test/vcs/tools/calculate-state                |   2 +-
+    test/{module => z}/CMakeLists.txt             |   2 +-
+    test/{module => z}/README                     |   0
+    test/{module => z}/run                        |   2 +-
+    test/{module => z}/setup                      |   2 +-
+    test/{module => z}/src/CMakeLists.txt         |   2 +-
+    .../src/boards/native_posix_64.conf           |   2 +-
+    .../src/boards/native_posix_64.overlay        |   2 +-
+    test/{module => z}/src/main.c                 |   2 +-
+    test/{module => z}/src/prj.conf               |   2 +-
+    test/{module => z}/system.yaml                |   2 +-
+    tools/apidoc-build.sh                         |   2 +-
+    tools/check-changes.sh                        |   2 +-
+    tools/check-copyright.sh                      |  12 +-
+    tools/check-meta-h.sh                         |   2 +-
+    tools/clang-analyzer.sh                       |   4 +-
+    tools/clang-tidy.sh                           |   4 +-
+    tools/compat-build.sh                         |   2 +-
+    tools/coverage-build.sh                       |   2 +-
+    tools/generate-diffstat.sh                    |   2 +-
+    tools/make-binary-format.scm                  |  78 ++-
+    tools/make-register-macros.scm                |   2 +-
+    tools/quick.yaml                              |   2 +-
+    tools/release-tests.sh                        |  20 +-
+    tools/run                                     |   2 +-
+    vcs-integration/build-information.sh          |   2 +-
+    vcs-integration/git.sh                        |   2 +-
+    vcs-integration/version.h.in                  |   2 +-
+    zephyr/Kconfig                                |  14 +-
+    .../boards/others/maplemini/Kconfig.maplemini |   2 +-
+    zephyr/boards/others/maplemini/board.yml      |   2 +-
+    zephyr/boards/others/maplemini/maplemini.dts  |   2 +-
+    .../others/maplemini/maplemini_defconfig      |   2 +-
+    zephyr/cmake-cache.cmake                      |   2 +-
+    zephyr/dts/bindings/ufw,i2c-text.yaml         |   2 +-
+    zephyr/dts/bindings/ufw,spi-text.yaml         |   2 +-
+    zephyr/module.yml                             |   2 +-
+    213 files changed, 2700 insertions(+), 917 deletions(-)
+
+
 * v6.0.3 → v6.1.0 (released 2025-09-22):
 
 ** New Features
