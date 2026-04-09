@@ -4,10 +4,10 @@
  * Terms for redistribution and use can be found in LICENCE.
  */
 
-#include <limits.h>
 #include <inttypes.h>
-#include <stdio.h>
+#include <limits.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
