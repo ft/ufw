@@ -176,7 +176,7 @@ zephyr_module_setup_ok () {
 
 check_prg abi-compliance-checker
 check_prg abi-dumper
-check_prg "${UFW_CLANG_ANALYZER:-analyze-build-19}"
+check_prg "${UFW_CLANG_ANALYZER:-analyze-build-21}"
 check_prg awk
 check_prg cmake
 check_prg clang-tidy
