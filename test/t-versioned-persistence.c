@@ -189,9 +189,28 @@ main(UNUSED int argc, UNUSED char *argv[])
     plan(43);
 
     {
-        memset(vp.metablock, UCHAR_MAX, VP_SIZE_META);
-        memset(&vp.result,   UCHAR_MAX, sizeof(vp.result));
-        memset(storage,      UCHAR_MAX, STORAGE_SIZE);
+        /*
+         * On C2000 and other platforms, where sizeof(int) == sizeof(char), you
+         * are subject to warnings like this:
+         *
+         *   warning: integer conversion resulted in a change of sign
+         *
+         * Which is true, but intended. You can get rid of it, by explicitly
+         * casting into int. But if you do, other toolchains, or static
+         * analyzers like clang-tidy will note, that you're performing a
+         * redundant cast. To handle this, I am using this ugly cludge.
+         *
+         * To be honest, I wonder if keeping support for TI's C2000 platform is
+         * worth all the additional hassle that ufw pulls off.
+         */
+#if CHAR_BIT == 16
+        const int ff = (int)UCHAR_MAX;
+#else
+        const int ff = UCHAR_MAX;
+#endif /* CHAR_BIT == 16 */
+        memset(vp.metablock, ff, VP_SIZE_META);
+        memset(&vp.result,   ff, sizeof(vp.result));
+        memset(storage,      ff, STORAGE_SIZE);
 
         ok(vp_load(&vp) == (-EBADFD), "boot: Meta data is inconsistent");
         ok(vp_usable(&vp) == false,
