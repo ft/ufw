@@ -97,7 +97,8 @@ function(generate_version_h)
 
   add_custom_target(${PARSED_ARGS_TARGET})
   add_custom_command(
-    TARGET "${PARSED_ARGS_TARGET}"
+    TARGET "${PARSED_ARGS_TARGET}" PRE_BUILD
+    BYPRODUCTS "${PARSED_ARGS_OUTPUT}"
     COMMAND
     "${MICROFRAMEWORK_ROOT}/bin/generate-version-h"
     "${MICROFRAMEWORK_ROOT}"
@@ -132,7 +133,8 @@ function(generate_revision_file)
 
   add_custom_target(${PARSED_ARGS_TARGET})
   add_custom_command(
-    TARGET "${PARSED_ARGS_TARGET}"
+    TARGET "${PARSED_ARGS_TARGET}" PRE_BUILD
+    BYPRODUCTS "${PARSED_ARGS_OUTPUT}"
     COMMAND
     "${MICROFRAMEWORK_ROOT}/bin/print-version"
     "${MICROFRAMEWORK_ROOT}"
@@ -163,7 +165,8 @@ function(generate_commitdate_file)
 
   add_custom_target(${PARSED_ARGS_TARGET})
   add_custom_command(
-    TARGET "${PARSED_ARGS_TARGET}"
+    TARGET "${PARSED_ARGS_TARGET}" PRE_BUILD
+    BYPRODUCTS "${PARSED_ARGS_OUTPUT}"
     COMMAND
     "${MICROFRAMEWORK_ROOT}/bin/print-commitdate"
     "${MICROFRAMEWORK_ROOT}"
