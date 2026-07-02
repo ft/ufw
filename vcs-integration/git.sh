@@ -46,9 +46,6 @@
 #   git_detached_head: Returns true, if __GIT_BRANCH__ suggests, the git
 #       repository is in DetachedHead state.
 #
-#   git_dirty: Returns true, if there are uncommitted changes in tracked files
-#       in the git repository.
-#
 # Example:
 #
 #     git_populate
@@ -57,13 +54,18 @@
 __GIT_LOADED__=1
 
 _git_version_ () {
-    REPLY="$(git describe --always \
+    git update-index -q --refresh
+    REPLY="$(git describe --always --dirty=-dirty \
                           --match "${__GIT_VERSION_PREFIX__}"'v[0-9]*' \
                           --abbrev=0)"
     REPLY="${REPLY#${__GIT_VERSION_PREFIX__}}"
     case "$REPLY" in
     v*) : ;;
-    *) REPLY=noversion
+    *) MORE="$(git describe --always --dirty=-dirty)"
+       case "$MORE" in
+       *-dirty) REPLY=noversion-dirty;;
+       *)       REPLY=noversion ;;
+       esac
     esac
 }
 
@@ -110,12 +112,10 @@ git_detached_head () {
 }
 
 git_dirty () {
-    git update-index -q --refresh
-    if [ -n "$(git diff-index --name-only HEAD --)" ]; then
-        # Yup, it's dirty.
-        return 0
-    fi
-    return 1
+    case "$1" in
+    *-dirty) return 0 ;;
+    *)       return 1 ;;
+    esac
 }
 
 git_got_info () {
@@ -184,12 +184,6 @@ git_populate () {
         _git_description_
         __GIT_DESCRIPTION__="$REPLY"
 
-        if git_dirty; then
-            __GIT_DIRTY__=1
-        else
-            __GIT_DIRTY__=0
-        fi
-
         _git_hash_
         __GIT_HASH__="$REPLY"
 
@@ -198,6 +192,14 @@ git_populate () {
 
         _git_version_
         __GIT_VERSION__="$REPLY"
+
+        if git_dirty "$__GIT_VERSION__"; then
+            __GIT_DIRTY__=1
+            __GIT_VERSION__="${__GIT_VERSION__%-dirty}"
+        else
+            __GIT_DIRTY__=0
+        fi
+
         case "$__GIT_VERSION__" in
         noversion)
             __GIT_VERSION__="NoVersion-g$__GIT_HASH__"
