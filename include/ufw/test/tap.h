@@ -58,16 +58,16 @@ void noplan(void);
 
 #define ok(expr, ...)                           \
     ufw_test_ok(__FILE__, __LINE__,             \
-                expr, #expr,                    \
+                (expr), #expr,                  \
                 __VA_ARGS__)
 
 #define okx(expr) ufw_test_ok(__FILE__, __LINE__, expr, #expr, NULL)
 
 #define cmp_mem(a, b, n, ...)                   \
     ufw_test_cmp_mem(__FILE__, __LINE__,        \
-                     a, #a,                     \
-                     b, #b,                     \
-                     n,                         \
+                     (a), #a,                   \
+                     (b), #b,                   \
+                     (n),                       \
                      __VA_ARGS__)
 
 /* Generic utilities for tests */
