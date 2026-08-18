@@ -67,6 +67,12 @@ builds it automatically sets up variables like:
 
 - `UFW_ZEPHYR_KERNEL`: Location of the Zephyr RTOS sources to be used in build.
 - `UFW_ZEPHYR_APPLICATION`: Location of the application source build.
+- `UFW_ZEPHYR_APPNAME`: Name of application set via `mmh`.
+- `UFW_ZEPHYR_APPVARIANT`: Part of `UFW_ZEPHYR_APPNAME` that is considered a
+  variant identifier suffix. If specified, this must start in a dash (`-`).
+- `UFW_ZEPHYR_APPBASENAME`: This is `UFW_ZEPHYR_APPNAME` without the
+  application variant specified in `UFW_ZEPHYR_APPVARIANT`. If the latter is
+  not used, this is equal to `UFW_ZEPHYR_APPNAME`.
 
 It is possible to do all of this setup without `mmh`. But it is recommended to
 use it, if only for convenience. Also note, that depending on the concrete
