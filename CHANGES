@@ -2,6 +2,27 @@
   User-visible changes in ufw
 -------------------------------
 
+* v7.0.0 → v7.0.1 (released 2026-08-18):
+
+** Bugfixes
+
+- cmake,git: Fix dependency order with Ninja generator for various file
+  generation functions, that can lead to outdated version information in
+  incremental builds.
+- vcs,git: Improve performance of -dirty detection.
+- cmake,toplevel: Silence warnings about mmh/ufw interaction variables, in case
+  a project does not use all CMake modules to touch them.
+- doc: Add documentation for missing UFW_ZEPHYR_* variables.
+
+** Diffstat
+
+    cmake/modules/GitIntegration.cmake |  9 +++++---
+    cmake/modules/SetupUFW.cmake       |  9 ++++++++
+    doc/pages/cmake.md                 |  6 +++++
+    vcs-integration/git.sh             | 36 ++++++++++++++++--------------
+    4 files changed, 40 insertions(+), 20 deletions(-)
+
+
 * v6.1.0 → v7.0.0 (released 2026-04-09):
 
 ** Breaking compatibility
