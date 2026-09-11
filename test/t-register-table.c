@@ -440,7 +440,7 @@ t_bfg2000(void)
             return false;                                               \
                                                                         \
         if (e->type == REG_TYPE_FLOAT32) {                              \
-            float eps = VT_EPS / 10.;                                   \
+            float eps = VT_EPS / 10.f;                                  \
             return (F32EQ(v.value.M, VLD_A, eps)                        \
                     || F32EQ(v.value.M, VLD_B, eps)                     \
                     || F32EQ(v.value.M, VLD_C, eps)                     \
@@ -580,19 +580,19 @@ GENERATE_CONSTRAIN_TESTS(
     /* TST, T, M, MM */
     t_f32_regs, FLOAT32, f32, F32,
     /* VT_EPS */
-    0.1,
+    0.1f,
     /* VLD */
     validate_f32,
     /* VLD_VAL, VLD_A, VLD_B, VLD_C, VLD_D, VLD_FAIL */
-    1e3, 1e3, 2e3, -3e3, -4e3, 5e3,
+    1e3f, 1e3f, 2e3f, -3e3f, -4e3f, 5e3f,
     /* VT_UNC_VAL, VT_UNC_MIN, VT_UNC_MAX */
-    200e3, F32_MIN, F32_MAX,
+    200e3f, F32_MIN, F32_MAX,
     /* VT_MIN_VAL, VT_MIN_MIN, VT_MIN_MAX */
-    300e3, -1e3, F32_MAX,
+    300e3f, -1e3f, F32_MAX,
     /* VT_MAX_VAL, VT_MAX_MIN, VT_MAX_MAX */
-    400e3, F32_MIN, 1e6,
+    400e3f, F32_MIN, 1e6f,
     /* VT_RAN_VAL, VT_RAN_MIN, VT_RAN_MAX */
-    500e3, -1e3, 800e3)
+    500e3f, -1e3f, 800e3f)
 
 static void
 t_f32_abnormal(void)
@@ -640,8 +640,8 @@ t_f32_abnormal(void)
     a = register_get(&regs, 0, &v);
     cmp_code(a.code, ==, REG_ACCESS_SUCCESS, "f32 can get value");
     cmp_code(v.type, ==, REG_TYPE_FLOAT32, "Gotten value is type f32");
-    unless (ok(v.value.f32 == 0., "Gotten value is correct value")) {
-        prf32(v.value.f32, 0.);
+    unless (ok(v.value.f32 == 0.f, "Gotten value is correct value")) {
+        prf32(v.value.f32, 0.f);
     }
 
     /* 122e9 so we can test for equality */
