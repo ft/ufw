@@ -11,7 +11,8 @@ endif()
 
 set(examples
   ex-regp-parse-frame
-  ex-rfc1055-parse-frame)
+  ex-rfc1055-parse-frame
+  ex-versioned-persistence)
 
 foreach (example ${examples})
   add_executable(${example} ${example}.c)
