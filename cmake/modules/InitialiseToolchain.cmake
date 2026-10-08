@@ -168,6 +168,11 @@ macro(initialise_toolchain)
     endif()
 
     ufw_check_toolchain_features(${with_c_lang} ${with_cxx_lang})
+    # Set these in the CMake cache. If something (like zephyr's module initia-
+    # lisation system) calls this from a function, we'd otherwise lose these
+    # and stuff that depends on it cannot work properly.
+    set(COMPILER_API "${COMPILER_API}" CACHE STRING "Compiler API Identifier" FORCE)
+    set(TOOLCHAIN_ID "${TOOLCHAIN_ID}" CACHE STRING "Toolchain Identifier" FORCE)
     set(__UFW_ToolchainInitialised 1)
   endif()
 
