@@ -4,6 +4,7 @@
 
 board:
   name: maplemini
+  full_name: LeafLabs Maple Mini
   vendor: others
   socs:
     - name: stm32f103xb
