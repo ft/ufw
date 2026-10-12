@@ -2,6 +2,27 @@
   User-visible changes in ufw
 -------------------------------
 
+* v7.0.1 → v7.0.2 (released 2026-10-12):
+
+** Bugfixes
+
+- test,tap: Improve bracketing of ok() cmp_mem() macro parameters
+- tests: Fix lots of double to float demotion warnings
+- tests,cmake: Quote possibly empty variable (PROJECT_TARGET_CPU)
+- toolchains: Put COMPILER_API and TOOLCHAIN_ID into cmake cache
+- zephyr,compat: Disable some warnings in GNUMakeStrictCCompiler
+
+** Diffstat
+
+    cmake/modules/GNUCompilerWarnings.cmake |  8 ++++----
+    cmake/modules/InitialiseToolchain.cmake |  5 +++++
+    include/ufw/meta.h                      |  2 +-
+    include/ufw/test/tap.h                  |  8 ++++----
+    test/CMakeLists.txt                     |  2 +-
+    test/t-register-table.c                 | 18 +++++++++---------
+    6 files changed, 24 insertions(+), 19 deletions(-)
+
+
 * v7.0.0 → v7.0.1 (released 2026-08-18):
 
 ** Bugfixes
