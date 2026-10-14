@@ -87,11 +87,45 @@ macro(ufw_toplevel)
   endif()
 endmacro()
 
+# Setting up ufw in various situations
+#
+# Synopsis: setup_ufw([<DIRECTORY-NAME>] [FORCE_INCLUDE] [PACKAGE])
+#
+# Relevant variables:
+#
+#   - MICROFRAMEWORK_ROOT: If this is set, it is assumed to be the absolute
+#     directory name of ufw's project root. This even has precedence over any
+#     directory-name parameter given to the function.
+#
+#   - UFW_SETUP_DONE: If this is set to True, the function exits without
+#     preforming any additional actions. This parameters is set at the end of
+#     the function in the caller's scope. The intention is to avoid issues if
+#     the function might be called multiple times. Only the first call will
+#     have any consequences.
+#
+# Parameters:
+#
+#   The first positional parameter of the function is optional. If it is given,
+#   it must be the name of ufw's root directory, relative to the currect source
+#   directory. See MICROFRAMEWORK_ROOT for precedence as well as possible abso-
+#   lute values to this parameter.
+#
+# Flags:
+#
+#   - PACKAGE: This is intended for use with the find_package() system. If
+#     given, ufw is included with an additional build-directory parameter,
+#     inside of CMAKE_CURRENT_BINARY_DIR (ufw-build).
+#
+#   - FORCE_INCLUDE: If given, and PACKAGE is not used, add_subdirectory() will
+#     be called even in situations the system things it should not, like in
+#     Zephyr module builds. Use with care!
+#
+# Example:  setup_ufw(libraries/ufw)
 function(setup_ufw)
   if (UFW_SETUP_DONE)
     return()
   endif()
-  cmake_parse_arguments(PA "FORCE_INCLUDE" "" "" ${ARGN})
+  cmake_parse_arguments(PA "FORCE_INCLUDE;PACKAGE" "" "" ${ARGN})
   list(LENGTH PA_UNPARSED_ARGUMENTS argc)
   if (${argc} GREATER 1)
       message(FATAL_ERROR "setup_ufw used with too many arguments!")
@@ -111,7 +145,9 @@ function(setup_ufw)
     set(MICROFRAMEWORK_ROOT "${_dir}" PARENT_SCOPE)
   endif()
   set(UFW_SETUP_DONE True PARENT_SCOPE)
-  if ((NOT DEFINED ZEPHYR_BASE) OR PA_FORCE_INCLUDE)
+  if (PA_PACKAGE)
+    add_subdirectory(${_dir} ${CMAKE_CURRENT_BINARY_DIR}/ufw-build)
+  elseif ((NOT DEFINED ZEPHYR_BASE) OR PA_FORCE_INCLUDE)
     add_subdirectory(${_dir})
   endif()
 endfunction()
