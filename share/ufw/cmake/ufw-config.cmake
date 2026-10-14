@@ -1,5 +1,5 @@
 macro(ufw_pkg_message)
-  if(NOT ufw_FIND_QUIETLY)
+  if (NOT ufw_FIND_QUIETLY)
     message(${ARGN})
   endif()
 endmacro()
