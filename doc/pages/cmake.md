@@ -79,6 +79,51 @@ use it, if only for convenience. Also note, that depending on the concrete
 scenario, it is possible to strip down this boilerplate a lot. For more
 information about `mmh` see @ref develmmh.
 
+
+## CMake Package Support {#cmakepackage}
+
+Additionally to the traditional CMake introduction, `ufw` now also supports
+CMake's `find_package()` system, to find `ufw` by standard CMake means, and
+usually relies on the system's `HINTS` keyword parameter. A common way of
+setting `ufw` up like this is to set the `MICROFRAMEWORK_ROOT` environment
+variable to the root of the libary's source code, and do the following in
+`CMakeLists.txt`:
+
+```cmake
+find_package(ufw REQUIRED HINTS $ENV{MICROFRAMEWORK_ROOT})
+```
+
+This will error out of `ufw` cannot be found. It will also set the library up
+to be built within `${CMAKE_CURRENT_BINARY_DIR}/ufw-build`, and hook all its
+CMake modules into `CMAKE_MODULE_PATH`.
+
+The package has support for a number of `COMPONENTS`:
+
+- `cmake`: This enables the extension of `CMAKE_MODULE_PATH` only.
+- `core`: The core `ufw` C library, and currently its auxiliary libraries like
+  `ufw-tap`, and `ufw-sx`. This requires the `cmake` component to be enabled.
+
+The previous example enables all components and is therefore equivalent to
+this:
+
+```cmake
+find_package(ufw REQUIRED
+  HINTS $ENV{MICROFRAMEWORK_ROOT}
+  COMPONENTS core cmake)
+```
+
+In case only `ufw`'s CMake modules are required, it is possible to do this:
+
+```cmake
+find_package(ufw REQUIRED
+  HINTS $ENV{MICROFRAMEWORK_ROOT}
+  COMPONENTS cmake)
+```
+
+Using `core` without `cmake` will issue a warning and enable the latter. Using
+any other component will issue a warning.
+
+
 ## CMake Modules {#cmakemodules}
 
 ### Core Modules
