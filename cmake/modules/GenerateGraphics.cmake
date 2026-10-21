@@ -32,12 +32,15 @@ endif()
 
 
 function(ufw_inkscape_make_command type input output outvar)
+  # Parallel inkscape invocations, can fail. Setting SELF_CALL is a workaround.
+  # See: https://gitlab.com/inkscape/inkscape/-/work_items/4716
   if ("${UFW_INKSCAPE_VERSION}" EQUAL 0)
-    set(cmd "${UFW_INKSCAPE_EXECUTABLE}"
-            --export-${type} ${output} ${input})
+    set(cmd "${CMAKE_COMMAND}" -E env SELF_CALL=xxx
+      "${UFW_INKSCAPE_EXECUTABLE}" --export-${type} ${output} ${input})
   else()
-    set(cmd "${UFW_INKSCAPE_EXECUTABLE}"
-            --export-type=${type} --export-filename=${output} ${input})
+    set(cmd "${CMAKE_COMMAND}" -E env SELF_CALL=xxx
+      "${UFW_INKSCAPE_EXECUTABLE}" --export-type=${type}
+                                   --export-filename=${output} ${input})
   endif()
   set(${outvar} ${cmd} PARENT_SCOPE)
 endfunction()
