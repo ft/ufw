@@ -123,3 +123,13 @@ function(ufw_force_compat outvar)
     set(${outvar} 0 PARENT_SCOPE)
   endif()
 endfunction()
+
+function(ufw_full_float_support outvar)
+  if (CONFIG_MINIMAL_LIBC AND "${CONFIG_MINIMAL_LIBC}" STREQUAL y)
+    set(${outvar} 0 PARENT_SCOPE)
+    message(STATUS
+      "ufw: Zephyr minimal libc: Limited Floating Point implementation")
+  else()
+    set(${outvar} 1 PARENT_SCOPE)
+  endif()
+endfunction()

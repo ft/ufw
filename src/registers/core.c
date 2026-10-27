@@ -310,9 +310,11 @@ static bool
 rds_f32_ser(const RegisterValue v, RegisterAtom *r, const bool bigendian)
 {
     assert(v.type == REG_TYPE_FLOAT32);
+#ifdef UFW_FULL_FLOAT_SUPPORT
     if ((v.value.f32 != 0.F) && (isnormal(v.value.f32) == false)) {
         return false;
     }
+#endif /* UFW_FULL_FLOAT_SUPPORT */
     if (bigendian) {
         bf_set_f32b(r, v.value.f32);
     } else {
@@ -330,16 +332,22 @@ rds_f32_des(const RegisterAtom *r, RegisterValue *v, const bool bigendian)
         v->value.f32 = bf_ref_f32l(r);
     }
     v->type = REG_TYPE_FLOAT32;
+#ifdef UFW_FULL_FLOAT_SUPPORT
     return ((v->value.f32 == 0.F) || (isnormal(v->value.f32) == true));
+#else
+    return true;
+#endif /* UFW_FULL_FLOAT_SUPPORT */
 }
 
 static bool
 rds_f64_ser(const RegisterValue v, RegisterAtom *r, const bool bigendian)
 {
     assert(v.type == REG_TYPE_FLOAT64);
+#ifdef UFW_FULL_FLOAT_SUPPORT
     if ((v.value.f64 != 0.) && (isnormal(v.value.f64) == false)) {
         return false;
     }
+#endif /* UFW_FULL_FLOAT_SUPPORT */
     if (bigendian) {
         bf_set_f64b(r, v.value.f64);
     } else {
@@ -357,7 +365,11 @@ rds_f64_des(const RegisterAtom *r, RegisterValue *v, const bool bigendian)
         v->value.f64 = bf_ref_f64l(r);
     }
     v->type = REG_TYPE_FLOAT64;
+#ifdef UFW_FULL_FLOAT_SUPPORT
     return ((v->value.f64 == 0.) || (isnormal(v->value.f64) == true));
+#else
+    return true;
+#endif /* UFW_FULL_FLOAT_SUPPORT */
 }
 
 const RegisterSerDes rds_serdes[] = {

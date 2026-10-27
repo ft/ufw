@@ -372,6 +372,12 @@
 #undef UFW_COMPAT_HAVE_STRNLEN
 #endif /* UFW_COMPAT_HAVE_STRNLEN */
 
+/** Reflect the floating point API support */
+#cmakedefine01 UFW_FULL_FLOAT_SUPPORT
+#if (UFW_FULL_FLOAT_SUPPORT == 0)
+#undef UFW_FULL_FLOAT_SUPPORT
+#endif /* UFW_FULL_FLOAT_SUPPORT */
+
 /**
  * UFW errno compatibility offset
  *

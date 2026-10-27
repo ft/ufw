@@ -65,10 +65,15 @@ if (WITH_CTYPE_H)
   check_symbol_exists(isprint "ctype.h" UFW_HAVE_CTYPE_ISPRINT)
 endif()
 
-check_include_file("unistd.h" WITH_UNISTD_H)
-if (WITH_UNISTD_H)
-  check_symbol_exists(read  "unistd.h" UFW_HAVE_POSIX_READ)
-  check_symbol_exists(write "unistd.h" UFW_HAVE_POSIX_WRITE)
+if (CONFIG_MINIMAL_LIBC AND "${CONFIG_MINIMAL_LIBC}" STREQUAL y)
+  set(UFW_HAVE_POSIX_READ 0)
+  set(UFW_HAVE_POSIX_WRITE 0)
+else()
+  check_include_file("unistd.h" WITH_UNISTD_H)
+  if (WITH_UNISTD_H)
+    check_symbol_exists(read  "unistd.h" UFW_HAVE_POSIX_READ)
+    check_symbol_exists(write "unistd.h" UFW_HAVE_POSIX_WRITE)
+  endif()
 endif()
 
 ufw_compiler_has_type(uint8_t WITH_UINT8_T)
@@ -84,6 +89,8 @@ else()
   set(UFW_COMPAT_HAVE_STRNLEN 0)
 endif()
 
+ufw_full_float_support(UFW_FULL_FLOAT_SUPPORT)
+
 configure_file("${PROJECT_SOURCE_DIR}/include/ufw/toolchain.h.in"
                "${PROJECT_BINARY_DIR}/include/ufw/toolchain.h" )
 
@@ -93,7 +100,6 @@ set(__ufw_sources src/allocator.c
                   src/endpoints/continuable-sink.c
                   src/endpoints/core.c
                   src/endpoints/instrumentable.c
-                  src/endpoints/posix.c
                   src/endpoints/trivial.c
                   src/length-prefix.c
                   src/hexdump.c
@@ -108,6 +114,12 @@ set(__ufw_sources src/allocator.c
                   src/vp/core.c
                   src/vp/internal.c)
 
+if (CONFIG_MINIMAL_LIBC AND "${CONFIG_MINIMAL_LIBC}" STREQUAL y)
+  message(STATUS "ufw: Zephyr minimal libc: Disabling POSIX endpoints")
+else()
+  list(APPEND __ufw_sources src/endpoints/posix.c)
+endif()
+
 if (WITH_UINT8_T)
   list(APPEND __ufw_sources src/octet-ring.c)
 endif()
@@ -119,7 +131,12 @@ set(__ufw_tap_sources src/test/memdiff.c
                       src/test/output-utils.c
                       src/test/tap.c)
 
-set(__ufw_sx_sources src/sx.c)
+if (CONFIG_MINIMAL_LIBC AND "${CONFIG_MINIMAL_LIBC}" STREQUAL y)
+  message(STATUS "ufw: Zephyr minimal libc: Disabling SX library")
+  set(__ufw_sx_sources)
+else()
+  set(__ufw_sx_sources src/sx.c)
+endif()
 
 set(__ufw_targets)
 
@@ -170,12 +187,17 @@ if (NOT ("${TOOLCHAIN_ID}" MATCHES "^ti-"))
 endif()
 
 add_library(ufw-tap STATIC ${__ufw_tap_sources})
-add_library(ufw-sx STATIC ${__ufw_sx_sources})
+
+if (__ufw_sx_sources)
+  add_library(ufw-sx STATIC ${__ufw_sx_sources})
+endif()
 
 foreach (__lib ufw-tap ufw-sx)
-  __ufw_setup(${__lib})
-  __ufw_sanitise(${__lib})
-  target_link_libraries(${__lib} PUBLIC ufw)
+  if (TARGET ${__lib})
+    __ufw_setup(${__lib})
+    __ufw_sanitise(${__lib})
+    target_link_libraries(${__lib} PUBLIC ufw)
+  endif()
 endforeach()
 
 if ("${PROJECT_TARGET_CPU}" STREQUAL "native")
@@ -188,11 +210,14 @@ if ("${PROJECT_TARGET_CPU}" STREQUAL "native")
   endif()
 
   add_library(ufw-tap-nosan STATIC ${__ufw_tap_sources})
-  add_library(ufw-sx-nosan STATIC ${__ufw_sx_sources})
-  foreach (__lib ufw-tap ufw-sx)
-    __ufw_setup(${__lib}-nosan)
-    target_link_libraries(${__lib}-nosan PUBLIC ufw-nosan)
-  endforeach()
+  __ufw_setup(ufw-tap-nosan)
+  target_link_libraries(ufw-tap-nosan PUBLIC ufw-nosan)
+
+  if (__ufw_sx_sources)
+    add_library(ufw-sx-nosan STATIC ${__ufw_sx_sources})
+    __ufw_setup(ufw-sx-nosan)
+    target_link_libraries(ufw-sx-nosan PUBLIC ufw-nosan)
+  endif()
 endif()
 
 if (UFW_ENABLE_DYNAMIC_LIBRARY)
